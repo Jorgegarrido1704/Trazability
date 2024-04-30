@@ -1,0 +1,23 @@
+body{
+    background-color: azure;
+}
+
+#divCir {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Set the height of the container to 100% of the viewport height */
+}
+canvas{
+    border: #000 solid 1px;
+}
+#bar{
+    padding-left: 150px;
+    align-items: center;
+    align-content: center;
+}
+.grap{
+text-align: center;
+align-items: center;
+align-content: center;
+}

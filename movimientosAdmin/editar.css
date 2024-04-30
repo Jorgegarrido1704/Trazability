@@ -1,0 +1,22 @@
+body{
+    width: 100%;
+    background-color: darkgray;
+}
+table{
+    width: 100%;
+
+}
+tr:hover{
+background-color: blanchedalmond;
+}
+tr,th{
+    background-color: antiquewhite;
+    text-align: center;
+}
+td{
+    background-color: cornsilk;
+    text-align: center;
+}
+input[type='text']{
+background-color: azure;
+}

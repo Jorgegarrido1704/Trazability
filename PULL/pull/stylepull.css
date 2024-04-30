@@ -1,0 +1,66 @@
+/* Reset some default margin and padding */
+body, h1, form {
+    margin: 0;
+    padding: 0;
+}
+
+/* Center the form vertically */
+#frm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+/* Style the form container */
+#frm form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    max-width: 300px;
+    text-align: center;
+}
+
+/* Style the form heading */
+#frm h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+/* Style the form labels */
+#frm label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+/* Style the form inputs */
+#frm input[type="text"],
+#frm input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+/* Style the submit button */
+#frm input[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#frm input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+#title {
+background-color: bisque;
+
+}

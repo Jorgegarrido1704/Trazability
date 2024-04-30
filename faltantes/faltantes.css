@@ -1,0 +1,37 @@
+.scan{
+    text-align: center;
+    align-items: center;
+}
+
+.table{
+    padding-top: 50px;
+ text-align: center;
+ align-items: center;   
+}
+table{
+    width: 100%;
+    text-align: center;
+    align-items: center;
+}
+body{
+    background-color: rgb(200, 248, 232);
+}
+th{
+    border: #000 2px solid;
+    background-color: aqua;
+}
+td{
+    border: #000 3px solid;
+}
+tr:hover{
+    background-color: blue;
+    color: aliceblue;
+}
+a{
+    text-decoration: none;
+    color: aliceblue;
+    
+}
+#Home{
+background-color: blueviolet;
+}

@@ -1,0 +1,16 @@
+table{
+    width: 100%;
+}
+th{
+    border: #000 solid 1px;
+}
+td{
+    border: #000 solid 1px;
+}
+body{
+    background-color: aquamarine;
+}
+tr:hover{
+    background-color: blueviolet;
+    color: aliceblue;
+}

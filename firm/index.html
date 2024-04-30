@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>CVTS By Jorge Garrido</title>
+</head>
+<style>
+    input{
+    border-radius: 20px;
+    align-items: center;
+    text-align: center;
+    
+}
+input::-webkit-input-placeholder{
+    text-align: center;
+}
+.container{
+    display: inline-block;
+    border:  solid 1px #000;
+    border-radius: solid 50px #000;
+    min-width: 100px;
+    background-color: whitesmoke;
+    max-width: 250px;
+}
+.links{
+    align-items: center;
+    text-align: center;
+}
+body{
+    width: 100%;
+    background-color: beige;
+}
+h1{
+    font-size: xxx-large;
+}
+h2{
+    font-size: xx-large;
+}
+input[type=submit]{
+    width: 100px;
+    height: 80px;
+}
+input[type=number]{
+    width: 50px;
+ 
+}
+
+.ex-container {
+        display: inline-block;
+        vertical-align: top; /* Align the containers at the top */
+        margin-right: 10px; /* Optional margin between containers */
+    }
+</style>
+<body>
+    <div><small><a href="../main/principal.php"><button>Home</button></a></small></div>
+    <div class="links"><a href="ff.php"><button>Por aprovar</button></a>  
+        
+        <div class="desv" align="center">
+    <div class="title"><h1>Requerimiento de material </h1></div>
+    <form  id="formula" action="registro.php" method="POST">
+    <div><label for="quien"><h2>Solicitado por:</label>
+        <input type="text" name="quien" id="quien" required>
+        <label for="area">Area:</label>
+        <input type="text" name="area" id="area" placeholder="Corte" required>
+       
+    
+        <h4>
+            <label for="cant">Cantidad de articulos a solicitar</label>
+            <input type="number" name="cant" id="cant" min='0' required onchange="generateElements()">
+        </h4>
+        
+    </div>
+    <div id="dynamicElementsContainer"></div>   
+    <div>
+       
+        <input type="hidden" name="evihidden" id="evihidden">
+        <input type="hidden" name="texthidden" id="texthidden">
+        <input type="hidden" name="acchidden" id="acchidden">
+        <input type="submit" name="enviar" id="enviar" value="Save">
+    </div>
+    </form>
+    
+    <script>
+        
+    function generateElements() {
+        var container = document.getElementById('dynamicElementsContainer');
+        var quantity = document.getElementById('cant').value;
+
+        // Clear previous dynamic elements
+        container.innerHTML = '';
+
+        for (var i = 0; i < quantity; i++) {
+            var dynamicElement = document.createElement('div');
+            dynamicElement.className = 'ex-container';
+
+            dynamicElement.innerHTML = `
+            <div class="make-maker"> 
+    <div class="ex-container">
+        <h4>
+            <label for="text${i}">Descripcion o link</label>
+            <div class="container">
+                <div id="text${i}" name="text${i}" required contenteditable="true" value></div>
+            </div>
+        </h4>
+    </div>
+    
+    <div class="ex-container">
+        <h4>
+            <label for="obs${i}">Observacion</label>
+            <div class="container">
+                <div id="obs${i}" name="obs${i}" contenteditable="true" value></div>
+            </div>
+        </h4>
+    </div>
+    
+    <div class="ex-container">
+        <h4>
+            <label for="cantOb${i}">Cantidad</label>
+            <input type="number" name="cantOb${i}" id="cantOb${i}" min="0" value="1">
+        </h4>
+    </div>
+    
+    <div class="ex-container">
+        <h4>
+            <label for="uni${i}">Unidad</label>
+            <select name="uni${i}" id="uni${i}">
+                <option value=""></option>
+                <option value="Ft">Ft</option>
+                <option value="In">In</option>
+                <option value="Mts">Mts</option>
+                <option value="mm">mm</option>
+                <option value="Kg">Kg</option>
+                <option value="Onz">onz</option>
+                <option value="Lts">Lts</option>
+                <option value="ml">ml</option>
+                <option value="pzs">pzs</option>
+            </select>
+        </h4>
+    </div>
+    
+    <div class="ex-container">
+        <div class="ex-container">
+            <h4>
+                <label for="nota${i}">Nota adicional</label>
+                <div class="container">
+                    <div id="nota${i}" name="nota${i}" contenteditable="true" value></div>
+                </div>
+            </h4>
+        </div>
+    </div>
+</div>
+            `;
+
+            container.appendChild(dynamicElement);
+        }
+    }
+
+        function cantidad() {
+            var cantidad = document.getElementById("cant").value;
+            if (cantidad <= 0) {
+                alert("No puede ingresar cantidades menores a 1 ");
+                document.getElementById("cant").value = 1;
+                console.log(cantidad);
+            }
+            // Add any additional logic here if needed
+        }
+   
+       
+        document.forms["formula"].onsubmit = function(){
+            // Collect data from dynamic elements
+            var dynamicData = [];
+            var quantity = document.getElementById('cant').value;
+
+            for (var i = 0; i < quantity; i++) {
+                var elementData = {
+                    text: document.getElementById(`text${i}`).innerHTML,
+                    obs: document.getElementById(`obs${i}`).innerHTML,
+                    cantOb: document.getElementById(`cantOb${i}`).value,
+                    uni: document.getElementById(`uni${i}`).value,
+                    nota: document.getElementById(`nota${i}`).innerHTML
+                };
+
+                dynamicData.push(elementData);
+            }
+
+            // Set the dynamic data as a JSON string to hidden input fields
+            document.getElementById('texthidden').value = JSON.stringify(dynamicData);
+
+            // Your existing form validation logic remains unchanged
+
+            // Return true to submit the form, or false to prevent submission
+            return true;}
+        
+    </script>
+     <footer>    <style>
+        .desv{
+            padding-bottom: 9.5%;
+        }
+        footer{            background-color: lightslategray;
+            color: aliceblue;
+            height: 20px;  
+            align-items: center;
+           width: 100%;                                }
+            p{                font: bold italic            } 
+            
+    </style>    <p>Created by Jorge Garrido</p></footer>
+</body>
+</html>

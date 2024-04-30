@@ -1,0 +1,13 @@
+html{
+    height: 100%;
+}
+
+table{
+    width: 100%;
+}
+#table{
+    align-items: center;
+    text-align: center;
+    align-content: center;
+    background-color: aqua ;
+}

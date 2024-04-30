@@ -1,0 +1,15 @@
+body{
+    width: 100%;
+    background-color: azure;
+}
+table{
+    width: 100%;
+}
+th{
+    border-bottom: 2px solid #000;
+    background-color: lightseagreen;
+}
+td:hover{
+    background-color: antiquewhite;
+}
+

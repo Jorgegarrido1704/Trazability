@@ -1,0 +1,19 @@
+body{
+    background-color: lightgoldenrodyellow;
+    width: 100%;
+}
+table{
+    width: 100%;
+    
+}
+td{
+    border-bottom: 2px chartreuse solid;
+    text-align: center;
+    align-items: center;
+}
+tr:hover{
+    background-color: yellow;
+}
+h1{
+    font-size: xx-large;
+}

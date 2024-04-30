@@ -1,0 +1,26 @@
+table{
+    width: 100%;
+    padding-top: 50px ;
+}
+.btn{
+    align-items: center;
+    text-align: center;
+
+}
+body{
+    background-color: azure;
+}
+th{
+    border: #000 solid  2px;
+}
+td{
+    border-bottom: #000 solid  2px;
+    text-align: center;
+    align-items: center ;
+}
+#Blue{
+    background-color: rgb(118, 118, 240);
+}
+#green{
+    background-color: aquamarine;
+}

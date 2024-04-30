@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styleindex.css">
+    <title>Buscar gráfica</title>
+</head>
+<body>
+    <form method="POST" id="send" onsubmit="buscar(); return false;">
+        <label for="calibre">Seleccione su calibre a graficar</label>
+        <select name="cal" id="cal">
+            <option value="10">10</option>
+            <option value="12">12</option>
+            <option value="14">14</option>
+            <option value="16">16</option>
+            <option value="18">18</option>
+            <option value="20">20</option>
+            <option value="22">22</option>
+        </select>
+        <input type="submit" value="enviar">
+    </form>
+
+    <script>
+        function buscar() {
+            var selectedValue = document.getElementById('cal').value;
+
+            if (selectedValue === "10") {
+                window.location.href = './gra10.html';
+            } else if(selectedValue === "12"){
+                window.location.href = './gra12.html';
+            } else if (selectedValue === "14") {
+                window.location.href = './gra14.html';
+            } else if(selectedValue === "16"){
+                window.location.href = './gra16.html';
+            } if (selectedValue === "18") {
+                window.location.href = './gra18.html';
+            } else if(selectedValue === "20"){
+                window.location.href = './gra20.html';
+            }else if (selectedValue === "22") {
+                window.location.href = './gra22.html';
+            } 
+        }
+    </script>
+</body>
+</html>

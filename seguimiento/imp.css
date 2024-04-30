@@ -1,0 +1,37 @@
+div.Fast{
+   
+   
+float: left;
+margin-right: 80px;
+border: 1px solid black;
+}
+div.ship,div.wo,div.date{
+    float: right;
+    margin-top: 5px;
+    border: 1px solid black;
+}
+div.client{
+    margin-top: 5px;
+    float: left;
+    border: 1px solid black;
+}
+
+table{
+    margin-top: 35px;
+    border: 2px solid black;
+width: 100%;
+}
+tr, td{
+    border: 1px solid black;
+    text-align: center;
+}
+p.codigo{
+    align-items: center;
+    text-align: center;
+    align-content: center;}
+    div.lista{
+        align-items: center;
+        text-align: center;
+        align-content: center;
+        
+    }

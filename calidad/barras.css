@@ -1,0 +1,40 @@
+body{
+    width: 100%;
+    background-color: azure
+}
+canvas{
+    border: 1px solid #ddd;
+
+}
+.grap{
+    align-items: center;
+    text-align: center;
+    flex: 1;
+}
+.graph-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+}
+
+
+.info {
+   /* flex: 1; /* Hace que el div con la información ocupe todo el espacio disponible */
+    margin-left: 15px; /* Puedes ajustar el margen según sea necesario */
+    width: 400px;
+    height: 20px;
+}
+
+/* Otros estilos para dar formato según tu diseño */
+.graph-container {
+    margin-top: 20px;
+}
+span{
+    font-size: xx-large;
+   
+}
+p{
+    width: 300px;
+    height: 110px;
+}

@@ -1,0 +1,36 @@
+.Titulo{
+    text-align: center;
+    
+}
+body{
+    background-attachment: fixed;
+    background-color: aquamarine;
+}
+table{
+    width: 100%;
+    background-color: rgb(151, 218, 195);
+}
+thead{
+    background-color: rgb(7, 161, 110);
+}
+tbody :hover{
+
+background-color: rgb(60, 230, 173);
+
+}
+td{
+    border-bottom: 1px #000 solid;
+}
+.form{
+    display: flex;
+    content: flex;
+}
+.grap{
+    align-items: center;
+    align-content: center;
+    text-align: center;
+}
+a{
+    text-decoration: none;
+    color: black;
+}

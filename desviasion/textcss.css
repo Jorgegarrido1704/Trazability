@@ -1,0 +1,32 @@
+input{
+    border-radius: 20px;
+    
+}
+input::-webkit-input-placeholder{
+    text-align: center;
+}
+.container{
+    display: inline-block;
+    border:  solid 1px #000;
+    border-radius: solid 50px #000;
+    min-width: 200px;
+    background-color: whitesmoke;
+}
+.links{
+    align-items: center;
+    text-align: center;
+}
+body{
+    width: 100%;
+    background-color: beige;
+}
+h1{
+    font-size: xxx-large;
+}
+h2{
+    font-size: xx-large;
+}
+input[type=submit]{
+    width: 100px;
+    height: 80px;
+}

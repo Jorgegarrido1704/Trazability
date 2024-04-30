@@ -1,0 +1,36 @@
+body{
+    width: auto;
+    height: auto;
+   background-color: aliceblue; 
+}
+h1{
+    font-size: xxx-large;
+}
+.title{
+    align-items: center;
+    text-align: center;
+}
+
+#contenedor{
+    display: inline-block;  
+    border: solid 3px #000;
+    min-width: 100px;
+    align-items: center;
+    text-align: center;
+    
+   
+  }
+  
+.divCont div{
+    align-items: center;
+    text-align: center;
+    
+}
+.work{
+    padding-top: 10px;
+}
+#req{
+    align-items: center;
+    text-align: center;
+    
+}

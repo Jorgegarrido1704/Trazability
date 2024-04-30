@@ -1,0 +1,76 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.align-center {
+    text-align: center;
+}
+
+#logout {
+    color: #007bff;
+    text-decoration: none;
+}
+
+#logout:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+form {
+    width: 70%;
+    margin: 0 auto;
+}
+
+form label {
+    display: inline-block;
+    width: 200px;
+    margin-right: 10px;
+    text-align: right;
+}
+
+form select,
+form input[type="text"],
+form input[type="password"] {
+    padding: 8px;
+    width: 60%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+form select {
+    width: 63.5%; /* Adjust to align with input fields */
+}
+
+form input[type="submit"] {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+form input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+#inputContainer {
+    margin-top: 10px;
+}
+
+/* Add more styles as needed */

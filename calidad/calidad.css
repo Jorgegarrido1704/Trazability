@@ -1,0 +1,60 @@
+body{
+    background-color: rgb(29, 177, 177);
+}
+h1{
+    align-items: center;
+    text-align: center;
+}
+h2{
+    align-items: center;
+    text-align: center;
+}
+
+#pruebanum{
+    align-content: center;
+    align-items: center;
+    
+    width: 50%; /* Adjust the width as needed */
+    margin: 0 auto; /* Center the div horizontally */
+    text-align: center;
+}
+#lprueba{
+    align-content: center;
+    align-items: center;
+}
+#container{
+    width: 50%; /* Adjust the width as needed */
+    margin: 0 auto; /* Center the div horizontally */
+    text-align: center;
+}
+input[type="number"]{
+    width: 60px;
+    padding-left: 10px;
+}
+
+#parciallabel{
+    margin-left: 30px;
+    
+}
+#parcial{
+    width: 40px
+}
+input[type="text"]{
+    padding-left: 10px;
+
+}
+.btn{
+    align-items: center;
+    text-align: center;
+}
+input[type="submit"]{
+align-items: center;
+text-align: center;
+width: 80px;
+height: 60px;
+
+}
+a{
+    align-items: center;
+    text-align: center;
+}

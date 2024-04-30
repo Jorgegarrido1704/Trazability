@@ -1,0 +1,95 @@
+/* tablastyle.css */
+
+/* Apply styles to the table */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* Style table headers */
+th {
+    background-color: #007BFF;
+    color: white;
+    text-align: left;
+    padding: 8px;
+}
+
+/* Style table cells */
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+/* Style alternating rows */
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Style the link */
+a#principal {
+    text-decoration: none;
+    color:white;
+}
+
+/* Style the header */
+h1 {
+    text-align: center;
+    color: #333;
+}
+/* Reset some default styles to ensure consistency */
+body, h1, h2, p, ul, li {
+    margin: 0;
+    padding: 0;
+}
+
+/* Set a background color for the entire page */
+body {
+    background-color: #f4f4f4;
+    font-family: Arial, sans-serif;
+}
+
+/* Style the header with a background color and text color */
+header {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+}
+
+/* Style the button in the header */
+button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 15px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* Style the form for date input */
+#fe {
+    text-align: center;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Style the submit button */
+#enviar {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Add some spacing between elements */
+small {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+}

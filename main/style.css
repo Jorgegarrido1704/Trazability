@@ -1,0 +1,36 @@
+ul {
+    list-style-type: none;
+    text-align: center;
+    background-position: top center;
+padding-left: 100px;
+}
+
+li {
+    float: left;
+    background-position: top center;
+    background-color: #F6E3CA;
+    margin-right: 10px;
+    border: #D7C8B6 2px solid;
+}
+
+body{
+    background-image: url(fth.jpg);
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-attachment: scroll;
+}
+small{
+    float: right;
+}
+div.links{
+    width: 100%;
+    height: 600px;
+    align-items: center;
+    text-align: center;
+
+}
+.title{
+    text-align: center;
+    align-items: center;
+    
+}
