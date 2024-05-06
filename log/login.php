@@ -6,6 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = $_POST['user'];
     $password = $_POST['pass'];
 $i=0;
+$users=$claves=[];
     $sql = "SELECT * FROM login";
    $stml=mysqli_prepare($con,$sql);
    mysqli_stmt_execute($stml);
@@ -13,18 +14,12 @@ $i=0;
    while($row=mysqli_fetch_array($result)){
     $user=$row['user'];
     $clave=$row['clave'];
-    $claves[$i]=$clave;
-    $users[$i]=$user;
+    
     $i++;
 
    }
-    if(in_array($username,$users)){
-        $countUser=1;
-    } 
-    if(in_array($password,$claves)){
-        $countPass=1;
-    }   
-    if ($countUser == 1 and $countPass==1) {
+     
+    if ($user !="" and $clave!="") {
         $log = "login";
         $_SESSION['usuario'] = $username; 
 
