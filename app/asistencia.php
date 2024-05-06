@@ -11,7 +11,7 @@ $dia3=date("d-m-y", strtotime("-4 day"));
 $dia4=date("d-m-y", strtotime("-3 day"));
 $dia5=date("d-m-y", strtotime("-2 day"));
 $datefin=date("d-m-y", strtotime("-1 day"));
-$week=17;
+$week=date("W", strtotime("-5 day"));
 $semana=$week-1;
 $lider="Angel_G";
 $departamento="Corte-Liberacion";
@@ -37,7 +37,7 @@ $sheet->setCellValue('g11', $dia4);
 $sheet->setCellValue('h11', $dia5);
 $sheet->setCellValue('i11', $datefin);
 
-$buscarinfo=mysqli_query($con,"SELECT * FROM assistence WHERE weeks='$week' and lider Like '$lider'");
+$buscarinfo=mysqli_query($con,"SELECT * FROM assistence WHERE week='$week' and lider Like '$lider'");
 $rows=mysqli_num_rows($buscarinfo);
 while($row=mysqli_fetch_array($buscarinfo)){
    $name= $row['name'];

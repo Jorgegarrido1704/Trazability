@@ -67,7 +67,56 @@ if((substr($rev,0,4)=='PPAP' or substr($rev,0,4)=='PRIM') and (substr($revp,0,4)
                         }  }           } }}        
 
 
-                      
+$buscarTimesharn=mysqli_query($con,"SELECT * FROM timesharn INNER JOIN registro  WHERE timesharn.wo=registro.wo ");
+while($rowdepu=mysqli_fetch_array($buscarTimesharn)){
+    $fechain=$rowdepu["fecha"];
+    if($rowdepu['cut']==NULL and ($rowdepu['count']=='2' or $rowdepu['count']=='3' )){
+        $update=mysqli_query($con,"UPDATE timesharn SET cut='$fechain' WHERE wo='$rowdepu[wo]'");
+    }else if($rowdepu['cutF']==NULL and ($rowdepu['count']=='2' or $rowdepu['count']=='3' )){
+        $info=$rowdepu['info'];
+        $buscarTiempos=mysqli_query($con,"SELECT * FROM tiempos WHERE info='$info'");
+        $rowt=mysqli_fetch_assoc($buscarTiempos);
+        $corte=$rowt["corte"];
+        $update=mysqli_query($con,"UPDATE timesharn SET cutF='$corte' WHERE wo='$rowdepu[wo]'");
+    }else if($rowdepu['term']==NULL and ($rowdepu['count']=='4' or $rowdepu['count']=='5' )){
+        $info=$rowdepu['info'];
+        $buscarTiempos=mysqli_query($con,"SELECT * FROM tiempos WHERE info='$info'");
+        $rowt=mysqli_fetch_assoc($buscarTiempos);
+        $corte=$rowt["corte"];
+        $update=mysqli_query($con,"UPDATE timesharn SET ensa='$corte' WHERE wo='$rowdepu[wo]'");
+    }else if($rowdepu['termF']==NULL and ($rowdepu['count']=='4' or $rowdepu['count']=='5' )){
+        $info=$rowdepu['info'];
+        $buscarTiempos=mysqli_query($con,"SELECT * FROM tiempos WHERE info='$info'");
+        $rowt=mysqli_fetch_assoc($buscarTiempos);
+        $corte=$rowt["liberacion"];
+        $update=mysqli_query($con,"UPDATE timesharn SET ensa='$corte' WHERE wo='$rowdepu[wo]'");
+    }else if($rowdepu['ensa']==NULL and ($rowdepu['count']=='6' or $rowdepu['count']=='7' )){
+        $info=$rowdepu['info'];
+        $buscarTiempos=mysqli_query($con,"SELECT * FROM tiempos WHERE info='$info'");
+        $rowt=mysqli_fetch_assoc($buscarTiempos);
+        $corte=$rowt["liberacion"];
+        $update=mysqli_query($con,"UPDATE timesharn SET ensa='$corte' WHERE wo='$rowdepu[wo]'");
+    }else if($rowdepu['ensaF']==NULL and ($rowdepu['count']=='6' or $rowdepu['count']=='7' )){
+        $info=$rowdepu['info'];
+        $buscarTiempos=mysqli_query($con,"SELECT * FROM tiempos WHERE info='$info'");
+        $rowt=mysqli_fetch_assoc($buscarTiempos);
+        $corte=$rowt["ensamble"];
+        $update=mysqli_query($con,"UPDATE timesharn SET ensa='$corte' WHERE wo='$rowdepu[wo]'");
+    }else if($rowdepu['loom']==NULL and ($rowdepu['count']=='8' or $rowdepu['count']=='9' )){
+        $info=$rowdepu['info'];
+        $buscarTiempos=mysqli_query($con,"SELECT * FROM tiempos WHERE info='$info'");
+        $rowt=mysqli_fetch_assoc($buscarTiempos);
+        $corte=$rowt["liberacion"];
+        $update=mysqli_query($con,"UPDATE timesharn SET ensa='$corte' WHERE wo='$rowdepu[wo]'");
+    }else if($rowdepu['loomF']==NULL and ($rowdepu['count']=='8' or $rowdepu['count']=='9' )){
+        $info=$rowdepu['info'];
+        $buscarTiempos=mysqli_query($con,"SELECT * FROM tiempos WHERE info='$info'");
+        $rowt=mysqli_fetch_assoc($buscarTiempos);
+        $corte=$rowt["ensamble"];
+        $update=mysqli_query($con,"UPDATE timesharn SET ensa='$corte' WHERE wo='$rowdepu[wo]'");
+    }
+}
+                
 
 
 $busq="SELECT * FROM registro WHERE  count= '20' ";
