@@ -34,8 +34,13 @@ $cliente=$row['cliente'];
 $np=$row['np'];
 
 $defecto=$row['defecto'];
+if($row['timeIni']!="No Aun" && $row['timeFin']!='No Aun'){
 $timeIni=date("d-m-Y H:i", ($row['timeIni'] ));
 $timeFin=date("d-m-Y H:i", ($row['timeFin'] ));
+}else if($row['timeIni']!="No Aun" && $row['timeFin']=='No Aun'){
+    $timeIni=date("d-m-Y H:i", ($row['timeIni'] ));
+$timeFin="Activa";}
+
 $total=$row['Total'];
 $who=$row['whoDet'];
 $respArea=$row['respArea'];
