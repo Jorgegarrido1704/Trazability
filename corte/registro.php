@@ -1,7 +1,7 @@
 <?php
 require "../app/conection.php";
 
-$buscar=mysqli_query($con,"SELECT * FROM registro ");
+$buscar=mysqli_query($con,"SELECT * FROM registro WHERE count<4");
 while($row=mysqli_fetch_array($buscar)){
     $pn=$row['NumPart'];
     $client=$row['cliente'];
@@ -24,6 +24,6 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn'");
         $codigo=substr($wo,2).substr($cons,5);
 
         }else{ $codigo=substr($wo,2).$cons;}
-    echo $pn." ".$client." ".$wo." ".$cons." ".$tipo." ".$aws." ".$color." ".$codigo." ".$term1." ".$term2." ".$dataForm." ".$dataTo." ".$cuantos."<br> ";
+    echo $pn." ".$client." ".$wo." ".$cons." ".$tipo." ".$aws." ".$color." ".$codigo." ".$term1." ".$term2." ".$dataForm." ".$dataTo." ".$cuantos." ".$tamano."<br><br> ";
     $insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`, `term2`, `dataFrom`, `dataTo`, `qty`, `tamano`) VALUES ('$pn','$client','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$term2','$dataForm','$dataTo','$cuantos','$tamano')");
 }}
