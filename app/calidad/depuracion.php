@@ -1,7 +1,7 @@
 <?php 
 
 date_default_timezone_set("America/Mexico_City");
-require "../app/conection.php";
+require "../conection.php";
 $busc="SELECT * FROM calidad";
 $qry=mysqli_query($con,$busc);
 while($row=mysqli_fetch_array($qry)){
