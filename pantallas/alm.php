@@ -11,6 +11,10 @@ require "../app/conection.php";
         th{       text-align: center;   font-size: xx-large; border-radius: 5px; }
         thead{    background-color: lightcyan; border-radius: 15%; }
         td{       text-align: center;   font-size: xx-large; border-radius: 5px; }
+        #trid{ background-color: red;}
+        #ama{    background-color: yellow;     }
+        #green{  background-color: orange;     }
+        
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,16 +31,64 @@ require "../app/conection.php";
         </thead>
         <tbody>
             <?php
-$busqueda=mysqli_query($con,"SELECT * FROM kitenespera  WHERE status!='Completo' ");
+        $busqueda=mysqli_query($con,"SELECT * FROM kitenespera 
+
+WHERE QuienSolicita != 'No Aun' AND fechaSalida = 'No Aun'");
             while($row=mysqli_fetch_array($busqueda)){
                 $np=$row['np'];
                 $wo=$row['wo'];
                 $status=$row['status'];
                 $fechaCreation=$row['fechaCreation'];
                 $quien=$row['Quien'];
-                $fechaSalida=$row['fechaSalida'];
+                if($fechaCreation!='No Aun'){
+                    $fechaCreation=date("d-m-Y H:i", $fechaCreation);
+                }
             ?>
-            <tr>
+            <tr id="green">
+                <td><?php echo $np; ?></td>
+                <td><?php echo $wo; ?></td>
+                <td><?php echo $status; ?></td>
+                <td><?php echo $fechaCreation; ?></td>
+            </tr>
+            <?php }
+$busqueda=mysqli_query($con,"SELECT *FROM kitenespera 
+INNER JOIN kits ON kits.wo = kitenespera.wo 
+WHERE kitenespera.status = 'Completo' AND kitenespera.fechaSalida = 'No Aun'");
+            while($row=mysqli_fetch_array($busqueda)){
+                $np=$row['numeroParte'];
+                $wo=$row['wo'];
+                $status=$row['status'];
+                $fechaCreation=$row['fechaIni'];
+                $quien=$row['usuario'];
+                if($fechaCreation!='No Aun'){
+                    $fechaCreation=date("d-m-Y H:i", $fechaCreation);
+                }
+            ?>
+            <tr id="trid">
+                <td><?php echo $np; ?></td>
+                <td><?php echo $wo; ?></td>
+                <td><?php echo $status; ?></td>
+                <td><?php echo $fechaCreation; ?></td>
+            </tr>
+            <?php }
+$busqueda=mysqli_query($con,"SELECT * FROM kits  WHERE status!='Completo' ");
+            while($row=mysqli_fetch_array($busqueda)){
+                $np=$row['numeroParte'];
+                $wo=$row['wo'];
+                $status=$row['status'];
+                $fechaCreation=$row['fechaIni'];
+                $quien=$row['usuario'];
+                if($fechaCreation!='No Aun'){
+                    $fechaCreation=date("d-m-Y H:i", $fechaCreation);
+                }
+                if($status=="Parcial"){
+                    $Col="ama";
+                }else{
+                    $Col="no";
+                }
+
+            ?>
+            <tr id="<?php echo $Col;?>">
                 <td><?php echo $np; ?></td>
                 <td><?php echo $wo; ?></td>
                 <td><?php echo $status; ?></td>
