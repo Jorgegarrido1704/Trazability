@@ -2,6 +2,11 @@
 require "../app/conection.php";
 $num=isset($_GET['Num']) ? $_GET['Num'] : "";
 $cons1=isset($_GET['cons1'])? $_GET['cons1'] :"";
+if($cons1!=''){
+    $cons=explode('-',$cons1);
+    $consIn=$cons[0];
+    $consFin=$cons[1];
+}
 $id=isset($_POST['id']) ? $_POST['id'] :[];
 $cons=isset($_POST['cons']) ? $_POST['cons'] :[];
 $tipo=isset($_POST['tipo']) ? $_POST['tipo'] :[];
@@ -18,7 +23,7 @@ $dataTo=isset($_POST['dataTo']) ? $_POST['dataTo'] :[];
 if($id!=""){
     
     for($i=0;$i<count($id);$i++){
-        echo    "id: ".$id[$i]." tipo: ".$tipo[$i]." cons: ".$cons[$i]." aws: ".$aws[$i]." color: ".$color[$i]." tamano: ".$tamano[$i]." strip1: ".$strip1[$i]." terminal1: ".$terminal1[$i]." strip2: ".$strip2[$i]." terminal2: ".$terminal2[$i]." conector: ".$conector[$i]." detaFrom: ".$dataFrom[$i]." dataTO: ".$dataTo[$i]."<br>";     
+    $update=mysqli_query($con,"UPDATE listascorte SET tipo='$tipo[$i]',aws='$aws[$i]',color='$color[$i]',tamano='$tamano[$i]',strip1='$strip1[$i]', terminal1='$terminal1[$i]',strip2='$strip2[$i]',terminal2='$terminal2[$i]',conector='$conector[$i]',dataFrom='$dataFrom[$i]',dataTo='$dataTo[$i]' WHERE id='$id[$i]'");    
      }
 }
 
@@ -63,7 +68,7 @@ if($id!=""){
             <tbody>
             <?php if($cons1==''){
             $BuscarInfo=mysqli_query($con,"SELECT * from listascorte WHERE pn='$num' ");
-      }else{$BuscarInfo=mysqli_query($con,"SELECT * from listascorte WHERE pn='$num' AND cons='$cons1' ");}
+      }else if($cons1!=''){$BuscarInfo=mysqli_query($con,"SELECT * from listascorte WHERE pn='$num' AND cons>='$consIn' AND cons<='$consFin'  ");}
       while($row=mysqli_fetch_array($BuscarInfo)){?>
                 <form action="modificacionLista.php" method="POST">
                 <tr>
