@@ -38,7 +38,7 @@ if($id!=""){
 </head>
 <body>
     <?php 
-    if($num=="" ){ ?>
+    if($num==""  ){ ?>
     <form action="modificacionLista.php" method="GET">
         <label for="Num">Part Number: </label>
         <input type="text" name="Num" id="Num">
