@@ -1,3 +1,8 @@
 <?php 
 require "../app/conection.php";
-$delte=mysqli_query($con,"DELETE FROM listascorte WHERE pn='911035'");
+$lista=isset($_GET['elim'])?$_GET['elim']:"";
+$lista=strtoupper($lista);
+if($lista!=""){
+$delte=mysqli_query($con,"DELETE FROM listascorte WHERE pn='$lista'");
+header("location:busqueda.php");
+}

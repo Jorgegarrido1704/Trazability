@@ -31,5 +31,7 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn'");
 }}
 if($insertar){
     echo "<br><br><h1>Se Agregaron correctamente Correctamente</h1>";
+    header("location:busqueda.php");
 }
+
 }

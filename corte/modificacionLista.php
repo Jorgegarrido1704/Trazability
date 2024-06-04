@@ -2,7 +2,9 @@
 require "../app/conection.php";
 $num=isset($_GET['Num']) ? $_GET['Num'] : "";
 $cons1=isset($_GET['cons1'])? $_GET['cons1'] :"";
+$num=strtoupper($num);
 if($cons1!=''){
+    $cons1=str_replace([',','_',';','/'],'-',$cons1);
     $cons=explode('-',$cons1);
     $consIn=$cons[0];
     $consFin=$cons[1];
@@ -21,32 +23,32 @@ $conector=isset($_POST['conector']) ? $_POST['conector'] :[];
 $dataFrom=isset($_POST['dataFrom']) ? $_POST['dataFrom'] :[];
 $dataTo=isset($_POST['dataTo']) ? $_POST['dataTo'] :[];
 if($id!=""){
-    
+    $update="";
     for($i=0;$i<count($id);$i++){
     $update=mysqli_query($con,"UPDATE listascorte SET tipo='$tipo[$i]',aws='$aws[$i]',color='$color[$i]',tamano='$tamano[$i]',strip1='$strip1[$i]', terminal1='$terminal1[$i]',strip2='$strip2[$i]',terminal2='$terminal2[$i]',conector='$conector[$i]',dataFrom='$dataFrom[$i]',dataTo='$dataTo[$i]' WHERE id='$id[$i]'");    
      }
+    if($update!=""){
+        header("location:busqueda.php");
+    }
 }
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        table{
+            width: 100%;
+        }
+    </style>
     <title>AjusteLista</title>
 </head>
 <body>
-    <?php 
-    if($num==""  ){ ?>
-    <form action="modificacionLista.php" method="GET">
-        <label for="Num">Part Number: </label>
-        <input type="text" name="Num" id="Num">
-        <label for="cons1">Consecutivo: </label>
-        <input type="text" name="cons1" id="cons1">
-        <input type="submit" name="value" id="value" value="Buscar">
-    </form>    
-      <?php }else { ?>
+    
         <table>
             <thead>
                 <tr>
@@ -94,6 +96,5 @@ if($id!=""){
         </table>
         
         
-        <?php }?>
 </body>
 </html>
