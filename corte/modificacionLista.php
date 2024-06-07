@@ -55,14 +55,14 @@ if($id!=""){
                     <th>Part Number</th>
                     <th>cons</th>
                     <th>tipo</th> 
-                    <th>aws</th>
+                    <th>awg</th>
                     <th>color</th>
                     <th>tamano</th>
                     <th>strp1</th>
                     <th>term1</th>
                     <th>strp2</th>
                     <th>term2</th>
-                    <th>conector</th>
+                    <th>estampado</th>
                     <th>from</th>
                     <th>to</th>    
                 </tr>
