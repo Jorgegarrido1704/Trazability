@@ -20,6 +20,8 @@ $sheet->setCellValue('D1', 'Numero de Parte');
 $sheet->setCellValue('E1', 'Cantidad');
 $sheet->setCellValue('F1', 'Codigo');
 $sheet->setCellValue('G1', 'Serial');
+$sheet->setCellValue('H1', 'Responsable');
+
 
 $buscarinfo=mysqli_query($con,"SELECT * FROM regsitrocalidad ");
 $rows=mysqli_num_rows($buscarinfo);
@@ -32,6 +34,7 @@ while($row=mysqli_fetch_array($buscarinfo)){
     $fecha=$row['fecha'];
     $client=$row['client'];
     $info=$row['info'];
+    $resp=$row['Responsable'];
     $fechas=strtotime($fecha);
 if($fechas<=$date && $fechas>=$lastweek){
 $sheet->setCellValue('A'.$t, $id);
@@ -41,6 +44,7 @@ $sheet->setCellValue('D'.$t, $parte);
 $sheet->setCellValue('E'.$t, $qty);
 $sheet->setCellValue('F'.$t, $codigo);
 $sheet->setCellValue('G'.$t, $prueba);
+$sheet->setCellValue('H'.$t, $prueba);
 
 $t++;}}
 
