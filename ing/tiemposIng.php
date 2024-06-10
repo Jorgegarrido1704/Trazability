@@ -1,6 +1,6 @@
 <?php
-require "conection.php";
-require 'vendor/autoload.php'; 
+require "../app/conection.php";
+require '../app/vendor/autoload.php'; 
 date_default_timezone_set("America/Mexico_City");
 $today=date("d-m-Y");
 $year=strtotime("01-01-2024");
@@ -13,40 +13,37 @@ $lastweek=$date-$last;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 $spreadsheet = new Spreadsheet();$sheet = $spreadsheet->getActiveSheet();$t=2;
-$sheet->setCellValue('A1', 'Folio');
+$sheet->setCellValue('A1', 'Ingeniero');
 $sheet->setCellValue('B1', 'Fecha');
-$sheet->setCellValue('C1', 'Cliente');
-$sheet->setCellValue('D1', 'Numero de Parte');
-$sheet->setCellValue('E1', 'Cantidad');
-$sheet->setCellValue('F1', 'Codigo');
-$sheet->setCellValue('G1', 'Serial');
-$sheet->setCellValue('H1', 'Responsable');
+$sheet->setCellValue('C1', 'fin');
+$sheet->setCellValue('D1', 'actividades');
+$sheet->setCellValue('E1', 'descripcion');
+$sheet->setCellValue('f1', 'minutos');
 
 
-$buscarinfo=mysqli_query($con,"SELECT * FROM regsitrocalidad ");
+
+$buscarinfo=mysqli_query($con,"SELECT * FROM ingactividades ");
 $rows=mysqli_num_rows($buscarinfo);
 while($row=mysqli_fetch_array($buscarinfo)){
-    $parte=$row['pn'];
-    $qty=$row['resto'];
-    $codigo=$row['codigo'];
-    $prueba=$row['prueba'];
-    $id=$row['id'];
+    $id=$row['Id_request'];
     $fecha=$row['fecha'];
-    $client=$row['client'];
-    $info=$row['info'];
-    $resp=$row['Responsable'];
-    $fechas=strtotime($fecha);
-if($fechas<=$date && $fechas>=$lastweek){
+    $fin=$row['finT'];
+    $actividades=$row['actividades'];
+    $desciption=$row['desciption'];
+    if(!empty($fin)){
+    $min=(strtotime($fin)-strtotime($fecha))/60;
+}else {
+    $min=0;
+}
 $sheet->setCellValue('A'.$t, $id);
-$sheet->setCellValue('B'.$t, $fecha);
-$sheet->setCellValue('C'.$t, $client);
-$sheet->setCellValue('D'.$t, $parte);
-$sheet->setCellValue('E'.$t, $qty);
-$sheet->setCellValue('F'.$t, $codigo);
-$sheet->setCellValue('G'.$t, $prueba);
-$sheet->setCellValue('H'.$t, $resp);
+$sheet->setCellValue('B'.$t, str_replace("-","/",substr( $fecha,0, 10,)));
+$sheet->setCellValue('C'.$t, str_replace("-","/",substr($fin,0, 10,)));
+$sheet->setCellValue('D'.$t, $actividades);
+$sheet->setCellValue('E'.$t, $desciption);
+$sheet->setCellValue('f'.$t, $min);
 
-$t++;}}
+
+$t++;}
 
 
 // Dynamic Sheet
@@ -89,7 +86,7 @@ $t++;}}
 
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment;filename="Calidad  WEEK: '.$week.'.xlsx"');
+header('Content-Disposition: attachment;filename="Tiempos Ing.xlsx"');
 header('Cache-Control: max-age=0');
 
 $writer->save('php://output');
