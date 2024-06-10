@@ -14,33 +14,37 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 $spreadsheet = new Spreadsheet();$sheet = $spreadsheet->getActiveSheet();$t=2;
 $sheet->setCellValue('A1', 'Ingeniero');
-$sheet->setCellValue('B1', 'Fecha');
-$sheet->setCellValue('C1', 'fin');
-$sheet->setCellValue('D1', 'actividades');
-$sheet->setCellValue('E1', 'descripcion');
-$sheet->setCellValue('f1', 'minutos');
+$sheet->setCellValue('B1', 'Mes');
+$sheet->setCellValue('C1', 'Fecha');
+$sheet->setCellValue('D1', 'fin');
+$sheet->setCellValue('E1', 'actividades');
+$sheet->setCellValue('f1', 'descripcion');
+$sheet->setCellValue('g1', 'minutos');
 
 
 
 $buscarinfo=mysqli_query($con,"SELECT * FROM ingactividades ");
 $rows=mysqli_num_rows($buscarinfo);
 while($row=mysqli_fetch_array($buscarinfo)){
-    $id=$row['Id_request'];
+    $id=$row['Id_request']; 
     $fecha=$row['fecha'];
     $fin=$row['finT'];
     $actividades=$row['actividades'];
     $desciption=$row['desciption'];
+    $mes=substr($fecha,3,2);
     if(!empty($fin)){
     $min=(strtotime($fin)-strtotime($fecha))/60;
+
 }else {
     $min=0;
 }
 $sheet->setCellValue('A'.$t, $id);
-$sheet->setCellValue('B'.$t, str_replace("-","/",substr( $fecha,0, 10,)));
-$sheet->setCellValue('C'.$t, str_replace("-","/",substr($fin,0, 10,)));
-$sheet->setCellValue('D'.$t, $actividades);
-$sheet->setCellValue('E'.$t, $desciption);
-$sheet->setCellValue('f'.$t, $min);
+$sheet->setCellValue('b'.$t, $mes);
+$sheet->setCellValue('c'.$t, str_replace("-","/",substr( $fecha,0, 10,)));
+$sheet->setCellValue('d'.$t, str_replace("-","/",substr($fin,0, 10,)));
+$sheet->setCellValue('e'.$t, $actividades);
+$sheet->setCellValue('f'.$t, $desciption);
+$sheet->setCellValue('g'.$t, $min);
 
 
 $t++;}
