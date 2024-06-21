@@ -1,6 +1,7 @@
 <?php 
 
 require "../app/conection.php";
+require "ingclass.php";
 
 function array_in_string($array, $string) {
     foreach ($array as $item) {
@@ -39,22 +40,20 @@ while ($rowo = mysqli_fetch_array($buscawo)) {
             $conteo_cable[$recop] += $tamano;
         }
        
-        if (array_in_string($nome, $terminal1)) {
+       
             if (!array_key_exists($terminal1, $terminales)) {
                 $terminales[$terminal1] = 1;
             } else {
                 $terminales[$terminal1] += 1;
             }
-        }
+        
 
-        if (array_in_string($nome, $terminal2)) {
             if (!array_key_exists($terminal2, $terminales)) {
                 $terminales[$terminal2] = 1;
             } else {
                 $terminales[$terminal2] += 1;
             }
-            
-        }}
+    }
         }    
     
 

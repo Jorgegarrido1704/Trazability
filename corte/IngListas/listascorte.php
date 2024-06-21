@@ -1,6 +1,6 @@
 <?php
-require "../app/conection.php";
-require '../app/vendor/autoload.php'; 
+require "../../app/conection.php";
+require '../../app/vendor/autoload.php'; 
 
 $numero=isset($_GET['wo'])?$_GET['wo']:"007877";
 date_default_timezone_set("America/Mexico_City");
@@ -17,7 +17,7 @@ $spreadsheet = IOFactory::load($archivo);
 $sheet = $spreadsheet->getActiveSheet();$t=11;$i=1;$total=0;$diseño=0;
 $control="";
 $count=1;
-$buscawo=mysqli_query($con,"SELECT * FROM registro WHERE wo='$numero'");
+$buscawo=mysqli_query($con,"SELECT * FROM registro WHERE wo=''");
 while($rowo=mysqli_fetch_array($buscawo)){
     $pn=$rowo['NumPart'];
     $client=$rowo['cliente'];
