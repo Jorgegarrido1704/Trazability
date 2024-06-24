@@ -26,51 +26,51 @@ for($i=1;$i<=$consTotal;$i++){
     $addLista=new listaCorte();
    $addLista->insert($con,strtoupper($pn),strtoupper($tipo_cons[$i]),$cons[$i],strtoupper($tipo[$i]),$awg[$i],strtoupper($color[$i]),$tamano[$i],strtoupper($term1[$i]),strtoupper($sello1[$i]),strtoupper($term2[$i]),strtoupper($sello2[$i]),strtoupper($est[$i]),strtoupper($from[$i]),strtoupper($to[$i]),strtoupper($komment[$i])); 
    if ($tamano[$i] != 0) {
-    $recop = $tipo[$i] . "," . $awg[$i] . "," . $color[$i];
+    $recop = strtoupper($tipo[$i]) . "," . strtoupper($awg[$i]) . "," . strtoupper($color[$i]);
     if (!array_key_exists($recop, $conteo_cable)) {
         $conteo_cable[$recop] = floatval($tamano[$i]);
     } else {
         $conteo_cable[$recop] += floatval($tamano[$i]);
     }
 }
-if ($term1[$i] != "") {
-if(explode(" ",$term1[$i])){
-    $term1[$i]=explode(" ",$term1[$i])[0];
+if (strtoupper($term1[$i]) != "") {
+if(explode(" ",strtoupper($term1[$i]))){
+    strtoupper($term1[$i])=explode(" ",strtoupper($term1[$i]))[0];
 }
-if (!array_key_exists($term1[$i], $terminales)) {
-    $terminales[$term1[$i]] = 1;
+if (!array_key_exists(strtoupper($term1[$i]), $terminales)) {
+    $terminales[strtoupper($term1[$i])] = 1;
 } else {
-    $terminales[$term1[$i]] += 1;
+    $terminales[strtoupper($term1[$i])] += 1;
 }
 }
-if ($term2[$i] != "") {
-if(explode(" ",$term2[$i])){
-    $term2[$i]=explode(" ",$term2[$i])[0];
+if (strtoupper($term2[$i]) != "") {
+if(explode(" ",strtoupper($term2[$i]))){
+    strtoupper($term2[$i])=explode(" ",strtoupper($term2[$i]))[0];
 }
-if (!array_key_exists($term2[$i], $terminales)) {
-    $terminales[$term2[$i]] = 1;
+if (!array_key_exists(strtoupper($term2[$i]), $terminales)) {
+    $terminales[strtoupper($term2[$i])] = 1;
 } else {
-    $terminales[$term2[$i]] += 1;
+    $terminales[strtoupper($term2[$i])] += 1;
 }
 }
-if ($sello1[$i] != "") {
-if(explode(" ",$sello1[$i])){
-    $sello1[$i]=explode(" ",$sello1[$i])[0];
+if (strtoupper($sello1[$i]) != "") {
+if(explode(" ",strtoupper($sello1[$i]))){
+    strtoupper($sello1[$i])=explode(" ",strtoupper($sello1[$i]))[0];
 }
-if (!array_key_exists($sello1[$i], $sellos)) {
-    $sellos[$sello1[$i]] = 1;
+if (!array_key_exists(strtoupper($sello1[$i]), $sellos)) {
+    $sellos[strtoupper($sello1[$i])] = 1;
 } else {
-    $sellos[$sello1[$i]] += 1;
+    $sellos[strtoupper($sello1[$i])] += 1;
 }
 }
-if ($sello2[$i] != "") {
-if(explode(" ",$sello2[$i])){
-    $sello2[$i]=explode(" ",$sello2[$i])[0];
+if (strtoupper($sello2[$i]) != "") {
+if(explode(" ",strtoupper($sello2[$i]))){
+    strtoupper($sello2[$i])=explode(" ",strtoupper($sello2[$i]))[0];
 }
-if (!array_key_exists($sello2[$i], $sellos)) {
-    $sellos[$sello2[$i]] = 1;
+if (!array_key_exists(strtoupper($sello2[$i]), $sellos)) {
+    $sellos[strtoupper($sello2[$i])] = 1;
 } else {
-    $sellos[$sello2[$i]] += 1;
+    $sellos[strtoupper($sello2[$i])] += 1;
 }
 }
 }
