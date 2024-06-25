@@ -20,11 +20,12 @@ $sello2=isset($_POST['sello2']) ? $_POST['sello2'] : [];
 $est=isset($_POST['est']) ? $_POST['est'] : [];
 $from=isset($_POST['from']) ? $_POST['from'] : [];
 $to=isset($_POST['to']) ? $_POST['to'] : [];
-$komment=isset($_POST['komment']) ? $_POST['komment'] : [];
+$nota1=isset($_POST['nota1']) ? $_POST['nota1'] : [];
+$nota2=isset($_POST['nota2']) ? $_POST['nota2'] : [];
 $consTotal=isset($_POST['consTotal']) ? $_POST['consTotal'] : "";
 for($i=1;$i<=$consTotal;$i++){
     $addLista=new listaCorte();
-   $addLista->insert($con,strtoupper($pn),strtoupper($tipo_cons[$i]),$cons[$i],strtoupper($tipo[$i]),$awg[$i],strtoupper($color[$i]),$tamano[$i],strtoupper($term1[$i]),strtoupper($sello1[$i]),strtoupper($term2[$i]),strtoupper($sello2[$i]),strtoupper($est[$i]),strtoupper($from[$i]),strtoupper($to[$i]),strtoupper($komment[$i])); 
+   $addLista->insert($con,strtoupper($pn),strtoupper($tipo_cons[$i]),$cons[$i],strtoupper($tipo[$i]),$awg[$i],strtoupper($color[$i]),$tamano[$i],strtoupper($term1[$i]),strtoupper($sello1[$i]),strtoupper($nota1[$i]),strtoupper($term2[$i]),strtoupper($sello2[$i]),strtoupper($nota2[$i]),strtoupper($est[$i]),strtoupper($from[$i]),strtoupper($to[$i])); 
    if ($tamano[$i] != 0) {
     $recop = strtoupper($tipo[$i]) . "," . strtoupper($awg[$i]) . "," . strtoupper($color[$i]);
     if (!array_key_exists($recop, $conteo_cable)) {
@@ -35,7 +36,7 @@ for($i=1;$i<=$consTotal;$i++){
 }
 if (strtoupper($term1[$i]) != "") {
 if(explode(" ",strtoupper($term1[$i]))){
-    strtoupper($term1[$i])=explode(" ",strtoupper($term1[$i]))[0];
+$term1[$i]=explode(" ",$term1[$i])[0];
 }
 if (!array_key_exists(strtoupper($term1[$i]), $terminales)) {
     $terminales[strtoupper($term1[$i])] = 1;
@@ -45,7 +46,7 @@ if (!array_key_exists(strtoupper($term1[$i]), $terminales)) {
 }
 if (strtoupper($term2[$i]) != "") {
 if(explode(" ",strtoupper($term2[$i]))){
-    strtoupper($term2[$i])=explode(" ",strtoupper($term2[$i]))[0];
+    $term2[$i]=explode(" ",$term2[$i])[0];
 }
 if (!array_key_exists(strtoupper($term2[$i]), $terminales)) {
     $terminales[strtoupper($term2[$i])] = 1;
@@ -55,7 +56,7 @@ if (!array_key_exists(strtoupper($term2[$i]), $terminales)) {
 }
 if (strtoupper($sello1[$i]) != "") {
 if(explode(" ",strtoupper($sello1[$i]))){
-    strtoupper($sello1[$i])=explode(" ",strtoupper($sello1[$i]))[0];
+    $sello1[$i]=explode(" ",$sello1[$i])[0];
 }
 if (!array_key_exists(strtoupper($sello1[$i]), $sellos)) {
     $sellos[strtoupper($sello1[$i])] = 1;
@@ -65,7 +66,7 @@ if (!array_key_exists(strtoupper($sello1[$i]), $sellos)) {
 }
 if (strtoupper($sello2[$i]) != "") {
 if(explode(" ",strtoupper($sello2[$i]))){
-    strtoupper($sello2[$i])=explode(" ",strtoupper($sello2[$i]))[0];
+    $sello2[$i]=explode(" ",$sello2[$i])[0];
 }
 if (!array_key_exists(strtoupper($sello2[$i]), $sellos)) {
     $sellos[strtoupper($sello2[$i])] = 1;
@@ -113,34 +114,39 @@ foreach ($sellos as $key => $value) {
     <label for="cons">Indique el número de consecutivos</label>
     <input type="number" name="cons" id="cons" onchange="consect()">
     <div id="consecutivos">
-
     </div>
+    <script>
+        function consect() {
+            var contest = parseInt(document.getElementById('cons').value);
+            var tableContainer = document.getElementById('consecutivos');
+            var existingRows = tableContainer.querySelectorAll('tbody tr');
+            var existingRowCount = existingRows.length;
+
+            var htmls = '<form method="POST" action="#"><input type="text" id="pn" name="pn"><table><thead><tr><th>tipo-cons</th><th>consecutivo</th><th>tipo</th><th>awg</th><th>color</th><th>tamaño</th><th>terminal1</th><th>sello1</th><th>nota1</th><th>terminal2</th><th>sello2</th><th>nota2</th><th>Estampado</th><th>From</th><th>To</th></tr></thead><tbody>';
+
+            for (var i = 1; i <= contest; i++) {
+                htmls += '<tr>' +
+                    '<td><input type="text" name="tipo_cons[' + i + ']" id="tipo_cons_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#tipo_cons_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="cons[' + i + ']" id="cons_' + i + '" value="' + i + '"></td>' +
+                    '<td><input type="text" name="tipo[' + i + ']" id="tipo_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#tipo_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="awg[' + i + ']" id="awg_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#awg_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="color[' + i + ']" id="color_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#color_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="tamano[' + i + ']" id="tamano_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#tamano_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="term1[' + i + ']" id="term1_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#term1_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="sello1[' + i + ']" id="sello1_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#sello1_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="nota1[' + i + ']" id="nota1_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#nota1_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="term2[' + i + ']" id="term2_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#term2_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="sello2[' + i + ']" id="sello2_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#sello2_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="nota2[' + i + ']" id="nota2_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#nota2_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="est[' + i + ']" id="est_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#est_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="from[' + i + ']" id="from_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#from_' + i).value : '') + '"></td>' +
+                    '<td><input type="text" name="to[' + i + ']" id="to_' + i + '" value="' + (existingRows[i - 1] ? existingRows[i - 1].querySelector('#to_' + i).value : '') + '"></td>' +
+                    '</tr>';
+            }
+
+            htmls += '</tbody></table><input type="hidden" name="consTotal" id="consTotal" value="' + contest + '"><input type="submit" value="Guardar"></form>';
+            tableContainer.innerHTML = htmls;
+        }
+    </script>
 </body>
 </html>
-
-<script>
-    function consect() {
-        var contest = document.getElementById('cons').value;
-        var htmls = '<form method="POST" action="#"><input type="text" id="pn" name="pn"><table><thead><tr><th>tipo-cons</th><th>consecutivo</th><th>tipo</th><th>awg</th><th>color</th><th>tamaño</th><th>terminal1</th><th>sello1</th><th>terminal2</th><th>sello2</th><th>Estampado</th><th>From</th><th>To</th></tr></thead><tbody>';
-        for (var i = 1; i <= contest; i++) {
-            htmls += '<tr>' +
-                     '<td><input type="text" name="tipo_cons[' + i + ']" id="tipo_cons_' + i + '"></td>' +
-                     '<td><input type="text" name="cons[' + i + ']" id="cons_' + i + '" value="'+ i +'"></td>' +
-                     '<td><input type="text" name="tipo[' + i + ']" id="tipo_' + i + '"></td>' +
-                     '<td><input type="text" name="awg[' + i + ']" id="awg_' + i + '"></td>' +
-                     '<td><input type="text" name="color[' + i + ']" id="color_' + i + '"></td>' +
-                     '<td><input type="text" name="tamano[' + i + ']" id="tamano_' + i + '"></td>' +
-                     '<td><input type="text" name="term1[' + i + ']" id="term1_' + i + '"></td>' +
-                     '<td><input type="text" name="sello1[' + i + ']" id="sello1_' + i + '"></td>' +
-                     '<td><input type="text" name="term2[' + i + ']" id="term2_' + i + '"></td>' +
-                     '<td><input type="text" name="sello2[' + i + ']" id="sello2_' + i + '"></td>' +
-                     '<td><input type="text" name="est[' + i + ']" id="est_' + i + '"></td>' +
-                     '<td><input type="text" name="from[' + i + ']" id="from_' + i + '"></td>' +
-                     '<td><input type="text" name="to[' + i + ']" id="to_' + i + '"></td>' +
-                     '<td><input type="text" name="komment[' + i + ']" id="komment_' + i + '"></td>' +
-                     '</tr>';
-        }
-        htmls += '</tbody></table><input type="hidden" name="consTotal" id="consTotal" value="' + contest + '"><input type="submit" value="Guardar"></form>';
-        document.getElementById('consecutivos').innerHTML = htmls;
-    }
-</script>
