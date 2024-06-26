@@ -66,6 +66,12 @@ table{
                 <input type="submit" name="relod" id="relod" value="Update">
             </form>
         </div>
+        <div class="contenido">
+            <h1>Update Bom</h1>
+            <form action="datos.php" method="POST">
+                <input type="submit" name="relod" id="relod" value="Update Bom">
+            </form>
+        </div>
        
     </div>
     <br>
