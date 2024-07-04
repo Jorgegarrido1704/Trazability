@@ -32,7 +32,9 @@ while($row=mysqli_fetch_array($buscarinfo)){
 
 
    
-if($dateIni<strtotime($fecha) ){    
+if($dateIni<strtotime($fecha) && $tiempo>0){
+    
+   
 $sheet->setCellValue('A'.$t, $quien);
 $sheet->setCellValue('B'.$t, $fecha);
 $sheet->setCellValue('C'.$t, $fint);
