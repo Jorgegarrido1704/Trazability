@@ -36,7 +36,7 @@ if($dateIni<strtotime($fecha) ){
 $sheet->setCellValue('A'.$t, $quien);
 $sheet->setCellValue('B'.$t, $fecha);
 $sheet->setCellValue('C'.$t, $fint);
-$sheet->setCellValue('D'.$t, $tiempo." min");
+$sheet->setCellValue('D'.$t, $tiempo);
 $sheet->setCellValue('E'.$t, $actividad);
 $sheet->setCellValue('F'.$t, $desciption);
 
