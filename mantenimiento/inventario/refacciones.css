@@ -1,0 +1,51 @@
+body {
+    background-image: url(refacciones2.jpg);
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-attachment: scroll;
+    margin: 0;
+    padding: 0;
+}
+
+#ingresref {
+    width: 100%;
+    height: 20%;
+    margin-left: 30px;
+    padding-left: 50px;
+}
+
+#elotro {
+    width: 10%;
+    margin-left: 100px;
+    text-align: center;
+}
+
+.button {
+    text-align: center;
+    color: aqua;
+}
+
+.box {
+    width: 100%;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.title {
+    text-align: center;
+    color: rgb(21, 186, 228);
+}
+.home{
+    align-items: right;
+    text-align: right;
+}
+a{
+    color: blueviolet;
+    text-decoration: none;
+}
+a :hover{
+    background-color: orchid;
+}

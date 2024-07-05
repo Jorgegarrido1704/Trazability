@@ -1,0 +1,41 @@
+body{
+    background-image: url(herramientas3.jpg);
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-attachment: scroll;
+
+}
+
+
+h1.title{
+    color: rgb(236, 161, 63);
+}
+#ingreso{
+    margin-top: 30px;
+    text-align: center;
+    padding-bottom: 40px;
+    margin-bottom: 20px;
+}
+#qty{
+    width: 50px ;
+    margin-bottom: 15px;
+}    
+
+label{
+    color: rgb(221, 79, 79);
+}
+a{
+    text-decoration: none;
+    color:aliceblue;
+}
+div.home{
+    text-align: right;
+}
+button.home{
+    
+    background-color: blueviolet;
+}
+input[type="submit"]{
+    text-shadow: 10px;
+    background-color: blanchedalmond;
+}

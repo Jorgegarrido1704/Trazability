@@ -1,0 +1,33 @@
+body{
+    background-image: url(mantenimeinto2.jpg);
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-attachment: scroll;
+    
+}
+
+header{
+    
+    color:rgb(35, 238, 126);
+    text-align: center;
+}
+#datos{
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    margin-bottom: auto;
+}
+input[type="text"]{
+    margin-top: 15px;
+    margin-bottom: 20px;
+    margin-left: 10px;
+
+}
+input[type="sumbit"]{
+    margin: 50px;
+
+}
+label{
+    text-decoration: double;
+}

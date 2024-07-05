@@ -4,6 +4,7 @@ require 'vendor/autoload.php';
 date_default_timezone_set("America/Mexico_City");
 $datefin=strtotime(date("d-m-Y 23:59"));
 $dateIni=strtotime(date("d-m-Y 00:00"));
+$today = date("d-m-Y");
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 $spreadsheet = new Spreadsheet();$sheet = $spreadsheet->getActiveSheet();
@@ -31,7 +32,7 @@ $sheet->setCellValue('E'.$t, $actividad);
 $sheet->setCellValue('F'.$t, $desciption);
 $t++;} }  
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment;filename="Engineering Activities .xlsx"');
+header('Content-Disposition: attachment;filename="Engineering Activities '.$today.'.xlsx"');
 header('Cache-Control: max-age=0');
 $writer = new Xlsx($spreadsheet);
 $writer->save('php://output');

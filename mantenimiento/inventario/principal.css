@@ -1,0 +1,42 @@
+body{
+    background-image: url(principal.jpg);
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-attachment: scroll;
+}
+#button{
+align-items: center;
+text-align: right;
+}
+button.logout{
+    background-color: rgb(6, 207, 243);
+    margin-bottom: 10px;
+        text-align: center;
+        width: 52px;
+        height: 18px;
+}
+a{
+    text-decoration: none;
+    color: green ;
+}
+#title{
+    text-align: center;
+    align-items: center;
+}
+h1{
+    color: rgb(250, 77, 65);
+}
+h2{
+    color: rgb(40, 26, 235);
+}
+button.inv{
+    padding: 40px;
+    padding-right: 40px;
+    margin-right: 95px;
+    margin-left: 100px;
+    margin-top: 120px;
+    background-color: ghostwhite;
+}
+button.inv:hover{
+    background-color: gainsboro;
+}
