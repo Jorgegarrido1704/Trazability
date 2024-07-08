@@ -1,5 +1,26 @@
 <?php
 require "../app/conection.php";
+$id=isset($_GET['id'])?$_GET['id']:[];
+$today=date("d-m-Y H:i");
+$quienInput=isset($_GET['quienInput'])?$_GET['quienInput']:"";
+
+echo $quienInput;
+if($quienInput!=""){
+    $buscar = mysqli_query($con,"SELECT * FROM registro_paro WHERE id='$id[0]'");
+    $row = mysqli_fetch_array($buscar);
+    $atiende = $row['atiende'];
+    $inimant = $row['inimant'];
+    if($atiende=="Nadie aun" and $inimant==""){
+mysqli_query($con,"UPDATE registro_paro SET inimant='$today',atiende='$quienInput' WHERE id='$id[0]'");
+    }else if($atiende!="" and $inimant!=""){
+        $inif=strtotime($inimant);
+        $finTime=strtotime($today);
+        $dif=($finTime-$inif)/60;
+        mysqli_query($con,"UPDATE registro_paro SET Tiempo='$dif',finhora='$today' WHERE id='$id[0]'");
+        
+    }
+    header("Location: req.php");}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +33,7 @@ require "../app/conection.php";
 </head>
 <body>
 <div><small><a href="../../main/principal.php" id="principal"><button>Home</button></a></small></div>
-    <Table>
+    <table>
         <thead>
             <th>Fecha de solicitud</th>
             <th>Equipo</th>
@@ -25,11 +46,11 @@ require "../app/conection.php";
         </thead>
         <tbody>
             <?php
-            $qry = mysqli_query($con, "SELECT * FROM registro_paro_corte WHERE trabajo = 'aplicador'");
+            $qry = mysqli_query($con, "SELECT * FROM registro_paro WHERE equipo = 'Bancos para terminales' and finhora='' ");
             while ($row = mysqli_fetch_array($qry)) {
                 $idmant = $row['id'];
                 $fmant = $row['fecha'];
-                $equipo=$row['equipo'];
+                $equipo = $row['equipo'];
                 $equimant = $row['nombreEquipo'];
                 $damant = $row['dano'];
                 $quienmant = $row['quien'];
@@ -39,25 +60,26 @@ require "../app/conection.php";
             ?>
                 <tr style="<?php echo $style; ?>">
                     <td id='fecha<?php echo $idmant; ?>'><?php echo $fmant; ?></td>
-                    <td id='fecha<?php echo $idmant; ?>'><?php echo $equipo; ?></td>
+                    <td id='equipo<?php echo $idmant; ?>'><?php echo $equipo; ?></td>
                     <td id='area<?php echo $idmant; ?>'><?php echo $areamant; ?></td>
-                    <td id='equipo<?php echo $idmant; ?>'><?php echo $equimant; ?></td>
+                    <td id='nombreEquipo<?php echo $idmant; ?>'><?php echo $equimant; ?></td>
                     <td id='dano<?php echo $idmant; ?>'><?php echo $damant; ?></td>
                     <td id='quien<?php echo $idmant; ?>'><?php echo $quienmant; ?></td>
                     <td id='atiende<?php echo $idmant; ?>'><?php echo $atiendemant; ?></td>
-                    <td>
-                        <form action="registo_mantenimiento.php" method="POST" onsubmit="return Validation(<?php echo $idmant; ?>, '<?php echo $areamant; ?>', '<?php echo $equimant; ?>', '<?php echo $damant; ?>')">
-                            <input type="hidden" name="id[]" value="<?php echo $idmant; ?>">
-                            <input type="text" name="quienInput" id="quienInput<?php echo $idmant; ?>">
+                   
+                        <form action="req.php" method="GET" >
+                        <td> <input type="hidden" name="id[]"  id="id[]" value="<?php echo $idmant; ?>">
+                               <input type="text" name="quienInput" id="quienInput">  </td>
+                            <td>  <input type="submit" class="btn btn-primary" value="Registro">  </td>
                         </form>
-                    </td>
+                   
                 </tr>
             <?php } ?>
         </tbody>
-    </Table>
+    </table>
 
     <script>
-        function Validation(id, area, equipo, dano) {
+      /*  function Validation(id, area, equipo, dano) {
             var quien = prompt("¿Quién va a realizar el mantenimiento?");
             if (quien !== null) {
                 // Set the value of the specific quienInput element based on the row id
@@ -73,18 +95,18 @@ require "../app/conection.php";
                 alert("No se registró a nadie para el mantenimiento.");
                 return false; // Prevent the form submission
             }
-        }
+        }*/
 
         // Function to read information for each row when the window loads
         window.onload = function() {
             <?php
-            $qry = mysqli_query($con, $tabla);
+            $qry = mysqli_query($con, "SELECT * FROM registro_paro WHERE equipo = 'Bancos para terminales' and finhora='' ");
             while ($row = mysqli_fetch_array($qry)) {
                 $idmant = $row['id'];
                 $areamant = $row['area'];
                 $equimant = $row['nombreEquipo'];
                 $damant = $row['dano']; 
-                $team=$row['equipo'];
+                $team = $row['equipo'];
                 $atiendemant = $row['atiende'];
                 if ($atiendemant == "Nadie aun") {
             ?>
@@ -93,8 +115,8 @@ require "../app/conection.php";
                 var dano<?php echo $idmant; ?> = "<?php echo $damant; ?>";
                 var team<?php echo $idmant; ?> = "<?php echo $team; ?>";
     
-                var speech<?php echo $idmant; ?> = new SpeechSynthesisUtterance("Se requiere a " + team<?php echo $idmant; ?> + ".en el área de " + area<?php echo $idmant; ?> + ". para" + equipo<?php echo $idmant; ?> );
-                speech<?php echo $idmant; ?>.lang = "es-US";
+                var speech<?php echo $idmant; ?> = new SpeechSynthesisUtterance("Se requiere " + dano<?php echo $idmant; ?> + ". en la maquina " + area<?php echo $idmant; ?> + ". para el herramental " + equipo<?php echo $idmant; ?> );
+                speech<?php echo $idmant; ?>.lang = "es-MX";
                 window.speechSynthesis.speak(speech<?php echo $idmant; ?>);
             <?php
                 }
