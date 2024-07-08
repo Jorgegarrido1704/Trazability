@@ -24,7 +24,8 @@ $totalmant=intval($totalmant);
 if($fechas<$fecha && $diaFechas==$diafecha){
     $golesdeldia=$golpesDiariosanterio+$golpesdiarios;
     if($totalmant>$totalactual){
-    mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today',maquina='Bodega_aplicadores', golpesTotales='$totalupadate',  totalmant='$totalmant' WHERE herramental ='$herramental' ");     
+    mysqli_query($con, "INSERT INTO mant_golpes (herramental,fecha_reg,golpesDiarios) values ('$herramental','$today','$golpesdiarios')");
+        mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today',maquina='Bodega_aplicadores', golpesTotales='$totalupadate',  totalmant='$totalmant' WHERE herramental ='$herramental' ");     
 $message = '<html><body>';
 $message .= '<div> <h1 align="center">Registro de golpeteo de herramental</h1> </div>';
 $message .= '<div> <h3 align="center">Fecha: '.$diafecha.'</h3>';
@@ -66,6 +67,7 @@ try {
     echo 'Error sending email: ', $mail->ErrorInfo;
 }
 }else{
+    mysqli_query($con, "INSERT INTO mant_golpes (herramental,fecha_reg,golpesDiarios) values ('$herramental','$today','$golpesdiarios')");
         mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate',maquina='Bodega_aplicadores'  WHERE herramental ='$herramental' ");
         header('location:index.php');
     }
@@ -73,6 +75,7 @@ try {
 }else if($fechas<$fecha && $diaFechas!=$diafecha){
     $golesdeldia=$golpesdiarios;
     if($totalmant>$totalactual){
+        mysqli_query($con, "INSERT INTO mant_golpes (herramental,fecha_reg,golpesDiarios) values ('$herramental','$today','$golpesdiarios')");
     mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate', maquina='Bodega_aplicadores', totalmant='$totalmant' WHERE herramental ='$herramental' ");
            
 $message = '<html><body>';
@@ -116,6 +119,7 @@ try {
     echo 'Error sending email: ', $mail->ErrorInfo;
 }
 }else{
+    mysqli_query($con, "INSERT INTO mant_golpes (herramental,fecha_reg,golpesDiarios) values ('$herramental','$today','$golpesdiarios')");
         mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate', maquina='Bodega_aplicadores' WHERE herramental ='$herramental' ");
         header('location:index.php');
     }

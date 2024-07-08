@@ -1,4 +1,5 @@
 <?php
+session_start();
 require "../app/conection.php";
 $id=isset($_GET['id'])?$_GET['id']:[];
 $today=date("d-m-Y H:i");

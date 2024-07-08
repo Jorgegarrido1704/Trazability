@@ -71,6 +71,7 @@ header('location:admin.php');
             <li><a href="../mantenimiento/contadorgolpes/diario.php"><button><h1>Golpeteo acumulado</h1></button></a></li>
             <li><a href="../mantenimiento/contadorgolpes/tabla.php"><button><h1>Golpeteo diario</h1></button></a></li>
             <li><a href="../mantenimiento/contadorgolpes/req.php"><button><h1>Requerimiento de aplicador</h1></button></a></li>
+            <li><a href="../mantenimiento/contadorgolpes/addherra.php"><button><h1>Agregar aplicador</h1></button></a></li>
         <?php  }else{?>
             <li><a href="../seguimiento/checker_estacion.php"><button><h1>Registro de proceso </h1></button></a></li>
        <li><a href="../seguimiento/seguimiento.php"><button><h1>Donde esta el arnes</h1></button></a></li>

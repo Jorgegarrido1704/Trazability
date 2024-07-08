@@ -1,7 +1,7 @@
 <?php
 
     include "../app/conection.php";
-
+    session_start();
 $qry=mysqli_query($con,"SELECT * FROM mant_golpes_diarios");
 ?>
 <!DOCTYPE html>
