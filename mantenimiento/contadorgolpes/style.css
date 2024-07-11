@@ -11,7 +11,7 @@ h1 {
 }
 
 form {
-    max-width: 400px;
+    max-width: 600px;
     margin: 0 auto;
     padding: 20px;
     background-color: #ffffff;
@@ -26,6 +26,7 @@ label {
 
 select,
 input[type="number"],
+input[type="text"],
 input[type="submit"] {
     width: 100%;
     padding: 10px;

@@ -10,7 +10,10 @@ $fecha = strtotime(date('d-m-Y 23:59'));
 $diafecha=date('d-m-Y');
 $golpesdiarios=intval($_POST['cantidad']);
 $today=date("d-m-Y H:i");
-$conect=mysqli_query($con,"SELECT * FROM mant_golpes_diarios WHERE herramental ='$herramental' ");
+$terminal=$_POST['terminal'];
+$terminal=strtoupper($terminal);
+$conect=mysqli_query($con,"SELECT * FROM mant_golpes_diarios WHERE herramental ='$herramental',and terminal='$terminal' ");
+$rowcount=mysqli_num_rows($conect);
 while($row=mysqli_fetch_array($conect)){
 $golpesDiariosanterio=$row['golpesDiarios'];    
 $golpesanterio=intval($row['golpesTotales']);
@@ -24,12 +27,12 @@ $totalmant=intval($totalmant);
 if($fechas<$fecha && $diaFechas==$diafecha){
     $golesdeldia=$golpesDiariosanterio+$golpesdiarios;
     if($totalmant>$totalactual){
-    mysqli_query($con, "INSERT INTO mant_golpes (herramental,fecha_reg,golpesDiarios) values ('$herramental','$today','$golpesdiarios')");
-        mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today',maquina='Bodega_aplicadores', golpesTotales='$totalupadate',  totalmant='$totalmant' WHERE herramental ='$herramental' ");     
+    mysqli_query($con, "INSERT INTO mant_golpes (herramental,terminal,fecha_reg,golpesDiarios) values ('$herramental','$terminal','$today','$golpesdiarios')");
+        mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today',maquina='Bodega_aplicadores', golpesTotales='$totalupadate',  totalmant='$totalmant' WHERE herramental ='$herramental' and terminal='$terminal'");     
 $message = '<html><body>';
 $message .= '<div> <h1 align="center">Registro de golpeteo de herramental</h1> </div>';
 $message .= '<div> <h3 align="center">Fecha: '.$diafecha.'</h3>';
-$message .= ' <h3 align="center">El Herramental: '.$herramental.' necesita mantenimiento</h3>';
+$message .= ' <h3 align="center">El Herramental: '.$herramental.' con terminal: '.$terminal.' necesita mantenimiento</h3>';
 $message .= ' <h3 align="center">Este seria su mantenimiento N°: '.$totalmant.'</h3>';
 $message .= ' </div>';
 $message .= '</body></html>';
@@ -67,8 +70,8 @@ try {
     echo 'Error sending email: ', $mail->ErrorInfo;
 }
 }else{
-    mysqli_query($con, "INSERT INTO mant_golpes (herramental,fecha_reg,golpesDiarios) values ('$herramental','$today','$golpesdiarios')");
-        mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate',maquina='Bodega_aplicadores'  WHERE herramental ='$herramental' ");
+    mysqli_query($con, "INSERT INTO mant_golpes (herramental,terminal,fecha_reg,golpesDiarios) values ('$herramental','$terminal','$today','$golpesdiarios')");
+        mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate',maquina='Bodega_aplicadores'  WHERE herramental ='$herramental' and terminal='$terminal' ");
         header('location:index.php');
     }
 
@@ -81,7 +84,7 @@ try {
 $message = '<html><body>';
 $message .= '<div> <h1 align="center">Registro de golpeteo de herramental</h1> </div>';
 $message .= '<div> <h3 align="center">Fecha: '.$diafecha.'</h3>';
-$message .= ' <h3 align="center">El Herramental: '.$herramental.' necesita mantenimiento</h3>';
+$message .= ' <h3 align="center">El Herramental: '.$herramental.'  con terminal: '.$terminal.' necesita mantenimiento</h3>';
 $message .= ' <h3 align="center">Este seria su mantenimiento N°: '.$totalmant.'</h3>';
 $message .= ' </div>';
 $message .= '</body></html>';
@@ -119,14 +122,19 @@ try {
     echo 'Error sending email: ', $mail->ErrorInfo;
 }
 }else{
-    mysqli_query($con, "INSERT INTO mant_golpes (herramental,fecha_reg,golpesDiarios) values ('$herramental','$today','$golpesdiarios')");
-        mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate', maquina='Bodega_aplicadores' WHERE herramental ='$herramental' ");
+    mysqli_query($con, "INSERT INTO mant_golpes (herramental,terminal,fecha_reg,golpesDiarios) values ('$herramental','$terminal','$today','$golpesdiarios')");
+        mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate', maquina='Bodega_aplicadores' WHERE herramental ='$herramental',terminal ='$terminal' ");
         header('location:index.php');
     }
 
 }
 
 
+}
+if($rowcount==0){
+    mysqli_query($con, "INSERT INTO mant_golpes (herramental,terminal,fecha_reg,golpesDiarios) values ('$herramental','$terminal','$today','$golpesdiarios')");
+    mysqli_query($con,"INSERT INTO mant_golpes_diarios (herramental,terminal,fecha_reg,golpesDiarios,golpesTotales,maquina,totalmant)VALUES('$herramental','$terminal','$today',0,0,'Bodega_aplicadores',0)");
+    header('location:index.php');
 }
 header("location=index.php");
 

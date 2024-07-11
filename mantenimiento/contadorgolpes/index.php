@@ -9,6 +9,15 @@ require "../app/conection.php";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Contador de golpes</title>
+    <style>
+        #terminal{
+            width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
 
@@ -21,7 +30,7 @@ require "../app/conection.php";
     <select name="dado" id="dado" required>
     <option value="null"></option>
             <?php 
-                        $qry = mysqli_query($con, "SELECT * From mant_golpes_diarios");
+                        $qry = mysqli_query($con, "SELECT DISTINCT herramental From mant_golpes_diarios");
             if ($qry) {
                 while ($row = mysqli_fetch_array($qry)) {
                     echo "<option value='" . $row['herramental'] . "'>" . $row['herramental'] . "</option>"; // Added 'value' attribute
@@ -31,6 +40,8 @@ require "../app/conection.php";
             }
             ?>
     </select>
+    <label for="terminal">Terminal</label>
+    <input type="text" name="terminal" id="terminal" required>
     <label for="cantidad">Cantidad</label>
     <input type="number" id="cantidad" name="cantidad" required>
    
