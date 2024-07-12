@@ -10,7 +10,7 @@ if($apli!="" and $term!=""){
     $rownum=mysqli_num_rows($buscarcons);
     if($rownum<=0){
     mysqli_query($con,"INSERT INTO herramental (herramental,comp)VALUES('$apli','$term')");
-        mysqli_query($con,"INSERT INTO mant_golpes_diarios (herramental,fecha_reg,golpesDiarios,golpesTotales,maquina,totalmant)VALUES('$apli','',0,0,'Bmacen_aplicadores',0)");
+        mysqli_query($con,"INSERT INTO mant_golpes_diarios (herramental,terminal,fecha_reg,golpesDiarios,golpesTotales,maquina,totalmant)VALUES('$apli','$term','',0,0,'Bmacen_aplicadores',0)");
         header("location:addherra.php");
     } else {
         ?>
