@@ -2,7 +2,7 @@
 session_start();
 require "../app/conection.php";
 
-$qry=mysqli_query($con,"SELECT * FROM mant_golpes_diarios");
+$qry=mysqli_query($con,"SELECT * FROM mant_golpes_diarios ORDER BY id DESC");
 $fecha=strtotime('d-m-Y 00:00');
 ?>
 <!DOCTYPE html>
@@ -20,25 +20,19 @@ $fecha=strtotime('d-m-Y 00:00');
             <th>Herramental</th>
             <th> Ultima Fecha Registrada</th>
             <th>Ultimo registro de golpes</th>
-            
         </thead>
         <tbody>
         <?php
 while($row=mysqli_fetch_array($qry)){
-    if(strtotime($row['fecha_reg'])>=$fecha and $row['fecha_reg']!=""){
-        
-    
-?>
+    if(strtotime($row['fecha_reg'])>=$fecha and $row['fecha_reg']!=""){ ?>
             <tr>
                 <td><?php echo $row['herramental']; ?> </td>
                 <td><?php echo $row['fecha_reg']; ?></td>
-                <td><?php echo $row['golpesDiarios']; ?></td>
-                
+                <td><?php echo $row['golpesDiarios']; ?></td>            
             </tr>
             <?php }}?>
         </tbody>
     </table>
-
 </body>
 </html>
 

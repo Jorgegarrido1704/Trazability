@@ -2,7 +2,7 @@
 
     include "../app/conection.php";
     session_start();
-$qry=mysqli_query($con,"SELECT * FROM mant_golpes_diarios");
+$qry=mysqli_query($con,"SELECT * FROM mant_golpes_diarios ORDER BY id DESC");
 ?>
 <!DOCTYPE html>
 <html lang="en">
