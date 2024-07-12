@@ -18,6 +18,7 @@ $fecha=strtotime('d-m-Y 00:00');
     <table>
         <thead>
             <th>Herramental</th>
+            <th>Terminal</th>
             <th> Ultima Fecha Registrada</th>
             <th>Ultimo registro de golpes</th>
         </thead>
@@ -27,6 +28,7 @@ while($row=mysqli_fetch_array($qry)){
     if(strtotime($row['fecha_reg'])>=$fecha and $row['fecha_reg']!=""){ ?>
             <tr>
                 <td><?php echo $row['herramental']; ?> </td>
+                <td><?php echo $row['terminal']; ?></td>
                 <td><?php echo $row['fecha_reg']; ?></td>
                 <td><?php echo $row['golpesDiarios']; ?></td>            
             </tr>

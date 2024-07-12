@@ -17,6 +17,7 @@ $qry=mysqli_query($con,"SELECT * FROM mant_golpes_diarios ORDER BY id DESC");
     <table>
         <thead>
             <th>Herramental</th>
+            <th>Terminal</th>
             <th>Fecha</th>
             <th>Ultimo registro de golpes</th>
             <th>Total acumulado</th>
@@ -26,10 +27,10 @@ $qry=mysqli_query($con,"SELECT * FROM mant_golpes_diarios ORDER BY id DESC");
         $totalgolpes=0;
 while($row=mysqli_fetch_array($qry)){
     $totalgolpes+=$row['golpesDiarios'];
-
 ?>
             <tr>
                 <td><?php echo $row['herramental']; ?> </td>
+                <td><?php echo $row['terminal']; ?></td>
                 <td><?php echo $row['fecha_reg']; ?></td>
                 <td><?php echo $row['golpesDiarios']; ?></td>
                 <td><?php echo $row['golpesTotales']; ?></td>
