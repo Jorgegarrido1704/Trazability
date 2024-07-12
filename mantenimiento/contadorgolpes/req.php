@@ -28,7 +28,7 @@ mysqli_query($con,"UPDATE registro_paro SET inimant='$today',atiende='$quienInpu
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="120">
+    <meta http-equiv="refresh" content="60">
     <link rel="stylesheet" href="fallas.css">
     <title>Fallas</title>
 </head>
