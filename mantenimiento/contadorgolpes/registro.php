@@ -12,7 +12,7 @@ $golpesdiarios=intval($_POST['cantidad']);
 $today=date("d-m-Y H:i");
 $terminal=$_POST['terminal'];
 $terminal=strtoupper($terminal);
-$conect=mysqli_query($con,"SELECT * FROM mant_golpes_diarios WHERE herramental ='$herramental',and terminal='$terminal' ");
+$conect=mysqli_query($con,"SELECT * FROM mant_golpes_diarios WHERE herramental ='$herramental'and terminal='$terminal' ");
 $rowcount=mysqli_num_rows($conect);
 while($row=mysqli_fetch_array($conect)){
 $golpesDiariosanterio=$row['golpesDiarios'];    
@@ -79,7 +79,7 @@ try {
     $golesdeldia=$golpesdiarios;
     if($totalmant>$totalactual){
         mysqli_query($con, "INSERT INTO mant_golpes (herramental,fecha_reg,golpesDiarios) values ('$herramental','$today','$golpesdiarios')");
-    mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate', maquina='Bodega_aplicadores', totalmant='$totalmant' WHERE herramental ='$herramental' ");
+    mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate', maquina='Bodega_aplicadores', totalmant='$totalmant' WHERE herramental ='$herramental' and terminal='$terminal'");
            
 $message = '<html><body>';
 $message .= '<div> <h1 align="center">Registro de golpeteo de herramental</h1> </div>';
@@ -123,7 +123,7 @@ try {
 }
 }else{
     mysqli_query($con, "INSERT INTO mant_golpes (herramental,terminal,fecha_reg,golpesDiarios) values ('$herramental','$terminal','$today','$golpesdiarios')");
-        mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate', maquina='Bodega_aplicadores' WHERE herramental ='$herramental',terminal ='$terminal' ");
+        mysqli_query($con,"UPDATE mant_golpes_diarios SET golpesDiarios='$golesdeldia',fecha_reg='$today', golpesTotales='$totalupadate', maquina='Bodega_aplicadores' WHERE herramental ='$herramental' AND terminal ='$terminal' ");
         header('location:index.php');
     }
 
