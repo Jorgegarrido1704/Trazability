@@ -136,6 +136,6 @@ if($rowcount==0){
     mysqli_query($con,"INSERT INTO mant_golpes_diarios (herramental,terminal,fecha_reg,golpesDiarios,golpesTotales,maquina,totalmant)VALUES('$herramental','$terminal','$today',$golpesdiarios,$golpesdiarios,'Bodega_aplicadores',0)");
     header('location:index.php');
 }
-header("location=index.php");
+header("location:index.php");
 
 ?>
