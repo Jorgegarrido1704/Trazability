@@ -133,7 +133,7 @@ try {
 }
 if($rowcount==0){
     mysqli_query($con, "INSERT INTO mant_golpes (herramental,terminal,fecha_reg,golpesDiarios) values ('$herramental','$terminal','$today','$golpesdiarios')");
-    mysqli_query($con,"INSERT INTO mant_golpes_diarios (herramental,terminal,fecha_reg,golpesDiarios,golpesTotales,maquina,totalmant)VALUES('$herramental','$terminal','$today',0,0,'Bodega_aplicadores',0)");
+    mysqli_query($con,"INSERT INTO mant_golpes_diarios (herramental,terminal,fecha_reg,golpesDiarios,golpesTotales,maquina,totalmant)VALUES('$herramental','$terminal','$today',$golpesdiarios,$golpesdiarios,'Bodega_aplicadores',0)");
     header('location:index.php');
 }
 header("location=index.php");
