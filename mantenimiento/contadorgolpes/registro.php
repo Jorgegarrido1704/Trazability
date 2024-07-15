@@ -26,7 +26,7 @@ $golpesanterio=intval($row['golpesTotales']);
 $totalactual=$row['totalmant'];
 $fechas=strtotime($row['fecha_reg']);
 $diaFechas=substr($row['fecha_reg'],0,10);
-
+$diaFechas=str_replace("/","-",$diaFechas);
 $totalupadate=$golpesdiarios + $golpesanterio;
 $totalmant=$totalupadate/5000;
 $totalmant=intval($totalmant);
