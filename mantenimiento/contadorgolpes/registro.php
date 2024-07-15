@@ -14,6 +14,12 @@ $terminal=$_POST['terminal'];
 $terminal=strtoupper($terminal);
 $conect=mysqli_query($con,"SELECT * FROM mant_golpes_diarios WHERE herramental ='$herramental'and terminal='$terminal' ");
 $rowcount=mysqli_num_rows($conect);
+echo $rowcount;
+if($rowcount==0){
+    mysqli_query($con, "INSERT INTO mant_golpes (herramental,terminal,fecha_reg,golpesDiarios) values ('$herramental','$terminal','$today','$golpesdiarios')");
+    mysqli_query($con,"INSERT INTO mant_golpes_diarios (herramental,terminal,fecha_reg,golpesDiarios,golpesTotales,maquina,totalmant)VALUES('$herramental','$terminal','$today',$golpesdiarios,$golpesdiarios,'Bodega_aplicadores',0)");
+    header('location:index.php');
+}
 while($row=mysqli_fetch_array($conect)){
 $golpesDiariosanterio=$row['golpesDiarios'];    
 $golpesanterio=intval($row['golpesTotales']);
@@ -131,11 +137,6 @@ try {
 
 
 }
-if($rowcount==0){
-    mysqli_query($con, "INSERT INTO mant_golpes (herramental,terminal,fecha_reg,golpesDiarios) values ('$herramental','$terminal','$today','$golpesdiarios')");
-    mysqli_query($con,"INSERT INTO mant_golpes_diarios (herramental,terminal,fecha_reg,golpesDiarios,golpesTotales,maquina,totalmant)VALUES('$herramental','$terminal','$today',$golpesdiarios,$golpesdiarios,'Bodega_aplicadores',0)");
-    header('location:index.php');
-}
-header("location:index.php");
+
 
 ?>
