@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../app/conection.php";
+date_default_timezone_set('America/Mexico_City');
 $id=isset($_GET['id'])?$_GET['id']:[];
 $today=date("d-m-Y H:i");
 $quienInput=isset($_GET['quienInput'])?$_GET['quienInput']:"";
