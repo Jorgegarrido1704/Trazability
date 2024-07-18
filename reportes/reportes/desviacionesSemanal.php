@@ -49,7 +49,7 @@ while($row=mysqli_fetch_array($select)){
 
     if($fechas>=$lastweek){
     $sheet->setCellValue('A'.$t, $dato[0] );
-    $sheet->setCellValue('B'.$t, $dato[1] );
+    $sheet->setCellValue('B'.$t, substr($dato[1],0,10) );
     $sheet->setCellValue('C'.$t, $dato[2] );
     $sheet->setCellValue('D'.$t, $dato[3] );
     $sheet->setCellValue('E'.$t, $dato[4] );
