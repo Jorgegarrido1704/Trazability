@@ -65,7 +65,7 @@ try {
         $update="UPDATE mant_golpes_diarios SET mantenimiento='falta' WHERE id='$id'";
         $qryup=mysqli_query($con,$update);
         mysqli_close($con);    
-        header("location:url=../../../ing/emails/index.html");
+        header("location:../../../ing/emails/index.html");
        
 } catch (Exception $e) {
     echo 'Error sending email: ', $mail->ErrorInfo;
@@ -73,4 +73,4 @@ try {
 }      
 
 }
-header("location:url=../../../ing/emails/index.html");
+header("location:../../../ing/emails/index.html");
