@@ -2,11 +2,11 @@
     include "../app/conection.php";
     session_start();
 
-$buscar= mysqli_query($con,"SELECT * FROM mant_golpes_diarios ORDER BY id DESC");
+$buscar= mysqli_query($con,"SELECT * FROM mant_golpes_diarios WHERE golpesTotales=0 ORDER BY id DESC");
 while($row=mysqli_fetch_array($buscar)){
     $id=$row['id'];
     $fecha=$row['fecha_reg'];
-    $fecha=str_replace('/','-',$fecha);
-    mysqli_query($con,"UPDATE mant_golpes_diarios SET fecha_reg='$fecha' WHERE id='$id'");
+    $fecha='01-03-2024';
+    mysqli_query($con,"UPDATE mant_golpes_diarios SET fecha_reg='$fecha' where id='$id'");
     
 }    
