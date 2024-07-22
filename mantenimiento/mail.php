@@ -7,7 +7,7 @@ require "../app/conection.php";
 $buscar="SELECT * FROM mant_golpes_diarios WHERE  mantenimiento='falta1'";
 $sqli=mysqli_query($con,$buscar);
 if($sqli){
-    if($numR=mysqli_num_rows($sqli)<=0){        header("location:../actividades/emailact.php"); }else{
+    if($numR=mysqli_num_rows($sqli)<=0){        header("location:../../../ing/emails/index.html"); }else{
     mysqli_data_seek($sqli, $numR=mysqli_num_rows($sqli)-1);
     $row=mysqli_fetch_assoc($sqli); 
     $id=$row['id'];
