@@ -1,9 +1,8 @@
 <?php 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-require '../vendor/autoload.php';
-
-require "../app/conection2.php";
+require '../app/vendor/autoload.php';
+require "../app/conection.php";
 
 $buscar="SELECT * FROM mant_golpes_diarios WHERE  mantenimiento='falta1'";
 $sqli=mysqli_query($con,$buscar);
