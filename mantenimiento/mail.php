@@ -24,7 +24,7 @@ $messege .= '<div align="center"><h2>Con la terminal '.$terminal.'</h2><br></div
 $messege .= '<div align="center"><h2>Este sera el mantenimiento No. '.$totalmant.'.</h2><br></div>';
 
 $subject='Mantenimiento preventivo -'.$herramental.' - '.$terminal;
-$recipientEmail='jolaes@mx.bergstrominc.com';
+$recipientEmail='jolaes@mx.bergstrominc.com,jaredti@live.com.com,gonzalez.fast.turn4@outlook.com';
 $headers = "From: jorgegarrdio@gmail.com\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
 $headers .= "Content-type: text/html; charset=utf-8\r\n"; // Changed charset to UTF-8 for better compatibility

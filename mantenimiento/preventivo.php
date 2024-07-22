@@ -47,7 +47,7 @@ for($i=0; $i < 4; $i++) {
 $messege .= '<div align="center"><h2> '.$her.' Con la terminal '.$term.' </h2><br></div>';
 }
 $subject='Mantenimientos preventivos ';
-$recipientEmail='jgarrido@mx.bergstrominc.com';
+$recipientEmail='jolaes@mx.bergstrominc.com,jaredti@live.com.com,gonzalez.fast.turn4@outlook.com';
 $headers = "From: jorgegarrdio@gmail.com\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
 $headers .= "Content-type: text/html; charset=utf-8\r\n"; 
