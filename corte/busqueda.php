@@ -61,18 +61,18 @@ table{
     </form>    
         </div>
         <div class="contenido">
-      
+        <h1>Cargar listas</h1>
         <form action="uplista.php" method="POST" enctype="multipart/form-data">
-        <label for="excel_file">Cargar lista:</label>
+        
         <input type="file" name="csv_file" accept=".csv">
         <br>
         <input type="submit" name="upload" value="Cargar CSV">
         </form>
         </div>
         <div class="contenido">
-           
+           <h1>Update Boms</h1>
             <form action="guardarprueba.php" method="POST" enctype="multipart/form-data">
-            <label for="excel_file">Update Bom:</label>
+            
         <input type="file" name="excel_file" id="excel_file" accept=".xlsx,.xls">
         <input type="submit" name="upload" value="Subir">
     </form>
