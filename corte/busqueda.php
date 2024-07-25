@@ -61,16 +61,21 @@ table{
     </form>    
         </div>
         <div class="contenido">
-            <h1>Update listas</h1>
-            <form action="registro.php" method="POST">
-                <input type="submit" name="relod" id="relod" value="Update">
-            </form>
+      
+        <form action="uplista.php" method="POST" enctype="multipart/form-data">
+        <label for="excel_file">Cargar lista:</label>
+        <input type="file" name="csv_file" accept=".csv">
+        <br>
+        <input type="submit" name="upload" value="Cargar CSV">
+        </form>
         </div>
         <div class="contenido">
-            <h1>Update Bom</h1>
-            <form action="datos.php" method="POST">
-                <input type="submit" name="relod" id="relod" value="Update Bom">
-            </form>
+           
+            <form action="guardarprueba.php" method="POST" enctype="multipart/form-data">
+            <label for="excel_file">Update Bom:</label>
+        <input type="file" name="excel_file" id="excel_file" accept=".xlsx,.xls">
+        <input type="submit" name="upload" value="Subir">
+    </form>
         </div>
        
     </div>
