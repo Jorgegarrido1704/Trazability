@@ -16,7 +16,7 @@ $sheet->setCellValue('G1', 'Qty');
 $sheet->setCellValue('H1', 'Where');
 $sheet->setCellValue('I1', 'paro');
 $sheet->setCellValue('J1', 'Test');
-$buscarinfo=mysqli_query($con,"SELECT * FROM registro WHERE count!=20  ORDER BY count ASC");
+$buscarinfo=mysqli_query($con,"SELECT * FROM registro ORDER BY count ASC");
 $rows=mysqli_num_rows($buscarinfo);
 while($row=mysqli_fetch_array($buscarinfo)){
     $fecha= $row['fecha'];
@@ -37,9 +37,12 @@ while($row=mysqli_fetch_array($buscarinfo)){
             $where='LOOMING';
         }elseif($count==10 or $count==11){
             $where='TESTING';
-        }elseif($count==12 ){
+        }elseif($count==12 or $count==20){ 
             $where='SHIPPING';
-        }elseif($count==15){
+        }elseif($count==13 or $count==14 or $count==16 or $count==17 or $count==18 or $count==19){
+            $where='Engineery';
+        }
+        elseif($count==15){
             $where='SPECIAL WIRE';
         }
 
@@ -61,8 +64,11 @@ $sheet->setCellValue('F'.$t, $po);
 $sheet->setCellValue('G'.$t, $Qty);
 $sheet->setCellValue('H'.$t, $where);
 $sheet->setCellValue('I'.$t, $paro);
+if($rowscal>$cantpo){
+    $sheet->setCellValue('J'.$t, $cantpo."/".$cantpo);    
+}else{
 $sheet->setCellValue('J'.$t, $rowscal."/".$cantpo);
-
+}
 $t++;}
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
