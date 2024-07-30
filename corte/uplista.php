@@ -25,6 +25,20 @@ if (isset($_POST['upload'])) {
                 $rowCount = 0;
                 $batchSize = 10000;
 
+                // Leer la primera línea y eliminar el BOM si está presente
+                $firstLine = fgets($handle);
+                if (strpos($firstLine, "\xEF\xBB\xBF") === 0) {
+                    $firstLine = substr($firstLine, 3);
+                }
+
+                // Convertir la primera línea en un array si no está vacía
+                if (!empty($firstLine)) {
+                    $data = str_getcsv($firstLine);
+                    list($pn, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo) = $data;
+                    mysqli_stmt_execute($stmt);
+                    $rowCount++;
+                }
+
                 // Leer e insertar datos en bloques
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                     // Asignar los valores a las variables vinculadas
