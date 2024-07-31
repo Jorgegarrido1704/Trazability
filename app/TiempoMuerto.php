@@ -46,8 +46,8 @@ $who=$row['whoDet'];
 $respArea=$row['respArea'];
 
    
-//if($fechasControl>$datestart ){    
-    if($fechasControl>$datefin ){ 
+if($fechasControl>$datestart ){    
+  //  if($fechasControl>$datefin ){ 
 $sheet->setCellValue('A'.$t, $fecha);
 $sheet->setCellValue('B'.$t, $cliente);
 $sheet->setCellValue('C'.$t, $np);
