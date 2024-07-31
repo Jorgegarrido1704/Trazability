@@ -4,13 +4,13 @@ require 'vendor/autoload.php';
 
 date_default_timezone_set("America/Mexico_City");
 $date=date("d-m-Y");
-$datestart=strtotime(date("d-m-Y H:i", strtotime("-7 day")));
+$datestart=strtotime(date("d-m-Y 00:00"));
 $dia1=date("d-m-y", strtotime("-6 day"));
 $dia2=date("d-m-y", strtotime("-5 day"));
 $dia3=date("d-m-y", strtotime("-4 day"));
 $dia4=date("d-m-y", strtotime("-3 day"));
 $dia5=date("d-m-y", strtotime("-2 day"));
-$datefin=strtotime(date("d-m-Y H:i", strtotime("-1 day")));
+$datefin=strtotime(date("d-m-Y 00:00", strtotime("-1 day")));
 $week=date("W", strtotime("-5 day"));
 
 
@@ -46,7 +46,8 @@ $who=$row['whoDet'];
 $respArea=$row['respArea'];
 
    
-if($fechasControl>$datestart && $fechasControl<$datefin){    
+//if($fechasControl>$datestart ){    
+    if($fechasControl>$datefin ){ 
 $sheet->setCellValue('A'.$t, $fecha);
 $sheet->setCellValue('B'.$t, $cliente);
 $sheet->setCellValue('C'.$t, $np);
@@ -62,7 +63,7 @@ $t++;}}
 
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment;filename="TimeDead Calidad  '.$week.'.xlsx"');
+header('Content-Disposition: attachment;filename="TimeDead Calidad  '.$date.'.xlsx"');
 header('Cache-Control: max-age=0');
 $writer = new Xlsx($spreadsheet);
 $writer->save('php://output');
