@@ -24,7 +24,7 @@ require "conection.php";
         </thead>
         <tbody>
             <?php
-            $tabla = "SELECT * FROM registro_paro_corte";
+            $tabla = "SELECT * FROM registro_paro WHERE equipo = 'Mantenimiento' and  finhora = '' ORDER BY id DESC";
             $qry = mysqli_query($con, $tabla);
             while ($row = mysqli_fetch_array($qry)) {
                 $idmant = $row['id'];
@@ -74,8 +74,6 @@ require "conection.php";
                 return false; // Prevent the form submission
             }
         }
-
-        // Function to read information for each row when the window loads
         window.onload = function() {
             <?php
             $qry = mysqli_query($con, $tabla);
