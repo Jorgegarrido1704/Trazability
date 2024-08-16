@@ -1,5 +1,6 @@
 <?php
 require "conection.php";
+session_start();
 $buscar=mysqli_query($con,"SELECT * FROM registro_mant order by id desc");
 ?>
 
