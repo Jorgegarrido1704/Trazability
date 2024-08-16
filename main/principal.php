@@ -32,7 +32,7 @@ if($_SESSION['user']=== 'cali'){
     header('location:Bossprincipal.php');
 }else if($_SESSION['admin']=== 'Admin'){
 header('location:admin.php');
-}else if($_SESSION['user']=== 'Mant'){
+}else if($_SESSION['user']=== 'Jesus Per'){
     header('location:Mant.php');}
 
 ?>
