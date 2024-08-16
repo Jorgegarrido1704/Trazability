@@ -5,7 +5,7 @@ if(!$_SESSION['usuario']){
     header("location:index.html");
 }
 
-if($_SESSION['user']=== 'Admi'){
+else{
 ?>
 <!DOCTYPE html>
 <html lang="en">
