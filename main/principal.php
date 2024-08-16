@@ -25,6 +25,7 @@ if($_SESSION['usuario']==="Admin"){
     $_SESSION['admin']='';
 
 }
+echo $_SESSION['user'];
 
 if($_SESSION['user']=== 'cali'){
     header('location:calidadPrincipal.php');
