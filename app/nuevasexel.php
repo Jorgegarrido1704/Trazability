@@ -41,7 +41,7 @@ while($row=mysqli_fetch_array($buscarinfo)){
         }elseif($count==12 or $count==20){ 
             $where='SHIPPING';
         }elseif($count==13 or $count==14 or $count==16 or $count==17 or $count==18 or $count==19){
-            $where='Engineery';
+            $where='ENGINNERY';
         }
         elseif($count==15){
             $where='SPECIAL WIRE';
