@@ -1,0 +1,9 @@
+.col1{
+    width: 38mm;
+    height: 13mm;
+    border-radius: 1px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}

@@ -1,0 +1,64 @@
+
+        #label {
+            width: 38mm;
+            height: 26mm;
+            border-radius: 1px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .row {
+            display: flex;
+            align-items: top;
+        }
+        .qrs {
+            align-items: top;
+            width: 13mm;
+            height: 13mm;
+        } .qrss {
+            width: 13mm;
+            height: 13mm;
+        }
+        .data-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: top;
+            margin-left: 1px;
+        }
+        .datos {
+            width: 22mm;
+            border-radius: 1px;
+            border: solid 1px #000;
+            text-align: center;
+            margin: 1px 0;
+            padding-left: 1px;            
+            box-sizing: border-box;
+
+        }
+        .datot {
+            width: 22mm;
+            border-radius: 1px;
+            border: solid 1px #000;
+            text-align: center;
+            margin: 1px 0;
+          
+            box-sizing: border-box;
+        }
+        textarea {
+            width: 22mm;
+            height: 13mm;
+            border-radius: 1px;
+            border: solid 1px #000;
+            box-sizing: border-box;
+            resize: none;
+            font-size: xx-small;
+            overflow: hidden; /* Oculta las barras de desplazamiento */
+            resize: none;
+            margin-left: 3px;
+        }
+       #qrs_img{
+           width: 10mm;
+           height: 8mm;
+       }
+        
