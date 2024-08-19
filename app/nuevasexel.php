@@ -16,6 +16,7 @@ $sheet->setCellValue('G1', 'Qty');
 $sheet->setCellValue('H1', 'Where');
 $sheet->setCellValue('I1', 'paro');
 $sheet->setCellValue('J1', 'Test');
+$sheet->setCellValue('K1', 'Orig Qty');
 $buscarinfo=mysqli_query($con,"SELECT * FROM registro ORDER BY count ASC");
 $rows=mysqli_num_rows($buscarinfo);
 while($row=mysqli_fetch_array($buscarinfo)){
@@ -65,9 +66,11 @@ $sheet->setCellValue('G'.$t, $Qty);
 $sheet->setCellValue('H'.$t, $where);
 $sheet->setCellValue('I'.$t, $paro);
 if($rowscal>$cantpo){
-    $sheet->setCellValue('J'.$t, $cantpo."/".$cantpo);    
+    $sheet->setCellValue('J'.$t, $cantpo);
+    $sheet->setCellValue('K'.$t, $cantpo);    
 }else{
-$sheet->setCellValue('J'.$t, $rowscal."/".$cantpo);
+$sheet->setCellValue('J'.$t, $rowscal);
+$sheet->setCellValue('K'.$t, $cantpo);
 }
 $t++;}
 
