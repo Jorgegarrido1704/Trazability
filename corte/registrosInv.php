@@ -1,10 +1,10 @@
 <?php
 require "../app/conection.php";
 
-$buscar=mysqli_query($con,"SELECT * FROM registro WHERE count<'3'");
+$buscar=mysqli_query($con,"SELECT * FROM regsitrocalidad ");
 while($row=mysqli_fetch_array($buscar)){
-    $pn=$row['NumPart'];
-    $wo=$row['wo'];
-    $cuantos=$row['Qty'];
-    $insertar=mysqli_query($con,"INSERT INTO kits (`numeroParte`, `qty`, `wo`) VALUES ('$pn','$cuantos','$wo')");
+ $ids=$row['id'];   
+$fecha=$row['fecha'];
+$cambio=str_replace('/','-',$fecha);
+$up=mysqli_query($con,"UPDATE regsitrocalidad SET fecha='$cambio' WHERE id='$ids'");
 }
