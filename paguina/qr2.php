@@ -14,6 +14,9 @@ if($wo==""){
        $rev=$rows['rev']; 
        $info=$rows['info'];
        $desc=$rows['description'];
+       if(substr($rev,0,4)=="PPAP" or substr($rev,0,4)=="PRIM"){
+           $rev=substr($rev,5);
+       }
     
 $buscarCuenta=mysqli_query($con,"SELECT * FROM `consterm` where `codigo` = '$info' ");
 if(mysqli_num_rows($buscarCuenta)>0){
