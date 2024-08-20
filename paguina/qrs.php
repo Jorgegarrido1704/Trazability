@@ -12,7 +12,7 @@
         <form action="qr2.php" method="post">
             <div class="mb-3">
                 <label for="wo" class="form-label">Wo order</label>
-                <input type="text" class="form-control" id="wo" name="wo" focus placeholder="WO" required>
+                <input type="text" class="form-control" id="wo" name="wo" autofocus placeholder="WO" required>
             </div>
             <div class="mb-3">    
                 <button class="btn btn-primary" type="submit">Imprimir</button>
