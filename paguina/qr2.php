@@ -93,7 +93,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
             margin-left: 2px;
         }
         .datos {
-            width: 33mm;
+            width: 31mm;
             border-radius: 1px;
             border: solid 1px #000;
             text-align: center;
@@ -103,7 +103,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
             box-sizing: border-box;
         }
         textarea {
-            width: 33mm;
+            width: 31mm;
             height: 13mm;
             border-radius: 1px;
             border: solid 1px #000;
