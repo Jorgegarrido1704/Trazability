@@ -2,6 +2,7 @@
 require 'conector.php';
 require 'vendor/autoload.php';
 session_start();
+date_default_timezone_set("america/Mexico_City");
 $wo=isset($_POST['wo'])?$_POST['wo']:"";
 $today = date('mdY');
 if($wo==""){
