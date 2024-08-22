@@ -14,7 +14,7 @@ $sheet->setCellValue('E1', 'Wo');
 $sheet->setCellValue('F1', 'Sono');
 $sheet->setCellValue('G1', 'Qty');
 $sheet->setCellValue('H1', 'Where');
-$sheet->setCellValue('I1', 'paro');
+$sheet->setCellValue('I1', 'Issue');
 $sheet->setCellValue('J1', 'Test');
 $sheet->setCellValue('K1', 'Orig Qty');
 $buscarinfo=mysqli_query($con,"SELECT * FROM registro ORDER BY count ASC");
@@ -28,7 +28,9 @@ while($row=mysqli_fetch_array($buscarinfo)){
     $po= $row['po'];
     $Qty= $row['Qty'];
     $count=$row['count'];
-        if($count==2 or $count==3){
+    if($count==1){
+    $where='PLANNING';
+    }elseif($count==2 or $count==3){
             $where='CUTTING';
         }elseif($count==4 or $count==5){
             $where='TERMINALS';
