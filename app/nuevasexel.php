@@ -68,9 +68,12 @@ $sheet->setCellValue('I'.$t, $paro);
 if($rowscal>$cantpo){
     $sheet->setCellValue('J'.$t, $cantpo);
     $sheet->setCellValue('K'.$t, $cantpo);    
-}else{
+}else if($rowscal<=$cantpo){
 $sheet->setCellValue('J'.$t, $rowscal);
 $sheet->setCellValue('K'.$t, $cantpo);
+}else{
+    $sheet->setCellValue('J'.$t, "0");
+    $sheet->setCellValue('K'.$t, "0"); 
 }
 $t++;}
 
