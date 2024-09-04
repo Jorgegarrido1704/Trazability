@@ -4,7 +4,6 @@ require 'vendor/autoload.php';
 session_start();
 date_default_timezone_set("america/Mexico_City");
 $wo=isset($_POST['wo'])?$_POST['wo']:"";
-$cons=isset($_POST['const'])?$_POST['const']:"";
 $today = date('mdY');
 if($wo==""){
     header("Location:qrs.php");
@@ -26,18 +25,15 @@ if(mysqli_num_rows($buscarCuenta)>0){
     $day=$rowsCuenta['dias'];
     if($day==$today){
         $dias=$today;
-        $inicio=$rowsCuenta['cuenta'];
-           $cuentas=$rowsCuenta['cuenta']+$cons;
+   $cuentas=$rowsCuenta['cuenta']+1;
    mysqli_query($con,"UPDATE `consterm` SET `cuenta` = '$cuentas' WHERE `consterm`.`codigo` = '$info' ");
 }else{
     $dias=$today;
-    $inicio=0;
-    $cuentas=$cons;
+    $cuentas=1;
     mysqli_query($con,"UPDATE `consterm` SET `cuenta` = '$cuentas', `dias` = '$today' WHERE `consterm`.`codigo` = '$info' ");
 }
 }else{
-    $inicio=0;
-    $cuentas=$cons;
+    $cuentas=1;
     $dias=$today;
     mysqli_query($con,"INSERT INTO `consterm` (`pn`, `cuenta`, `rev`,`dias`, `codigo`) VALUES ('$np', '$cuentas', '$rev','$dias', '$info') ");
 }
@@ -128,20 +124,18 @@ use chillerlan\QRCode\{QRCode, QROptions};
     </style>
 </head>
 <body>
-    <?php for ($inicio; $inicio < $cuentas; $inicio++) { ?>
-    <div style="display:flex; width: 40mm; height: 105mm">    
     <div id="label" class="container">
         <div class="row">
             <div class="qrs">
                 <?php
-                $data = '5703|'.$np.'|'.$rev.'|'.$dias.'|'.$inicio+1;
+                $data = '5703|'.$np.'|'.$rev.'|'.$dias.'|'.$cuenta;
                 $qrcode = (new QRCode)->render($data);
                 ?>
                 <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?> 
             </div>
             <div class="data-container">
                 <h6 class="datos"><?php echo $np; ?> | <?php echo $rev; ?></h6>
-                <h6 class="datos"><?php echo $inicio; ?></h6>
+                <h6 class="datos"><?php echo $cuenta; ?></h6>
             </div>
         </div>
         <div class="row">
@@ -153,8 +147,6 @@ use chillerlan\QRCode\{QRCode, QROptions};
             </div>
         </div>
     </div>
-    </div>
-    <?php } ?>
     <script>
         window.onload = function() {
             print();
