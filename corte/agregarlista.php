@@ -17,7 +17,7 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn'");
         $dataForm=$rowList['dataFrom'];
         $dataTo=$rowList['dataTo'];
       
-       if(substr($cons,0,5)=="CORTE"){
+       if(substr($cons,0,5)=="C"){
         $cons=str_replace([".","-"," "],"",$cons);
         $codigo=substr($wo,2).substr($cons,5);
 
