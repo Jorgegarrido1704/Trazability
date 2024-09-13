@@ -1,6 +1,10 @@
 <?php
 require "../app/conection.php";
+$wo='009723';
 $pn ="1003826612";
+
+
+
 $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn'");
     while($rowList=mysqli_fetch_array($selectlist)){
         $cons=$rowList['cons'];
