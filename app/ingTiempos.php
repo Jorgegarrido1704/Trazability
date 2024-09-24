@@ -4,6 +4,7 @@ require 'vendor/autoload.php';
 date_default_timezone_set("America/Mexico_City");
 $datefin=strtotime(date("d-m-Y 23:59"));
 $dateIni=strtotime(date("d-m-Y 00:00"));
+//$dateIni=strtotime(date("01-06-2024 00:00"));
 $today = date("d-m-Y");
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
