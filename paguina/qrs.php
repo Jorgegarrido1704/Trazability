@@ -15,7 +15,7 @@
                 <input type="text" class="form-control" id="wo" name="wo" autofocus placeholder="WO" required>
             </div>
             <div class="mb-3">
-                <label for="const" class="form-label">Wo order</label>
+                <label for="const" class="form-label">Cantidad (max 10)</label>
                 <input type="number" class="form-control" id="const" name="const"  placeholder="10" max="10" min="1" required>
             </div>
             <div class="mb-3">    

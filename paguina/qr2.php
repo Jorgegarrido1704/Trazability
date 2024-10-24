@@ -134,7 +134,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
         <div class="row">
             <div class="qrs">
                 <?php
-                $data = '5703|'.$np.'|'.$rev.'|'.$dias.'|'.$inicio+1;
+                $data = '5703|'.$np.'|'.$rev.'|'.$dias.'|'.$inicio;
                 $qrcode = (new QRCode)->render($data);
                 ?>
                 <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?> 
