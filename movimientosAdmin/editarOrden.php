@@ -5,7 +5,7 @@ if($wo_post!=""){
     echo $wo_post;
 }
 $sel= new registro;
-$sel->select($con,'registro',"id>0");
+$sel->select($con,'registro',"id>0 order by NumPart asc,wo asc");
 
 ?>
 <!DOCTYPE html>
