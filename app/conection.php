@@ -8,8 +8,9 @@ if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-class registro    {
+class registro   {
         public $parte;
+       
         public function select($con,$from,$where){
             $select=mysqli_query($con,"SELECT * FROM $from WHERE $where");
             $maxrow=mysqli_num_rows($select);
@@ -46,6 +47,7 @@ class registro    {
 
 class corte{
     public $codigo;
+   
     public function select($con,$from,$where){
         $buscar=mysqli_query($con,"SELECT * FROM $from WHERE $where");
         $maxrow=mysqli_num_rows($buscar);
