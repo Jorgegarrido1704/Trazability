@@ -5,7 +5,7 @@ require '../app/vendor/autoload.php';
 date_default_timezone_set("America/Mexico_City");
 //$today=date("d-m-Y");
 
-$today=date("02-10-2024");
+$today=date("d-m-Y");
 $partes=[];
 $parte=mysqli_query($con,"SELECT * FROM regsitrocalidad  WHERE fecha LIKE '$today%' ");
 foreach($parte as $part){
