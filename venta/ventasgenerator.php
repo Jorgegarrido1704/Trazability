@@ -24,7 +24,7 @@ $sheet->setCellValue('D1', 'Cantidad registrada');
 $sheet->setCellValue('E1', 'Total');
 
 foreach($partes as $parte){
-    $buscarInfo=mysqli_query($con,"SELECT * FROM regsitrocalidad WHERE pn='$parte'");
+    $buscarInfo=mysqli_query($con,"SELECT * FROM regsitrocalidad WHERE pn='$parte' AND fecha LIKE '$today%'");
     $numRow=mysqli_num_rows($buscarInfo);
     $buscarPrice=mysqli_query($con,"SELECT * FROM precios WHERE pn='$parte'");
     $rowPrice=mysqli_fetch_array($buscarPrice);
