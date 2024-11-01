@@ -5,7 +5,7 @@ require '../app/vendor/autoload.php';
 date_default_timezone_set("America/Mexico_City");
 //$today=date("d-m-Y");
 
-$today=date("02-10-2024");
+$today=date("d-m-Y");
 $partes=[];
 $parte=mysqli_query($con,"SELECT * FROM regsitrocalidad  WHERE fecha LIKE '$today%' ");
 foreach($parte as $part){
@@ -24,7 +24,7 @@ $sheet->setCellValue('D1', 'Cantidad registrada');
 $sheet->setCellValue('E1', 'Total');
 
 foreach($partes as $parte){
-    $buscarInfo=mysqli_query($con,"SELECT * FROM regsitrocalidad WHERE pn='$parte'");
+    $buscarInfo=mysqli_query($con,"SELECT * FROM regsitrocalidad WHERE pn='$parte' AND fecha LIKE '$today%'");
     $numRow=mysqli_num_rows($buscarInfo);
     $buscarPrice=mysqli_query($con,"SELECT * FROM precios WHERE pn='$parte'");
     $rowPrice=mysqli_fetch_array($buscarPrice);
