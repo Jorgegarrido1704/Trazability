@@ -98,7 +98,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
               <img src="bergs.jpg" alt="responsive image"/>  
               </div>
               <div class="fecha-hecho">
-                <div class="fecha">15/11/2024</div>
+                <div class="fecha">13/11/2024</div>
                 <div class="hecho">Made in MEX</div>
               </div>
             </div>
@@ -110,10 +110,10 @@ use chillerlan\QRCode\{QRCode, QROptions};
                             <h6 class="datos">SUPPLIER P/N</h6>
                         </div>
                         <div class="supplierPn">
-                            <h5 class="datospn">1003617118</h5>   
+                            <h5 class="datospn">1201301203020x</h5>   
                         </div>
                 </div>
-                <div class="rev"><H6>REVISION LEVEL: 1</H6></div>
+                <div class="rev"><H6>REVISION LEVEL: XX</H6></div>
             </div>
             </div>
             <div class="row">
@@ -123,7 +123,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
                     <h6 class="datos">CUSTOMER P/N</h6> 
                 </div>
                 <div class="cust">
-                    <h5 class="datospn1">1003617118</h5>
+                    <h5 class="datospn1">1201301203020x</h5>
                 </div> 
                 </div>   
             </div>
