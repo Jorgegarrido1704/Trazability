@@ -64,34 +64,38 @@ use chillerlan\QRCode\{QRCode, QROptions};
     <title>QR Codes</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body{
+            width:70mm; height:78mm;
+        }
         #label {
-            width: 70mm;
-            height: 30mm;
-            border-radius: solid 1px #000;
-            box-sizing: border-box;
-            display: block;
+            width: 78mm;
+            height: 35mm;
+            
             flex-direction: column;
-            justify-content: space-between;            }
+            justify-content: space-between;
+        
+              }
         .row {            display: block;            align-items: center;            margin-bottom: none;        }
         .data-container {  display: flex;  align-items: center;  border: solid 1px #000;
-  width: 70mm;  height: 10mm;            padding-top: 4px;             margin-left: 2px;}
-.img img ,.supplier{  width: 30mm;   height: 8mm;  margin-right: 15mm; margin-left: 2px; }
+  width: 70mm;  height: 10mm;            padding-top: 2px;             margin-left: 1px;}
+.img img ,.supplier{  width: 30mm;   height: 9mm;  margin-right: 15mm; margin-left: 1px; }
 .fecha-hecho,.rev {  display: center;  flex-direction: column;  width: 24mm; 
-  height: 9mm;  padding-buttom: 1mm;}
-.fecha,.hecho {  font-size: 14px;   color: #333;  width: 24mm;   height: 4mm;}
+  height: 10mm;  padding-buttom: 2mm;}
+.fecha,.hecho {  font-size: 14px;   color: #333;  width: 24mm;   height: 5mm;}
 .datos{    font-size: xx-small;  font-style: bold; margin-left: 1mm;  }
 .datospn{    font-size: small; font-style: bold; margin-left: 1mm;  }
 .datospn1{    font-size: small; font-style: bold; margin-left: 10mm; }
-.labelSupplier,.supplierPn {  display: center;  flex-direction: column;  width: 24mm; height: 4mm;}
+.labelSupplier,.supplierPn {  display: center;  flex-direction: column;  width: 24mm; height: 5mm; }
+
 .rev h6{margin-top: 6mm;    font-size: xx-small;    align-items: buttom; }
-.custpn,.cust{display: center;  flex-direction: column;  width: 68mm; height: 4mm; }
-.custleb{width: 68mm;   height: 8mm;   }
+.custpn,.cust{display: center;  flex-direction: column;  width: 70mm; height: 5mm; margin-top: 1px;}
+.custleb{width: 70mm;   height: 10mm;   }
     </style>
 </head>
 <body>
     
-    <div style="display:flex; width: 70mm; height: 30mm">    
-    <div id="label" class="container">
+    <div style=" display:flex; width:70mm; height:78mm; rotate:90deg;  ">    
+    <div id="label" style="padding-top:30mm; padding-left:3mm;" >
         <div class="row">
             <div class="data-container">
                 <div class="img">
