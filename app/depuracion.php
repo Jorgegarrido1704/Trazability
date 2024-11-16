@@ -123,7 +123,6 @@ $busq="SELECT * FROM registro WHERE  count= '20' ";
 $qrydepu=mysqli_query($con,$busq);
 While($rowdepu=mysqli_fetch_array($qrydepu)){
     $fechain=$rowdepu["fecha"];
-    
     $cliente=   $rowdepu["cliente"];
     $np= $rowdepu["NumPart"];
     $wo=$rowdepu['wo'];
@@ -173,13 +172,11 @@ While($rowdepu=mysqli_fetch_array($qrydepu)){
         $plan=$rowinsertar["calidad"];
         $inserta=mysqli_query($con,"UPDATE timesharn SET `emba` = '$plan' WHERE bar = '$codigo' ");
     }
-
-   
    $update=mysqli_query($con,"UPDATE timesharn SET `embaF` = '$today' WHERE bar = '$codigo' "); 
-
-
     $delteregistro="DELETE FROM registro WHERE info='$codigo' ";
-    $qrydelteregistro=mysqli_query($con, $delteregistro) or die(mysqli_error($con));}
+    $qrydelteregistro=mysqli_query($con, $delteregistro) or die(mysqli_error($con));
+    $quitarDreg=mysqli_query($con,"DELETE FROM `registroparcial` WHERE `codeBar`='$codigo'");
+}
 
 
     
