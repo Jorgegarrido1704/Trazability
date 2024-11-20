@@ -96,9 +96,9 @@ $sheetVenta->setCellValue('B1', 'Numero de Parte ');
 $sheetVenta->setCellValue('C1', 'Precio Unitario');
 $sheetVenta->setCellValue('D1', 'Cantidad registrada');
 $sheetVenta->setCellValue('E1', 'Total');
-
+$t=2;
 foreach($partes as $parte){
-    $buscarInfo=mysqli_query($con,"SELECT * FROM regsitrocalidad WHERE pn='$parte' AND fecha LIKE '$today%'");
+    $buscarInfo=mysqli_query($con,"SELECT * FROM regsitrocalidad WHERE pn='$parte' AND fecha LIKE '$todays%'");
     $numRow=mysqli_num_rows($buscarInfo);
     $buscarPrice=mysqli_query($con,"SELECT * FROM precios WHERE pn='$parte'");
     $rowPrice=mysqli_fetch_array($buscarPrice);
@@ -108,9 +108,9 @@ foreach($partes as $parte){
 
 $sheetVenta->setCellValue('A'.$t, $today);
 $sheetVenta->setCellValue('B'.$t, $parte);
-$sheetVenta->setCellValue('C'.$t, $price);
+$sheetVenta->setCellValue('C'.$t,'$ '. $price);
 $sheetVenta->setCellValue('D'.$t, $numRow);
-$sheetVenta->setCellValue('E'.$t, $numRow*$price);
+$sheetVenta->setCellValue('E'.$t,'$ '. $numRow*$price);
 $t++;
 }
 
