@@ -2,17 +2,92 @@
 require "conection.php";
 require 'vendor/autoload.php';
 date_default_timezone_set("America/Mexico_City");
-if(date("D")=="Mon"){
+if(date("N")=="1"){
     $lastDate=strtotime(date('d-m-Y 17:00',strtotime('-3 day')));
 }else{
 $lastDate=strtotime(date('d-m-Y 17:00',strtotime('-1 day')));}
 $todays=date("d-m-Y");
+$today=date("d-m-Y 00:00");
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 $spreadsheet = new Spreadsheet();
-$sheet = $spreadsheet->getActiveSheet();
-$sheet->setTitle('Paros Semanal');
+$sheetwo = $spreadsheet->getActiveSheet();
+// Work orders
+$sheetwo->setTitle('Work order '.$todays);
+$sheetwo->setCellValue('A1','Part Number');
+$sheetwo->setCellValue('B1', 'Work Order');
+$sheetwo->setCellValue('C1', 'Original Quantity');
+$sheetwo->setCellValue('D1', 'Cutting');
+$sheetwo->setCellValue('E1', 'Terminals');
+$sheetwo->setCellValue('F1', 'Assembly');
+$sheetwo->setCellValue('G1', 'Looming');
+$sheetwo->setCellValue('H1', 'Testing');
+$sheetwo->setCellValue('I1', 'Shipping');
+$sheetwo->setCellValue('J1', 'Tiempo en proceso');
+$t=2;
+$buscarWo=mysqli_query($con,"SELECT * FROM `registroparcial` INNER JOIN `registro` ON registroparcial.codeBar=registro.info ORDER BY `pn` DESC");
+While($row=mysqli_fetch_array($buscarWo)){
+    $pn=$row['pn'];
+    $wo=$row['wo'];
+    $orgQty=$row['orgQty'];
+    $cortPar=$row['cortPar'];
+    $libePar=$row['libePar'];
+    $ensaPar=$row['ensaPar'];
+    $loomPar=$row['loomPar'];
+    $testPar=$row['testPar'];
+    $embPar=$row['embPar'];   
+    $tiempo=$row['tiempototal'];
+$sheetwo->setCellValue('A'.$t, $pn);
+$sheetwo->setCellValue('B'.$t, $wo);
+$sheetwo->setCellValue('C'.$t, $orgQty);
+$sheetwo->setCellValue('D'.$t, $cortPar);
+$sheetwo->setCellValue('E'.$t, $libePar);
+$sheetwo->setCellValue('F'.$t, $ensaPar);
+$sheetwo->setCellValue('G'.$t, $loomPar);
+$sheetwo->setCellValue('H'.$t, $testPar);
+$sheetwo->setCellValue('I'.$t, $embPar);
+$sheetwo->setCellValue('J'.$t, $tiempo);
+$t++;        
+}
+//Movimientos del dia
+$sheetMov=$spreadsheet->createSheet();
+$sheetMov->setTitle('Movimientos del dia en areas');
+$sheetMov->setCellValue('A1','Part Number');
+$sheetMov->setCellValue('B1', 'Work Order');
+$sheetMov->setCellValue('C1', 'Cantidad de arneses');
+$sheetMov->setCellValue('D1', 'Dolares en movimiento');
+$sheetMov->setCellValue('E1', 'Quien realizo el movimiento');
+$sheetMov->setCellValue('F1', 'Fecha de movimiento');
+$t=2;
+$buscarWo=mysqli_query($con,"SELECT * FROM `registroparcialtiempo` INNER JOIN `registro` ON registroparcialtiempo.codeBar=registro.info ");
+While($row=mysqli_fetch_array($buscarWo)){
+    if(strtotime($row['fechaReg'])>strtotime($today)){
+    $code=$row['codeBar'];
+    $qtyPar=$row['qtyPar'];
+    $area=$row['area'];
+    $fechaReg=$row['fechaReg'];
+    $numPart=$row['NumPart'];
+    $wo=$row['wo'];
+    $price=$row['price'];
+    $sheetMov->setCellValue('A'.$t, $numPart);
+    $sheetMov->setCellValue('B'.$t, $wo);
+    $sheetMov->setCellValue('C'.$t, $qtyPar);
+    $sheetMov->setCellValue('D'.$t, "$ ".$price*$qtyPar);
+    $sheetMov->setCellValue('E'.$t, $area);
+    $sheetMov->setCellValue('F'.$t, $fechaReg);
+    $t++;
+        
+    }
+}
+
+
+
+
+
+//Paros Semanal
+$sheet=$spreadsheet->createSheet();
+$sheet->setTitle('Paros Herramentales Semanal');
 $sheet->setCellValue('A1','Fecha' );
 $sheet->setCellValue('B1', 'Aplicador');
 $sheet->setCellValue('C1', 'Terminal');
@@ -59,7 +134,7 @@ While($row=mysqli_fetch_array($buscarventa)){
     $sheet->setCellValue('G'.$t, $tiempoFin );
     $t++;
     }}
-
+//Golpes Semanal
 $sheet1=$spreadsheet->createSheet(); 
 $sheet1->setTitle('Golpes Semanal');
 $sheet1->setCellValue('A1', 'Herrmental');
@@ -84,9 +159,7 @@ $sheet2->setTitle('Mantenimiento faltante Semanal');
 $sheet2->setCellValue('A1', 'Herrmental');
 $sheet2->setCellValue('B1', 'Terminal');
 $sheet2->setCellValue('C1', 'Numero de Mantenimientos');
-
 $t=2;
-
 $mant3m=strtotime(date('d-m-Y 00:00',strtotime('-3 month')));
 $buscarinfo=mysqli_query($con,"SELECT * FROM mant_golpes_diarios  ORDER BY id DESC");
 while($row=mysqli_fetch_array($buscarinfo)){
