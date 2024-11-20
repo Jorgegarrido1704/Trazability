@@ -1,7 +1,5 @@
 <?php
 require "../app/conection.php";
-
-
 $buscar=mysqli_query($con,"SELECT * FROM registro WHERE count<4");
 while($row=mysqli_fetch_array($buscar)){
     $pn=$row['NumPart'];
