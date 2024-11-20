@@ -80,7 +80,39 @@ While($row=mysqli_fetch_array($buscarWo)){
         
     }
 }
+//venta del dia
+$partes=[];
+$parte=mysqli_query($con,"SELECT * FROM regsitrocalidad  WHERE fecha LIKE '$todays%' ");
+foreach($parte as $part){
+    $partes[]=$part['pn']; 
+}
+$partes=array_unique($partes);
 
+$sheetVenta=$spreadsheet->createSheet();
+$sheetVenta->setTitle('Venta del dia');
+
+$sheetVenta->setCellValue('A1', 'Fecha');
+$sheetVenta->setCellValue('B1', 'Numero de Parte ');
+$sheetVenta->setCellValue('C1', 'Precio Unitario');
+$sheetVenta->setCellValue('D1', 'Cantidad registrada');
+$sheetVenta->setCellValue('E1', 'Total');
+
+foreach($partes as $parte){
+    $buscarInfo=mysqli_query($con,"SELECT * FROM regsitrocalidad WHERE pn='$parte' AND fecha LIKE '$today%'");
+    $numRow=mysqli_num_rows($buscarInfo);
+    $buscarPrice=mysqli_query($con,"SELECT * FROM precios WHERE pn='$parte'");
+    $rowPrice=mysqli_fetch_array($buscarPrice);
+    $price=$rowPrice['price'];
+    $client=$rowPrice['client'];
+   
+
+$sheetVenta->setCellValue('A'.$t, $today);
+$sheetVenta->setCellValue('B'.$t, $parte);
+$sheetVenta->setCellValue('C'.$t, $price);
+$sheetVenta->setCellValue('D'.$t, $numRow);
+$sheetVenta->setCellValue('E'.$t, $numRow*$price);
+$t++;
+}
 
 
 
