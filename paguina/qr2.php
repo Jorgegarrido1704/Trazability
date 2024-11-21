@@ -16,9 +16,15 @@ if($wo==""){
        $rev=$rows['rev']; 
        $info=$rows['info'];
        $desc=$rows['description'];
+       $berglab=array();
+       $berglab=['1003647380','1003617118'];
        if(substr($rev,0,4)=="PPAP" or substr($rev,0,4)=="PRIM"){
-           $rev=substr($rev,5);
-       }
+        $rev=substr($rev,5);    }
+       if(in_array($np,$berglab)){
+        header("Location:label.php?rev=$rev&np=$np&desc=$desc");}
+
+       
+       
     
 $buscarCuenta=mysqli_query($con,"SELECT * FROM `consterm` where `codigo` = '$info' ");
 if(mysqli_num_rows($buscarCuenta)>0){
@@ -60,7 +66,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta https-equiv="refresh" content=" url=qrs.php">
+    
     <title>QR Codes</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -162,5 +168,6 @@ use chillerlan\QRCode\{QRCode, QROptions};
     </script>
 </body>
 </html>
+
 
 

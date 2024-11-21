@@ -1,59 +1,12 @@
 <?php
-//require 'conector.php';
-//require 'vendor/autoload.php';
-//session_start();
-/*date_default_timezone_set("america/Mexico_City");
-$wo=isset($_POST['wo'])?$_POST['wo']:"";
-$cons=isset($_POST['const'])?$_POST['const']:"";
-$today = date('mdY');
-if($wo==""){
-    header("Location:qrs.php");
-}else{
-    $buscar=mysqli_query($con,"SELECT * FROM `registro` where `wo` = '$wo' ");
-    if(mysqli_num_rows($buscar)>0){
-        $rows = mysqli_fetch_array($buscar);
-       $np=$rows['NumPart'];
-       $rev=$rows['rev']; 
-       $info=$rows['info'];
-       $desc=$rows['description'];
-       if(substr($rev,0,4)=="PPAP" or substr($rev,0,4)=="PRIM"){
-           $rev=substr($rev,5);
-       }
-    
-$buscarCuenta=mysqli_query($con,"SELECT * FROM `consterm` where `codigo` = '$info' ");
-if(mysqli_num_rows($buscarCuenta)>0){
-    $rowsCuenta = mysqli_fetch_array($buscarCuenta);
-    $day=$rowsCuenta['dias'];
-    if($day==$today){
-        $dias=$today;
-        $inicio=$rowsCuenta['cuenta'];
-           $cuentas=$rowsCuenta['cuenta']+$cons;
-   mysqli_query($con,"UPDATE `consterm` SET `cuenta` = '$cuentas' WHERE `consterm`.`codigo` = '$info' ");
-}else{
-    $dias=$today;
-    $inicio=0;
-    $cuentas=$cons;
-    mysqli_query($con,"UPDATE `consterm` SET `cuenta` = '$cuentas', `dias` = '$today' WHERE `consterm`.`codigo` = '$info' ");
-}
-}else{
-    $inicio=0;
-    $cuentas=$cons;
-    $dias=$today;
-    mysqli_query($con,"INSERT INTO `consterm` (`pn`, `cuenta`, `rev`,`dias`, `codigo`) VALUES ('$np', '$cuentas', '$rev','$dias', '$info') ");
-}
+$rev=isset($_GET['rev'])?$_GET['rev']:"";
+$pn=isset($_GET['np'])?$_GET['np']:"";
+$desc=isset($_GET['desc'])?$_GET['desc']:"";
+$berglab=['1003647380','1003617118'];
+       if(!in_array($pn,$berglab)){
+        header("Location:qrs.php");
+        }
 
-if($cuentas<10){
-    $cuenta="00".$cuentas;
-}else if($cuentas>9 and  $cuentas<100){
-    $cuenta="0".$cuentas;
-}else{
-    $cuenta=$cuentas;
-}}else{
-    header("Location:qrs.php");
-}
-}
-use chillerlan\QRCode\{QRCode, QROptions};
-*/
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,10 +23,8 @@ use chillerlan\QRCode\{QRCode, QROptions};
         #label {
             width: 78mm;
             height: 35mm;
-            
             flex-direction: column;
             justify-content: space-between;
-        
               }
         .row {            display: block;            align-items: center;            margin-bottom: none;        }
         .data-container {  display: flex;  align-items: center;  border: solid 1px #000;
@@ -84,9 +35,9 @@ use chillerlan\QRCode\{QRCode, QROptions};
 .fecha,.hecho {  font-size: 14px;   color: #333;  width: 24mm;   height: 5mm;}
 .datos{    font-size: xx-small;  font-style: bold; margin-left: 1mm;  }
 .datospn{    font-size: small; font-style: bold; margin-left: 1mm;  }
-.datospn1{    font-size: small; font-style: bold; margin-left: 10mm; }
-.labelSupplier,.supplierPn {  display: center;  flex-direction: column;  width: 24mm; height: 5mm; }
-
+.datospn1{    font-size: small; font-style: bold; margin-left: 10mm;   }
+.labelSupplier,.supplierPn {  display: center;  flex-direction: column;  width: 24mm; height: 3mm; }
+.labelSupplier1{  display: center;  flex-direction: column;  width: 40mm; height: 2mm; }
 .rev h6{margin-top: 6mm;    font-size: xx-small;    align-items: buttom; }
 .custpn,.cust{display: center;  flex-direction: column;  width: 70mm; height: 5mm; margin-top: 1px;}
 .custleb{width: 70mm;   height: 10mm;   }
@@ -102,7 +53,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
               <img src="bergs.jpg" alt="responsive image"/>  
               </div>
               <div class="fecha-hecho">
-                <div class="fecha">13/11/2024</div>
+                <div class="fecha" align="center"><?php echo date("d/m/y"); ?></div>
                 <div class="hecho">Made in MEX</div>
               </div>
             </div>
@@ -114,10 +65,13 @@ use chillerlan\QRCode\{QRCode, QROptions};
                             <h6 class="datos">SUPPLIER P/N</h6>
                         </div>
                         <div class="supplierPn">
-                            <h5 class="datospn">1201301203020x</h5>   
+                            <h5 class="datospn"><?php echo $pn; ?></h5>   
+                        </div>
+                        <div class="labelSupplier1">
+                            <h6 class="datos"><?php echo $desc; ?></h6>
                         </div>
                 </div>
-                <div class="rev"><H6>REVISION LEVEL: XX</H6></div>
+                <div class="rev"><H6>REVISION LEVEL: <?php echo $rev; ?></H6></div>
             </div>
             </div>
             <div class="row">
@@ -127,7 +81,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
                     <h6 class="datos">CUSTOMER P/N</h6> 
                 </div>
                 <div class="cust">
-                    <h5 class="datospn1">1201301203020x</h5>
+                    <h4 class="datospn1"><?php echo $pn; ?></h4>
                 </div> 
                 </div>   
             </div>
