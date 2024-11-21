@@ -8,7 +8,7 @@ if (isset($_POST['upload'])) {
             // Conectar a la base de datos
             try {
                 // Preparar la consulta de inserción
-                $insertQuery = "INSERT INTO listascorte (`pn`, `cons`, `tipo`, `aws`, `color`, `tamano`, `strip1`, `terminal1`, `strip2`, `terminal2`, `conector`, `dataFrom`, `dataTo`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $insertQuery = "INSERT INTO listascorte (`pn`,`rev`, `cons`, `tipo`, `aws`, `color`, `tamano`, `strip1`, `terminal1`, `strip2`, `terminal2`, `conector`, `dataFrom`, `dataTo`) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt = mysqli_prepare($con, $insertQuery);
 
                 if (!$stmt) {
@@ -16,10 +16,10 @@ if (isset($_POST['upload'])) {
                 }
 
                 // Variables para vincular los parámetros
-                $pn = $cons = $tipo = $aws = $color = $tamano = $strip1 = $terminal1 = $strip2 = $terminal2 = $conector = $dataFrom = $dataTo = '';
+                $pn =$rev=$cons = $tipo = $aws = $color = $tamano = $strip1 = $terminal1 = $strip2 = $terminal2 = $conector = $dataFrom = $dataTo = '';
 
                 // Vincular los parámetros
-                mysqli_stmt_bind_param($stmt, 'sssssssssssss', $pn, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo);
+                mysqli_stmt_bind_param($stmt, 'ssssssssssssss', $pn, $rev, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo);
 
                 // Contador de filas procesadas
                 $rowCount = 0;
@@ -34,7 +34,7 @@ if (isset($_POST['upload'])) {
                 // Convertir la primera línea en un array si no está vacía
                 if (!empty($firstLine)) {
                     $data = str_getcsv($firstLine);
-                    list($pn, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo) = $data;
+                    list($pn,$rev, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo) = $data;
                     mysqli_stmt_execute($stmt);
                     $rowCount++;
                 }
@@ -42,7 +42,7 @@ if (isset($_POST['upload'])) {
                 // Leer e insertar datos en bloques
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                     // Asignar los valores a las variables vinculadas
-                    list($pn, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo) = $data;
+                    list($pn,$rev, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo) = $data;
 
                     // Ejecutar la consulta de inserción
                     mysqli_stmt_execute($stmt);
