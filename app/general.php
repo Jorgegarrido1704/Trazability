@@ -87,16 +87,15 @@ foreach($parte as $part){
     $partes[]=$part['pn']; 
 }
 $partes=array_unique($partes);
-
 $sheetVenta=$spreadsheet->createSheet();
 $sheetVenta->setTitle('Venta del dia');
-
 $sheetVenta->setCellValue('A1', 'Fecha');
 $sheetVenta->setCellValue('B1', 'Numero de Parte ');
 $sheetVenta->setCellValue('C1', 'Precio Unitario');
 $sheetVenta->setCellValue('D1', 'Cantidad registrada');
 $sheetVenta->setCellValue('E1', 'Total');
 $t=2;
+$total=0;
 foreach($partes as $parte){
     $buscarInfo=mysqli_query($con,"SELECT * FROM regsitrocalidad WHERE pn='$parte' AND fecha LIKE '$todays%'");
     $numRow=mysqli_num_rows($buscarInfo);
@@ -111,12 +110,20 @@ $sheetVenta->setCellValue('B'.$t, $parte);
 $sheetVenta->setCellValue('C'.$t,'$ '. $price);
 $sheetVenta->setCellValue('D'.$t, $numRow);
 $sheetVenta->setCellValue('E'.$t,'$ '. $numRow*$price);
+$total=$total+($numRow*$price);
 $t++;
 }
+$sheetVenta->setCellValue('D'.$t, 'Total');
+$sheetVenta->setCellValue('E'.$t,'$ '. $total);
+//tiempos por arnes
+/*
+$sheetTiempo=$spreadsheet->createSheet();
+$sheetTiempo->setTitle('Tiempo por arnes');
+$sheetTiempo->setCellValue('A1', 'Part Number');
 
 
 
-
+*/
 //Paros Semanal
 $sheet=$spreadsheet->createSheet();
 $sheet->setTitle('Paros Herramentales Semanal');
