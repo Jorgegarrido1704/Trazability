@@ -120,7 +120,32 @@ $sheetVenta->setCellValue('E'.$t,'$ '. $total);
 $sheetTiempo=$spreadsheet->createSheet();
 $sheetTiempo->setTitle('Tiempo por arnes');
 $sheetTiempo->setCellValue('A1', 'Part Number');
-
+$sheetTiempo->setCellValue('B1', 'Work Order');
+$sheetTiempo->setCellValue('C1', 'Cutting');
+$sheetTiempo->setCellValue('D1', 'Terminals');
+$sheetTiempo->setCellValue('E1', 'Assembly');
+$sheetTiempo->setCellValue('F1', 'Looming');
+$sheetTiempo->setCellValue('I1', 'Tiempo total en proceso');
+$t=2;
+$buscarTiempo=mysqli_query($con,"SELECT * FROM `registro` INNER JOIN `tiempos` INNER JOIN `timesharn` 
+ON registro.info=tiempos.info AND tiempos.info=timesharn.bar");
+While($row=mysqli_fetch_array($buscarTiempo)){
+    $pn=$row['pn'];
+    $wo=$row['wo'];
+    $cut=$row['cut'];
+    $cutF=$row['cutF'];
+    $term=$row['term'];
+    $termF=$row['termF'];
+    $ensa=$row['ensa'];
+    $ensaF=$row['ensaF'];
+    $loom=$row['loom'];
+    $loomF=$row['loomF'];
+    
+    
+   
+       
+   }
+     
 
 
 */
