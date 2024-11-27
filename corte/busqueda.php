@@ -86,14 +86,15 @@ table{
         $i=1;
         echo "<div class='titles'><h1 >Lista en sistema</h1>";
         echo "<table><tbody><tr>";
-        $buscar=mysqli_query($con,"SELECT DISTINCT pn FROM listascorte ");
+        $buscar=mysqli_query($con,"SELECT DISTINCT pn,rev FROM listascorte ");
         while($row=mysqli_fetch_array($buscar)){
             $nup=$row['pn'];
+            $revs=$row['rev'];
             if($i%10==0 ){
             echo "<tr>";
-            echo "<td>".$nup."</td>";
+            echo "<td>".$nup."-".$revs."</td>";
             }else{
-                echo "<td>".$nup."</td>";
+                echo "<td>".$nup."-".$revs."</td>";
             }
             if(($i+1)%10==0){
                 echo "</tr>";
