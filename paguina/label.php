@@ -81,7 +81,7 @@ $berglab=['1003647380','1003617118'];
                     <h6 class="datos">CUSTOMER P/N</h6> 
                 </div>
                 <div class="cust">
-                    <h4 class="datospn1"><?php echo $pn; ?></h4>
+                    <h4 class="datospn1"><b>24763470</b></h4>
                 </div> 
                 </div>   
             </div>
