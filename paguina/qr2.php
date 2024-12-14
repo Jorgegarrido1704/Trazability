@@ -72,7 +72,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
     <style>
         #label {
             width: 38mm;
-            height: 26mm;
+            height: 24mm;
             border-radius: 1px;
             box-sizing: border-box;
             display: flex;
@@ -83,17 +83,17 @@ use chillerlan\QRCode\{QRCode, QROptions};
         .row {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
         .qrs {
-            width: 15mm;
-            height: 15mm;
+            width: 16mm;
+            height: 16mm;
         }
         .data-container{
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            padding-top: 4px; 
+            padding-top: 15px; 
             margin-left: 2px;
         }
         .textarea-container {
@@ -125,7 +125,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
             margin: 0;
         }
         #qrs_img {
-            width: 15mm;
+            width: 16mm;
             height: 8mm;
         }
         .textarea-container {
@@ -135,7 +135,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
 </head>
 <body>
     <?php for ($inicio; $inicio < $cuentas; $inicio++) { ?>
-    <div style="display:flex; width: 40mm; height: 105mm">    
+    <div style="display:flex; width: 38mm; height: 102mm">    
     <div id="label" class="container">
         <div class="row">
             <div class="qrs">
