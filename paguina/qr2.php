@@ -86,8 +86,8 @@ use chillerlan\QRCode\{QRCode, QROptions};
             margin-bottom: 1px;
         }
         .qrs {
-            width: 16mm;
-            height: 16mm;
+            width: 15mm;
+            height: 15mm;
         }
         .data-container{
             display: flex;
@@ -125,8 +125,8 @@ use chillerlan\QRCode\{QRCode, QROptions};
             margin: 0;
         }
         #qrs_img {
-            width: 16mm;
-            height: 8mm;
+            width: 14mm;
+            height: 7mm;
         }
         .textarea-container {
             margin-top: 0;

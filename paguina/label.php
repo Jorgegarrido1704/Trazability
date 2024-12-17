@@ -6,6 +6,12 @@ $berglab=['1003647380','1003617118'];
        if(!in_array($pn,$berglab)){
         header("Location:qrs.php");
         }
+if($pn='1003647380'){
+    $cust='24763470';
+}else if($pn='1003617118'){
+    $cust='24763468';
+}        
+        
 
 ?>
 <!DOCTYPE html>
@@ -81,7 +87,7 @@ $berglab=['1003647380','1003617118'];
                     <h6 class="datos">CUSTOMER P/N</h6> 
                 </div>
                 <div class="cust">
-                    <h4 class="datospn1"><b>24763470</b></h4>
+                    <h4 class="datospn1"><b><?php echo $cust;?></b></h4>
                 </div> 
                 </div>   
             </div>
