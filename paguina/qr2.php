@@ -16,12 +16,11 @@ if($wo==""){
        $rev=$rows['rev']; 
        $info=$rows['info'];
        $desc=$rows['description'];
-       $berglab=array();
-       $berglab=['1003647380','1003617118'];
+      
        if(substr($rev,0,4)=="PPAP" or substr($rev,0,4)=="PRIM"){
         $rev=substr($rev,5);    }
-       if(in_array($np,$berglab)){
-        header("Location:label.php?rev=$rev&np=$np&desc=$desc");}
+       if($np=='1003647380' or $np=='1003617118'){
+        header("Location:label.php?wo=$rev&np=$np&desc=$desc");}
 
        
        
@@ -86,8 +85,8 @@ use chillerlan\QRCode\{QRCode, QROptions};
             margin-bottom: 1px;
         }
         .qrs {
-            width: 15mm;
-            height: 15mm;
+            width: 14mm;
+            height: 14mm;
         }
         .data-container{
             display: flex;
@@ -115,7 +114,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
         }
         textarea {
             width: 31mm;
-            height: 13mm;
+            height: 12mm;
             border-radius: 1px;
             border: solid 1px #000;
             box-sizing: border-box;
@@ -135,7 +134,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
 </head>
 <body>
     <?php for ($inicio; $inicio < $cuentas; $inicio++) { ?>
-    <div style="display:flex; width: 38mm; height: 102mm">    
+    <div style="display:flex; width: 38mm; height: 119.5mm">    
     <div id="label" class="container">
         <div class="row">
             <div class="qrs">

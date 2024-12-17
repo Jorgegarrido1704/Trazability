@@ -2,13 +2,10 @@
 $rev=isset($_GET['rev'])?$_GET['rev']:"";
 $pn=isset($_GET['np'])?$_GET['np']:"";
 $desc=isset($_GET['desc'])?$_GET['desc']:"";
-$berglab=['1003647380','1003617118'];
-       if(!in_array($pn,$berglab)){
-        header("Location:qrs.php");
-        }
-if($pn='1003647380'){
+
+if($pn=='1003647380'){
     $cust='24763470';
-}else if($pn='1003617118'){
+}else if($pn=='1003617118'){
     $cust='24763468';
 }        
         
