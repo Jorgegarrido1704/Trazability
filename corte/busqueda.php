@@ -77,7 +77,15 @@ table{
         <input type="submit" name="upload" value="Subir">
     </form>
         </div>
-       
+        <div class="contenido">
+        <h1>Lista actividades</h1>
+        <form action="../ing/upActividades.php" method="POST" enctype="multipart/form-data">
+        
+        <input type="file" name="csv_file" accept=".csv">
+        <br>
+        <input type="submit" name="upload" value="Cargar CSV">
+        </form>
+        </div>
     </div>
     <br>
     
