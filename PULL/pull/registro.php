@@ -101,6 +101,7 @@ $user=$_SESSION['usuario'];
                 <option value="Spartan">Spartan</option>
                 <option value="Proterra_California">Proterra_California</option>
                 <option value="Pantros">Pantros</option>
+                <option value="JOHN DEERE">JOHN DEERE</option>
           </select>
              <br><br>
             <label >Numero de parte</label>
