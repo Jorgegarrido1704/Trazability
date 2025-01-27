@@ -6,7 +6,7 @@ $today=date("d-m-Y");
 $year=strtotime("01-01-2024");
 $date=strtotime(date("d-m-Y 17:00"));
 
-$last=604800;
+$last=648000;
 $week=round(($date-$year)/$last);
 $lastweek=$date-$last;
 //echo $date."-".$last."-".$lastweek;
