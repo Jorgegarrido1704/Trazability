@@ -1,18 +1,25 @@
 <?php
-// Here you can add the code to handle form submission, such as storing the laps in a database.
-// For now, we'll just display the laps.
+require '../app/conection.php';
+$registo =isset($_GET['registro']) ? $_GET['registro'] : '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Save email, password, and laps to the database
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    $laps = $_POST['laps'];
+ date_default_timezone_set('America/Mexico_City');
+    $today = date('d-m-Y H:i');   
+    $mainProcess = $_POST['proceso'];
+    $subProcess = $_POST['subproceso'];
+    $PartNumber = $_POST['PartNumber'];
+    $quien = $_POST['quien'];
+    $obs = $_POST['obs'];
+    $laps = $_POST['laps'];    
 
-    // You would insert this data into your database here
-    // Example: Save to database (You should use prepared statements for security)
-    // $sql = "INSERT INTO your_table (email, password, laps) VALUES ('$email', '$password', '$laps')";
-    // $conn->query($sql);
-}
+$insertInfo=mysqli_query($con,"INSERT INTO `timeprocess`( `dayHourProcess`, `process`, `subProcess`, `partnum`, `Operator`, `obs`, `laps`) VALUES ('$today','$mainProcess','$subProcess','$PartNumber','$quien','$obs','$laps')");
+
+if($insertInfo){
+    
+     header('Location: tiempos.php?registro=Registro exitoso');
+}else{
+        header('Location: tiempos.php');
+}}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-   
+    <script >
+        const respuesta = "<?php echo $registo; ?>";
+        if(respuesta != ""){
+            alert(respuesta);
+            redirect = "tiempos.php";
+            window.location.href = redirect;
+        }
+    </script>
     <title>Timer </title>
    
     <style>
@@ -53,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 
 <body>
+    
     <div class="container">
         <div class="row">
             <div class="col-12">
@@ -79,17 +94,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                     <div class="mb-3">
                         <label for="quien" class="form-label">Quien realiza proceso</label>
-                        <input type="text" name="proceso" class="form-control" id="quien" required>
+                        <input type="text" name="quien" class="form-control" id="quien" required>
                     </div>
                     <div class="mb-3">
                         <label for="obs" class="form-label">Obseravisones</label>
-                        <textarea name="obs" id="obs" class="form-control" rows="3" required></textarea>
+                        <textarea name="obs" id="obs" class="form-control" rows="3" ></textarea>
                       </div>
 
                     <div class="mb-3">
-                        <label for="laps" class="form-label">Laps</label>            
-                        <textarea name="laps" id="laps" class="form-control" rows="3" required="required" disabled></textarea>
-                       
+                        <label for="laps" class="form-label">Laps</label>      
+                        <textarea name="laps" id="laps" class="form-control" rows="3" required readonly></textarea>      
+                    
                     </div>
                   
                     <button type="button" id="startStopButton" class="btn btn-primary">Start</button>
