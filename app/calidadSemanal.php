@@ -6,7 +6,7 @@ $today=date("d-m-Y");
 $year=strtotime("01-01-2024");
 $date=strtotime(date("d-m-Y 17:00"));
 
-$last=604800;
+$last=648000;
 $week=round(($date-$year)/$last);
 $lastweek=$date-$last;
 //echo $date."-".$last."-".$lastweek;
@@ -19,7 +19,7 @@ $sheet->setCellValue('C1', 'Cliente');
 $sheet->setCellValue('D1', 'Numero de Parte');
 $sheet->setCellValue('E1', 'Cantidad');
 $sheet->setCellValue('F1', 'Codigo');
-$sheet->setCellValue('G1', 'Serial');
+$sheet->setCellValue('G1', 'Serial');   
 $sheet->setCellValue('H1', 'Responsable');
 
 
