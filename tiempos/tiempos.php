@@ -202,16 +202,20 @@ function diffprocess(){
     
 
 var corte =['cutting w/2 terminals without saels',
+            'cutting w/1 terminals without saels',
             'cutting w/1 terminals with saels',
             'cutting w/2 terminals with saels',
-            'cutting w/1 terminals',
             'cutting without terminals'];
 
-var terminales =['terminal apply with machine',
+var terminales =[
+                'twist wire',
+                'terminal apply with machine',
                 'terminal apply with handtool',
                 'create set for splice',
-                'splice set',
+                'splice set apply with machine',
+                'splice set apply with handtool',
                 'put seal on wire',
+                'set headshrink',
                 'burn headshrirnk w/headgun',
                 'burn headshrink w/machine'];
 var assembly =['subassembly',
