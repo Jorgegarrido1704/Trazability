@@ -1,6 +1,7 @@
 <?php
 require "../conection.php";
 require '../vendor/autoload.php'; 
+require "comFam.php";
 
 date_default_timezone_set("America/Mexico_City");
 $date=date("d-m-Y");
@@ -24,6 +25,19 @@ $sheet->setCellValue('A7', 'Family G');
 $sheet->setCellValue('B7', 'FROM 5 TO 9');
 $sheet->setCellValue('A8', 'Family H');
 $sheet->setCellValue('B8', 'LESS THAN 5');
+
+$familyA=$spreadsheet->createSheet();
+$familyA->setTitle('Family A');
+$familyA->setCellValue('A1', 'Part Number');
+$familyA->setCellValue('B1', 'Compatibility');
+$famA=familias('A');
+$i=2;
+foreach($famA as $part  => $datos ){
+$familyA->setCellValue('A'.$i,$part);
+$familyA->setCellValue('B'.$i,$datos);
+$i++;
+
+}
 
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
