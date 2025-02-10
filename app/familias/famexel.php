@@ -26,18 +26,22 @@ $sheet->setCellValue('B7', 'FROM 5 TO 9');
 $sheet->setCellValue('A8', 'Family H');
 $sheet->setCellValue('B8', 'LESS THAN 5');
 
-$familyA=$spreadsheet->createSheet();
-$familyA->setTitle('Family A');
-$familyA->setCellValue('A1', 'Part Number');
-$familyA->setCellValue('B1', 'Compatibility');
-$famA=familias('A');
-$i=2;
-foreach($famA as $part  => $datos ){
-$familyA->setCellValue('A'.$i,$part);
-$familyA->setCellValue('B'.$i,$datos);
-$i++;
-
-}
+$sheet1 = $spreadsheet->createSheet();  
+$sheet1->setTitle('Family A');
+$sheet2 = $spreadsheet->createSheet();  
+$sheet2->setTitle('Family B');
+$sheet3 = $spreadsheet->createSheet();  
+$sheet3->setTitle('Family C');
+$sheet4 = $spreadsheet->createSheet();  
+$sheet4->setTitle('Family D');
+$sheet5 = $spreadsheet->createSheet();  
+$sheet5->setTitle('Family E');
+$sheet6 = $spreadsheet->createSheet();  
+$sheet6->setTitle('Family F');
+$sheet7 = $spreadsheet->createSheet();  
+$sheet7->setTitle('Family G');
+$sheet8 = $spreadsheet->createSheet();  
+$sheet8->setTitle('Family H');
 
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
