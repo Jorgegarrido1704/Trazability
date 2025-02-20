@@ -8,7 +8,10 @@ $cons=isset($_POST['const'])?$_POST['const']:"";
 $today = date('mdY');
 if($wo==""){
     header("Location:qrs.php");
-}else{
+}elseif($wo=='111'){
+    header("Location:label.php?wo=2&np=1003622360&desc=WIRE HARNESS, I.P. CAB");
+}
+else{
     $buscar=mysqli_query($con,"SELECT * FROM `registro` where `wo` = '$wo' ");
     if(mysqli_num_rows($buscar)>0){
         $rows = mysqli_fetch_array($buscar);
@@ -19,7 +22,7 @@ if($wo==""){
       
        if(substr($rev,0,4)=="PPAP" or substr($rev,0,4)=="PRIM"){
         $rev=substr($rev,5);    }
-       if($np=='1003647380' or $np=='1003617118'){
+       if($np=='1003647380' or $np=='1003617118' or $np=='1003622360'){
         header("Location:label.php?wo=$rev&np=$np&desc=$desc");}
 
        

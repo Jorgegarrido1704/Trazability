@@ -7,6 +7,10 @@ if($pn=='1003647380'){
     $cust='24763470';
 }else if($pn=='1003617118'){
     $cust='24763468';
+}else if($pn=='100362360'){
+    $cust='24763469';
+}else{
+    $cust='24763469';
 }        
         
 
@@ -21,38 +25,36 @@ if($pn=='1003647380'){
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body{
-            width:70mm; height:78mm;
+            width:73mm; height:92mm;
         }
         #label {
-            width: 78mm;
-            height: 35mm;
+            width: 70mm;
+            height: 32mm;
             flex-direction: column;
             justify-content: space-between;
               }
         .row {            display: block;            align-items: center;            margin-bottom: none;        }
-        .data-container {  display: flex;  align-items: center;  border: solid 1px #000;
-  width: 70mm;  height: 10mm;            padding-top: 2px;             margin-left: 1px;}
-.img img ,.supplier{  width: 30mm;   height: 9mm;  margin-right: 15mm; margin-left: 1px; }
-.fecha-hecho,.rev {  display: center;  flex-direction: column;  width: 24mm; 
-  height: 10mm;  padding-buttom: 2mm;}
-.fecha,.hecho {  font-size: 14px;   color: #333;  width: 24mm;   height: 5mm;}
+        .data-container {  display: flex;  align-items: center;  border: solid 1px #000;  width: 70mm;  height: 10mm;            padding-top: 2px;             margin-left: 1px;}
+.img img ,.supplier{  width: 25mm;   height: 7mm;  margin-right: 5mm; margin-left: 1px; }
+.fecha-hecho,.rev {  display: center;  flex-direction: column;  width: 24mm; height: 7mm;  padding-buttom: 1mm;}
+.fecha,.hecho {  font-size: 12px;   color: #333;  width: 24mm;   height: 3.5mm;}
 .datos{    font-size: xx-small;  font-style: bold; margin-left: 1mm;  }
-.datospn{    font-size: small; font-style: bold; margin-left: 1mm;  }
+.datospn{    font-size: x-small; font-style: bold; margin-left: 1mm;  }
 .datospn1{    font-size: small; font-style: bold; margin-left: 10mm;   }
-.labelSupplier,.supplierPn {  display: center;  flex-direction: column;  width: 24mm; height: 3mm; }
-.labelSupplier1{  display: center;  flex-direction: column;  width: 40mm; height: 2mm; }
-.rev h6{margin-top: 6mm;    font-size: xx-small;    align-items: buttom; }
+.labelSupplier,.supplierPn {  display: center;  flex-direction: column;  width: 24mm; height: 2mm; }
+.labelSupplier1{  display: center;  flex-direction: column;  width: 40mm; height: 3mm; }
+.rev h6{margin-top: 5mm;    font-size: xx-small;    align-items: right; }
 .custpn,.cust{display: center;  flex-direction: column;  width: 70mm; height: 5mm; margin-top: 1px;}
 .custleb{width: 70mm;   height: 10mm;   }
     </style>
 </head>
 <body>
     
-    <div style=" display:flex; width:70mm; height:78mm; rotate:90deg;  ">    
-    <div id="label" style="padding-top:30mm; padding-left:3mm;" >
+    <div style=" display:flex; width:42mm; height:26mm; rotate:90deg;  ">    
+    <div id="label" style="padding-top:3mm; padding-left:12.8mm;" >
         <div class="row">
             <div class="data-container">
-                <div class="img">
+                <div class="img" style=" padding-right:10mm;">
               <img src="bergs.jpg" alt="responsive image"/>  
               </div>
               <div class="fecha-hecho">
@@ -67,14 +69,15 @@ if($pn=='1003647380'){
                         <div class="labelSupplier">
                             <h6 class="datos">SUPPLIER P/N</h6>
                         </div>
-                        <div class="supplierPn">
+                        <div class="supplierPn" style="padding-top:0.3mm; ">
                             <h5 class="datospn"><?php echo $pn; ?></h5>   
                         </div>
-                        <div class="labelSupplier1">
+                        <div class="labelSupplier1" style="padding-top:0.7mm; ">
                             <h6 class="datos"><?php echo $desc; ?></h6>
                         </div>
                 </div>
-                <div class="rev"><H6>REVISION LEVEL: <?php echo $rev; ?></H6></div>
+                <div class="rev" style="padding-left:15mm; width: 40mm; ">
+                    <H6>REVISION LEVEL: <?php echo $rev; ?></H6></div>
             </div>
             </div>
             <div class="row">
