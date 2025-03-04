@@ -1,7 +1,7 @@
 <?php
  require "../app/conection.php";
     if(isset($_POST['registro'])){
-        
+        $count=isset($_POST['count'])?$_POST['count']:"";
     
     $registro=isset($_POST['registro'])?$_POST['registro']:"";
     if(strpos($registro,',')){
@@ -12,9 +12,9 @@
 
     //$registro=['011680','011758','011155','011387','011627','011628','011745','010998','011607','011604','011598','011599','011011','011564','011213','011067','010580','010562'];
  foreach($registro as $reg){
-    $cambiarRegistro=mysqli_query($con,"UPDATE registro SET count='1' WHERE wo='$reg'");
+    $cambiarRegistro=mysqli_query($con,"UPDATE registro SET count=$count WHERE wo='$reg'");
     if($cambiarRegistro){
-        echo "Registro $reg cambiado<br>";}}
+        echo "Registro $reg cambiado correctamente al contador $count<br>";}}
  
 }else{
     ?>
@@ -27,7 +27,10 @@
     </head>
     <body>
         <form action="embarque.php" method="POST">
-            <input type="text" name="registro">
+        <label for="registro">WO(s)</label>    
+        <input type="text" name="registro">
+        <label for="count">count</label>
+        <input type="nuember" name="count" value="20">
             <input type="submit">
         </form>
     </body>
