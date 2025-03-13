@@ -5,16 +5,20 @@ $creatos=strtoupper(isset($_POST['creador'])?$_POST['creador']:"");
 $cliente=strtoupper(isset($_POST['cliente'])?$_POST['cliente']:"");
 $pn=strtoupper(isset($_POST['pn'])?$_POST['pn']:"");
 $rev=strtoupper(isset($_POST['rev'])?$_POST['rev']:"");
+$corte=[$creatos, $cliente, $pn, $rev];
 if(!empty($creatos) || !empty($cliente) || !empty($pn) || !empty($rev)){
     $movimiento = "Creacion de lista";
     $fecha = intval(strtotime(date("d-m-Y H:i")));
     $stmt = $con->prepare("INSERT INTO `registromovimientoslistas`(`creadorLista`, `pn`, `cliente`, `rev`, `Tipodemovimiento`, `ultimaFechaRegistro`) VALUES (?, ?, ?, ?,?, ?)");
     $stmt->bind_param("ssssss", $creatos, $cliente, $pn, $rev, $movimiento, $fecha);
     $stmt->execute();
-    echo json_encode(['status' => 'Registro exitoso', 'message' => 'Datos guardados correctamente']);
-    
-header("Refresh: 2; URL=../normal/listaNew.php?creador=$creatos&cliente=$cliente&pn=$pn&rev=$rev");
-exit;
+    if($stmt){
+        echo "<script>var respuesta = confirm('Deseas Continuar', 'Contunuar');
+        if(respuesta == true) window.location = ('../normal/listaNew.php?corte=".implode(";", $corte)."&tipos=normal')</script>";
+    }else{
+        echo "<script>alert('Error al crear la lista');</script>";
+    }
+  
 }
 
 ?>
