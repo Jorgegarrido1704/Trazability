@@ -255,19 +255,13 @@ document.getElementById("addRowButton").addEventListener("click", function() {
         </div>
         <div class="col-md-1">
             <label for="tipo${rowCount}" class="form-label">Tipo:</label>
-            
              <select name="tipo" id="tipo${rowCount}" class="form-control" required>
                             <option value="" disabled selected>cable</option>
                             <option value="GXL">gxl</option>
                             <option value="TXL">txl</option>
                             <option value="SGX">sgx</option>
-                        </select>
-                        
-                    </div>
-                    <div class="col-md-1">
-                        <label for="calibre1" class="form-label">Calibre:</label>
-                        <input type="number" name="calibre" id="calibre1" class="form-control" required><br>
-                    </div>
+            </select>
+        </div>
         </div>
         <div class="col-md-1">
             <label for="calibre${rowCount}" class="form-label">Calibre:</label>
