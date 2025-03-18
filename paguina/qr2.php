@@ -10,6 +10,8 @@ if($wo==""){
     header("Location:qrs.php");
 }elseif($wo=='111'){
     header("Location:label.php?wo=2&np=1003622360&desc=WIRE HARNESS, I.P. CAB");
+}elseif($wo=='12'){
+    header("Location:labelnew.php");
 }
 else{
     $buscar=mysqli_query($con,"SELECT * FROM `registro` where `wo` = '$wo' ");
