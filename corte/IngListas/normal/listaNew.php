@@ -3,8 +3,8 @@
     $corte= isset($_GET['corte'])?$_GET['corte']:"";
     $corte = explode(";", $corte);
     $creador= $corte[0];
-    $cliente= $corte[2];
-    $pn= $corte[1];
+    $cliente= $corte[1];
+    $pn= $corte[2];
     $rev= $corte[3];
     
     

@@ -1,3 +1,10 @@
+<?php date_default_timezone_set('America/Mexico_City'); 
+$db=isset($_GET['db'])?$_GET['db']:"";
+if ($db!="") {
+ ?>
+    <div class="alert alert-success" role="alert">
+        <?php echo $db; ?>
+    </div> <?php } ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,6 +76,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../vizual/index.php">Ver lista de corte</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../Registros/importarDatos.php">Subir lista de corte</a>
                 </li>
             </ul>
         </div>
