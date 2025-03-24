@@ -22,11 +22,12 @@ while ($row = mysqli_fetch_array($busqueda)) {
     if ((isset($item[1]) && strtoupper($item[1]) == 'C' && isset($item[2]) && is_numeric($item[2])) || 
         (isset($item[2]) && strtoupper($item[2]) == 'C' && isset($item[3]) && is_numeric($item[3]))) {
 
-        echo "--" . $item . "--<br>";
+        
 
         // Realizar la consulta para obtener los "part_num" asociados al item
         $parno = mysqli_query($con, "SELECT part_num FROM datos WHERE item = '$item'");
             $numRow=mysqli_num_rows($parno);
+            echo "--" . $item . " : " . $numRow . "--<br>";
         // Consultar todos los items relacionados con los "part_num" encontrados
         while ($row = mysqli_fetch_array($parno)) {
             $part_num = $row['part_num'];
@@ -54,13 +55,18 @@ while ($row = mysqli_fetch_array($busqueda)) {
                     $lista[$ter] += 1; // Incrementar contador si el item ya existe
                 }
             }
+           
         }
-        //
-        foreach ($lista as $it => $count) {
-            if ($count == $numRow) {
-            echo $it . " : " . $count . "<br>";
+        arsort($lista);
+        $i=0;
+        foreach ($lista as $key => $value) {
+            echo $key . " : " . $value . "<br>";
+            $i++;
+            if($i==5){
+                break;
             }
         }
+       
         // Limpiar la lista para la siguiente iteración
         $lista = [];
     }
