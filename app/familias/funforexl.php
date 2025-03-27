@@ -1,10 +1,13 @@
 <?php
-require "family.php";
 
-$subFamiliesA = $grupos['A'];
 
+function excels($g) {
+    
+ require_once "family.php";
+$subFamiliesA = $grupos[$g];
+$x= 0;
 foreach ($subFamiliesA as $subA) {
-    $i = 0;
+    $i =0;
     $items = [];
     $compatativo = [];
     
@@ -55,17 +58,28 @@ foreach ($subFamiliesA as $subA) {
         }
     }
 
-    //Filtrar y mostrar resultados con compatibilidad > 75%
-   echo "<h3> $subA (Compatibility > 75%)</h3>";
-    echo "<pre>";
+    // Filtrar y mostrar resultados con compatibilidad > 75%
+ //   echo "<h3> $subA (Compatibility > 75%)</h3>";
+   // echo "<pre>";
+    
     foreach ($compatativo as $key => $comparisons) {
         foreach ($comparisons as $part_num => $count) {
             $compatibility = ($count / $totalItems) * 100;
             if ($compatibility >= 75) {
-               echo " $part_num Compatibility: " . round($compatibility, 2) . "%\n";
-               
+               // echo " $part_num Compatibility: " . round($compatibility, 2) . "%\n";
+               $grupoCom[$x][0]=$key;
+               $grupoCom[$x][1]=$part_num;
+               $grupoCom[$x][2]=round($compatibility, 2);
+               $x++;
+            }else if ($compatibility >= 60 and $compatibility < 75) {
+                $grupoCom[$x][0]=$key;
+                $grupoCom[$x][1]=$part_num;
+                $grupoCom[$x][2]=round($compatibility, 2);
+                $x++;
             }
         }
     }
-    echo "</pre>";
+    //echo "</pre>";
+}
+return $grupoCom;
 }

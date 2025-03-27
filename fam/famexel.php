@@ -1,8 +1,8 @@
 <?php
-require "../conection.php";
-require '../vendor/autoload.php'; 
+require "../app/conection.php";
+require '../app/vendor/autoload.php'; 
 require "funforexl.php";
-$producF=['A','B','C','D','E','F','G','H'];
+
 
 date_default_timezone_set("America/Mexico_City");
 $date=date("d-m-Y");
@@ -28,19 +28,19 @@ $sheet->setCellValue('A8', 'Family H');
 $sheet->setCellValue('B8', 'LESS THAN 5');
 
 
-foreach($producF as $fam){
+foreach($grupoCom as $fam){
     $sheet1 = $spreadsheet->createSheet();  
     $sheet1->setTitle('Family '.$fam);
-    $registro = excels($fam);
     $t=2;
-    $sheet1->setCellValue('A1', 'Part Number');
-    $sheet1->setCellValue('B1', 'PN common');
-    $sheet1->setCellValue('C1', 'Compatibility %');
-    // $registro[][]=
-    foreach ($registro as $reg) {
-        $sheet1->setCellValue('A' . $t, $reg[0]);
-        $sheet1->setCellValue('B' . $t, $reg[1]);
-        $sheet1->setCellValue('C' . $t, $reg[2]);
+   foreach($fam as $org => $comparativo)
+    foreach($comparativo as $part_num => $compat){
+        $sheet1->setCellValue('A1', 'Part Number');
+        $sheet1->setCellValue('B1', 'PN common');
+        $sheet1->setCellValue('C1', 'Compatibility %');
+
+        $sheet1->setCellValue('A'.$t, $org);
+        $sheet1->setCellValue('B'.$t, $part_num);
+        $sheet1->setCellValue('C'.$t, $compat);
         $t++;
     }
    
