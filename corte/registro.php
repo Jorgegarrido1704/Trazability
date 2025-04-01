@@ -9,7 +9,10 @@ while($row=mysqli_fetch_array($buscar)){
     $client=$row['cliente'];
     $wo=$row['wo'];
     $cuantos=$row['Qty'];
-    $rev=$row['rev'];
+    $rev1=$row['rev'];
+    if(substr($rev1,0,4)=="PPAP" or substr($rev1,0,4)=="PRIM"){
+        $rev=substr($rev1,5);
+    }else { $rev=$rev1;}
 $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev='$rev' ");
     while($rowList=mysqli_fetch_array($selectlist)){
         $cons=$rowList['cons'];
