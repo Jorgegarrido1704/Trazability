@@ -9,7 +9,8 @@ while($row=mysqli_fetch_array($buscar)){
     $client=$row['cliente'];
     $wo=$row['wo'];
     $cuantos=$row['Qty'];
-$selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn'");
+    $rev=$row['rev'];
+$selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev='$rev' ");
     while($rowList=mysqli_fetch_array($selectlist)){
         $cons=$rowList['cons'];
         $tipo=$rowList['tipo'];
@@ -20,7 +21,7 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn'");
         $term2=$rowList['terminal2'];
         $dataForm=$rowList['dataFrom'];
         $dataTo=$rowList['dataTo'];
-        $rev=$rowList['rev'];
+       
         $conector=$rowList['conector'];
       
        if(substr($cons,0,5)=="C"){

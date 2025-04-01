@@ -27,7 +27,7 @@ $sheet->setCellValue('B7', 'FROM 5 TO 9');
 $sheet->setCellValue('A8', 'Family H');
 $sheet->setCellValue('B8', 'LESS THAN 5');
 
-
+/*
 foreach($grupoCom as $fam){
     $sheet1 = $spreadsheet->createSheet();  
     $sheet1->setTitle('Family '.$fam);
