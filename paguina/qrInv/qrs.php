@@ -34,7 +34,7 @@ while($row = mysqli_fetch_array($bsucada)){
         .row {            display: block;            align-items: center;            margin-bottom: none;        }
         .data-container1 {  display: flex;  align-items: center;  border: solid 1px #000;  width: 70mm;  height: 12mm;            padding-top: 1px;             margin-left: 1px;}
         .data-container {  display: flex;  align-items: center;  border: solid 1px #000;  width: 70mm;  height: 9mm;            padding-top: 1px;             margin-left: 1px;}
-.img img {  width: 25mm;   height: 7mm;  margin-right: 5mm; margin-left: 1px; }
+.img img {  width: 20mm;   height: 20mm;  margin-right: 5mm; margin-left: 1px; }
 .supplier{  width: 25mm;   height: 11mm;  margin-right: 5mm; margin-left: 1px; }
 .fecha-hecho,.rev {  display: center;  flex-direction: column;  width: 24mm; height: 7mm;  padding-buttom: 1mm;}
 .fecha,.hecho {  font-size: 12px;   color: #333;  width: 24mm;   height: 3.5mm;}
@@ -42,7 +42,7 @@ while($row = mysqli_fetch_array($bsucada)){
 .datospn{    font-size: x-small; font-style: bold; margin-left: 1mm; padding-button: 3px; }
 .datospn1{    font-size: small; font-style: bold; margin-left: 10mm;   }
 .labelSupplier,.supplierPn {  display: center;  flex-direction: column;  width: 24mm; height: 1.5mm; }
-.labelSupplier1{  display: center;  flex-direction: column;  width: 40mm; height: 2mm; }
+.labelSupplier1{  display: center;  flex-direction: column;  width: 5mm; height: 5mm; }
 .rev h6{margin-top: 5mm;    font-size: xx-small;    align-items: right; }
 .custpn,.cust{display: center;  flex-direction: column;  width: 70mm; height: 5mm; margin-top: 1px;}
 .custleb{width: 70mm;   height: 10mm;   }
@@ -64,6 +64,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
                 $qrcode = (new QRCode)->render($data);
                 ?>
                <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?> 
+               <h6 class="labelSupplier1"><?php echo $data; ?></h6>
   
     
     </div>
