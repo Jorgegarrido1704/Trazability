@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$buscarRegistro) {
                 echo "<script>alert('la WO: " . $woValue . " no existe o no se encuentra activa ');</script>";
                 continue; // Skip to the next iteration if there's an error
-            }
+            }else{
             $row = mysqli_fetch_array($buscarRegistro);
             $numPart = $row['NumPart'];            
             $qty = $row['Qty'];
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "</tbody></table> <br><hr><br>";
 
             
-        }
+        } }
         echo "<h2 class='mt-4'>Total Acumulado</h2>
         <table class='table table-bordered mt-4'>
                 <thead>
