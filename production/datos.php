@@ -13,6 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $CuentaItems = [];
         foreach ($wo as $woValue) {
             $buscarRegistro = mysqli_query($con, "SELECT NumPart,Qty,rev FROM `registro` WHERE `wo` = '$woValue'");
+            if (!$buscarRegistro) {
+                echo "<script>alert('la WO: " . $woValue . " no existe o no se encuentra activa ');</script>";
+                continue; // Skip to the next iteration if there's an error
+            }
             $row = mysqli_fetch_array($buscarRegistro);
             $numPart = $row['NumPart'];            
             $qty = $row['Qty'];
