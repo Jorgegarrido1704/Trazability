@@ -36,10 +36,10 @@ while($row = mysqli_fetch_array($bsucada)){
         .data-container {  display: flex;  align-items: center;  border: solid 1px #000;  width: 70mm;  height: 9mm;            padding-top: 1px;             margin-left: 1px;}
 .img img {  width: 20mm;   height: 20mm;  margin-right: 5mm; margin-left: 1px; }
 .supplier{  width: 25mm;   height: 11mm;  margin-right: 5mm; margin-left: 1px; }
-.fecha-hecho,.rev {  display: center;  flex-direction: column;  width: 24mm; height: 7mm;  padding-buttom: 1mm;}
+.fecha-hecho,.rev {  display: center;  flex-direction: column;  width: 24mm; height: 7mm;  padding: 1mm;}
 .fecha,.hecho {  font-size: 12px;   color: #333;  width: 24mm;   height: 3.5mm;}
 .datos{    font-size: xx-small;  font-style: bold; margin-left: 1mm;  }
-.datospn{    font-size: x-small; font-style: bold; margin-left: 1mm; padding-button: 3px; }
+.datospn{    font-size: x-small; font-style: bold; margin-left: 1mm; padding: 3px; }
 .datospn1{    font-size: small; font-style: bold; margin-left: 10mm;   }
 .labelSupplier,.supplierPn {  display: center;  flex-direction: column;  width: 24mm; height: 1.5mm; }
 .labelSupplier1{  display: center;  flex-direction: column;  width: 5mm; height: 5mm; }
