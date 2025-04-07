@@ -223,7 +223,9 @@ var terminales =['',
                 'put seal on wire',
                 'set headshrink',
                 'burn headshrirnk w/headgun',
-                'burn headshrink w/machine'];
+                'burn headshrink w/machine',
+                'set tin point',];
+
 var assembly =['','subassembly',
               'assembly'];
 var loom =['','looming',
