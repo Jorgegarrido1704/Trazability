@@ -18,6 +18,7 @@ while ($row = mysqli_fetch_array($buscarReportes)) {
     $part = $row['partnum'];
     $subProcess = $row['subProcess'];
     $laps = $row['laps'];
+    $mm = $row['mm'];
     $obs = $row['obs'];
     $id=$row['id_tp'];
 
@@ -40,7 +41,12 @@ while ($row = mysqli_fetch_array($buscarReportes)) {
     $sheet->setCellValue('B' . $i, $part);
     $sheet->setCellValue('C' . $i, "Sub Process: ");
     $sheet->setCellValue('D' . $i, $subProcess);
+    $sheet->setCellValue('F' . $i, "MM: ");
+    $sheet->setCellValue('F' . $i, $mm);
     $i++;  // Move to the next row
+
+
+
 
     // Add Laps information to the sheet
     $sheet->setCellValue('A' . $i, "Laps: ");
