@@ -7,12 +7,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $today = date('d-m-Y H:i');   
     $mainProcess = $_POST['proceso'];
     $subProcess = $_POST['subproceso'];
+    $mm = $_POST['mm'];
     $PartNumber = $_POST['PartNumber'];
     $quien = $_POST['quien'];
     $obs = $_POST['obs'];
     $laps = $_POST['laps'];    
 
-$insertInfo=mysqli_query($con,"INSERT INTO `timeprocess`( `dayHourProcess`, `process`, `subProcess`, `partnum`, `Operator`, `obs`, `laps`) VALUES ('$today','$mainProcess','$subProcess','$PartNumber','$quien','$obs','$laps')");
+$insertInfo=mysqli_query($con,"INSERT INTO `timeprocess`( `dayHourProcess`, `process`, `subProcess`, `mm`, `partnum`, `Operator`, `obs`, `laps`) VALUES ('$today','$mainProcess','$subProcess','$mm','$PartNumber','$quien','$obs','$laps')");
 
 if($insertInfo){
     
@@ -80,14 +81,19 @@ if($insertInfo){
                        <select name="proceso" id="proceso" class="form-select" required onchange="diffprocess()">
                             <option value="">Select Proceso</option>
                             <option value="Cutting">Cutting</option>
-                            <option value="Terminals">Terminaks</option>
+                            <option value="Terminals">Terminals</option>
                             <option value="Assembly">Assembly</option>
                             <option value="Looming">Looming</option>
                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="subproceso" class="form-label">Subproceso</label>
-                        <select name="subproceso" class="form-select" id="subproceso"></select>
+                        <select name="subproceso" class="form-select" id="subproceso"  required onchange="suproceso()"></select>
+                    </div>
+                    <div class="mb-3" id="size-mm" style="display: none ;">
+                        <label for="mm" class="form-label">Tamano del cable</label>
+                        <input type="text" name="mm" class="form-control" id="mm"  value="0.00" step="0.01" required>
+                    </div>
                     <div class="mb-3">
                         <label for="PartNumber" class="form-label">Part Number</label>
                         <input type="text" name="PartNumber" class="form-control" id="PartNumber" required>
@@ -201,13 +207,13 @@ const subproceso = document.getElementById('subproceso');
 function diffprocess(){
     
 
-var corte =['cutting w/2 terminals without saels',
+var corte =['','cutting w/2 terminals without saels',
             'cutting w/1 terminals without saels',
             'cutting w/1 terminals with saels',
             'cutting w/2 terminals with saels',
             'cutting without terminals'];
 
-var terminales =[
+var terminales =['',
                 'twist wire',
                 'terminal apply with machine',
                 'terminal apply with handtool',
@@ -218,17 +224,19 @@ var terminales =[
                 'set headshrink',
                 'burn headshrirnk w/headgun',
                 'burn headshrink w/machine'];
-var assembly =['subassembly',
+var assembly =['','subassembly',
               'assembly'];
-var loom =['looming',
+var loom =['','looming',
             'braiding',
-            'set slavee for braiding'];
+            'set slavee for braiding',
+        ];
 
 if(proceso.value == 'Cutting'){
     subproceso.innerHTML = '';
     for (let i = 0; i < corte.length; i++) {
         subproceso.innerHTML += `<option value="${corte[i]}">${corte[i]}</option>`;
     }
+
 }else if(proceso.value == 'Terminals'){
     subproceso.innerHTML = '';
     for (let i = 0; i < terminales.length; i++) {
@@ -246,4 +254,14 @@ if(proceso.value == 'Cutting'){
     }    
 }
 }
+function suproceso(){
+    if(subproceso.value == 'cutting w/2 terminals without saels' || subproceso.value == 'cutting w/1 terminals without saels'
+     || subproceso.value == 'cutting w/1 terminals with saels' || subproceso.value == 'cutting w/2 terminals with saels' 
+     || subproceso.value == 'cutting without terminals' || subproceso.value == 'twist wire'){
+        document.getElementById('size-mm').style.display = 'block';
+    }else{
+        document.getElementById('size-mm').style.display = 'none';
+    }
+}
+
 </script>
