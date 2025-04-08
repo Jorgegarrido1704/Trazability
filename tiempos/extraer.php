@@ -42,7 +42,7 @@ while ($row = mysqli_fetch_array($buscarReportes)) {
     $sheet->setCellValue('C' . $i, "Sub Process: ");
     $sheet->setCellValue('D' . $i, $subProcess);
     $sheet->setCellValue('F' . $i, "MM: ");
-    $sheet->setCellValue('F' . $i, $mm);
+    $sheet->setCellValue('G' . $i, $mm);
     $i++;  // Move to the next row
 
 
