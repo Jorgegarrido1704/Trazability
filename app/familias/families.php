@@ -1,7 +1,7 @@
 <?php
 require "family.php";
 
-$subFamiliesA = $grupos['A'];
+$subFamiliesA = $grupos['G'];
 
 foreach ($subFamiliesA as $subA) {
     $i = 0;
@@ -16,7 +16,7 @@ foreach ($subFamiliesA as $subA) {
                                   AND item NOT LIKE 'WSGX-%' 
                                   AND item NOT LIKE 'LTP%' 
                                   AND item NOT LIKE 'LW-%' 
-                                  AND item NOT LIKE 'TAPE-25'");
+                                  AND item NOT LIKE 'TAPE-%'");
     
     if (!$buscar) {
         echo "Error en la consulta: " . mysqli_error($con);
