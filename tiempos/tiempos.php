@@ -231,6 +231,9 @@ var assembly =['','subassembly',
 var loom =['','looming',
             'braiding',
             'set slavee for braiding',
+            'Tapping',
+            'labeling',
+            
         ];
 
 if(proceso.value == 'Cutting'){
