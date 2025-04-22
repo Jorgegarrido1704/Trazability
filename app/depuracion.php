@@ -255,5 +255,5 @@ if ($resultado) {
 
 
 mysqli_close($con);
-header("location:../../mant/trazabiliy/ing/piso.php");
+header("location:../../mant/trazability/ing/piso.php");
 
