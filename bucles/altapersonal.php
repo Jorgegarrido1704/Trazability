@@ -1,0 +1,20 @@
+<?php 
+include "../app/conection.php";
+$week = (int)(date('W'));
+
+//Search fist intereaction in the table assitence for comparation
+$lastWeek=mysqli_query($con,"SELECT week FROM assistence WHERE week = $week ORDER BY id DESC LIMIT 1");
+if(mysqli_num_rows($lastWeek) <= 0){
+    //search all personal
+    $personal = mysqli_query($con,"SELECT * FROM personalberg");
+    while($row = mysqli_fetch_array($personal)){
+        $lider = $row['employeeLider'];
+        $name = $row['employeeName'];
+      
+        //insert into assitence table
+        $insert = mysqli_query($con,"INSERT INTO assistence (`week`, `lider`, `name`) VALUES ('$week', '$lider', '$name')");
+    }
+    
+}else{
+    echo "<script>alert('Ya se ha registrado la asistencia de esta semana');</script>";
+}
