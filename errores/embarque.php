@@ -30,7 +30,7 @@
         <label for="registro">WO(s)</label>    
         <input type="text" name="registro">
         <label for="count">count</label>
-        <input type="nuember" name="count" value="20">
+        <input type="number" name="count" value="20">
             <input type="submit">
         </form>
     </body>
