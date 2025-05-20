@@ -6,14 +6,14 @@
         // Redirect to GeneralDiario.php after 3 seconds
         setTimeout(function() {
             window.location.href = './GeneralDiario.php';
-        }, 3000);
+        }, 2000);
 
         // Optional: Redirect again after 8 seconds (5 seconds after the first one)
-        /*
+        
         setTimeout(function() {
-            window.location.href = './embarque.php';
+            window.location.href = './emailDaily.php';
         }, 8000);
-        */
+        
     </script>
 </head>
 <body>
