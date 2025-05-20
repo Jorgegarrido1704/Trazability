@@ -14,7 +14,13 @@
  foreach($registro as $reg){
     $cambiarRegistro=mysqli_query($con,"UPDATE registro SET count=$count WHERE wo='$reg'");
     if($cambiarRegistro){
-        echo "Registro $reg cambiado correctamente al contador $count<br>";}}
+        echo "Registro $reg cambiado correctamente al contador $count<br>";
+    }else{
+        echo "Error al cambiar el registro $reg al contador $count<br>";
+    }
+    
+    }
+        
  
 }else{
     ?>
