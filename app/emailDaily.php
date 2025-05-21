@@ -10,8 +10,8 @@ $date=date("d-m-Y");
 
 $messege = '<html><body><br><div align="center"><h1>Desviacion aprobada</h1></div><br>';
 
-$subject='Desviacion Aprovada -';
-$recipientEmail='jgarrido@mx.bergstrominc.com';
+$subject='Reporte General  WO '.$date;
+$recipientEmail='jgarrido@mx.bergstrominc.com,mvaladez@mx.bergstrominc.com,egaona@mx.bergstrominc.com,ejimenez@mx.bergstrominc.com,fgomez@mx.bergstrominc.com,lmireles@mx.bergstrominc.com,eceron@mx.bergstrominc.com,jgamboa@mx.bergstrominc.com,jguillen@mx.bergstrominc.com';
 $headers = "MIME-Version: 1.0\r\n";
 $headers .= "Content-type: text/html; charset=utf-8\r\n"; 
 $headers .= "SPF: v=spf1 mx ~all\r\n";
@@ -42,7 +42,7 @@ try {
     $mail->addAttachment($attachmentPath);
     // Send the email
     $mail->send();
-    
+    header("location:../errores/mejoraTiempoPrecio.php");
  return true;
 
        
