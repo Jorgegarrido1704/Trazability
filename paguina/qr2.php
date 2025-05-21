@@ -90,8 +90,14 @@ use chillerlan\QRCode\{QRCode, QROptions};
             margin-bottom: 1px;
         }
         .qrs {
-            width: 14mm;
-            height: 14mm;
+             padding-top: 2mm;
+            width: 17mm;
+            height: 17mm;
+        }
+        .qrss {
+           padding-top: 1mm;
+            width: 17mm;
+            height: 17mm;
         }
         .data-container{
             display: flex;
@@ -108,17 +114,18 @@ use chillerlan\QRCode\{QRCode, QROptions};
             margin-left: 2px;
         }
         .datos {
-            width: 31mm;
+            width: 25mm;
             border-radius: 1px;
             border: solid 1px #000;
             text-align: center;
             margin: 1px 0;
-            padding-left: 1px;   
+            padding-left: 1px;  
+            font-size: small; 
                     
             box-sizing: border-box;
         }
         textarea {
-            width: 31mm;
+            width: 25mm;
             height: 12mm;
             border-radius: 1px;
             border: solid 1px #000;
@@ -150,7 +157,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
                 <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?> 
             </div>
             <div class="data-container">
-                <h6 class="datos"><?php echo $np; ?> | <?php echo $rev; ?></h6>
+                <h6 class="datos"><?php echo $np; ?>|<?php echo $rev; ?></h6>
                 <h6 class="datos"><?php echo $inicio; ?></h6>
             </div>
         </div>
