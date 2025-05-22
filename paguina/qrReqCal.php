@@ -88,7 +88,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
            display: flex;
              justify-content: center; /* Centra horizontalmente */
               align-items: center;     /* Centra verticalmente */
-             height: 100vh;           /* Ocupa toda la altura de la ventana */
+            margin-bottom: 1px;
         }
         .qrs {  
             width: 23mm;
