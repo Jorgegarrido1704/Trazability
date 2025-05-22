@@ -43,9 +43,8 @@ if ($wo == "") {
         if (mysqli_num_rows($buscarCuenta) > 0) {
             $rowsCuenta = mysqli_fetch_array($buscarCuenta);
             $total=$rowsCuenta['totalWo']-$cons;
-   
-               mysqli_query($con, "UPDATE `consterm` SET `cuenta` = '$cuentas' WHERE `dias` = '$today' ");
                 mysqli_query($con, "UPDATE `consterm` SET `dias` = '$today', `totalWo`= '$total' WHERE `consterm`.`codigo` = '$info' ");     
+                mysqli_query($con, "UPDATE `consterm` SET `cuenta` = '$cuentas' WHERE `dias` = '$today' ");
         }else{
             $rest=$qty-$cons;
             mysqli_query($con, "INSERT INTO `consterm`( `pn`, `cuenta`, `rev`, `descri`, `dias`, `codigo`, `totalWo`) VALUES ('$np','$cuentas','$rev','$desc','$today','$info','$rest')");
