@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <div class="row">
-        <form action="qr2.php" method="post">
+        <form action="qrReqCal.php" method="post">
             <div class="mb-3">
                 <label for="wo" class="form-label">Wo order</label>
                 <input type="text" class="form-control" id="wo" name="wo" autofocus placeholder="WO" required>
