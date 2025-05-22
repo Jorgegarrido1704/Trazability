@@ -85,21 +85,20 @@ use chillerlan\QRCode\{QRCode, QROptions};
            
         }
         .row {
-           display: flex;
-             justify-content: center; /* Centra horizontalmente */
-              align-items: center;     /* Centra verticalmente */
-            margin-bottom: 1px;
+           margin-left: 35px;
+            align-items: center;
+            margin-top: 90px;
         }
         .qrs {  
-            width: 23mm;
-            height: 23mm;
+            width: 25mm;
+            height: 24mm;
         }
        
     </style>
 </head>
 <body>
     <?php for ($inicio; $inicio < $cuentas; $inicio++) { ?>
-    <div style="display:flex; width: 38mm; height: 119.5mm">    
+    <div style="display:flex; width: 38mm; height: 162mm">    
     <div id="label" class="container">
         <div class="row">
             <div class="qrs">
