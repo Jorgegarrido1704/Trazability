@@ -8,7 +8,7 @@ $date=date("d-m-Y");
 
 
 
-$messege = '<html><body><br><div align="center"><h1>Desviacion aprobada</h1></div><br>';
+$messege = '<html><body><br><div align="center"><h1>WO Station Report</h1></div><br>';
 
 $subject='Reporte General  WO '.$date;
 $recipientEmail='jgarrido@mx.bergstrominc.com,mvaladez@mx.bergstrominc.com,egaona@mx.bergstrominc.com,ejimenez@mx.bergstrominc.com,fgomez@mx.bergstrominc.com,lmireles@mx.bergstrominc.com,eceron@mx.bergstrominc.com,jgamboa@mx.bergstrominc.com,jguillen@mx.bergstrominc.com';
