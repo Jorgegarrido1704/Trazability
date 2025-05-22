@@ -31,7 +31,7 @@ if ($wo == "") {
         $regstroCuenta=mysqli_query($con,"SELECT cuenta FROM `consterm` where `dias` = '$today' order by id desc limit 1");
         if(mysqli_num_rows($regstroCuenta)>0){
             $rowsCuenta = mysqli_fetch_array($regstroCuenta);
-            $inicio=$rowsCuenta['cuenta'];
+            $inicio=$rowsCuenta['cuenta']+1;
             $cuentas=$rowsCuenta['cuenta']+$cons;
         }else{
             $inicio=1;
