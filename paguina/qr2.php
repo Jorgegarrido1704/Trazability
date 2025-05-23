@@ -79,25 +79,33 @@ use chillerlan\QRCode\{QRCode, QROptions};
             height: 24mm;
             border-radius: 1px;
             box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            display: inline-flex;
+            margin-top: 75px;
+            margin-left: 15px;
+            
+            
            
         }
         .row {
-            display: flex;
+            display: block;
+            align-items: flex-start;
+            margin-bottom: 1px;
+            margin-right: 2px;
+        }
+         .row1 {
+            display: block;
             align-items: flex-start;
             margin-bottom: 1px;
         }
         .qrs {
-             padding-top: 2mm;
-            width: 17mm;
-            height: 17mm;
+             margin-top: 2mm;
+            width: 20mm;
+            height: 19mm;
         }
         .qrss {
-           padding-top: 1mm;
-            width: 17mm;
-            height: 17mm;
+          margin-top: 1mm;
+            width: 20mm;
+            height: 12mm;
         }
         .data-container{
             display: flex;
@@ -114,19 +122,19 @@ use chillerlan\QRCode\{QRCode, QROptions};
             margin-left: 2px;
         }
         .datos {
-            width: 25mm;
+            width: 30mm;
             border-radius: 1px;
             border: solid 1px #000;
             text-align: center;
             margin: 1px 0;
             padding-left: 1px;  
-            font-size: small; 
+            
                     
             box-sizing: border-box;
         }
         textarea {
-            width: 25mm;
-            height: 12mm;
+            width: 30mm;
+            height: 16mm;
             border-radius: 1px;
             border: solid 1px #000;
             box-sizing: border-box;
@@ -136,8 +144,9 @@ use chillerlan\QRCode\{QRCode, QROptions};
             margin: 0;
         }
         #qrs_img {
-            width: 14mm;
-            height: 7mm;
+            width: 18mm;
+            height: 11mm;
+            margin-left: 3-2px;
         }
         .textarea-container {
             margin-top: 0;
@@ -145,8 +154,8 @@ use chillerlan\QRCode\{QRCode, QROptions};
     </style>
 </head>
 <body>
-    <?php for ($inicio; $inicio < $cuentas; $inicio++) { ?>
-    <div style="display:flex; width: 38mm; height: 1625mm">    
+    <?php for ($inicio; $inicio <= $cuentas; $inicio++) { ?>
+    <div style="display:flex; width: 38mm; height: 162mm">    
     <div id="label" class="container">
         <div class="row">
             <div class="qrs">
@@ -156,15 +165,17 @@ use chillerlan\QRCode\{QRCode, QROptions};
                 ?>
                 <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?> 
             </div>
+             <div class="qrss">
+                <img id="qrs_img" src="proterra_dark.png" alt="codigo" class="img-fluid">
+            </div>
+            
+        </div>
+        <div class="row1">
             <div class="data-container">
                 <h6 class="datos"><?php echo $np; ?>|<?php echo $rev; ?></h6>
                 <h6 class="datos"><?php echo $inicio; ?></h6>
             </div>
-        </div>
-        <div class="row">
-            <div class="qrss">
-                <img id="qrs_img" src="proterra_dark.png" alt="codigo" class="img-fluid">
-            </div>
+           
             <div class="textarea-container">
                 <textarea name="datost" id="datost"><?php echo $desc; ?></textarea>
             </div>
