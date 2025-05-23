@@ -187,6 +187,13 @@ use chillerlan\QRCode\{QRCode, QROptions};
         window.onload = function() {
             print();
         }
+         function returnqr() {
+            setTimeout(function() {
+                window.location.href = "qrs.php";
+            }, 1000);
+        }
+
+        returnqr();
     </script>
 </body>
 </html>
