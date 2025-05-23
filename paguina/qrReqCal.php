@@ -104,12 +104,14 @@ use chillerlan\QRCode\{QRCode, QROptions};
 </head>
 
 <body>
-    <?php for ($inicio; $inicio < $cuentas; $inicio++) { ?>
+    <?php for ($inicio; $inicio <= $cuentas; $inicio++) { ?>
+
         <div style="display:flex; width: 38mm; height: 162mm">
             <div id="label" class="container">
                 <div class="row">
                     <div class="qrs">
                         <?php
+                        echo $inicio."<br>";
                         $data = '5703|' . $np . '|' . $rev . '|' . $today . '|' . $inicio;
                         $qrcode = (new QRCode)->render($data);
                         ?>
