@@ -9,7 +9,8 @@
 <body>
     <div class="container">
         <div class="row">
-        <form action="qrReqCal.php" method="post">
+           <!-- //qr2 or qrReqCal -->
+        <form action="qr2.php" method="post">
             <div class="mb-3">
                 <label for="wo" class="form-label">Work <i class="fas fa-first-order    "></i>rder</label>
                 <input type="text" class="form-control" id="wo" name="wo" autofocus placeholder="WO" required onchange="sobran()">
@@ -19,7 +20,7 @@
                 <input type="number" class="form-control" id="const" name="const"  placeholder="10" max="10" min="1" required>
             </div>
             <div class="mb-3">    
-                <button class="btn btn-primary" type="submit">Pront</button>
+                <button class="btn btn-primary" type="submit">Print</button>
             </div>
 
         </form>
