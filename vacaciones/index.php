@@ -21,6 +21,7 @@ if(mysqli_num_rows($busqueda) > 0){
 
         $date = date("Y-m-d");
         $anio = date("Y");
+        $nextYear = date("Y", strtotime($date . "+1 year"));
         $empleadoIngeso=date("Y", strtotime($DateIngreso));
         $cumple= $anio."-".substr($DateIngreso,5,2)."-".substr($DateIngreso,8,2);
         $cumple=date("Y-m-d", strtotime($cumple));
@@ -73,7 +74,7 @@ if(mysqli_num_rows($busqueda) > 0){
         } else{
         $diasVacacionesPendientes=(int)(($diasVacaciones/365)*$difference);
         $total=$currentYear+$diasVacacionesPendientes+$lastYear;
-         $menos= mysqli_query($con,"SELECT COUNT(*) as total FROM `registro_vacaciones` WHERE  `fecha_de_solicitud` LIKE '$anio%' AND (`id_empleado` = '$employeeNumber' or `id_empleado` LIKE '$employeeLider-%' or `id_empleado` LIKE '%-$employeeLider') AND `usedYear` = '$anio'");
+         $menos= mysqli_query($con,"SELECT COUNT(*) as total FROM `registro_vacaciones` WHERE  `fecha_de_solicitud` LIKE '$anio%' AND (`id_empleado` = '$employeeNumber' or `id_empleado` LIKE '$employeeLider-%' or `id_empleado` LIKE '%-$employeeLider') AND `usedYear` = '$nextYear' ");
         if(mysqli_num_rows($menos) > 0){
         $menos = mysqli_fetch_array($menos);
         echo $menos['total'] . "<br>";
