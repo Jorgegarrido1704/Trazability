@@ -42,7 +42,7 @@ try {
     $mail->addAttachment($attachmentPath);
     // Send the email
     $mail->send();
-    header("location:../errores/mejoraTiempoPrecio.php");
+    header("location:../vacaciones/index.php");
  return true;
 
        
@@ -66,6 +66,8 @@ $secM1 = 'tls';
         $secM2   = false;  
         if(!sendEmail($host2,$userM2,$auth2,$passM2,$secM2,$recipientEmail,$subject,$messege,$id,$con)){
             echo "no se pudo";
-    } }
+            header("location:../vacaciones/index.php");
+    } 
+}
 
     
