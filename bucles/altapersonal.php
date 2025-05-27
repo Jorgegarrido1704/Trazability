@@ -19,3 +19,4 @@ if(mysqli_num_rows($lastWeek) <= 0){
 }else{
     echo "Ya se ha registrado la asistencia de esta semana";
 }
+header("location:./assistence.php");

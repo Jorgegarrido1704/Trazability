@@ -39,3 +39,5 @@ if($registro){
 }
 
 }
+
+header("location:../errores/mejoraTiempoPrecio.php");
