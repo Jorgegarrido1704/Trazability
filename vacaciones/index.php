@@ -61,7 +61,7 @@ if(mysqli_num_rows($busqueda) > 0){
             $absDifference=abs($difference);
         $diasVacacionesPendientes=(int)(($diasVacaciones/365)*(365-$absDifference));
         $total=$diasVacacionesPendientes+$lastYear;
-        $menos= mysqli_query($con,"SELECT COUNT(*) as total FROM `registro_vacaciones` WHERE  `fecha_de_solicitud` LIKE '$anio%' AND (`id_empleado` = '$employeeNumber' or `id_empleado` LIKE '$employeeLider-%' or `id_empleado` LIKE '%-$employeeLider') AND `fecha_de_solicitud` = '$anio' ");
+        $menos= mysqli_query($con,"SELECT COUNT(*) as total FROM `registro_vacaciones` WHERE  `fecha_de_solicitud` LIKE '$anio%' AND (`id_empleado` = '$employeeNumber' or `id_empleado` LIKE '$employeeLider-%' or `id_empleado` LIKE '%-$employeeLider') AND `usedYear` = '$anio' ");
         if(mysqli_num_rows($menos) > 0){
         $menos = mysqli_fetch_array($menos);
         $total=$total-$menos['total'];
@@ -73,7 +73,7 @@ if(mysqli_num_rows($busqueda) > 0){
         } else{
         $diasVacacionesPendientes=(int)(($diasVacaciones/365)*$difference);
         $total=$currentYear+$diasVacacionesPendientes+$lastYear;
-         $menos= mysqli_query($con,"SELECT COUNT(*) as total FROM `registro_vacaciones` WHERE  `fecha_de_solicitud` LIKE '$anio%' AND (`id_empleado` = '$employeeNumber' or `id_empleado` LIKE '$employeeLider-%' or `id_empleado` LIKE '%-$employeeLider') AND `fecha_de_solicitud` = '$anio'");
+         $menos= mysqli_query($con,"SELECT COUNT(*) as total FROM `registro_vacaciones` WHERE  `fecha_de_solicitud` LIKE '$anio%' AND (`id_empleado` = '$employeeNumber' or `id_empleado` LIKE '$employeeLider-%' or `id_empleado` LIKE '%-$employeeLider') AND `usedYear` = '$anio'");
         if(mysqli_num_rows($menos) > 0){
         $menos = mysqli_fetch_array($menos);
         echo $menos['total'] . "<br>";
