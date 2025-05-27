@@ -10,11 +10,12 @@ if(mysqli_num_rows($lastWeek) <= 0){
     while($row = mysqli_fetch_array($personal)){
         $lider = $row['employeeLider'];
         $name = $row['employeeName'];
+        $idEmployee = $row['employeeNumber'];
       
         //insert into assitence table
-        $insert = mysqli_query($con,"INSERT INTO assistence (`week`, `lider`, `name`) VALUES ('$week', '$lider', '$name')");
+        $insert = mysqli_query($con,"INSERT INTO assistence (`week`, `lider`, `name`, `id_empleado`) VALUES ('$week', '$lider', '$name', '$idEmployee')");
     }
     
 }else{
-    echo "<script>alert('Ya se ha registrado la asistencia de esta semana');</script>";
+    echo "Ya se ha registrado la asistencia de esta semana";
 }
