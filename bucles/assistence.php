@@ -26,7 +26,7 @@ switch ($today) {
         break;
 }
 
-$personalIndirectos = mysqli_query($con, "SELECT * FROM personalberg WHERE typeWorker = 'Indirecto'");
+$personalIndirectos = mysqli_query($con, "SELECT  employeeNumber FROM personalberg WHERE typeWorker = 'Indirecto'");
 while($row = mysqli_fetch_array($personalIndirectos)){
     $indirectos = $row['employeeNumber'];
 
