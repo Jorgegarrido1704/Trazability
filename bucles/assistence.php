@@ -33,7 +33,7 @@ while($row = mysqli_fetch_array($personalIndirectos)){
 // Search first interaction in the table assistence for comparation
 $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'OK' WHERE `week` = $week AND `id_empleado` = '$indirectos' AND `$day` = '' ");
 if($registro){
-    echo "Asistencia actualizada para el empleado $indirectos en $day de la semana $week. <br>";
+    echo "Asistencia actualizada para el empleado <br>";
 } else {
     echo "Error al actualizar la asistencia: " . mysqli_error($con);
 }
