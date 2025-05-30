@@ -86,11 +86,11 @@ if(mysqli_num_rows($busqueda) > 0){
         $subit =mysqli_query($con,"UPDATE `personalberg` SET `nextYear` = '$diasVacacionesPendientes', `DaysVacationsAvailble` = '$total' WHERE `id` = '$id' ");
         }
         
-        echo $employeeName. " anos en la empresa: ". $anosEnEmpleado. " dias de vacaciones pendientes: ". $diasVacacionesPendientes. " dias de diferencia: ".$difference."<br>";
+        echo "realised";
 
     }
 }else{
     echo "No se encontraron registros";
 }
 
-header("location:../bucles/altapersonal.php");
+//header("location:../bucles/altapersonal.php");
