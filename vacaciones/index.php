@@ -93,4 +93,4 @@ if(mysqli_num_rows($busqueda) > 0){
     echo "No se encontraron registros";
 }
 
-//header("location:../bucles/altapersonal.php");
+header("location:../bucles/altapersonal.php");
