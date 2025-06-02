@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Codes</title>
+    <title>QR Codes v1.0.2</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+
     <div class="container">
         <div class="row">
+            <div class="col-md-12">
+                <h1 class="text-center">QR Codes v1.0.2</h1>
+                <p class="text-center">Generador de códigos QR para órdenes de trabajo</p>
+            </div>
            <!-- //qr2 or qrReqCal -->
         <form action="qr2.php" method="post">
             <div class="mb-3">
