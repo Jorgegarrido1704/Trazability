@@ -33,10 +33,16 @@ else{
             $rowsCuenta = mysqli_fetch_array($regstroCuenta);
             $inicio=$rowsCuenta['cuenta']+1;
             $cuentas=$rowsCuenta['cuenta']+$cons;
+           
         }else{
             $inicio=1;
             $cuentas=$cons;
         }
+         for($i=$inicio;$i<=$cuentas;$i++){
+            $data = '5703|'.$np.'|'.$rev.'|'.$today.'|'.$i;
+            $todayDate = date('Y-m-d');
+                $insertarregistros=mysqli_query($con,"INSERT INTO `registroqrs`( `infoQr`, `CodigoIdentificaicon`, `fecha`) VALUES ('$info','$data','$todayDate')");
+            }
         
         $buscarCuenta = mysqli_query($con, "SELECT * FROM `consterm` where `codigo` = '$info' ");
         if (mysqli_num_rows($buscarCuenta) > 0) {
