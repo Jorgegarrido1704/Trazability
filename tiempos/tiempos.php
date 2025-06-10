@@ -7,13 +7,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $today = date('d-m-Y H:i');   
     $mainProcess = $_POST['proceso'];
     $subProcess = $_POST['subproceso'];
+    $Process_Number=$_POST['Process_Number'];
+    $DescriptionProcess = $_POST['DescriptionProcess'];
     $mm = $_POST['mm'];
     $PartNumber = $_POST['PartNumber'];
     $quien = $_POST['quien'];
     $obs = $_POST['obs'];
     $laps = $_POST['laps'];    
 
-$insertInfo=mysqli_query($con,"INSERT INTO `timeprocess`( `dayHourProcess`, `process`, `subProcess`, `mm`, `partnum`, `Operator`, `obs`, `laps`) VALUES ('$today','$mainProcess','$subProcess','$mm','$PartNumber','$quien','$obs','$laps')");
+$insertInfo=mysqli_query($con,"INSERT INTO `timeprocess`( `dayHourProcess`, `process`, `subProcess`,`Process_Number`, `DescriptionProcess`, `mm`, `partnum`, `Operator`, `obs`, `laps`) VALUES ('$today','$mainProcess','$subProcess','$Process_Number','$DescriptionProcess','$mm','$PartNumber','$quien','$obs','$laps')");
 
 if($insertInfo){
     
@@ -90,6 +92,14 @@ if($insertInfo){
                         <label for="subproceso" class="form-label">Subproceso</label>
                         <select name="subproceso" class="form-select" id="subproceso"  required onchange="suproceso()"></select>
                     </div>
+                    <div class="mb-3">
+                        <label for="Process_Number" class="form-label">Process Number</label>
+                        <input type="text" name="Process_Number" class="form-control" id="Process_Number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="DescriptionProcess" class="form-label">Where Or what asset is being processed</label>
+                        <input type="text" name="DescriptionProcess" class="form-control" id="DescriptionProcess" required>
+                    </div>
                     <div class="mb-3" id="size-mm" style="display: none ;">
                         <label for="mm" class="form-label">Tamano del cable</label>
                         <input type="text" name="mm" class="form-control" id="mm"  value="0.00" step="0.01" required>
@@ -109,7 +119,7 @@ if($insertInfo){
 
                     <div class="mb-3">
                         <label for="laps" class="form-label">Laps</label>      
-                        <textarea name="laps" id="laps" class="form-control" rows="3" required readonly></textarea>      
+                        <textarea name="laps" id="laps" class="form-control" rows="3" required ></textarea>      
                     
                     </div>
                   
@@ -227,7 +237,9 @@ var terminales =['',
                 'set tin point',];
 
 var assembly =['','subassembly',
-              'assembly'];
+              'assembly',
+                'Add Ties',
+            ];
 var loom =['','looming',
             'braiding',
             'set slavee for braiding',
