@@ -49,7 +49,7 @@ if($_SESSION['user']=== 'Admi'){
         <li><a href="../firm/index.html"><button><h1>Requerimiento de material</h1></button></a></li> 
         <li><a href="../impresion/espcon.php"><button><h1>Impresion consecutivo</h1></button></a></li> 
         <li><a href="../movimientosAdmin/editarOrden.php"><button><h1>Editar</h1></button></a></li> 
-        <li><a href="../seguimiento/embarque.php"><button><h1>Registro de proceso embarque</h1></button></a></li>
+        <li><a href="../seguimiento/emba2.php"><button><h1>Registro de proceso embarque</h1></button></a></li>
         <li><a href="../reportes/reportes/index.html"><button><h1>Reportes</h1></button></a></li>
     <!--movimientosAdmin
 <li><a href="../inventario/registro.php"><button><h1>Registrar uno nuevo</h1></button></a></li>

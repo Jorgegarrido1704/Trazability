@@ -55,7 +55,7 @@ header('location:admin.php');
     <ul>
    
         <?php if($_SESSION['user']== 'emba'){ ?>
-            <li><a href="../seguimiento/embarque.php"><button><h1>Registro de proceso embarque</h1></button></a></li>
+            <li><a href="../seguimiento/emba2.php"><button><h1>Registro de proceso embarque</h1></button></a></li>
        <li><a href="../seguimiento/seguimiento.php"><button><h1>Donde esta el arnes</h1></button></a></li>
        <!-- <li><a href="../filtro/index.html"><button><h1>Filtro Booms</h1></button></a></li>
         <li><a href="../seguimiento/checker_estacion.php"><button><h1>Registro de proceso</h1></button></a></li>
