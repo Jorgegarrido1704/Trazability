@@ -26,17 +26,27 @@ switch ($today) {
         break;
 }
 
-$personalIndirectos = mysqli_query($con, "SELECT  employeeNumber FROM personalberg WHERE typeWorker = 'Indirecto'");
+$personalIndirectos = mysqli_query($con, "SELECT  employeeNumber, typeWorker,`status` FROM personalberg ORDER BY typeWorker ASC");
 while($row = mysqli_fetch_array($personalIndirectos)){
     $indirectos = $row['employeeNumber'];
-
-// Search first interaction in the table assistence for comparation
+    $tipo = $row['typeWorker'];
+    $status = $row['status'];
+if($tipo == 'Indirecto' && $status == 'Activo'){   
 $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'OK' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");
-if($registro){
-    echo "Asistencia actualizada para el empleado <br>";
-} else {
-    echo "Error al actualizar la asistencia: " . mysqli_error($con);
+}elseif($tipo == 'Practicante' && $status == 'Activo'){
+    $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'PCT' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");
+}elseif($status == 'PSS'){
+    $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'PSS' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");
+} elseif($status == 'Vacaciones'){
+    $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'V' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");
+}else if($status == 'PCS'){
+    $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'PCS' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");
+} else if($status == 'Suspension'){
+    $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'SUS' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");    
+}else if($status == 'Incapacidad'){
+    $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'INC' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");
 }
+
 
 }
 
