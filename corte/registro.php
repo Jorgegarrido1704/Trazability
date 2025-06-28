@@ -13,7 +13,7 @@ while($row=mysqli_fetch_array($buscar)){
     if(substr($rev1,0,4)=="PPAP" or substr($rev1,0,4)=="PRIM"){
         $rev=substr($rev1,5);
     }else { $rev=$rev1;}
-$selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev='$rev' ");
+$selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev='$rev' AND cons != '' ");
     while($rowList=mysqli_fetch_array($selectlist)){
         $cons=$rowList['cons'];
         $tipo=$rowList['tipo'];

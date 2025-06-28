@@ -1,6 +1,8 @@
 <?php
 require "../app/conection.php";
 
+$numerosDeParte = [];
+
 if (isset($_POST['upload'])) {
     if (is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
         $csvFile = $_FILES['csv_file']['tmp_name'];   
@@ -36,6 +38,7 @@ if (isset($_POST['upload'])) {
                     $data = str_getcsv($firstLine);
                     list($pn,$rev, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo) = $data;
                     mysqli_stmt_execute($stmt);
+                    $numerosDeParte[] = $pn;
                     $rowCount++;
                 }
 
@@ -43,7 +46,7 @@ if (isset($_POST['upload'])) {
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                     // Asignar los valores a las variables vinculadas
                     list($pn,$rev, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo) = $data;
-
+                    $numerosDeParte[] = $pn;
                     // Ejecutar la consulta de inserción
                     mysqli_stmt_execute($stmt);
                     $rowCount++;
@@ -59,7 +62,9 @@ if (isset($_POST['upload'])) {
                 mysqli_commit($con);
                 echo "Carga completa. Total de filas procesadas: $rowCount";
                 fclose($handle);
-                header("location:registro.php");
+                $numerosDeParte = array_unique($numerosDeParte); // Eliminar duplicados
+
+                header("location:altaRouting.php?np=" . implode(',', $numerosDeParte));
             } catch (Exception $e) {
                 echo 'Error: ' . $e->getMessage();
             }
