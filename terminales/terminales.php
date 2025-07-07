@@ -11,7 +11,7 @@
     $terminalesCom=mysqli_query($con,"SELECT terminal1,  aws, pn, cons from listascorte WHERE terminal1 LIKE '$terminals' 
            OR terminal1 LIKE '$terminals (%'
            OR terminal1 LIKE '$terminals %'
-        ORDER BY terminal1 ASC");
+        ORDER BY id DESC");
     while($row=mysqli_fetch_assoc($terminalesCom)){
 
         $terminal=$row['terminal1'];
@@ -24,7 +24,7 @@
  $terminalesCom1=mysqli_query($con,"SELECT  terminal2, aws, pn, cons from listascorte WHERE terminal2 LIKE '$terminals' 
            OR terminal2 LIKE '$terminals (%'
            OR terminal2 LIKE '$terminals %'
-        ORDER BY terminal2 ASC");
+        ORDER BY id DESC");
     while($rows=mysqli_fetch_assoc($terminalesCom1)){
         
         $terminal2=$rows['terminal2'];
