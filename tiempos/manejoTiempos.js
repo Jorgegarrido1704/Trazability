@@ -98,14 +98,14 @@
         var assembly = ['', 'subassembly',
             'assembly',
             'Add Ties',
-            'Tapping',
+            'Tapping/Assembly',
             'plugging',
-            
+
         ];
         var loom = ['', 'looming',
             'braiding',
             'set slavee for braiding',
-            'Tapping',
+            'Tapping/Looming',
             'labeling',
 
         ];
@@ -135,11 +135,102 @@
     }
 
     function suproceso() {
+        let processNumber = document.getElementById('Process_Number');
+        let asset = document.getElementById('DescriptionProcess');
         if (subproceso.value == 'cutting w/2 terminals without saels' || subproceso.value == 'cutting w/1 terminals without saels' ||
             subproceso.value == 'cutting w/1 terminals with saels' || subproceso.value == 'cutting w/2 terminals with saels' ||
             subproceso.value == 'cutting without terminals' || subproceso.value == 'twist wire') {
             document.getElementById('size-mm').style.display = 'block';
-        } else {
+        }else{
             document.getElementById('size-mm').style.display = 'none';
         }
-    }
+        if(subproceso.value =='cutting w/2 terminals without saels'){
+           document.getElementById('Process_Number').value = '10041';
+           document.getElementById('DescriptionProcess').value = 'FB045';
+        }if(subproceso.value =='cutting w/1 terminals without saels'){
+            document.getElementById('Process_Number').value = '10021';
+            document.getElementById('DescriptionProcess').value = 'FB048';
+         }if(subproceso.value =='cutting w/1 terminals with saels'){
+            document.getElementById('Process_Number').value = '10051';
+            document.getElementById('DescriptionProcess').value = 'FB040';
+         }if(subproceso.value =='cutting w/2 terminals with saels'){
+            document.getElementById('Process_Number').value = '10052';
+            document.getElementById('DescriptionProcess').value = 'FB040';
+         }if(subproceso.value =='cutting without terminals'){
+            document.getElementById('Process_Number').value = '10001';
+            document.getElementById('DescriptionProcess').value = 'FB036';
+         }if(subproceso.value =='twist wire'){
+            document.getElementById('Process_Number').value = '10061';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='terminal apply with machine'){
+            document.getElementById('Process_Number').value = '10081';
+            document.getElementById('DescriptionProcess').value = 'FB-081';
+         }if(subproceso.value =='terminal apply with handtool'){
+            document.getElementById('Process_Number').value = '10101';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='terminal apply with cannon machine'){
+            document.getElementById('Process_Number').value = '10095';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='create set for splice'){
+            document.getElementById('Process_Number').value = '10341';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='splice set apply with machine'){
+            document.getElementById('Process_Number').value = '10301';
+            document.getElementById('DescriptionProcess').value = 'FB110';
+         }if(subproceso.value =='splice set apply with handtool'){
+            document.getElementById('Process_Number').value = '10321';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='put seal on wire'){
+            document.getElementById('Process_Number').value = '10381';
+            document.getElementById('DescriptionProcess').value = 'Pend';   
+
+         }if(subproceso.value =='set headshrink'){
+            document.getElementById('Process_Number').value = '10361';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='burn headshrink w/headgun'){
+            document.getElementById('Process_Number').value = '10401';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='burn headshrink w/machine'){
+            document.getElementById('Process_Number').value = '10421';
+            document.getElementById('DescriptionProcess').value = 'FB-078';
+         }if(subproceso.value =='set tin point'){
+            document.getElementById('Process_Number').value = '10431';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='subassembly'){
+            document.getElementById('Process_Number').value = '10441';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='assembly'){
+            document.getElementById('Process_Number').value = '10501';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         
+         }if(subproceso.value =='looming'){
+            document.getElementById('Process_Number').value = '10601';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='labeling'){
+            document.getElementById('Process_Number').value = '10701';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+        }if(subproceso.value =='Add Ties'){
+            document.getElementById('Process_Number').value = '10801';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='Tapping/Assembly'){
+            document.getElementById('Process_Number').value = '10901';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='Plugging/Sub-Assembly'){
+            document.getElementById('Process_Number').value = '10951';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='Plugging/Assembly'){
+            document.getElementById('Process_Number').value = '10975';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value =='Tapping/Looming'){
+            document.getElementById('Process_Number').value = '11001';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value == 'braiding'){
+            document.getElementById('Process_Number').value = '11101';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }if(subproceso.value == 'set slavee for braiding'){
+            document.getElementById('Process_Number').value = '11201';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }
+         
+
+        }
