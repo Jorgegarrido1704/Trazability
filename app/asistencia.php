@@ -90,13 +90,13 @@ $sheet->setCellValue('D'.$t, 'VACACIONES');
 $sheet->setCellValue('E'.$t, 'V');
 $t=$t+1;
 $sheet->setCellValue('B'.$t, 'INCAPACIDAD');
-$sheet->setCellValue('C'.$t, 'I');
+$sheet->setCellValue('C'.$t, 'INC');
 $sheet->setCellValue('D'.$t, 'SUSPENSION');
-$sheet->setCellValue('E'.$t, 'S');
+$sheet->setCellValue('E'.$t, 'SUS');
 $sheet->setCellValue('M'.$t, '___________________');
 $t=$t+1;
 $sheet->setCellValue('B'.$t, 'TIEMPO EXTRA');
-$sheet->setCellValue('C'.$t, 'T');
+$sheet->setCellValue('C'.$t, 'TE');
 $sheet->setCellValue('M'.$t, 'Autorizado por');
 
 
