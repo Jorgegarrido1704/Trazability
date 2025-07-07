@@ -98,6 +98,9 @@
         var assembly = ['', 'subassembly',
             'assembly',
             'Add Ties',
+            'Tapping',
+            'plugging',
+            
         ];
         var loom = ['', 'looming',
             'braiding',
