@@ -98,8 +98,12 @@
         var assembly = ['', 'subassembly',
             'assembly',
             'Add Ties',
-            'Tapping/Assembly',
+            'Tapping Body/Assembly',
+            'Tapping breakout/Assembly',
             'plugging',
+            'Plugging/Sub-Assembly',
+            'Plugging/Assembly',
+            
 
         ];
         var loom = ['', 'looming',
@@ -212,8 +216,12 @@
         }if(subproceso.value =='Add Ties'){
             document.getElementById('Process_Number').value = '10801';
             document.getElementById('DescriptionProcess').value = 'Pend';
-         }if(subproceso.value =='Tapping/Assembly'){
+         }if(subproceso.value =='Tapping Body/Assembly'){
             document.getElementById('Process_Number').value = '10901';
+            document.getElementById('DescriptionProcess').value = 'Pend';
+         }
+         if(subproceso.value =='Tapping breakout/Assembly'){
+            document.getElementById('Process_Number').value = '10902';
             document.getElementById('DescriptionProcess').value = 'Pend';
          }if(subproceso.value =='Plugging/Sub-Assembly'){
             document.getElementById('Process_Number').value = '10951';
@@ -231,6 +239,6 @@
             document.getElementById('Process_Number').value = '11201';
             document.getElementById('DescriptionProcess').value = 'Pend';
          }
-         
+
 
         }
