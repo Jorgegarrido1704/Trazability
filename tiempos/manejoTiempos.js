@@ -100,7 +100,6 @@
             'Add Ties',
             'Tapping Body/Assembly',
             'Tapping breakout/Assembly',
-            'plugging',
             'Plugging/Sub-Assembly',
             'Plugging/Assembly',
             
