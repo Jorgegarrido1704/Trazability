@@ -78,7 +78,9 @@
             'cutting w/1 terminals without saels',
             'cutting w/1 terminals with saels',
             'cutting w/2 terminals with saels',
-            'cutting without terminals'
+            'cutting without terminals',
+            'cutting without terminals big size',
+
         ];
 
         var terminales = ['',
@@ -93,6 +95,7 @@
             'burn headshrirnk w/headgun',
             'burn headshrink w/machine',
             'set tin point',
+            'terminal apply with cannon machine',
         ];
 
         var assembly = ['', 'subassembly',
@@ -146,6 +149,10 @@
             document.getElementById('size-mm').style.display = 'block';
         }else{
             document.getElementById('size-mm').style.display = 'none';
+        }
+        if(subproceso.value == 'cutting without terminals big size'){
+           document.getElementById('Process_Number').value = '10011';
+           document.getElementById('DescriptionProcess').value = 'FB022';
         }
         if(subproceso.value =='cutting w/2 terminals without saels'){
            document.getElementById('Process_Number').value = '10041';
