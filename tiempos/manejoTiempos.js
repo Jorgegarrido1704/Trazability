@@ -91,9 +91,9 @@
             'splice set apply with machine',
             'splice set apply with handtool',
             'put seal on wire',
-            'set headshrink',
-            'burn headshrirnk w/headgun',
-            'burn headshrink w/machine',
+            'set heatshrink',
+            'burn heatshrirnk w/heatgun',
+            'burn heatshrink w/machine',
             'set tin point',
             'terminal apply with cannon machine',
         ];
@@ -194,13 +194,13 @@
             document.getElementById('Process_Number').value = '10381';
             document.getElementById('DescriptionProcess').value = 'Pend';   
 
-         }if(subproceso.value =='set headshrink'){
+         }if(subproceso.value =='set heatshrink'){
             document.getElementById('Process_Number').value = '10361';
             document.getElementById('DescriptionProcess').value = 'Pend';
-         }if(subproceso.value =='burn headshrink w/headgun'){
+         }if(subproceso.value =='burn heatshrink w/heatgun'){
             document.getElementById('Process_Number').value = '10401';
             document.getElementById('DescriptionProcess').value = 'Pend';
-         }if(subproceso.value =='burn headshrink w/machine'){
+         }if(subproceso.value =='burn heatshrink w/machine'){
             document.getElementById('Process_Number').value = '10421';
             document.getElementById('DescriptionProcess').value = 'FB-078';
          }if(subproceso.value =='set tin point'){
