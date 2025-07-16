@@ -64,7 +64,7 @@ if (isset($_POST['upload'])) {
                 fclose($handle);
                 $numerosDeParte = array_unique($numerosDeParte); // Eliminar duplicados
 
-                header("location:altaRouting.php?np=" . implode(',', $numerosDeParte));
+                header("location:duplicados.php?np=" . implode(',', $numerosDeParte));
             } catch (Exception $e) {
                 echo 'Error: ' . $e->getMessage();
             }
