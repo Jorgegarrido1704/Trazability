@@ -28,9 +28,8 @@ foreach ($datos as $np) {
     $gunHeatGun = $burnHeatGun[$random1];
 
     $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-            VALUES ('$np','10361','Pend','$leyenda1','$cantidad','$timeHeadShrink','600')");
-    $insertar2 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-            VALUES ('$np','10401','Pend','$leyenda2','$cantidad','$gunHeatGun','600')");
+            VALUES ('$np','10301','FB110','$leyenda1','$cantidad','$timeHeadShrink','600')");
+   
             
     echo 'Mangas a terminales: '  .$cantidad;
 

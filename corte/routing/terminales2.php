@@ -50,4 +50,4 @@ foreach ($datos as $np) {
 }
 
 
-//header("location:addmangaterminal1.php?np=" . implode(',', $datos));
+header("location:addmangaterminal1.php?np=" . implode(',', $datos));

@@ -28,7 +28,7 @@ foreach ($datos as $np) {
             $color = $row['color'];
             $tamano = $row['tamano'];
             $tiempo = floatval($tamano) * 0.35;
-            $dataLabel = 'Cutting cons' . $cons . ' // Tipo:' . $tipo . '// AWG: ' . $aws . '// Color: ' . $color;
+            $dataLabel = 'Cutting cons ' . $cons . ' // Tipo:' . $tipo . '// AWG: ' . $aws . '// Color: ' . $color;
             $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
             VALUES ('$np','10001','FB036','$dataLabel','1','$tiempo','600')");
 
