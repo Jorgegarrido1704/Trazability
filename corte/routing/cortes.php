@@ -1,5 +1,6 @@
 <?php 
 require "../../app/conection.php";
+require "timesReg.php";
 
 if (isset($_GET['np'])) {
     if(strpos($_GET['np'], ',') !== false){
@@ -27,7 +28,9 @@ foreach ($datos as $np) {
             $aws = $row['aws'];
             $color = $row['color'];
             $tamano = $row['tamano'];
-            $tiempo = floatval($tamano) * 0.35;
+            $random = rand(0, count($corte) - 1);
+
+            $tiempo = floatval($tamano) * $corte[$random] ;
             $dataLabel = 'Cutting cons ' . $cons . ' // Tipo:' . $tipo . '// AWG: ' . $aws . '// Color: ' . $color;
             $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
             VALUES ('$np','10001','FB036','$dataLabel','1','$tiempo','600')");
@@ -40,4 +43,4 @@ foreach ($datos as $np) {
 }
 
 
-header("location:terminales.php?np=" . implode(',', $datos));
+header("location:twist.php?np=" . implode(',', $datos));

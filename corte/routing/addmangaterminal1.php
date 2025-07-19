@@ -33,6 +33,6 @@ foreach ($datos as $np) {
             VALUES ('$np','10401','Pend','$leyenda2','$cantidad','$gunHeatGun','600')");
             
     echo 'Mangas a terminales: '  .$cantidad;
-
+header("location:spliceSet.php?np=" . implode(',', $datos));
    
 }

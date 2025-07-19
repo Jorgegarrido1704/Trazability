@@ -1,9 +1,10 @@
 <?php
 require "../../app/conection.php";
+require "timesReg.php";
 
 if (isset($_GET['np'])) {
     if (strpos($_GET['np'], ',') !== false) {
-        $datos[0] = $_GET['np'];
+        $datos = $_GET['np'];
     } else {
         $datos =  explode(',', $_GET['np']);
     }
@@ -11,43 +12,40 @@ if (isset($_GET['np'])) {
     echo "No se han recibido números de parte.";
     header("location:../registro.php");
 }
+    $np=$datos[0];
 
-foreach ($datos as $np) {
-  /*  $buscarExistencia = mysqli_query($con, "SELECT `pn_routing` FROM routing_models WHERE pn_routing='$np' AND `work_routing`='10081' ");
-    if (mysqli_num_rows($buscarExistencia) > 0) {
-        $delete = (mysqli_query($con, "DELETE FROM routing_models WHERE pn_routing='$np' AND  work_routing='10081'"));
-    }*/
-
-    $buscar = mysqli_query($con, "SELECT terminal2 FROM listascorte WHERE pn='$np' AND terminal2 IS NOT NULL and terminal2 !='' and 
-    terminal2 not like 'Empalme%' AND terminal2 not like 'EMPALME%' and terminal2 not like 'SPL%' AND terminal2 not like 'SPLICE%'   ");
+    $buscar = mysqli_query($con, "SELECT DataTo,terminal2 FROM listascorte WHERE pn='$np' AND terminal2 IS NOT NULL and terminal2 !='' and 
+    terminal2 not like 'Empalme%' AND terminal2 not like 'EMPALME%' and terminal2 not like 'SPL%' AND terminal2 not like 'SPLICE%'  
+    AND   terminal2 not like 'JUMPER%' AND terminal2 not like 'Jumper%' order by terminal2 desc");
     if (mysqli_num_rows($buscar) > 0) {
         while ($row = mysqli_fetch_array($buscar)) {
             $terminal = $row['terminal2'];
+            $conector=$row['DataTo'];
+           
             if (strpos($terminal, '(')) {
                 $terminal = substr($terminal, 0, strpos($terminal, '('));
             }
             if (isset($terminales[$terminal])) {
-                $terminales[$terminal]++;
+                $terminales[$terminal]=$terminales[$terminal]+1;
             } else {
                 $terminales[$terminal] = 1;
             }
-        }
-        foreach ($terminales as $terminal => $qtyTerminal) {
+            if(!strpos($terminal, 'T3-') AND !strpos($terminal, 'T4-')){
+                $random = rand(0, count($plugIn) - 1);
+                $tiempoPlugIn = $plugIn[$random];
+                $leyenda="Plug $terminal Terminal in $conector";
+                 echo $terminal . " = 1   In $conector en $tiempoPlugIn segundos". "<br>";
+                $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
+                VALUES ('$np','10951','pend','$leyenda','1','$tiempoPlugIn','300')");    
+            }
             
-            $buscarDatos=mysqli_query($con,"SELECT QtyTimes FROM routing_models WHERE pn_routing='$np' AND `work_routing`='10081' AND `work_description`='$terminal'");
-            if(mysqli_num_rows($buscarDatos)>0){
-                $row=mysqli_fetch_array($buscarDatos);
-                $qtyTerminal=$qtyTerminal+$row['QtyTimes'];
-                $update="UPDATE routing_models SET QtyTimes='$qtyTerminal' WHERE pn_routing='$np' AND `work_routing`='10081' AND `work_description`='$terminal'";
-            }else{
+        }
+        
+    }
+    foreach ($terminales as $terminal => $qtyTerminal) {
             $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-            VALUES ('$np','10081','FB-081','$terminal','$qtyTerminal','3.084','600')");}
-        echo $terminal . " = " . $qtyTerminal . "<br>";    
-    }
-    } else {
-        echo "No se encontraron registros para el número de parte: " . htmlspecialchars($np);
-    }
-}
+            VALUES ('$np','10081','FB-081','$terminal','$qtyTerminal','3.084','600')");    
+        }
 
 
 header("location:addmangaterminal1.php?np=" . implode(',', $datos));
