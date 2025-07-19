@@ -2,11 +2,13 @@
 require "../../app/conection.php";
 require "timesReg.php";
 
+
 if (isset($_GET['np'])) {
-    if(strpos($_GET['np'], ',') !== false){
-        $datos [0]= $_GET['np'];   
-    }else{
-    $datos =  explode(',', $_GET['np']);
+    $paramNp = $_GET['np'];
+    if (strpos($paramNp, ',') !== false) {
+        $datos = explode(',', $paramNp); 
+    } else {
+        $datos = [$paramNp]; 
     }
 } else {
     echo "No se han recibido números de parte.";

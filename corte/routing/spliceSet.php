@@ -2,11 +2,13 @@
 require "../../app/conection.php";
 require "timesReg.php";
 
+
 if (isset($_GET['np'])) {
-    if (strpos($_GET['np'], ',') !== false) {
-        $datos[0] = $_GET['np'];
+    $paramNp = $_GET['np'];
+    if (strpos($paramNp, ',') !== false) {
+        $datos = explode(',', $paramNp); 
     } else {
-        $datos =  explode(',', $_GET['np']);
+        $datos = [$paramNp]; 
     }
 } else {
     echo "No se han recibido números de parte.";
@@ -64,14 +66,14 @@ $tipoSplice=[];
             $gunHeatGun = $burnHeatGun[$random1];
 
             $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-                    VALUES ('$np','10361','Pend','$leyenda1','$cantidad','$timeHeadShrink','600')");
+                    VALUES ('$np','10361','Pend','$leyenda1','1','$timeHeadShrink','600')");
             $insertar2 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-                    VALUES ('$np','10401','Pend','$leyenda2','$cantidad','$gunHeatGun','600')");
+                    VALUES ('$np','10401','Pend','$leyenda2','1','$gunHeatGun','600')");
                     echo $key." ".$QtySpliceA.":".$QtySpliceB."<br>";
         }
     }
 
-    header("location:../registro.php");
+    header("location:../CargarRoutings.php");
             
     
 

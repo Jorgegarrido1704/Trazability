@@ -3,20 +3,25 @@ require "../../app/conection.php";
 require "timesReg.php";
 
 if (isset($_GET['np'])) {
-    if (strpos($_GET['np'], ',') !== false) {
-        $datos = $_GET['np'];
+    $paramNp = $_GET['np'];
+    if (strpos($paramNp, ',') !== false) {
+        $datos = explode(',', $paramNp); 
     } else {
-        $datos =  explode(',', $_GET['np']);
+        $datos = [$paramNp]; 
     }
+
 } else {
     echo "No se han recibido números de parte.";
     header("location:../registro.php");
 }
-    $np=$datos[0];
+   foreach ($datos as $np) {
 
     $buscar = mysqli_query($con, "SELECT DataTo,terminal2 FROM listascorte WHERE pn='$np' AND terminal2 IS NOT NULL and terminal2 !='' and 
     terminal2 not like 'Empalme%' AND terminal2 not like 'EMPALME%' and terminal2 not like 'SPL%' AND terminal2 not like 'SPLICE%'  
-    AND   terminal2 not like 'JUMPER%' AND terminal2 not like 'Jumper%' order by terminal2 desc");
+    AND   terminal2 not like 'JUMPER%' AND terminal2 not like 'Jumper%' AND terminal2 not like 'CONECTOR%' AND terminal2 not like 'Blunt%' AND terminal2 not like 'PORTA%'
+    AND terminal2 not like 'CORTAR%' AND terminal2 not like 'N/T%' AND terminal2 not like 'BLUNT%' 
+    
+     order by terminal2 desc");
     if (mysqli_num_rows($buscar) > 0) {
         while ($row = mysqli_fetch_array($buscar)) {
             $terminal = $row['terminal2'];
@@ -34,7 +39,7 @@ if (isset($_GET['np'])) {
                 $random = rand(0, count($plugIn) - 1);
                 $tiempoPlugIn = $plugIn[$random];
                 $leyenda="Plug $terminal Terminal in $conector";
-                 echo $terminal . " = 1   In $conector en $tiempoPlugIn segundos". "<br>";
+            //     echo $terminal . " = 1   In $conector en $tiempoPlugIn segundos". "<br>";
                 $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
                 VALUES ('$np','10951','pend','$leyenda','1','$tiempoPlugIn','300')");    
             }
@@ -46,6 +51,6 @@ if (isset($_GET['np'])) {
             $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
             VALUES ('$np','10081','FB-081','$terminal','$qtyTerminal','3.084','600')");    
         }
-
+    }
 
 header("location:addmangaterminal1.php?np=" . implode(',', $datos));
