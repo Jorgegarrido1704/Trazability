@@ -35,7 +35,7 @@ if (isset($_GET['np'])) {
             } else {
                 $terminales[$terminal] = 1;
             }
-            if(!strpos($terminal, 'T3-') AND !strpos($terminal, 'T4-')){
+            if(!strpos($terminal, 'T3-') AND !strpos($terminal, 'T4-')and !in_array($terminal, $NoRequeridas)){
                 $random = rand(0, count($plugIn) - 1);
                 $tiempoPlugIn = $plugIn[$random];
                 $leyenda="Plug $terminal Terminal in $conector";
