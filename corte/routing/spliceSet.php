@@ -73,7 +73,7 @@ $tipoSplice=[];
         }
     }
 
-    header("location:../CargarRoutings.php");
+    header("location:../registro.php");
             
     
 

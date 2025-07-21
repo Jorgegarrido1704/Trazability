@@ -53,4 +53,4 @@ if (isset($_GET['np'])) {
         }
     }
 
-header("location:addmangaterminal1.php?np=" . implode(',', $datos));
+header("location:addTin.php?np=" . implode(',', $datos));
