@@ -87,6 +87,17 @@ table{
         </form>
         </div>
     </div>
+    <div class="titles">
+         <div class="contenido">
+        <h1>Cargar Routing</h1>
+        <form action="routing/cortes.php" method="GET">
+        <input type="text" name="np" id="np" required>
+        <br>
+        <input type="submit" name="upload" value="Cargar Routing">
+        </form>
+        </div>
+        
+    </div>
     <br>
     
     <?php

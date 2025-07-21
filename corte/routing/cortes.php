@@ -17,11 +17,8 @@ if (isset($_GET['np'])) {
 }
 
 foreach ($datos as $np) {
-     $buscarExistencia = mysqli_query($con, "SELECT `pn_routing` FROM routing_models WHERE pn_routing='$np' ");
-            if(mysqli_num_rows($buscarExistencia)>0){
                 $delete=(mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np'"));
-            }
-            
+           
     $buscar = mysqli_query($con, "SELECT cons, tipo, aws, color,tamano FROM listascorte WHERE pn='$np' and tamano>0  ");
     if (mysqli_num_rows($buscar) > 0) {
         while ($row = mysqli_fetch_array($buscar)) {
