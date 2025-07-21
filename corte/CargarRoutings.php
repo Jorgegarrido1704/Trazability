@@ -1,21 +1,17 @@
 <?php
 require "../app/conection.php";
+$numerosDeParte = array();
 
-// Buscar hasta 20 números de parte que no estén en routing_models
-$query = "
-    SELECT DISTINCT l.pn 
-FROM listascorte l
-LEFT JOIN routing_models r 
-    ON l.pn COLLATE utf8mb4_unicode_ci = r.pn_routing COLLATE utf8mb4_unicode_ci
-WHERE r.pn_routing IS NULL
-LIMIT 20
-";
-
-$result = mysqli_query($con, $query);
-
-$numerosDeParte = [];
-while ($row = mysqli_fetch_array($result)) {
-    $numerosDeParte[] = $row['pn'];
+$selectListas = mysqli_query($con,"SELECT DISTINCT pn FROM listascorte");
+while ($row = mysqli_fetch_array($selectListas)) {
+    $selectRouting = mysqli_query($con,"SELECT DISTINCT pn_routing FROM routing_models WHERE pn_routing='$row[pn]'");
+    if (mysqli_num_rows($selectRouting) == 0) {
+        $numerosDeParte[] = $row['pn'];
+    }
+    if(count($numerosDeParte)>=20){
+       header("Location: duplicados.php?np=" . implode(',', $numerosDeParte));
+       exit;
+    }
 }
 
 if (empty($numerosDeParte)) {
