@@ -20,7 +20,6 @@ if (isset($_GET['np'])) {
     terminal2 not like 'Empalme%' AND terminal2 not like 'EMPALME%' and terminal2 not like 'SPL%' AND terminal2 not like 'SPLICE%'  
     AND   terminal2 not like 'JUMPER%' AND terminal2 not like 'Jumper%' AND terminal2 not like 'CONECTOR%' AND terminal2 not like 'Blunt%' AND terminal2 not like 'PORTA%'
     AND terminal2 not like 'CORTAR%' AND terminal2 not like 'N/T%' AND terminal2 not like 'BLUNT%' 
-    
      order by terminal2 desc");
     if (mysqli_num_rows($buscar) > 0) {
         while ($row = mysqli_fetch_array($buscar)) {
@@ -53,4 +52,4 @@ if (isset($_GET['np'])) {
         }
     }
 
-header("location:addTin.php?np=" . implode(',', $datos));
+header("location:selloEnTerminal2.php?np=" . implode(',', $datos));

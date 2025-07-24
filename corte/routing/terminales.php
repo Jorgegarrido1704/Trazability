@@ -46,8 +46,8 @@ foreach ($datos as $np) {
     }
     foreach ($terminales as $terminal => $qtyTerminal) {
         $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-            VALUES ('$np','10081','FB-081','$terminal','$qtyTerminal','3.084','600')");
+            VALUES ('$np','10081','FB-081','$terminal','$qtyTerminal','3.084','300')");
     }
 }
 
-header("location:terminales2.php?np=" . implode(',', $datos));
+header("location:selloEnTerminal1.php?np=" . implode(',', $datos));
