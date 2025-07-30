@@ -20,7 +20,7 @@ foreach ($datos as $np) {
      order by terminal2 desc");
     if (mysqli_num_rows($buscar) > 0) {
         while ($row = mysqli_fetch_array($buscar)) {
-            $terminal = $row['terminal1'];
+            $terminal = $row['terminal2'];
             
             if (strpos($terminal, '(')) {
                $terminal = explode('(', $terminal)[1];
