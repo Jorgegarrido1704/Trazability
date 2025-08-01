@@ -45,6 +45,11 @@ $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'OK' WHERE `week` =
     $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'SUS' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");    
 }else if($status == 'Incapacidad'){
     $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'INC' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");
+}else if($status == 'Asimilado'){
+    $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'ASM' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");
+}else if($status == 'Servicio comprado'){
+    $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'SCE' WHERE `week` = $week AND `id_empleado` = '$indirectos' ");
+    
 }
 
 
