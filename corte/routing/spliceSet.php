@@ -56,9 +56,9 @@ $tipoSplice=[];
             $applySpliceTime = $applySpleceInMachine[$random3];
             $timpoSetSplice = ($QtySpliceA * $createSpliceTime) * $createSpliceTime;
             $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-            VALUES ('$np','10341','Pend','Create set for splice $QtySpliceA : $QtySpliceB','1','$timpoSetSplice','600')");
+            VALUES ('$np','10341','Pend','Create set for splice $QtySpliceA : $QtySpliceB','1','$timpoSetSplice','300')");
             $insertar2 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-            VALUES ('$np','10301','FB110','splice set apply with machine','1','$applySpliceTime','600')");
+            VALUES ('$np','10301','FB110','splice set apply with machine','1','$applySpliceTime','300')");
             $random = rand(0, count($setHeadShrink) - 1);
             $random1 = rand(0, count($burnHeatGun) - 1);
             $leyenda1 = "Set HeadShrink in splice ";
@@ -67,9 +67,9 @@ $tipoSplice=[];
             $gunHeatGun = $burnHeatGun[$random1];
 
             $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-                    VALUES ('$np','10361','Pend','$leyenda1','1','$timeHeadShrink','600')");
+                    VALUES ('$np','10361','Pend','$leyenda1','1','$timeHeadShrink','300')");
             $insertar2 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-                    VALUES ('$np','10401','Pend','$leyenda2','1','$gunHeatGun','600')");
+                    VALUES ('$np','10401','Pend','$leyenda2','1','$gunHeatGun','300')");
                     echo $key." ".$QtySpliceA.":".$QtySpliceB."<br>";
         }
     }

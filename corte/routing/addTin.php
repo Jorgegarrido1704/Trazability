@@ -24,7 +24,7 @@ if (isset($_GET['np'])) {
             $tiempos = $tinSet[$random];
         
             $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-           VALUES ('$np','10431','Pend','$terminal','$totalVeces','$tiempos','600')");    
+           VALUES ('$np','10431','Pend','$terminal','$totalVeces','$tiempos','300')");    
         echo $np. " Ocupa un total de: " . $totalVeces . " veces: " . $terminal . " con tiempos de: " . $tiempos . "<br>";
     }
    }
