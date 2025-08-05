@@ -16,6 +16,7 @@ if (isset($_GET['np'])) {
 }
 
 foreach ($datos as $np) {
+    $delete=(mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and work_routing='10361' and work_routing='10401'"));
     $cantidad = 0;
 
     $buscarMangas = mysqli_query($con, "SELECT terminal1 FROM listascorte WHERE pn='$np' AND terminal1 IS NOT NULL and (terminal1 LIKE '%MANGA%' or terminal1 LIKE '%Manga%')");

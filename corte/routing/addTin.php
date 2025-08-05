@@ -15,7 +15,7 @@ if (isset($_GET['np'])) {
     header("location:../registro.php");
 }
        foreach ($datos as $np) {
-
+        $delete=(mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and work_routing='10431'"));
     $buscar = mysqli_query($con, "SELECT terminal1,terminal2 FROM listascorte WHERE pn='$np' AND (terminal1 LIKE '%SOLDAR%' or terminal2 LIKE '%SOLDAR%' OR terminal1 LIKE '%Soldar%' or terminal2 LIKE '%Soldar%' )");
     if (mysqli_num_rows($buscar) > 0) {
             $totalVeces=mysqli_num_rows($buscar);
