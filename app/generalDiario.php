@@ -11,6 +11,8 @@ $today=date("d-m-Y 00:00");
 
 $spreadsheet = new Spreadsheet();
 $sheetwo = $spreadsheet->getActiveSheet();
+
+
 // Work orders
 $sheetwo->setTitle('Work order '.$todays);
 $sheetwo->setCellValue('A1','Part Number');
@@ -26,10 +28,14 @@ $sheetwo->setCellValue('J1', 'Quality Errors');
 $sheetwo->setCellValue('K1', 'Engineering');
 $sheetwo->setCellValue('L1', 'Shipping');
 $sheetwo->setCellValue('M1', 'Shipped');
-$sheetwo->setCellValue('N1', 'Tiempo en proceso');
+$sheetwo->setCellValue('N1', 'Time in process');
+$sheetwo->setCellValue('o1', 'Order Date');
+$sheetwo->setCellValue('P1', 'Shorts');
+
 $t=2;
-$buscarWo=mysqli_query($con,"SELECT * FROM `registroparcial` INNER JOIN `registro` ON registroparcial.codeBar=registro.info ORDER BY `pn` DESC");
+$buscarWo=mysqli_query($con,"SELECT * FROM  `registroparcial` ORDER BY `pn` DESC");
 While($row=mysqli_fetch_array($buscarWo)){
+    $faltantes= '';
     $pn=$row['pn'];
     $wo=$row['wo'];
     $orgQty=$row['orgQty'];
@@ -43,7 +49,16 @@ While($row=mysqli_fetch_array($buscarWo)){
     $fallasCalidad=$row['fallasCalidad'];
     $preCalidad=$row['preCalidad'];
     $shipped=$orgQty-($cortPar+$libePar+$ensaPar+$loomPar+$testPar+$embPar+$eng+$fallasCalidad+$preCalidad); 
-    $tiempo=$row['tiempototal'];
+    $info=$row['codeBar'];
+
+    $registoID=mysqli_query($con,"SELECT id,tiempototal,reqday FROM `registro` WHERE `info`='$info' limit 1");
+    while($reg=mysqli_fetch_array($registoID)){
+         $tiempo=$reg['tiempototal'];
+    $resuly=$reg['id'];
+    $dateorder=$reg['reqday'];
+    }
+   
+
 $sheetwo->setCellValue('A'.$t, $pn);
 $sheetwo->setCellValue('B'.$t, $wo);
 $sheetwo->setCellValue('C'.$t, $orgQty);
@@ -58,6 +73,15 @@ $sheetwo->setCellValue('K'.$t, $eng);
 $sheetwo->setCellValue('L'.$t, $embPar);
 $sheetwo->setCellValue('M'.$t, $shipped);
 $sheetwo->setCellValue('N'.$t, $tiempo);
+$registrosFaltantes=mysqli_query($con,"SELECT * FROM `issuesfloor` WHERE `id_tiempos`=$resuly  ");
+while($row=mysqli_fetch_array($registrosFaltantes)){
+    $coment=$row['comment_issue'];
+    $date=$row['date'];
+    $reponosable=$row['responsable'];
+    $faltantes=$faltantes.' //'.$coment.' // '.$date.' // '.$reponosable.'<br>';
+}
+$sheetwo->setCellValue('O'.$t, $dateorder);
+$sheetwo->setCellValue('P'.$t, $faltantes);
 $t++;        
 }
 
