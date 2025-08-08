@@ -255,7 +255,7 @@ if ($resultado) {
 
 
 mysqli_close($con);
-header("location:../../mant/trazability/ing/piso.php");
+header("location:../ing/piso.php");
 
 ?>
 <!DOCTYPE html>
@@ -263,7 +263,7 @@ header("location:../../mant/trazability/ing/piso.php");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="25; url=../../mant/trazability/ing/piso.php">
+    <meta http-equiv="refresh" content="25; url=../ing/piso.php">
     <title>Depuracion</title>
 </head>
 <body>
