@@ -14,7 +14,7 @@ $subject='Reporte General  WO '.$date;
 $recipientEmail='jgarrido@mx.bergstrominc.com,dvillalpando@mx.bergstrominc.com,jolaes@mx.bergstrominc.com,
 egaona@mx.bergstrominc.com,ejimenez@mx.bergstrominc.com,fgomez@mx.bergstrominc.com,lmireles@mx.bergstrominc.com,
 eceron@mx.bergstrominc.com,jgamboa@mx.bergstrominc.com,jguillen@mx.bergstrominc.com,vpichardo@mx.bergstrominc.com,
-jrodriguez@mx.bergstrominc.com,DFlores@mx.bergstrominc.com';
+jrodriguez@mx.bergstrominc.com,DFlores@mx.bergstrominc.com,apacheco@mx.bergstrominc.com';
 $headers = "MIME-Version: 1.0\r\n";
 $headers .= "Content-type: text/html; charset=utf-8\r\n"; 
 $headers .= "SPF: v=spf1 mx ~all\r\n";
