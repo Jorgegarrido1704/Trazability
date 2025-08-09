@@ -4,7 +4,7 @@ $host = "localhost";
 $user = "pcadmin";
 $clave = "SupAdmin1212";
 
-$bd = "engineery";
+$bd = "trazabilidad";
 
 // Connect to the database
 $con = mysqli_connect($host, $user, $clave, $bd);
@@ -20,7 +20,7 @@ $month=date("m-Y");
     $desiredCalibre = mysqli_real_escape_string($con, $desiredCalibre);
     
     // Query to retrieve data with filtering based on calibre
-    $sql = "SELECT calibre, presion FROM registro WHERE calibre = '$desiredCalibre'  and fecha LIKE '%%%$month'";
+    $sql = "SELECT calibre, presion FROM registro_pull WHERE calibre = '$desiredCalibre'  and fecha LIKE '%%%$month'";
 
 
 $result = $con->query($sql);

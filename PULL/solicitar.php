@@ -1,5 +1,7 @@
 <?php 
-    require "../app/conection.php";  // Ensure the correct path to your connection file
+    require "app.php";  // Ensure the correct path to your connection file
+    session_start();
+    date_default_timezone_set('America/Mexico_City');
 ?> 
 <!doctype html>
 <html lang="en">
@@ -10,6 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   </head>
   <body>
+    <div><small><button><a href="registro.php">registro pull</a></button></small></div>
     <div align="center"><h1>Introduzca los Datos para solicitar aplicador</h1></div>
     
       <div class="input-group mb-6">
@@ -17,10 +20,11 @@
         <select class="form-control" id="aplicador" aria-label="Username" aria-describedby="basic-addon1" required>
           <option value="">  </option>
           <?php 
-          $busqueda = mysqli_query($con, "SELECT comp FROM herramental ORDER BY comp DESC");
+          $busqueda = mysqli_query($con, "SELECT  DISTINCT terminal FROM mant_golpes_diarios ORDER BY terminal DESC");
           while ($row = mysqli_fetch_array($busqueda)) { ?> 
-            <option value="<?php echo $row['comp']; ?>"><?php echo $row['comp']; ?></option>
+            <option value="<?php echo $row['terminal']; ?>"><?php echo $row['terminal']; ?></option>
           <?php } ?>
+          <option value="No esta(preguntar y agregar)">No esta en la lista</option>
         </select>
       </div>
       <br>

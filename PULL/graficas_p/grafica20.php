@@ -4,7 +4,7 @@ $host = "localhost";
 $user = "pcadmin";
 $clave = "SupAdmin1212";
 
-$bd = "engineery";
+$bd = "trazabilidad";
 
 // Connect to the database
 $con = mysqli_connect($host, $user, $clave, $bd);
@@ -15,7 +15,7 @@ date_default_timezone_set("America/Mexico_City");
 $month=date("m-Y");
 
 $calibreselect=20;
-$sql = "SELECT calibre, presion FROM registro WHERE calibre =$calibreselect and fecha LIKE '%%%$month'";
+$sql = "SELECT calibre, presion FROM registro_pull WHERE calibre =$calibreselect and fecha LIKE '%%%$month'";
 $result = $con->query($sql);
 $data = []; // Initialize an array to store the retrieved data
 

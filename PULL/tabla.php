@@ -44,11 +44,11 @@ $pn=isset($_POST['pn'])?$_POST['pn']:"";
             color: whitesmoke;
         }
     </style>
-    <div><small><a href="../../main/principal.php"><button>Home</button></a></small></div>
+    <div><small><a href="registro.php"><button>Home</button></a></small></div>
 
     <div align="center">
-    <a href="../graficas_p/index.html"><button>Grafica de puntos</button></a>
-        <a href="../graficas/index.html"><button>Grafica de Gauss</button></a>  
+    <a href="graficas_p/index.html"><button>Grafica de puntos</button></a>
+        <a href="graficas/index.html"><button>Grafica de Gauss</button></a>  
     
     <form action="tabla.php" method="POST"> 
         <br>

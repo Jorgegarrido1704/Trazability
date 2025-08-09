@@ -25,10 +25,10 @@ if($_SESSION['usuario']==="Admin"){
     $_SESSION['admin']='';
 
 }
-echo $_SESSION['usuario'];
+//echo $_SESSION['usuario'];
 
 if($_SESSION['user']=== 'cali'){
-    header('location:calidadPrincipal.php');
+    header('location:../pull/registro.php');
 }else if($_SESSION['user']=== 'Boss'or $_SESSION['user']==='plan'){
     header('location:Bossprincipal.php');
 }else if($_SESSION['admin']=== 'Admin'){

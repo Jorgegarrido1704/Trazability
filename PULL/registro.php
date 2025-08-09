@@ -13,12 +13,14 @@ $user=$_SESSION['usuario'];
 
 </head>
 <body>
-<small style="float:right"><a href="log_out.php" id="logout">Cerrar la sesión</a></small>
-    <a href="graficas.php"><button>Graficas</button></a>
+<div><button><small style="float:right"><a href="log_out.php" id="logout">Cerrar la sesión</a></small></button></div>
+<small style="float:right"><button><a href="graficas/index.html" id="logout">Graficas</a></button><button><a href="solicitar.php" id="logout">solicitar herrmanetal</a></button></small>
+
+    
 <script>
 
         function updateSecondSelect() {
-            var firstSelect = document.getElementById("apply").value; 
+            var firstSelect = document.getElementById("apply").value; // Get the selected value
 
             if (firstSelect === "emplame") {
                 var labelSentence = "Numero de empalme";
@@ -27,9 +29,9 @@ $user=$_SESSION['usuario'];
 
               
 
-                
+                // Append the label and input elements to the container
                 var container = document.getElementById("inputContainer");
-                container.innerHTML = ''; 
+                container.innerHTML = ''; // Clear previous content
                 container.appendChild(label);
                 
             } else if (firstSelect !== "emplame"){
@@ -39,9 +41,9 @@ $user=$_SESSION['usuario'];
 
                
 
-                
+                // Append the label and input elements to the container
                 var container = document.getElementById("inputContainer");
-                container.innerHTML = ''; 
+                container.innerHTML = ''; // Clear previous content
                 container.appendChild(label);
                 
             }
@@ -71,7 +73,8 @@ $user=$_SESSION['usuario'];
     <div align="center">
         <form    method="POST" name="form" id="form" action="conection_bd.php" onsubmit = "return validation()" >
             <label id="calibre">Calibre</label>
-         <select name="aws" id="aws">
+         <select name="aws" id="aws" required>
+         <option value="6">6</option>
             <option value="10">10</option>
             <option value="12">12</option>
             <option value="14">14</option>
@@ -82,12 +85,19 @@ $user=$_SESSION['usuario'];
             </select> 
             <br><br>
         <label >cliente</label>
-        <select id="cliente" name="cliente">
+        <select id="cliente" name="cliente" required>
+	<option value="" disabled>Seleciona el cliente</option>
+    	<option value="PALFINGER">PALFINGER</option>
+        <option value="MORGAN OLSON">MORGAN OLSON</option>
+        <option value="JONH DEERE">JONH DEERE</option> 
+        <option value="BERGSTROM EUROPE">BERGSTROM EUROPE</option>   
+        <option value="OP MOVILITY">OP MOVILITY</option>
+        <option value="BROWN">BROWN</option>
+        <option value="DUR-A-LIFE">DUR-A-LIFE</option>
+            <option value="Nilfisk">Nilfisk</option>
                 <option value="ultilimaster">Utilimaster</option>
                 <option value="SHYFT">SHYFT</option>
                 <option value="Tico">Tico</option>
-                <option value="Mabe">Mabe</option>
-                <option value="Plastic_omniun">Plastic omniun</option>
                 <option value="Bergstrom">Bergstrom</option>
                 <option value="California">California</option>
                 <option value="Atlas">Atlas</option>
@@ -96,28 +106,27 @@ $user=$_SESSION['usuario'];
                 <option value="Blue_bird">Blue_bird</option>
                 <option value="Forest">Forest</option>
                 <option value="Capacity">Capacity</option>
-                <option value="Proterra">Proterra</option>
+                <option value="Phoenix">Phoenix </option>
                 <option value="Collins">Collins</option>
                 <option value="Spartan">Spartan</option>
                 <option value="Proterra_California">Proterra_California</option>
-                <option value="Pantros">Pantros</option>
-                <option value="JOHN DEERE">JOHN DEERE</option>
+                
           </select>
              <br><br>
             <label >Numero de parte</label>
-            <input type="text" id="num_part" name="num_part">
+            <input type="text" id="num_part" name="num_part" required>
             <br><br>
             <label >Work Order</label>
-            <input type="text" id="wo" name="wo">
+            <input type="text" id="wo" name="wo" minlength="6" required>
             <br><br>
             <label >Nivel de presión (Lb)</label>
-            <input type="number" id="presion" name="presion" step="0.01" value="0">       
+            <input type="number" id="presion" name="presion" step="0.01" value="0" required>       
           <br><br>
           <label>Personal que registra</label>
-          <input type="text" name="persona" id="persona">
+          <input type="text" name="persona" id="persona" required>
           <br><br>
           <label >Forma de aplicado</label>
-          <select name="apply" id="apply" onchange="updateSecondSelect()">
+          <select name="apply" id="apply" required onchange="updateSecondSelect()" >
             <option value=""></option>
             <option value="banco">Banco</option>
             <option value="pinza">Pinza</option>
@@ -130,7 +139,8 @@ $user=$_SESSION['usuario'];
         <input type="text" id="specific" name="specific"  >
         <br><br>
         <label >Validado por</label>
-        <input type="text" id="valid" name="valid" value="<?php echo $user; ?>">
+        <span><b><?php echo $user; ?></b></span>
+        <input type="hidden" id="valid" name="valid" value="<?php echo $user; ?>">
                 <br><br>
      <input type="submit" value="enviar"  id="envio"  >
  </form> </div>
@@ -138,7 +148,7 @@ $user=$_SESSION['usuario'];
 </body>
 </html>
 
-<?php ; ?>
+
 
 
 
