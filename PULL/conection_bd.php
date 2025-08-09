@@ -1,6 +1,6 @@
 <?php
 session_start();
-require "app.php";
+require "../app/conection.php";
 
 // Retrieve form data
 $calibre = $_POST['aws'];

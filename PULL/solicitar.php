@@ -1,5 +1,5 @@
 <?php 
-    require "app.php";  // Ensure the correct path to your connection file
+    require "../app/conection.php";  // Ensure the correct path to your connection file
     session_start();
     date_default_timezone_set('America/Mexico_City');
 ?> 
