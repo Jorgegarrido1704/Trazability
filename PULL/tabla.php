@@ -1,17 +1,6 @@
 <?php 
 session_start();
-$host = "localhost";
-$user = "pcadmin";
-$clave = "SupAdmin1212";
-
-$bd = "trazabilidad";
-
-
-$con = mysqli_connect($host, $user, $clave, $bd);
-if (!$con) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-date_default_timezone_set("America/Mexico_City");
+require "../app/conection.php";
 $month=date("m-Y");
 
 $pn=isset($_POST['pn'])?$_POST['pn']:"";
