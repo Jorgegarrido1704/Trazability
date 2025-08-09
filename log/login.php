@@ -7,6 +7,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST['pass'];
 $i=0;
 $users=$claves=[];
+    try{
     $sql = mysqli_query($con,"SELECT `user`, `clave` FROM `login` WHERE `user` = '$username' AND `clave` = '$password'");
     if(mysqli_num_rows($sql)==1){
         $log = "login";
@@ -19,6 +20,8 @@ $users=$claves=[];
         header("location: ../main/index.html");
     }
 } 
-
-mysqli_close($con);
+catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
+}
 ?>
