@@ -9,29 +9,11 @@ $i=0;
 $users=$claves=[];
     $sql = mysqli_query($con,"SELECT `user`, `clave` FROM `login` WHERE `user` = '$username' AND `clave` = '$password'");
     if(mysqli_num_rows($sql)==1){
-      $user=$row['user'];
-    $clave=$row['clave'];
-    }else{
-        $user=$clave="";
-        header("location: ../main/index.html");
-    }  
-    
-   
-    
-   
-
-   
-     
-    if ($user !="" and $clave!="") {
         $log = "login";
         $_SESSION['usuario'] = $username; 
-
         date_default_timezone_set('America/Mexico_City');
         $fecha = date('d-m-Y H:i');
-        $registro = "INSERT INTO `registros`(`id`, `fecha`, `userName`, `action`) VALUES ('', '$fecha', '$username', '$log')";
-
-        mysqli_query($con, $registro); 
-
+        $registro = mysqli_query($con, "INSERT INTO `registros`(`id`, `fecha`, `userName`, `action`) VALUES ('', '$fecha', '$username', '$log')");
        header("location: ../main/principal.php");
     } else {
         header("location: ../main/index.html");
