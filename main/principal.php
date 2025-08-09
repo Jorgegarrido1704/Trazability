@@ -28,7 +28,7 @@ if($_SESSION['usuario']==="Admin"){
 //echo $_SESSION['usuario'];
 
 if($_SESSION['user']=== 'Serg'){
-    header('location:../pull/registro.php');
+    header('location:../PULL/registro.php');
 }else if($_SESSION['user']=== 'Boss'or $_SESSION['user']==='plan'){
     header('location:Bossprincipal.php');
 }else if($_SESSION['admin']=== 'Admin'){
