@@ -7,17 +7,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST['pass'];
 $i=0;
 $users=$claves=[];
-    $sql = "SELECT * FROM login";
-   $stml=mysqli_prepare($con,$sql);
-   mysqli_stmt_execute($stml);
-   $result=mysqli_stmt_get_result($stml);
-   while($row=mysqli_fetch_array($result)){
-    $user=$row['user'];
+    $sql = mysqli_query($con,"SELECT `user`, `clave` FROM `login` WHERE `user` = '$username' AND `clave` = '$password'");
+    if(mysqli_num_rows($sql)==1){
+      $user=$row['user'];
     $clave=$row['clave'];
+    }else{
+        $user=$clave="";
+        header("location: ../main/index.html");
+    }  
     
-    $i++;
+   
+    
+   
 
-   }
+   
      
     if ($user !="" and $clave!="") {
         $log = "login";
