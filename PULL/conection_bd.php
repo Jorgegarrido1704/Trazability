@@ -1,5 +1,5 @@
 <?php
-session_start();
+//session_start();
 require "../app/conection.php";
 
 // Retrieve form data
@@ -93,6 +93,4 @@ else if ($calibre == 10 && ($presion <= 80 || $presion > 161.12)) {
     }
 }
 
-// Close the database connection
-mysqli_close($con);
 ?>
