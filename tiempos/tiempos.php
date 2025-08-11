@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                     <div class="mb-3">
                         <label for="DescriptionProcess" class="form-label">Where Or what asset is being processed</label>
-                        <input type="text" name="DescriptionProcess" class="form-control" id="DescriptionProcess" required>
+                        <select name="DescriptionProcess" id="DescriptionProcess" class="form-select" ></select>
                     </div>
                     <div class="mb-3" id="size-mm" style="display: none ;">
                         <label for="mm" class="form-label">Tamano del cable</label>
