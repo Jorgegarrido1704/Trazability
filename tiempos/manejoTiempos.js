@@ -82,6 +82,8 @@
             'cutting without terminals big size',
 
         ];
+        var maquinasCon2 = ['', 'FB-045','FB-036','FB-046'];
+        var maquinasCon1 = ['', 'FB-045','FB-036','FB-046','FB-059','FB-048'];
 
         var terminales = ['',
             'twist wire',
@@ -150,23 +152,32 @@
         }else{
             document.getElementById('size-mm').style.display = 'none';
         }
+
+        //BIG SIZE
         if(subproceso.value == 'cutting without terminals big size'){
            document.getElementById('Process_Number').value = '10011';
            document.getElementById('DescriptionProcess').value = 'FB022';
         }
-        if(subproceso.value =='cutting w/2 terminals without saels'){
-           document.getElementById('Process_Number').value = '10041';
-           document.getElementById('DescriptionProcess').value = 'FB045';
-        }if(subproceso.value =='cutting w/1 terminals without saels'){
-            document.getElementById('Process_Number').value = '10021';
-            document.getElementById('DescriptionProcess').value = 'FB048';
-         }if(subproceso.value =='cutting w/1 terminals with saels'){
+         //with terminals and seals
+           if(subproceso.value =='cutting w/1 terminals with saels'){
             document.getElementById('Process_Number').value = '10051';
-            document.getElementById('DescriptionProcess').value = 'FB040';
+            document.getElementById('DescriptionProcess').value = 'FB036';
          }if(subproceso.value =='cutting w/2 terminals with saels'){
             document.getElementById('Process_Number').value = '10052';
-            document.getElementById('DescriptionProcess').value = 'FB040';
-         }if(subproceso.value =='cutting without terminals'){
+            document.getElementById('DescriptionProcess').value = 'FB036';
+         }
+        //without terminals neither seals
+        if(subproceso.value =='cutting w/2 terminals without saels'){
+           document.getElementById('Process_Number').value = '10041';
+           document.getElementById('DescriptionProcess').value = '';
+        }if(subproceso.value =='cutting w/1 terminals without saels'){
+            document.getElementById('Process_Number').value = '10021';
+            document.getElementById('DescriptionProcess').value = '';
+         }
+         
+      
+         
+         if(subproceso.value =='cutting without terminals'){
             document.getElementById('Process_Number').value = '10001';
             document.getElementById('DescriptionProcess').value = 'FB036';
          }if(subproceso.value =='twist wire'){
