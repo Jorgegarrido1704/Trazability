@@ -16,7 +16,7 @@ $cont = $_POST['specific'];
 $cont = strtoupper($cont); // Convert to uppercase
 $val = 'Sergio';
 
-$fecha = date('d-m-Y H:i'); 
+$fecha = date('d-m-Y'); 
 $month=date("m-Y");
 
 if($cont=='MT1-4' || $cont=='MT1-54'){
