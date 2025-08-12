@@ -1,10 +1,12 @@
 <?php 
 //conection to DB
-$host='localhost';
+$host='127.0.0.1';
 $user='pcadmin';
 $pass='SupAdmin1212';
 $db ='trazabilidad';
 $con=mysqli_connect($host,$user,$pass,$db);
+
+date_default_timezone_set("America/Mexico_City");
 
 //create a object to get function on DB
 class conectionTraza{
