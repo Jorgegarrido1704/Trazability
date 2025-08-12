@@ -4,6 +4,8 @@ require "../app/conection.php";
 
 $week = (int)(date('W'));
 $today = (int)(date('N'));
+try{
+    
 
 echo $today . "<br>";
 switch ($today) {
@@ -56,3 +58,6 @@ $registro=mysqli_query($con, "UPDATE assistence SET `$day` = 'OK' WHERE `week` =
 }
 
 header("location:../errores/mejoraTiempoPrecio.php");
+}catch(Exception $e){
+    echo $e->getMessage();
+}

@@ -1,7 +1,7 @@
 <?php 
 include "../app/conection.php";
 $week = (int)(date('W'));
-
+try{
 //Search fist intereaction in the table assitence for comparation
 $lastWeek=mysqli_query($con,"SELECT week FROM assistence WHERE week = $week ORDER BY id DESC LIMIT 1");
 if(mysqli_num_rows($lastWeek) <= 0){
@@ -20,3 +20,6 @@ if(mysqli_num_rows($lastWeek) <= 0){
     echo "Ya se ha registrado la asistencia de esta semana";
 }
 header("location:./assistence.php");
+}catch(Exception $e){
+    echo $e->getMessage();
+}
