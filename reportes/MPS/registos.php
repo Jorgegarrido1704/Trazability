@@ -1,7 +1,8 @@
 <?php
-require "../app/conectionTraza.php";
+
 
 try{
+    require "../app/conectionTraza.php";
     $registrosMPS = mysqli_query($con, "SELECT * FROM `datos_mps`");
 
 
