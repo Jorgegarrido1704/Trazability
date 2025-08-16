@@ -35,9 +35,9 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
    
     $insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `rev`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`, `term2`, `dataFrom`, `dataTo`, `qty`, `tamano`, `conector` ) VALUES ('$pn','$client','$rev','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$term2','$dataForm','$dataTo','$cuantos','$tamano','$conector')");
 }}
-if($insertar){
-    echo "<br><br><h1>Se Agregaron correctamente Correctamente</h1>";
+
+    //echo "<br><br><h1>Se Agregaron correctamente Correctamente</h1>";
     header("location:busqueda.php");
-}
+
 
 }

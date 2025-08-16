@@ -45,11 +45,12 @@ if (isset($_GET['np'])) {
             
         }
         
-    }
+    
     foreach ($terminales as $terminal => $qtyTerminal) {
             $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
             VALUES ('$np','10081','FB-081','$terminal','$qtyTerminal','3.084','300')");    
         }
+    }
     }
 
 header("location:selloEnTerminal2.php?np=" . implode(',', $datos));

@@ -36,13 +36,14 @@ foreach ($datos as $np) {
             }
          
         }
-    }
+    
     foreach ($terminales as $terminal => $qtyTerminal) {
         $rand=rand(0, count($setSealTime)-1);
         $tiempoSetSeal=$setSealTime[$rand];
         $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
             VALUES ('$np','10381','Pend','$terminal','$qtyTerminal','$tiempoSetSeal','300')");
     }
+}
 }
 header("location:addTin.php?np=" . implode(',', $datos));
 //header("location:terminales2.php?np=" . implode(',', $datos));
