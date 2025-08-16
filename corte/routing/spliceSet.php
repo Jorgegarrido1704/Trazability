@@ -11,7 +11,7 @@ if (isset($_GET['np'])) {
         $datos = [$paramNp]; 
     }
 } else {
-    echo "No se han recibido números de parte.";
+  //  echo "No se han recibido números de parte.";
     header("location:../registro.php");
 }
 
@@ -70,7 +70,7 @@ $tipoSplice=[];
                     VALUES ('$np','10361','Pend','$leyenda1','1','$timeHeadShrink','300')");
             $insertar2 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
                     VALUES ('$np','10401','Pend','$leyenda2','1','$gunHeatGun','300')");
-                    echo $key." ".$QtySpliceA.":".$QtySpliceB."<br>";
+                  //  echo $key." ".$QtySpliceA.":".$QtySpliceB."<br>";
         }
     }
 
