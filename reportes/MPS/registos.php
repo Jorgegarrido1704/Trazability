@@ -1,6 +1,10 @@
 <?php
 require "../app/conectionTraza.php";
 
+try{
+    $registrosMPS = mysqli_query($con, "SELECT * FROM `datos_mps`");
+
+
 $currentWeek = date("W");
 $pnRegistros = [];
 $allWeeks = [];
@@ -88,6 +92,9 @@ echo "<td>{$grandTotal}</td>";
 echo "</tr>";
 
 echo "</table>";
+}catch(Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
 ?>
 
 <script>
