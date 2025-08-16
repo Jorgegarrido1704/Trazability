@@ -54,7 +54,7 @@ echo "<tr><th>PN - Process</th>";
 foreach ($allWeeks as $week => $_) {
     echo "<th>Week {$week}</th>";
 }
-echo "<th>Total</th></tr>";
+//echo "<th>Total</th></tr>";
 
 $procesosBase = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Quality' => 0, 'Packaging' => 0];
 
@@ -135,7 +135,7 @@ foreach ($pnRegistros as $pn => $weeks) {
             $rowM -= 60;
         }
         $rowText = ($rowH < 1 && $rowM < 1) ? "0" : "{$rowH} h : {$rowM} min";
-        echo "<td>{$rowText}</td>";
+      //  echo "<td>{$rowText}</td>";
         echo "</tr>";
     }
 }
