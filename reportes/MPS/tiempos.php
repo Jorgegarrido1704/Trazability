@@ -70,24 +70,29 @@ foreach ($procesosBase as $p => $_) {
 // Loop through each PN for processing times
 foreach ($pnRegistros as $pn => $weeks) {
     $procesos = $procesosBase;
-
+    $assetsProcess = $procesosBase;
     // Get routing times for this PN
     $timeProcess = mysqli_query($con, "SELECT `work_routing`, QtyTimes, timePerProcess, setUp_routing FROM `routing_models` WHERE pn_routing = '$pn'");
     while ($row = mysqli_fetch_assoc($timeProcess)) {
         if ($row['work_routing'] > 10000 && $row['work_routing'] < 10061) {
             $procesos['Cutting'] += ($row['QtyTimes'] * $row['timePerProcess']);
+            $assetsProcess['Cutting'] += 1;
         }
         if ($row['work_routing'] > 10060 && $row['work_routing'] < 10441) {
             $procesos['Terminals'] += ($row['QtyTimes'] * $row['timePerProcess']);
+            $assetsProcess['Terminals'] += 1;
         }
         if ($row['work_routing'] > 10440 && $row['work_routing'] < 10999) {
             $procesos['Assembly'] += ($row['QtyTimes'] * $row['timePerProcess']);
+            $assetsProcess['Assembly'] += 1;
         }
         if ($row['work_routing'] > 11500 && $row['work_routing'] < 11700) {
             $procesos['Quality'] += ($row['QtyTimes'] * $row['timePerProcess']);
+            $assetsProcess['Quality'] += 1;
         }
         if ($row['work_routing'] > 11700 && $row['work_routing'] < 12000) {
             $procesos['Packaging'] += ($row['QtyTimes'] * $row['timePerProcess']);
+            $assetsProcess['Packaging'] += 1;
         }
     }
 
@@ -97,7 +102,7 @@ foreach ($pnRegistros as $pn => $weeks) {
         $rowTotal = 0;
         foreach ($allWeeks as $week => $_) {
             $value = isset($weeks[$week]) ? $weeks[$week] : 0;
-            $times = ($valor * $value) * 1.25; // 80% efficiency adjustment
+            $times = (($valor * $value) * 1.20)+($assetsProcess[$key]*300); // 80% efficiency adjustment
             $hours = floor($times / 3600);
             $min = round(($times % 3600) / 60);
             if ($min >= 60) {

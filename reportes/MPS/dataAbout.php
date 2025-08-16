@@ -107,28 +107,28 @@ echo "<h3>Production time per week in hours (80% efficiency ) </h3>";
 echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width: 100%;'>";
 $timeProcess=mysqli_query($con, "SELECT `work_routing`,QtyTimes, timePerProcess,setUp_routing FROM `routing_models` WHERE pn_routing = '$pn' ");
 $presesos=['Cutting'=>0,'Terminals'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
-$corte=$liberacion=$ensamble=$loom=$calidad=$embarque=0;
+$assetProces=['Cutting'=>0,'Terminals'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
 while ($row = mysqli_fetch_assoc($timeProcess)) {
    if($row['work_routing']>10000 and $row['work_routing']<10061){
        $presesos['Cutting']+=($row['QtyTimes']*$row['timePerProcess']);
-       $corte+=240;
+       $assetProces['Cutting']+=1;
    }
    if($row['work_routing']>10060 and $row['work_routing']<10441){
        $presesos['Terminals']+=($row['QtyTimes']*$row['timePerProcess']);
-       $liberacion+=240;
+       $assetProces['Terminals']+=1;
    }
    if($row['work_routing']>10440 and $row['work_routing']<10999){
        $presesos['Assembly']+=($row['QtyTimes']*$row['timePerProcess']);
-       $ensamble+=240;
+       $assetProces['Assembly']+=1;
    }
   
    if($row['work_routing']>11500 and $row['work_routing']<11700){
        $presesos['Quality']+=($row['QtyTimes']*$row['timePerProcess']);
-       $calidad+=240;
+       $assetProces['Quality']+=1;
    }
    if($row['work_routing']>11700 and $row['work_routing']<12000){
        $presesos['Packaging']+=($row['QtyTimes']*$row['timePerProcess']);
-       $embarque+=1;
+       $assetProces['Packaging']+=1;
    }
 }
 
@@ -144,7 +144,7 @@ while ($row = mysqli_fetch_assoc($timeProcess)) {
  foreach ($allWeeks as $week => $_) {
         
         $value = isset($weeks[$week]) ? $weeks[$week] : 0;
-        $times=($valor*$value)*1.25;
+        $times=(($valor*$value)*1.25)+($assetProces[$key]*300);
         $hours=round(($times/3600),0);
         $min= round(($times%3600)/60,0);
         if($min>=60){
