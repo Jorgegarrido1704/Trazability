@@ -1,8 +1,8 @@
 <?php 
 //conection to DB
 $host='127.0.0.1';
-$user='pcadmin';
-$pass='SupAdmin1212';
+$user='root';
+$pass='';
 $db ='trazabilidad';
 $con=mysqli_connect($host,$user,$pass,$db);
 
