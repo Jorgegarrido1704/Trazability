@@ -144,7 +144,7 @@ while ($row = mysqli_fetch_assoc($timeProcess)) {
  foreach ($allWeeks as $week => $_) {
         
         $value = isset($weeks[$week]) ? $weeks[$week] : 0;
-        $times=(($valor*$value)*1.25)+($assetProces[$key]*300);
+        $times=(($valor*$value)*1.20)+($assetProces[$key]*300);
         $hours=round(($times/3600),0);
         $min= round(($times%3600)/60,0);
         if($min>=60){
