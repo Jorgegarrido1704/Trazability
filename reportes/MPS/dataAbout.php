@@ -144,6 +144,9 @@ while ($row = mysqli_fetch_assoc($timeProcess)) {
  foreach ($allWeeks as $week => $_) {
         
         $value = isset($weeks[$week]) ? $weeks[$week] : 0;
+        if($value==0){
+            echo "<td>0</td>";
+        }else{
         $times=(($valor*$value)*1.20)+($assetProces[$key]*300);
         $hours=round(($times/3600),0);
         $min= round(($times%3600)/60,0);
@@ -153,7 +156,7 @@ while ($row = mysqli_fetch_assoc($timeProcess)) {
         }
         $qtyItems="{$hours} h : {$min} min";
         echo "<td>{$qtyItems}</td>";
-       
+    }
     }
 
     }

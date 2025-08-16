@@ -102,6 +102,9 @@ foreach ($pnRegistros as $pn => $weeks) {
         $rowTotal = 0;
         foreach ($allWeeks as $week => $_) {
             $value = isset($weeks[$week]) ? $weeks[$week] : 0;
+            if($value==0){
+                echo "<td>0</td>";
+            }else{
             $times = (($valor * $value) * 1.20)+($assetsProcess[$key]*300); // 80% efficiency adjustment
             $hours = floor($times / 3600);
             $min = round(($times % 3600) / 60);
@@ -116,7 +119,7 @@ foreach ($pnRegistros as $pn => $weeks) {
                 $qtyItems = "{$hours} h : {$min} min";
                 echo "<td>{$qtyItems}</td>";
             }
-
+        }
             // Save totals in seconds for accuracy
             $totalsPerProcess[$key][$week] += $times;
             $rowTotal += $times;
