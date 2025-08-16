@@ -111,20 +111,20 @@ $corte=$liberacion=$ensamble=$loom=$calidad=$embarque=0;
 while ($row = mysqli_fetch_assoc($timeProcess)) {
    if($row['work_routing']>10000 and $row['work_routing']<10061){
        $presesos['Cutting']+=($row['QtyTimes']*$row['timePerProcess']);
-       $corte+=1;
+       $corte+=240;
    }
    if($row['work_routing']>10060 and $row['work_routing']<10441){
        $presesos['Terminals']+=($row['QtyTimes']*$row['timePerProcess']);
-       $liberacion+=1;
+       $liberacion+=240;
    }
    if($row['work_routing']>10440 and $row['work_routing']<10999){
        $presesos['Assembly']+=($row['QtyTimes']*$row['timePerProcess']);
-       $ensamble+=1;
+       $ensamble+=240;
    }
   
    if($row['work_routing']>11500 and $row['work_routing']<11700){
        $presesos['Quality']+=($row['QtyTimes']*$row['timePerProcess']);
-       $calidad+=1;
+       $calidad+=240;
    }
    if($row['work_routing']>11700 and $row['work_routing']<12000){
        $presesos['Packaging']+=($row['QtyTimes']*$row['timePerProcess']);
@@ -134,22 +134,34 @@ while ($row = mysqli_fetch_assoc($timeProcess)) {
 
 
 
+
+
+
     foreach ($presesos as $key => $valor) {
         echo "<tr><td>{$key}</td>";
     
-    
+    $grandTotal=0;
  foreach ($allWeeks as $week => $_) {
+        
         $value = isset($weeks[$week]) ? $weeks[$week] : 0;
-        $qtyItems=($valor*$value)*1.2;
+        $times=($valor*$value)*1.25;
+        $hours=round(($times/3600),0);
+        $min= round(($times%3600)/60,0);
+        if($min>=60){
+            $hours=$hours+1;
+            $min=$min-60;
+        }
+        $qtyItems="{$hours} h : {$min} min";
         echo "<td>{$qtyItems}</td>";
-        $rowTotal += $qtyItems;
-        $totals[$week] += $value;
+       
     }
-}
 
-echo "</tr>";
+    }
 
+echo "</tr> ";
+    
 echo "</table><br><hr>";
+    
 
 ?>
 

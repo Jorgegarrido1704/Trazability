@@ -6,12 +6,16 @@ $pnRegistros = [];
 $allWeeks = [];
 
 // Get MPS records
-$registrosMPS = mysqli_query($con, "SELECT * FROM `datos_mps`");
+$registrosMPS = mysqli_query($con, "SELECT pn,dq,qtymps FROM `datos_mps`");
 
 while ($row = mysqli_fetch_assoc($registrosMPS)) {
     $pn = $row['pn'];
     $week = date("W", strtotime($row['dq']));
     $qty = (int)$row['qtymps'];
+    $registroItems=mysqli_query($con, "SELECT item, qty FROM `datos` WHERE part_num = '$pn' ");
+while ($row = mysqli_fetch_assoc($registroItems)) {
+    $item=$row['item'];
+    $qtyItems=$row['qty'];
 
     // Adjust week for next year
     if ($week < $currentWeek) {
@@ -22,12 +26,13 @@ while ($row = mysqli_fetch_assoc($registrosMPS)) {
     $allWeeks[$week] = true;
 
     // Initialize if not set
-    if (!isset($pnRegistros[$pn][$week])) {
-        $pnRegistros[$pn][$week] = 0;
+    if (!isset($pnRegistros[$item][$week])) {
+        $pnRegistros[$item][$week] = 0;
     }
 
     // Sum quantities
-    $pnRegistros[$pn][$week] += $qty;
+    $pnRegistros[$item][$week] += round(($qtyItems *$qty),2);
+}
 }
 
 // Sort weeks
@@ -49,12 +54,10 @@ uksort($pnRegistros, function($a, $b) use ($rowTotals) {
 });
 
 // Table header
-echo "<button onclick='redirectToForm();'>Update Data</button>";
-echo "<button onclick='redirectTotiempos();'>Build Times</button>";
-echo "<button onclick='redirectToItems();'>Items</button>";
+echo "<button><a href='registos.php'>Back</a></button>";
 
 echo "<table border='1' cellpadding='5'>";
-echo "<tr><th>Part Number</th>";
+echo "<tr><th>Items</th>";
 foreach ($allWeeks as $week => $_) {
     $displayWeek = $week > 52 ? ($week - 52) . " (next year)" : $week;
     echo "<th>W{$displayWeek}</th>";
@@ -66,7 +69,7 @@ echo "</tr>";
 foreach ($pnRegistros as $pn => $weeks) {
     $rowTotal = 0;
     echo "<tr>";
-    echo "<td><a href='dataAbout.php?pn={$pn}'>{$pn}</a></td>";
+    echo "<td>{$pn}</td>";
     foreach ($allWeeks as $week => $_) {
         $value = isset($weeks[$week]) ? $weeks[$week] : 0;
         echo "<td>{$value}</td>";
@@ -75,10 +78,10 @@ foreach ($pnRegistros as $pn => $weeks) {
     }
     echo "<td style='font-weight:bold;'>{$rowTotal}</td>";
     echo "</tr>";
-    $grandTotal += $rowTotal;
+   // $grandTotal += $rowTotal;
 }
 
-// Totals row
+/* Totals row
 echo "<tr style='font-weight:bold; background:#f0f0f0;'>";
 echo "<td>Total</td>";
 foreach ($totals as $week => $sum) {
@@ -86,20 +89,12 @@ foreach ($totals as $week => $sum) {
 }
 echo "<td>{$grandTotal}</td>";
 echo "</tr>";
-
+*/
 echo "</table>";
 ?>
 
 <script>
     function redirectToForm() {
         window.location.href = "../../corte/busqueda.php";
-    }
-
-    function redirectTotiempos() {
-        window.location.href = "tiempos.php";
-    }
-
-    function redirectToItems() {
-        window.location.href = "items.php";
     }
 </script>
