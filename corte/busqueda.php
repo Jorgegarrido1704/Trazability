@@ -51,8 +51,7 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
         <div class="col-lg-2 mb-4 border">
             <h1>Update Boms</h1>
             <form action="guardarprueba.php" method="POST" enctype="multipart/form-data">
-
-                <input type="file" name="excel_file" id="excel_file" accept=".xlsx,.xls">
+                <input type="file" name="excel_file" id="excel_file" accept=".csv">
                 <input type="submit" name="upload" value="Subir">
             </form>
         </div>
@@ -95,7 +94,7 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
             </form>
         </div>
         <div class="col-lg-2 mb-4 border">
-            <h1>Cargar listas</h1>
+            <h1>Cargar MPS </h1>
             <form action="../reportes/MPS/updateDatos.php" method="POST" enctype="multipart/form-data">
                 <input type="file" name="csv_file" accept=".csv">
                 <br>
