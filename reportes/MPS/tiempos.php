@@ -12,7 +12,7 @@ while ($row = mysqli_fetch_assoc($registrosMPS)) {
     $week = date("W", strtotime($row['dq']));
     $qty = (int)$row['qtymps'];
 
-    if ($week < $currentWeek) $week += 52;
+   // if ($week < $currentWeek) $week += 52;
 
     $allWeeks[$week] = true;
     if (!isset($pnRegistros[$pn][$week])) $pnRegistros[$pn][$week] = 0;
