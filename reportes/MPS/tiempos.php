@@ -5,169 +5,129 @@ $currentWeek = date("W");
 $pnRegistros = [];
 $allWeeks = [];
 
-// Get MPS records
+// Obtener registros MPS
 $registrosMPS = mysqli_query($con, "SELECT pn, dq, qtymps FROM `datos_mps`");
-
 while ($row = mysqli_fetch_assoc($registrosMPS)) {
     $pn = $row['pn'];
     $week = date("W", strtotime($row['dq']));
     $qty = (int)$row['qtymps'];
 
-    // Adjust week for next year
-    if ($week < $currentWeek) {
-        $week += 52;
-    }
+    if ($week < $currentWeek) $week += 52;
 
-    // Track all weeks (for header)
     $allWeeks[$week] = true;
-
-    // Initialize if not set
-    if (!isset($pnRegistros[$pn][$week])) {
-        $pnRegistros[$pn][$week] = 0;
-    }
-
-    // Sum quantities
+    if (!isset($pnRegistros[$pn][$week])) $pnRegistros[$pn][$week] = 0;
     $pnRegistros[$pn][$week] += $qty;
 }
 
-// Sort weeks
 ksort($allWeeks, SORT_NUMERIC);
 
-// Calculate totals per part number
+// Totales por PN
 $rowTotals = [];
-foreach ($pnRegistros as $pn => $weeks) {
-    $rowTotals[$pn] = array_sum($weeks);
-}
+foreach ($pnRegistros as $pn => $weeks) $rowTotals[$pn] = array_sum($weeks);
 
-// Sort part numbers by total qty (desc)
-uksort($pnRegistros, function ($a, $b) use ($rowTotals) {
+// Ordenar PN por total
+uksort($pnRegistros, function($a,$b) use($rowTotals) {
     return $rowTotals[$b] <=> $rowTotals[$a];
 });
 
-// Table header
 echo "<button><a href='registos.php'>Back</a></button>";
-echo "<h3>Production time per week in hours (80% efficiency)</h3>";
-echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width: 100%;'>";
+echo "<h3>Production time per day in hours (80% efficiency)</h3>";
+echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width:100%; border-collapse:collapse; text-align:center;'>";
 
-// Header row
-echo "<tr><th>PN - Process</th>";
-foreach ($allWeeks as $week => $_) {
-    echo "<th>Week {$week}</th>";
-}
-//echo "<th>Total</th></tr>";
+// Header semanas
+echo "<tr><th rowspan='2'>PN - Process</th>";
+foreach ($allWeeks as $week => $_) echo "<th colspan='5' style='background:" . (($week % 2 == 0) ? "#e6f7ff" : "#ffe6e6") . "'>W{$week}</th>";
+echo "<th rowspan='2'>Total</th></tr>";
 
-$procesosBase = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Quality' => 0, 'Packaging' => 0];
+// Header días
+$dias = ["Mon","Tue","Wed","Thu","Fri"];
+echo "<tr>";
+foreach ($allWeeks as $week => $_) foreach ($dias as $d) echo "<th>$d</th>";
+echo "</tr>";
 
-// Initialize totals per process
+// Procesos base
+$procesosBase = ['Cutting'=>0,'Terminals'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
+
+// Totales por proceso y por día
 $totalsPerProcess = [];
+$totalsPerDay = []; // array para total por día
 foreach ($procesosBase as $p => $_) {
     foreach ($allWeeks as $week => $_) {
+        for($i=0;$i<5;$i++) $totalsPerDay[$week][$i] = 0;
         $totalsPerProcess[$p][$week] = 0;
     }
     $totalsPerProcess[$p]['total'] = 0;
 }
 
-// Loop through each PN for processing times
+// Recorrer PNs
 foreach ($pnRegistros as $pn => $weeks) {
     $procesos = $procesosBase;
     $assetsProcess = $procesosBase;
-    // Get routing times for this PN
-    $timeProcess = mysqli_query($con, "SELECT `work_routing`, QtyTimes, timePerProcess, setUp_routing FROM `routing_models` WHERE pn_routing = '$pn'");
+
+    // Obtener tiempos de ruteo
+    $timeProcess = mysqli_query($con, "SELECT `work_routing`, QtyTimes, timePerProcess, setUp_routing 
+                                       FROM `routing_models` 
+                                       WHERE pn_routing = '$pn'");
     while ($row = mysqli_fetch_assoc($timeProcess)) {
-        if ($row['work_routing'] > 10000 && $row['work_routing'] < 10061) {
-            $procesos['Cutting'] += ($row['QtyTimes'] * $row['timePerProcess']);
-            $assetsProcess['Cutting'] += 1;
-        }
-        if ($row['work_routing'] > 10060 && $row['work_routing'] < 10441) {
-            $procesos['Terminals'] += ($row['QtyTimes'] * $row['timePerProcess']);
-            $assetsProcess['Terminals'] += 1;
-        }
-        if ($row['work_routing'] > 10440 && $row['work_routing'] < 10999) {
-            $procesos['Assembly'] += ($row['QtyTimes'] * $row['timePerProcess']);
-            $assetsProcess['Assembly'] += 1;
-        }
-        if ($row['work_routing'] > 11500 && $row['work_routing'] < 11700) {
-            $procesos['Quality'] += ($row['QtyTimes'] * $row['timePerProcess']);
-            $assetsProcess['Quality'] += 1;
-        }
-        if ($row['work_routing'] > 11700 && $row['work_routing'] < 12000) {
-            $procesos['Packaging'] += ($row['QtyTimes'] * $row['timePerProcess']);
-            $assetsProcess['Packaging'] += 1;
-        }
+        if ($row['work_routing'] > 10000 && $row['work_routing'] < 10061) {$procesos['Cutting'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Cutting']++;}
+        if ($row['work_routing'] > 10060 && $row['work_routing'] < 10441) {$procesos['Terminals'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Terminals']++;}
+        if ($row['work_routing'] > 10440 && $row['work_routing'] < 10999) {$procesos['Assembly'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Assembly']++;}
+        if ($row['work_routing'] > 11500 && $row['work_routing'] < 11700) {$procesos['Quality'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Quality']++;}
+        if ($row['work_routing'] > 11700 && $row['work_routing'] < 12000) {$procesos['Packaging'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Packaging']++;}
     }
 
-    // Display times per process
     foreach ($procesos as $key => $valor) {
         echo "<tr><td>{$pn} - {$key}</td>";
         $rowTotal = 0;
+
         foreach ($allWeeks as $week => $_) {
             $value = isset($weeks[$week]) ? $weeks[$week] : 0;
-            if($value==0){
-                echo "<td>0</td>";
-            }else{
-            $times = (($valor * $value) * 1.20)+($assetsProcess[$key]*300); // 80% efficiency adjustment
-            $hours = floor($times / 3600);
-            $min = round(($times % 3600) / 60);
-            if ($min >= 60) {
-                $hours += 1;
-                $min -= 60;
-            }
 
-            if ($min < 1 && $hours < 1) {
-                echo "<td>0</td>";
+            if ($value == 0) {
+                for ($i=0;$i<5;$i++) echo "<td>0</td>";
+                $times = 0;
             } else {
-                $qtyItems = "{$hours} h : {$min} min";
-                echo "<td>{$qtyItems}</td>";
+                $times = (($valor*$value)*1.20) + ($assetsProcess[$key]*300);
+                $perDay = $times / 5;
+                for ($i=0;$i<5;$i++) {
+                    $hours = floor($perDay/3600);
+                    $min = round(($perDay%3600)/60);
+                    $qtyItems = ($hours<1 && $min<1)?"0":"{$hours} h : {$min} m";
+                    echo "<td>{$qtyItems}</td>";
+                    $totalsPerDay[$week][$i] += $perDay;
+                }
             }
-        }
-            // Save totals in seconds for accuracy
             $totalsPerProcess[$key][$week] += $times;
             $rowTotal += $times;
         }
 
-        // Row total
-        $rowH = floor($rowTotal / 3600);
-        $rowM = round(($rowTotal % 3600) / 60);
-        $totalsPerProcess[$key]['total'] += $rowTotal;
-
-        if ($rowM >= 60) {
-            $rowH += 1;
-            $rowM -= 60;
-        }
-        $rowText = ($rowH < 1 && $rowM < 1) ? "0" : "{$rowH} h : {$rowM} min";
-      //  echo "<td>{$rowText}</td>";
+        $rowH = floor($rowTotal/3600);
+        $rowM = round(($rowTotal%3600)/60);
+        $rowText = ($rowH<1 && $rowM<1)?"0":"{$rowH} h : {$rowM} m";
+        echo "<td style='font-weight:bold;'>{$rowText}</td>";
         echo "</tr>";
+
+        $totalsPerProcess[$key]['total'] += $rowTotal;
     }
 }
 
-// Final totals row
-echo "<tr style='font-weight:bold; background:#f0f0f0;'><td colspan='" . (count($allWeeks) + 2) . "'>TOTALS</td></tr>";
-
-foreach ($totalsPerProcess as $proc => $weeks) {
-    echo "<tr style='font-weight:bold;'><td>{$proc} TOTAL</td>";
-    foreach ($allWeeks as $week => $_) {
-        $times = $weeks[$week];
-        $hours = floor($times / 3600);
-        $min = round(($times % 3600) / 60);
-        if ($min >= 60) {
-            $hours += 1;
-            $min -= 60;
-        }
-        $cell = ($hours < 1 && $min < 1) ? "0" : "{$hours} h : {$min} min";
+// Fila de totales por día
+echo "<tr style='font-weight:bold; background:#f0f0f0;'><td>DAILY TOTAL</td>";
+foreach ($allWeeks as $week => $_) {
+    for ($i=0;$i<5;$i++) {
+        $times = $totalsPerDay[$week][$i];
+        $hours = floor($times/3600);
+        $min = round(($times%3600)/60);
+        $cell = ($hours<1 && $min<1)?"0":"{$hours} h : {$min} m";
         echo "<td>{$cell}</td>";
     }
-    // Grand total
-    $total = $weeks['total'];
-    $hours = floor($total / 3600);
-    $min = round(($total % 3600) / 60);
-    if ($min >= 60) {
-        $hours += 1;
-        $min -= 60;
-    }
-    $cell = ($hours < 1 && $min < 1) ? "0" : "{$hours} h : {$min} min";
-    echo "<td>{$cell}</td>";
-    echo "</tr>";
 }
+$grandTotal = array_sum(array_map('array_sum', $totalsPerDay));
+$gH = floor($grandTotal/3600);
+$gM = round(($grandTotal%3600)/60);
+$gCell = ($gH<1 && $gM<1)?"0":"{$gH} h : {$gM} m";
+echo "<td style='font-weight:bold;'>{$gCell}</td>";
+echo "</tr>";
 
-echo "</table><br><hr>";
+echo "</table>";
 ?>
