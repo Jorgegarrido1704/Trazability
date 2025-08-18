@@ -57,7 +57,7 @@ echo "<h1 align='center'>Part Number: {$pn}</h1><hr><h3>MPS QTY</h3>";
 echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width: 100%;'>";
 echo '<tr style="font-weight:bold; align: center;"><th>Part Number</th>';
 foreach ($allWeeks as $week => $_) {
-    $displayWeek = $week > 52 ? ($week - 52) . " (next year)" : $week;
+    $displayWeek = $week > 52 ? ($week - 52) . " - " : $week;
     echo "<th>W{$displayWeek}</th>";
 }
 echo "<th>Total Row</th>";
