@@ -7,7 +7,6 @@ $now=strtotime($now);
 $dateIni = date("d-m-Y H:i");
 
 if(date("N") != 7){
-    if((strtotime($dateIni) > strtotime(date("d-m-Y 07:00")) and strtotime($dateIni) < strtotime(date("d-m-Y 10:05"))) || (strtotime($dateIni) > strtotime(date("d-m-Y 13:30")) and strtotime($dateIni) < strtotime(date("d-m-Y 13:37"))) ||  (strtotime($dateIni) > strtotime(date("d-m-Y 17:00")) and strtotime($dateIni) < strtotime(date("d-m-Y 17:07")))){
     
 
 // add price if  it was not registered
@@ -26,7 +25,7 @@ $Po=mysqli_query($con,"SELECT client,pn,rev,description,price,send FROM po WHERE
     $send=$row['send'];
    print($prtn." | ".$clie." | ".$pn." | ".$rev." | ".$desc." | ".$price." | ".$send." <br>");
    mysqli_query($con,"INSERT INTO `precios` (`id`, `client`, `pn`, `desc`, `rev`, `price`, `send`) VALUES ('', '$clie', '$pn', '$desc', '$rev', '$price', '$send')");
- }}
+ }
 }
 
 
