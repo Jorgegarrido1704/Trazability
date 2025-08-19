@@ -7,7 +7,7 @@ $now=strtotime($now);
 $dateIni = date("d-m-Y H:i");
 
 if(date("N") != 7){
-    if((strtotime($dateIni) > strtotime(date("d-m-Y 07:00")) and strtotime($dateIni) < strtotime(date("d-m-Y 07:05"))) || (strtotime($dateIni) > strtotime(date("d-m-Y 13:30")) and strtotime($dateIni) < strtotime(date("d-m-Y 13:37"))) ||  (strtotime($dateIni) > strtotime(date("d-m-Y 17:00")) and strtotime($dateIni) < strtotime(date("d-m-Y 17:07")))){
+    if((strtotime($dateIni) > strtotime(date("d-m-Y 07:00")) and strtotime($dateIni) < strtotime(date("d-m-Y 10:05"))) || (strtotime($dateIni) > strtotime(date("d-m-Y 13:30")) and strtotime($dateIni) < strtotime(date("d-m-Y 13:37"))) ||  (strtotime($dateIni) > strtotime(date("d-m-Y 17:00")) and strtotime($dateIni) < strtotime(date("d-m-Y 17:07")))){
     
 
 // add price if  it was not registered
