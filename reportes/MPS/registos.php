@@ -68,6 +68,7 @@ try {
     echo "<button onclick='redirectToForm();'>Update Data</button>";
     echo "<button onclick='redirectTotiempos();'>Build Times</button>";
     echo "<button onclick='redirectToItems();'>Items</button>";
+    echo "<button onclick='excelReport();'>Excel Report</button>";
 
     // --- Table ---
     echo "<table border='1' cellpadding='5' style='border-collapse:collapse; text-align:center;'>";
@@ -138,5 +139,8 @@ try {
     }
     function redirectToItems() {
         window.location.href = "items.php";
+    }
+    function excelReport() {
+        window.location.href = "recopilacion/excel.php";
     }
 </script>
