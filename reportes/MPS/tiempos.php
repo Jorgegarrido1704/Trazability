@@ -6,7 +6,7 @@ $pnRegistros = [];
 $allWeeks = [];
 
 // Obtener registros MPS
-$registrosMPS = mysqli_query($con, "SELECT pn, dq, qtymps FROM `datos_mps`");
+$registrosMPS = mysqli_query($con, "SELECT pn, dq, qtymps FROM `datos_mps` WHERE pn='1001489409'OR pn='1001488939'OR pn='660925'OR pn='1002707335'OR pn='1001455147'OR pn='1003318064'OR pn='B222992'OR pn='1000109371'OR pn='16517630'OR pn='1003312301'OR pn='1000473129'OR pn='1002835774'OR pn='16516661'OR pn='1002835044'OR pn='1003544214'OR pn='660320'OR pn='16516612'OR pn='1000516139'OR pn='1001774292'OR pn='16517623'OR pn='16514775'OR pn='16514514'OR pn='1000230326'OR pn='1000312635'OR pn='1002719292'OR pn='16518485'OR pn='16518486'OR pn='1003359943'OR pn='1002186052'OR pn='1001073962' ");
 while ($row = mysqli_fetch_assoc($registrosMPS)) {
     $pn = $row['pn'];
     $week = date("W", strtotime($row['dq']));

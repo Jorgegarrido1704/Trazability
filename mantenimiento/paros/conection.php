@@ -1,5 +1,5 @@
 <?php 
-$host="localhost";
+$host="127.0.0.1";
 $user="pcadmin";
 $clave="SupAdmin1212";
 $bd="trazabilidad";
