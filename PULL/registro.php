@@ -139,9 +139,9 @@ $user=$_SESSION['usuario'];
         <input type="text" id="specific" name="specific"  >
         <br><br>
         <label >Validado por</label>
-        <span><b><?php echo $user; ?></b></span>
-        <input type="hidden" id="valid" name="valid" value="<?php echo $user; ?>">
-                <br><br>
+        <span><b>Sergio</b></span>
+        <input type="hidden" id="valid" name="valid" value="Sergio">
+               
      <input type="submit" value="enviar"  id="envio"  >
  </form> </div>
 
