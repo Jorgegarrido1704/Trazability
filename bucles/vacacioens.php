@@ -1,5 +1,8 @@
 <?php 
 require '../app/conection.php';
+try {
+    
+
 $datos= [['i2144','ALDANA RIOS NANCY NOELIA',45468,1],
 ['i2144','ALDANA RIOS NANCY NOELIA',45656,1],
 ['i2144','ALDANA RIOS NANCY NOELIA',45653,1],
@@ -957,6 +960,9 @@ foreach ($datos as $value => $key) {
     }
 
 }
+}
+}catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
 }
 
     
