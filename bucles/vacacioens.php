@@ -946,7 +946,7 @@ foreach ($datos as $value => $key) {
     $key[4]=$row[0];
     $yearUsed=date('Y',strtotime($key[2]));
         $regitroVacaciones=mysqli_query($con, "INSERT INTO `registro_vacaciones`( `id_empleado`, `fecha_de_solicitud`, `estatus`, `dias_solicitados`, `usedYear`, `superVisor`) VALUES ('$key[0]','$key[2]','Aprovada','$key[3]','$yearUsed','$key[4]')");
-     echo $key[0].' - '.$key[1].' - '.$key[2].' - '.$key[3].' - '.$key[4].'<br>';
+    // echo $key[0].' - '.$key[1].' - '.$key[2].' - '.$key[3].' - '.$key[4].'<br>';
 
      $numberday=date('N',strtotime($key[2]));
 
