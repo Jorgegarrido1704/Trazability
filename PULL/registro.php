@@ -112,7 +112,7 @@ $user=$_SESSION['usuario']??"Sergio";
             <option value="emplame">Empalme</option>
         </select>
         <br>
-       <label id="inputContainer" name="inputContainer"></label>
+       <label id="inputContainer" name="inputContainer">Terminal</label>
         <input type="text" id="specific" name="specific"  >
         <br><br>
         <label >Validado por</label>
