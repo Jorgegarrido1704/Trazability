@@ -20,7 +20,7 @@ $user=$_SESSION['usuario']??"Sergio";
 
     
 <script>
-
+  
         function updateSecondSelect() {
             var firstSelect = document.getElementById("apply").value; // Get the selected value
 
@@ -73,8 +73,18 @@ $user=$_SESSION['usuario']??"Sergio";
     </div>
         <br>
     <div align="center">
-        <form    method="POST" name="form" id="form" action="conection_bd.php" onsubmit = "return validation()" >
-            <label id="calibre">Calibre</label>
+        <form    method="POST" name="form" id="form" action="conection_bd.php"  >
+            <label >Work Order</label>
+            <input type="text" id="wo" name="wo" minlength="6" required  onfocus onchange="BuscarInformacion(this.value);" >
+            <br><br>
+           
+        <label >cliente</label>
+        <input type="text" id="cliente" name="cliente" readonly>
+             <br><br>
+            <label >Numero de parte</label>
+            <input type="text" id="num_part" name="num_part" readonly>
+            <br><br>
+             <label id="calibre">Calibre</label>
          <select name="aws" id="aws" required>
          <option value="6">6</option>
             <option value="10">10</option>
@@ -85,41 +95,6 @@ $user=$_SESSION['usuario']??"Sergio";
             <option value="20">20</option>
             <option value="22">22</option>
             </select> 
-            <br><br>
-        <label >cliente</label>
-        <select id="cliente" name="cliente" required>
-	<option value="" disabled>Seleciona el cliente</option>
-    	<option value="PALFINGER">PALFINGER</option>
-        <option value="MORGAN OLSON">MORGAN OLSON</option>
-        <option value="JONH DEERE">JONH DEERE</option> 
-        <option value="BERGSTROM EUROPE">BERGSTROM EUROPE</option>   
-        <option value="OP MOVILITY">OP MOVILITY</option>
-        <option value="BROWN">BROWN</option>
-        <option value="DUR-A-LIFE">DUR-A-LIFE</option>
-            <option value="Nilfisk">Nilfisk</option>
-                <option value="ultilimaster">Utilimaster</option>
-                <option value="SHYFT">SHYFT</option>
-                <option value="Tico">Tico</option>
-                <option value="Bergstrom">Bergstrom</option>
-                <option value="California">California</option>
-                <option value="Atlas">Atlas</option>
-                <option value="Kalmar">Kalmar</option>
-                <option value="Modine">Modine</option>
-                <option value="Blue_bird">Blue_bird</option>
-                <option value="Forest">Forest</option>
-                <option value="Capacity">Capacity</option>
-                <option value="Phoenix">Phoenix </option>
-                <option value="Collins">Collins</option>
-                <option value="Spartan">Spartan</option>
-                <option value="Proterra_California">Proterra_California</option>
-                
-          </select>
-             <br><br>
-            <label >Numero de parte</label>
-            <input type="text" id="num_part" name="num_part" required>
-            <br><br>
-            <label >Work Order</label>
-            <input type="text" id="wo" name="wo" minlength="6" required>
             <br><br>
             <label >Nivel de presión (Lb)</label>
             <input type="number" id="presion" name="presion" step="0.01" value="0" required>       
@@ -150,8 +125,22 @@ $user=$_SESSION['usuario']??"Sergio";
 </body>
 </html>
 
+<script>
+    const wo = document.getElementById("wo");
+    function BuscarInformacion(wo){
+        //url=`http://http://mxloficina.corp.internal.bergstrominc.com/Trazability/PULL/consultar.php?wo=${wo}`;
+        url=(`consultar.php?wo=${wo}`)
+        fetch(url).then(response => response.json()).then(data => {
+            if(data[0]){
+                document.getElementById("num_part").value = data[0];
+                document.getElementById("cliente").value = data[1];
+            }else{
+                console.log("No data found");
+            }
+        });
+    }
+    </script>
 
 
-
-
+z
 
