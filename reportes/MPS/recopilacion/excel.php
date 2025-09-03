@@ -108,8 +108,8 @@ foreach ($data as $pn => $weeksData) {
         foreach ($weeks as $w) {
             $qty = $weeksData[$w] ?? 0;
             // tiempo real multiplicado por cantidad de arneses + setup
-            $timeSec = ($procesosBase[$proc] * $qty * 1.2) + ($assetsProcess[$proc]*300);
-            $timePerDay = $timeSec / 5;
+            $timeSec = ($procesosBase[$proc] * 1 * 1.2) + ($assetsProcess[$proc]*300);
+            $timePerDay = $timeSec ;// /5
 
             for($i=0;$i<5;$i++){
                 $h = floor($timePerDay/3600);
