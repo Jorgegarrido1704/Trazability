@@ -12,7 +12,10 @@ $spreadsheet = new Spreadsheet();
 $sheet1 = $spreadsheet->getActiveSheet();
 $sheet1->setTitle("Demand");
 
-$registrosMPS = mysqli_query($con, "SELECT pn, dq, qtymps FROM datos_mps WHERE pn='1001489409'OR pn='1001488939'OR pn='660925'OR pn='1002707335'OR pn='1001455147'OR pn='1003318064'OR pn='B222992'OR pn='1000109371'OR pn='16517630'OR pn='1003312301'OR pn='1000473129'OR pn='1002835774'OR pn='16516661'OR pn='1002835044'OR pn='1003544214'OR pn='660320'OR pn='16516612'OR pn='1000516139'OR pn='1001774292'OR pn='16517623'OR pn='16514775'OR pn='16514514'OR pn='1000230326'OR pn='1000312635'OR pn='1002719292'OR pn='16518485'OR pn='16518486'OR pn='1003359943'OR pn='1002186052'OR pn='1001073962' ");
+$registrosMPS = mysqli_query($con, "SELECT pn, dq, qtymps FROM datos_mps WHERE pn='1001489409'OR pn='1001488939'OR pn='660925'OR pn='1002707335'OR pn='1001455147'OR pn='1003318064'
+OR pn='B222992'OR pn='1000109371'OR pn='16517630'OR pn='1003312301'OR pn='1000473129'OR pn='1002835774'OR pn='16516661'OR pn='1002835044'OR pn='1003544214'OR pn='660320'OR pn='16516612'
+OR pn='1000516139'OR pn='1001774292'OR pn='16517623'OR pn='16514775'OR pn='16514514'OR pn='1000230326'OR pn='1000312635'OR pn='1002719292'OR pn='16518485'OR pn='16518486'OR pn='1003359943'
+OR pn='1002186052'OR pn='1001073962' ");
 $data = [];
 $allWeeks = [];
 while ($row = mysqli_fetch_assoc($registrosMPS)) {
@@ -59,7 +62,8 @@ foreach(range('A',$sheet1->getHighestColumn()) as $col) {
 $sheet2 = $spreadsheet->createSheet();
 $sheet2->setTitle("Times");
 
-$processes = ['Cutting','Terminals','Assembly','Quality','Packaging'];
+//$processes = ['Cutting','Terminals','Assembly','Quality','Packaging'];
+$processes = ['Sub-Assembly','Assembly','Quality','Packaging'];
 $dias = ['Mon','Tue','Wed','Thu','Fri'];
 
 // Header
@@ -79,18 +83,20 @@ foreach ($weeks as $w) $totalsPerDay[$w] = array_fill(0,5,0);
 // Fill data
 foreach ($data as $pn => $weeksData) {
     // Obtener tiempos de ruteo por proceso
-    $procesosBase = ['Cutting'=>0,'Terminals'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
-    $assetsProcess = ['Cutting'=>0,'Terminals'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
-
+    $procesosBase = ['Cutting'=>0,'Terminals'=>0,'Sub-Assembly'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
+    $assetsProcess = ['Cutting'=>0,'Terminals'=>0,'Sub-Assembly'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
+//    $procesosBase = ['Sub-Assembly'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
+  //  $assetsProcess = ['Sub-Assembly'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
     $timeProcess = mysqli_query($con, "SELECT `work_routing`, QtyTimes, timePerProcess 
                                        FROM `routing_models` 
-                                       WHERE pn_routing = '$pn'");
+                                       WHERE pn_routing = '$pn' and work_routing >10440");
     while ($row = mysqli_fetch_assoc($timeProcess)) {
         $wr = $row['work_routing'];
         $tpp = $row['QtyTimes'] * $row['timePerProcess'];
-        if ($wr>10000 && $wr<10061) {$procesosBase['Cutting'] += $tpp; $assetsProcess['Cutting']++;}
-        if ($wr>10060 && $wr<10441) {$procesosBase['Terminals'] += $tpp; $assetsProcess['Terminals']++;}
-        if ($wr>10440 && $wr<10999) {$procesosBase['Assembly'] += $tpp; $assetsProcess['Assembly']++;}
+      //  if ($wr>10000 && $wr<10061) {$procesosBase['Cutting'] += $tpp; $assetsProcess['Cutting']++;}
+     //   if ($wr>10060 && $wr<10441) {$procesosBase['Terminals'] += $tpp; $assetsProcess['Terminals']++;}
+        if (($wr>10440 && $wr<10501) or ($wr>10950 && $wr < 11000)) {$procesosBase['Sub-Assembly'] += $tpp; $assetsProcess['Sub-Assembly']++;}
+        if ($wr>10500 && $wr<10950) {$procesosBase['Assembly'] += $tpp; $assetsProcess['Assembly']++;}
         if ($wr>11500 && $wr<11700) {$procesosBase['Quality'] += $tpp; $assetsProcess['Quality']++;}
         if ($wr>11700 && $wr<12000) {$procesosBase['Packaging'] += $tpp; $assetsProcess['Packaging']++;}
     }
