@@ -62,39 +62,32 @@ foreach(range('A',$sheet1->getHighestColumn()) as $col) {
 $sheet2 = $spreadsheet->createSheet();
 $sheet2->setTitle("Times");
 
-//$processes = ['Cutting','Terminals','Assembly','Quality','Packaging'];
+// Processes
 $processes = ['Sub-Assembly','Assembly','Quality','Packaging'];
-$dias = ['Mon','Tue','Wed','Thu','Fri'];
 
 // Header
 $rowNum = 1;
 $header = ["PN - Process"];
-foreach ($weeks as $w) foreach ($dias as $d) $header[] = "W$w $d";
+foreach ($weeks as $w) $header[] = "W$w";  // only weeks
 $header[] = "Total";
 $sheet2->fromArray($header,NULL,"A$rowNum");
 $rowNum++;
 
-// Totales
+// Totales por proceso
 $totalsPerProcess = [];
-$totalsPerDay = [];
 foreach ($processes as $proc) $totalsPerProcess[$proc] = array_fill_keys($weeks,0);
-foreach ($weeks as $w) $totalsPerDay[$w] = array_fill(0,5,0);
 
 // Fill data
 foreach ($data as $pn => $weeksData) {
-    // Obtener tiempos de ruteo por proceso
     $procesosBase = ['Cutting'=>0,'Terminals'=>0,'Sub-Assembly'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
     $assetsProcess = ['Cutting'=>0,'Terminals'=>0,'Sub-Assembly'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
-//    $procesosBase = ['Sub-Assembly'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
-  //  $assetsProcess = ['Sub-Assembly'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0];
+
     $timeProcess = mysqli_query($con, "SELECT `work_routing`, QtyTimes, timePerProcess 
                                        FROM `routing_models` 
                                        WHERE pn_routing = '$pn' and work_routing >10440");
     while ($row = mysqli_fetch_assoc($timeProcess)) {
         $wr = $row['work_routing'];
         $tpp = $row['QtyTimes'] * $row['timePerProcess'];
-      //  if ($wr>10000 && $wr<10061) {$procesosBase['Cutting'] += $tpp; $assetsProcess['Cutting']++;}
-     //   if ($wr>10060 && $wr<10441) {$procesosBase['Terminals'] += $tpp; $assetsProcess['Terminals']++;}
         if (($wr>10440 && $wr<10501) or ($wr>10950 && $wr < 11000)) {$procesosBase['Sub-Assembly'] += $tpp; $assetsProcess['Sub-Assembly']++;}
         if ($wr>10500 && $wr<10950) {$procesosBase['Assembly'] += $tpp; $assetsProcess['Assembly']++;}
         if ($wr>11500 && $wr<11700) {$procesosBase['Quality'] += $tpp; $assetsProcess['Quality']++;}
@@ -107,24 +100,24 @@ foreach ($data as $pn => $weeksData) {
         $rowTotal = 0;
         foreach ($weeks as $w) {
             $qty = $weeksData[$w] ?? 0;
-            // tiempo real multiplicado por cantidad de arneses + setup
-            $timeSec = ($procesosBase[$proc] * 1 * 1.2) + ($assetsProcess[$proc]*300);
-            $timePerDay = $timeSec ;// /5
+            if($qty>0){
+            $timeSec = ($procesosBase[$proc] * $qty * 1.2) + ($assetsProcess[$proc]*300);
 
-            for($i=0;$i<5;$i++){
-                $h = floor($timePerDay/3600);
-                $m = round(($timePerDay%3600)/60);
-                $row[] = ($h<1 && $m<1) ? "0" : "{$h} h : {$m} m";
-                $totalsPerDay[$w][$i] += $timePerDay;
-            }
+            $h = floor($timeSec/3600);
+            $m = round(($timeSec%3600)/60,0);
+            $row[] = ($h<1 && $m<1) ? "0" : "{$h} h : {$m} m";
 
             $totalsPerProcess[$proc][$w] += $timeSec;
             $rowTotal += $timeSec;
+            } else {
+                $row[] = "0";
+            }
         }
 
         $hTotal = floor($rowTotal/3600);
         $mTotal = round(($rowTotal%3600)/60);
         $row[] = ($hTotal<1 && $mTotal<1) ? "0" : "{$hTotal} h : {$mTotal} m";
+    
 
         $sheet2->fromArray($row,NULL,"A$rowNum");
         $sheet2->getStyle("A$rowNum:".$sheet2->getHighestColumn().$rowNum)
@@ -134,16 +127,15 @@ foreach ($data as $pn => $weeksData) {
     }
 }
 
-// Totales diarios
-$totalRow = ["DAILY TOTAL"];
+// Totales por semana
+$totalRow = ["WEEKLY TOTAL"];
 foreach ($weeks as $w) {
-    foreach($dias as $i=>$d){
-        $h=floor($totalsPerDay[$w][$i]/3600);
-        $m=round(($totalsPerDay[$w][$i]%3600)/60);
-        $totalRow[] = ($h<1 && $m<1) ? "0" : "{$h} h : {$m} m";
-    }
+    $sum = array_sum(array_column($totalsPerProcess,$w));
+    $h=floor($sum/3600);
+    $m=round(($sum%3600)/60);
+    $totalRow[] = ($h<1 && $m<1) ? "0" : "{$h} h : {$m} m";
 }
-$grandTotal = array_sum(array_map('array_sum',$totalsPerDay));
+$grandTotal = array_sum(array_map('array_sum',$totalsPerProcess));
 $hG=floor($grandTotal/3600);
 $mG=round(($grandTotal%3600)/60);
 $totalRow[] = ($hG<1 && $mG<1) ? "0" : "{$hG} h : {$mG} m";
