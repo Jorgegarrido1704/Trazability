@@ -2,6 +2,8 @@
 session_start();
 require "../app/conection.php";
 $month=date("m-Y");
+$lasrMonth=date("m-Y",strtotime("-1 month"));
+$last2Month=date("m-Y",strtotime("-2 month"));
 
 $pn=isset($_POST['pn'])?$_POST['pn']:"";
 
@@ -33,7 +35,7 @@ $pn=isset($_POST['pn'])?$_POST['pn']:"";
             color: whitesmoke;
         }
     </style>
-    <div><small><a href="registro.php"><button>Home</button></a></small></div>
+    <div><small><!--<a href="registro.php"><button>Home</button></a></small></div>-->
 
     <div align="center">
     <a href="graficas_p/index.html"><button>Grafica de puntos</button></a>
@@ -67,8 +69,8 @@ $pn=isset($_POST['pn'])?$_POST['pn']:"";
         </thead>
         <tbody>
 <?php if($pn!=""){
-$select="SELECT * FROM registro_pull WHERE fecha LIKE '%$month' AND Num_part LIKE '%%$pn%%' ORDER BY id DESC ";}
-else{$select="SELECT * FROM registro_pull WHERE fecha LIKE '%$month' ORDER BY id DESC ";}
+$select="SELECT * FROM registro_pull WHERE (fecha LIKE '%$month' or fecha LIKE '%$lasrMonth' or fecha LIKE '%$last2Month') AND Num_part LIKE '%%$pn%%' ORDER BY id DESC ";}
+else{$select="SELECT * FROM registro_pull WHERE (fecha LIKE '%$month' or fecha LIKE '%$lasrMonth' or fecha LIKE '%$last2Month')  ORDER BY id DESC ";}
 $qry=mysqli_query($con,$select);
 while($row=mysqli_fetch_array($qry)){
 $date=$row['fecha'];
