@@ -2,7 +2,7 @@
 <?php 
 
 session_start();
-$user=$_SESSION['usuario'];
+$user=$_SESSION['usuario']??"Sergio";
 ?>
 <html lang="en">
 <head>
@@ -14,7 +14,9 @@ $user=$_SESSION['usuario'];
 </head>
 <body>
 <!--<div><button><small style="float:right"><a href="../log/logout.php" id="logout">Cerrar la sesión</a></small></button></div> -->
-<small style="float:right"><button><a href="tabla.php" id="logout">tabla de registros</a></button><button><a href="http://192.168.10.132/Trazability/PULL/solicitar.php" id="logout">solicitar herrmanetal</a></button></small>
+<small style="float:right">
+    <!--<button><a href="tabla.php" id="logout">tabla de registros</a></button>-->
+    <button><a href="http://192.168.10.132/Trazability/PULL/solicitar.php" id="logout">solicitar herrmanetal</a></button></small>
 
     
 <script>
