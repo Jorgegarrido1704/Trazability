@@ -22,7 +22,7 @@ if (isset($_POST['upload'])) {
 
                 // Variables para vincular los parámetros
                 $pn = $rev = $cons = $tipo = '';
-                mysqli_stmt_bind_param($stmt, 'ssss', $pn, $rev, $cons, $tipo);
+                mysqli_stmt_bind_param($stmt, 'ssis', $pn, $rev, $cons, $tipo);
 
                 $rowCount = 0;
                 $batchSize = 10000;
