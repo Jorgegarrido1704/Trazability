@@ -7,7 +7,7 @@ require "../app/conection.php";
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="refresh" content="300; url=../vacaciones/index.php">
+	    
         <link rel="stylesheet" href="fallas.css">
         <title>PPAP Piso</title>
     </head>
@@ -71,5 +71,6 @@ require "../app/conection.php";
         <div align="center"> <h1>Cuando termines de Validar, escanea la orden y tu codigo de ingeniero</h1></div>   
     </body>
     </html>
-
+<?php 
+ 
   

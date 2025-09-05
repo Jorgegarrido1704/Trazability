@@ -93,4 +93,4 @@ if(mysqli_num_rows($busqueda) > 0){
     echo "No se encontraron registros";
 }
 
-header("location:../ing/piso.php");
+header("location:../errores/mejoraTiempoPrecio.php");

@@ -59,5 +59,5 @@ while($row = mysqli_fetch_array($buscar)){
         $registroTiempo=$restD." dias, ".$restH." horas, ".$restM." min";
         $updateDias=mysqli_query($con,"UPDATE registro SET tiempototal='$registroTiempo' WHERE id='$id'");
     } }
- header("location:../app/calidad/depuracion.php");
+ header("location:../app/depuracion.php");
  // header("location:../../mant/trazabiliy/ing/piso.php");
