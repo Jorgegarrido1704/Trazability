@@ -37,7 +37,7 @@ while($row = mysqli_fetch_array($buscar)){
     $buscarPrice=mysqli_query($con,"SELECT price FROM precios WHERE pn='$pn' and price>'$price' order by id desc limit 1");
     while($rowPrice = mysqli_fetch_array($buscarPrice)){
         $pre= $rowPrice['price'];
-        echo $pn." ".$pre."<br>"; 
+      //  echo $pn." ".$pre."<br>"; 
         $update=mysqli_query($con,"UPDATE registro SET price='$pre' WHERE NumPart='$pn'");    
        
     }
