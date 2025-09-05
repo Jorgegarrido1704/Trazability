@@ -209,7 +209,7 @@ while($rowdepo=mysqli_fetch_array($actualqry)){
 }*/
 
 
-
+/*
 
 $sql = "SELECT pn, COUNT(pn) as cantidad_duplicados FROM precios GROUP BY pn HAVING COUNT(pn) > 1";
 
@@ -251,7 +251,7 @@ if ($resultado) {
     
     echo "Error al ejecutar la consulta: " . mysqli_error($con);
 }
-
+*/
 
 
 mysqli_close($con);
