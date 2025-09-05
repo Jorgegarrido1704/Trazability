@@ -1,7 +1,7 @@
 <?php 
 
 require "conection.php";
- date_default_timezone_set("America/Mexico_City");
+try{
  $date=date("d-m-Y");
  $today=date("d-m-Y H:i");
 $select="SELECT DISTINCT  * FROM registro ";
@@ -256,17 +256,8 @@ if ($resultado) {
 
 mysqli_close($con);
 header("location:../ing/piso.php");
+}catch(Exception $e){
+    echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+}
 
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="25; url=../ing/piso.php">
-    <title>Depuracion</title>
-</head>
-<body>
-    
-</body>
-</html>
