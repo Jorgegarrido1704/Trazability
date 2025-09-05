@@ -16,6 +16,7 @@ while($row=mysqli_fetch_array($qry)){
 if(substr($rev,0,4)=="PPAP" or substr($rev,0,4)=="PRIM"){
     $rev=substr($rev,5);
 }
+/*
 $buscarprice="SELECT * FROM precios WHERE pn='$pn'";
 $qryprecio=mysqli_query($con,$buscarprice);
 $numRow=mysqli_num_rows($qryprecio); 
@@ -66,7 +67,7 @@ if((substr($rev,0,4)=='PPAP' or substr($rev,0,4)=='PRIM') and (substr($revp,0,4)
                                 $sqyup=mysqli_query($con,$update);
                         }  }           } }}        
 
-
+*/
 $buscarTimesharn=mysqli_query($con,"SELECT * FROM timesharn INNER JOIN registro  WHERE timesharn.wo=registro.wo ");
 while($rowdepu=mysqli_fetch_array($buscarTimesharn)){
     $fechain=$rowdepu["fecha"];
