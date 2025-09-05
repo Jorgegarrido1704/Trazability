@@ -68,6 +68,7 @@ if((substr($rev,0,4)=='PPAP' or substr($rev,0,4)=='PRIM') and (substr($revp,0,4)
                         }  }           } }}        
 
 */
+}
 $buscarTimesharn=mysqli_query($con,"SELECT * FROM timesharn INNER JOIN registro  WHERE timesharn.wo=registro.wo ");
 while($rowdepu=mysqli_fetch_array($buscarTimesharn)){
     $fechain=$rowdepu["fecha"];
