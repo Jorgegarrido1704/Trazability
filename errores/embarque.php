@@ -29,16 +29,19 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta http-equiv="refresh" content="3; url=../corte/busqueda.php">
         <title>Document</title>
     </head>
     <body>
-        <form action="embarque.php" method="POST">
+      <!--  <form action="embarque.php" method="POST">
         <label for="registro">WO(s)</label>    
-        <input type="text" name="registro">
+        <textarea name="registro" id="registro"></textarea>
         <label for="count">count</label>
-        <input type="number" name="count" value="20">
-            <input type="submit">
-        </form>
+        <input type="number"  id= "count" name="count" value="20">
+            <button class="btn btn-primary" type="submit" name="registro">Modificar</button>
+        </form> -->
     </body>
     </html>
     <?php

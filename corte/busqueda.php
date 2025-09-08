@@ -23,12 +23,14 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
             </form>
         </div>
         <div class="col-lg-2 mb-4 border">
-            <h1>Eliminar Lista</h1>
-            <form action="eliminarLista.php" method="GET">
-                <label for="elim">Numero de parte</label>
-                <input type="text" name="elim" id="elim" required>
-                <input type="submit" name="send" id="send" value="Eliminar">
-            </form>
+            <h1>Modificar Cuenta</h1>
+             <form action="embarque.php" method="POST">
+            <label for="registro">WO(s)</label>    
+            <textarea name="registro" id="registro"></textarea>
+            <label for="count">count</label>
+            <input type="number"  id= "count" name="count" value="20">
+            <button class="btn btn-primary" type="submit" name="registro">Modificar</button>
+        </form>
         </div>
         <div class="col-lg-2 mb-4 border">
             <h1>Modificacion de lista</h1>

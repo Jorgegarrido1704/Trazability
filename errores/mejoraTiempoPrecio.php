@@ -23,7 +23,7 @@ $Po=mysqli_query($con,"SELECT client,pn,rev,description,price,send FROM po WHERE
     $desc=$row['description'];
     $price=$row['price'];
     $send=$row['send'];
-   print($prtn." | ".$clie." | ".$pn." | ".$rev." | ".$desc." | ".$price." | ".$send." <br>");
+  // print($prtn." | ".$clie." | ".$pn." | ".$rev." | ".$desc." | ".$price." | ".$send." <br>");
    mysqli_query($con,"INSERT INTO `precios` (`id`, `client`, `pn`, `desc`, `rev`, `price`, `send`) VALUES ('', '$clie', '$pn', '$desc', '$rev', '$price', '$send')");
  }
 }
