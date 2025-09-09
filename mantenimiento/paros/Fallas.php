@@ -97,11 +97,13 @@ try{
                 window.speechSynthesis.speak(speech<?php echo $idmant; ?>);
             <?php
                 }
-            }}catch (Exception $e) {
-                echo "Error: " . $e->getMessage();
             }
             ?>
         }
     </script>
 </body>
 </html>
+<?php
+}catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
+            }
