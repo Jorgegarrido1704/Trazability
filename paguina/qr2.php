@@ -1,9 +1,8 @@
 <?php
-try {
+
 require 'conector.php';
 require 'vendor/autoload.php';
-session_start();
-date_default_timezone_set("america/Mexico_City");
+
 $wo=isset($_POST['wo'])?$_POST['wo']:"";
 $cons=isset($_POST['const'])?$_POST['const']:"";
 $today = date('mdY');
@@ -208,6 +207,5 @@ use chillerlan\QRCode\{QRCode, QROptions};
 
 
 <?php
-} catch (Exception $e) {
-    echo 'Error: ' . $e->getMessage();
-}
+
+?><?php
