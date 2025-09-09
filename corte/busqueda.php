@@ -24,7 +24,7 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
         </div>
         <div class="col-lg-2 mb-4 border">
             <h1>Modificar Cuenta</h1>
-             <form action="embarque.php" method="POST">
+             <form action="../errores/embarque.php" method="POST">
             <label for="registro">WO(s)</label>    
             <textarea name="registro" id="registro"></textarea>
             <label for="count">count</label>
