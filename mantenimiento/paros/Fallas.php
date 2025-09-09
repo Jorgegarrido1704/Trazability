@@ -1,5 +1,6 @@
 <?php
 require "conection.php";
+try{
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -96,6 +97,8 @@ require "conection.php";
                 window.speechSynthesis.speak(speech<?php echo $idmant; ?>);
             <?php
                 }
+            }}catch (Exception $e) {
+                echo "Error: " . $e->getMessage();
             }
             ?>
         }
