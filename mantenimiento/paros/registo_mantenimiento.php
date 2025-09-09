@@ -1,9 +1,9 @@
 <?php
 require "conection.php";
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
     // Get the submitted IDs and quienInput values
-    $ids = isset($_POST['id']) ? $_POST['id'] : [];
-    $quienInputs = isset($_POST['quienInput']) ? $_POST['quienInput'] : "";
+    $ids = isset($_GET['id']) ? $_GET['id'] : [];
+    $quienInputs = isset($_GET['quienInput']) ? $_GET['quienInput'] : "";
     // Loop through the array and process the data
     for ($i = 0; $i < count($ids); $i++) {
         $id = $ids[$i];

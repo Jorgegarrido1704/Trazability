@@ -1,6 +1,7 @@
 <?php
-require "conection.php";
 try{
+    
+require "conection.php";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +48,7 @@ try{
                     <td id='quien<?php echo $idmant; ?>'><?php echo $quienmant; ?></td>
                     <td id='atiende<?php echo $idmant; ?>'><?php echo $atiendemant; ?></td>
                     <td>
-                        <form action="registo_mantenimiento.php" method="POST" onsubmit="return Validation(<?php echo $idmant; ?>, '<?php echo $areamant; ?>', '<?php echo $equimant; ?>', '<?php echo $damant; ?>')">
+                        <form action="registo_mantenimiento.php" method="get" onsubmit="return Validation(<?php echo $idmant; ?>, '<?php echo $areamant; ?>', '<?php echo $equimant; ?>', '<?php echo $damant; ?>')">
                             <input type="hidden" name="id[]" value="<?php echo $idmant; ?>">
                             <input type="text" name="quienInput" id="quienInput<?php echo $idmant; ?>">
                         </form>
