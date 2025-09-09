@@ -1,4 +1,5 @@
 <?php
+try {
 require 'conector.php';
 require 'vendor/autoload.php';
 session_start();
@@ -206,3 +207,7 @@ use chillerlan\QRCode\{QRCode, QROptions};
 
 
 
+<?php
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
