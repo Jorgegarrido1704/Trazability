@@ -24,12 +24,12 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
         </div>
         <div class="col-lg-2 mb-4 border">
             <h1>Modificar Cuenta</h1>
-             <form action="../errores/embarque.php" method="POST">
+             <form action="../errores/embarque.php" method="get">
             <label for="registro">WO(s)</label>    
             <input type="text" name="registro" id="registro">
             <label for="count">count</label>
             <input type="number"  id= "count" name="count" value="20">
-            <button class="btn btn-primary" type="submit" name="registro">Modificar</button>
+            <button class="btn btn-primary" type="submit" >Modificar</button>
         </form>
         </div>
         <div class="col-lg-2 mb-4 border">

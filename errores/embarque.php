@@ -1,8 +1,8 @@
 <?php
  require "../app/conection.php";
-        $count=isset($_POST['count'])?$_POST['count']:"";
+        $count=isset($_GET['count'])?$_GET['count']:"";
     
-    $registro=isset($_POST['registro'])?$_POST['registro']:"";
+    $registro=isset($_GET['registro'])?$_GET['registro']:"";
     if(strpos($registro,',')){
         $registro=explode(',',$registro);
     }else{
