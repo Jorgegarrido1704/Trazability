@@ -40,7 +40,11 @@ if($cont=='MT1-4' || $cont=='MT1-54'){
     } elseif ($calibre == 22 && ($presion <= 8.78)) {
         $insertar = "INSERT INTO `registro_pull`(`fecha`, `calibre`, `Cliente`, `Num_part`, `wo`, `presion`, `forma`, `cont`, `quien`,`val`,`tipo`) VALUES ('$fecha', '$calibre', '$cliente', '$num', '$wo', '$presion', '$apply', '$cont', '$personal','$val','malas')";
         $qry = mysqli_query($con, $insertar);
-        header('Location: ../PULL/error.php');  
+        header('Location: ../PULL/error.php');
+    }else if(($calibre == 24 || $calibre == 26 || $calibre == 28 || $calibre == 30 || $calibre == 32)&& ($presion <= 8)){
+         $insertar = "INSERT INTO `registro_pull`(`fecha`, `calibre`, `Cliente`, `Num_part`, `wo`, `presion`, `forma`, `cont`, `quien`,`val`,`tipo`) VALUES ('$fecha', '$calibre', '$cliente', '$num', '$wo', '$presion', '$apply', '$cont', '$personal','$val','malas')";
+        $qry = mysqli_query($con, $insertar);
+        header('Location: ../PULL/error.php');
 }else{
     $insertar = "INSERT INTO `registro_pull`(`fecha`, `calibre`, `Cliente`, `Num_part`, `wo`, `presion`, `forma`, `cont`, `quien`,`val`,`tipo`) VALUES ('$fecha', '$calibre', '$cliente', '$num', '$wo', '$presion', '$apply', '$cont', '$personal','$val','minfir')";
     $qry = mysqli_query($con, $insertar);  
@@ -78,6 +82,10 @@ else if ($calibre == 10 && ($presion <= 80 || $presion > 161.12)) {
     $qry = mysqli_query($con, $insertar);
     header('Location: ../PULL/error.php');
 } elseif ($calibre == 22 && ($presion <= 8 || $presion > 44.95)) {
+    $insertar = "INSERT INTO `registro_pull`(`fecha`, `calibre`, `Cliente`, `Num_part`, `wo`, `presion`, `forma`, `cont`, `quien`,`val`,`tipo`) VALUES ('$fecha', '$calibre', '$cliente', '$num', '$wo', '$presion', '$apply', '$cont', '$personal','$val','malas')";
+    $qry = mysqli_query($con, $insertar);
+    header('Location: ../PULL/error.php');
+}else if(($calibre == 24 || $calibre == 26 || $calibre == 28 || $calibre == 30 || $calibre == 32)&& ($presion <= 8 || $presion > 40)){
     $insertar = "INSERT INTO `registro_pull`(`fecha`, `calibre`, `Cliente`, `Num_part`, `wo`, `presion`, `forma`, `cont`, `quien`,`val`,`tipo`) VALUES ('$fecha', '$calibre', '$cliente', '$num', '$wo', '$presion', '$apply', '$cont', '$personal','$val','malas')";
     $qry = mysqli_query($con, $insertar);
     header('Location: ../PULL/error.php');

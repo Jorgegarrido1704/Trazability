@@ -94,6 +94,10 @@ $user=$_SESSION['usuario']??"Sergio";
             <option value="18">18</option>
             <option value="20">20</option>
             <option value="22">22</option>
+            <option value="24">24</option>
+            <option value="26">26</option>
+            <option value="28">28</option>
+            <option value="30">30</option>
             </select> 
             <br><br>
             <label >Nivel de presión (Lb)</label>
