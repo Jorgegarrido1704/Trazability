@@ -203,6 +203,6 @@ if($cuentas<10){
 
 <?php
 }catch(Exception $e){
-    header("Location:qrs.php");
+    echo "Error: " . $e->getMessage();
 }
 ?>
