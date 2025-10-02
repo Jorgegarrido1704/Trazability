@@ -7,14 +7,7 @@ try{
 $wo=isset($_POST['wo'])?$_POST['wo']:"";
 $cons=isset($_POST['const'])?$_POST['const']:"";
 $today = date('mdY');
-if($wo==""){
-    header("Location:qrs.php");
-}elseif($wo=='111'){
-    header("Location:label.php?wo=2&np=1003622360&desc=WIRE HARNESS, I.P. CAB");
-}elseif($wo=='12'){
-    header("Location:labelnew.php");
-}
-else{
+
     $buscar = mysqli_query($con, "SELECT * FROM `registro` where `wo` = '$wo' ");
     if (mysqli_num_rows($buscar) > 0) {
         $rows = mysqli_fetch_array($buscar);
@@ -65,10 +58,11 @@ if($cuentas<10){
     $cuenta="0".$cuentas;
 }else{
     $cuenta=$cuentas;
-}}else{
+}
+}else{
     header("Location:qrs.php");
 }
-}
+
 
 
 ?>
@@ -197,7 +191,7 @@ if($cuentas<10){
          function returnqr() {
             setTimeout(function() {
                 window.location.href = "qrs.php";
-            }, 1000);
+            }, 100000);
         }
 
         returnqr();
