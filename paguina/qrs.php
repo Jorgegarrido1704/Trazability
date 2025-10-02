@@ -21,7 +21,7 @@
                 <p class="text-center">Para imprimir códigos QR, ingresa el número de orden de trabajo y la cantidad deseada (máximo 10).</p>
                 <form action="qr2.php" method="post">
                     <div class="mb-3">
-                        <label for="wo" class="form-label">Work <i class="fas fa-first-order    "></i>rder</label>
+                        <label for="wo" class="form-label">Work <i class="fas fa-first-order"></i>Order</label>
                         <input type="text" class="form-control" id="wo" name="wo" autofocus placeholder="WO" required onchange="sobran()">
                     </div>
                     <div class="mb-3">
@@ -54,7 +54,9 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById('const').setAttribute('max', data.max);
+                    if(data.max < 10){
+                        document.getElementById('const').value = data.max;
+                    }
                     alert("Puedes imprimir " + data.max + " QRs");
                 } else {
                     alert("No se encontró la orden de trabajo o hubo un error.");
