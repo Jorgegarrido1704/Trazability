@@ -191,7 +191,7 @@ if($cuentas<10){
          function returnqr() {
             setTimeout(function() {
                 window.location.href = "qrs.php";
-            }, 100000);
+            }, 1000);
         }
 
         returnqr();
