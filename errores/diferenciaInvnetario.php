@@ -2,7 +2,7 @@
 
 require "../app/conection.php";
 try {
- $registrosInvnetarios=mysqli_query($con,"SELECT `id_item`, `first_qty_count`, `second_qty_count` FROM `inventarioGlobal` WHERE `second_qty_count`>0"); 
+ $registrosInvnetarios=mysqli_query($con,"SELECT `id_item`, `first_qty_count`, `second_qty_count` FROM `inventarioGlobal` WHERE `second_qty_count`>0 AND `first_qty_count`>0"); 
 
 while ($row = mysqli_fetch_array($registrosInvnetarios)) {
 $primer=$row['first_qty_count'];
