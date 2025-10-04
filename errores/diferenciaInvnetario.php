@@ -9,7 +9,7 @@ $primer=$row['first_qty_count'];
 $segundo=$row['second_qty_count'];
 $item= $row['id_item'];
 $differencia=abs($segundo-$primer);
-    $update="UPDATE `inventarioGlobal` SET `difference`='$differencia' WHERE `id_item`='$item'";
+    $update=mysqli_query($con,"UPDATE `inventarioGlobal` SET `difference`='$differencia' WHERE `id_item`='$item'");
 echo $differencia."<br>";
     
 } 
