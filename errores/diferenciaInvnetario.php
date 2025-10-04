@@ -10,10 +10,10 @@ $segundo=$row['second_qty_count'];
 $item= $row['id_item'];
 $differencia=abs($segundo-$primer);
     $update=mysqli_query($con,"UPDATE `inventarioGlobal` SET `difference`='$differencia' WHERE `id_item`='$item'");
-echo $differencia."<br>";
+//echo $differencia."<br>";
     
 } 
-   // header("Location: ../corte/busqueda.php");
+    header("Location: ../corte/busqueda.php");
 
 }catch (Exception $e) {
     echo $e->getMessage();
