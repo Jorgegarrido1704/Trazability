@@ -92,9 +92,15 @@ require "../../app/conection.php";
                             </div>
                             <div class="col-md-3 mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text">Medida registrada</span>
+                                    <span class="input-group-text">Primera Medida registrada</span>
                                 </div>
                                 <input type="number" class="form-control" id="largo" name="largo" step="0.01" min="0" required>
+                            </div>
+                              <div class="col-md-3 mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Segunda Medida registrada</span>
+                                </div>
+                                <input type="number" class="form-control" id="largo2" name="largo2" step="0.01" min="0" required>
                             </div>
                             <div class="col-md-3 mb-3">
                                 <div class="input-group-prepend">
