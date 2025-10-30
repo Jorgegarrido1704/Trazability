@@ -18,8 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     //Busqueda de empleado con tarjeta valida
     $bucarEmpleado = mysqli_query($con, "SELECT * FROM personalberg WHERE employeeNumber='$cardCode'");
     if (mysqli_num_rows($bucarEmpleado) <= 0) {
-        echo "El código de tarjeta no es válido.<br>";
-        header("Location:  asistencias.php?error=tarjetaInvalida");
+        header("Location:  asistencias.php?success=tarjeta Invalida, vuelva a intentarlo");
     } else {
         $row = mysqli_fetch_assoc($bucarEmpleado);
         $cardCode = $row['employeeNumber'];
@@ -28,37 +27,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $rowRegistro = mysqli_fetch_assoc($buscarRegistro);
         if (mysqli_num_rows($buscarRegistro) <= 0) {
             $insertarAsistencia = mysqli_query($con, "INSERT INTO relogchecador (employeeNumber,fechaRegistro,entrada) VALUES ('$cardCode','$dateNow','$timeNow')");
-            echo "Asistencia registrada correctamente<br>";
+           header("Location:  asistencias.php?success=Bienvenido $row[employeeName] , su entrada ha sido registrada");
         } else {
             if ($action == 'entrada') {
-                echo "Ya se ha registrado una entrada para hoy.<br>";
+                header("Location:  asistencias.php?success=Entrada ya registrada");
             } else if ($action == 'salida') {
+                if ($rowRegistro['entrada'] == null) {
+                    header("Location:  asistencias.php?success=Entrada no fue registrada, dirijase con recurson humanos");
+                }else if ($rowRegistro['salida'] != null) {
+                    header("Location:  asistencias.php?success=Salida ya registrada");
+
+                }else if($rowRegistro['salida'] == null) {                
                 $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET salida='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
+                header("Location:  asistencias.php?success=Gracias por tu esfuerzo $row[employeeName] , su salida ha sido registrada");
+            }
             } else if ($action == 'desayuno') {
                 if ($rowRegistro['desayunoSalida'] == null) {
                     $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET desayunoSalida='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
+                header("Location:  asistencias.php?success=Buen provecho $row[employeeName] , su salida a desayuno ha sido registrada");
                 } else if ($rowRegistro['desayunoEntrada'] == null) {
                     $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET desayunoEntrada='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
+                header("Location:  asistencias.php?success=Bienvenido de nuevo $row[employeeName] , su entrada de desayuno ha sido registrada");
+                }else{
+                header("Location:  asistencias.php?success= $row[employeeName] , ya registraste la entrada y salida de desayuno");
                 }
             } else if ($action == 'comida') {
                 if ($rowRegistro['comidaSalida'] == null) {
                     $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET comidaSalida='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
+                header("Location:  asistencias.php?success=Buen provecho $row[employeeName] , su salida a comida ha sido registrada");
                 } else if ($rowRegistro['comidaEntrada'] == null) {
                     $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET comidaEntrada='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
+                header("Location:  asistencias.php?success=Bienvenido de nuevo $row[employeeName] , su entrada de comida ha sido registrada");
+                }else {
+                header("Location:  asistencias.php?success= $row[employeeName] , ya registraste la entrada y salida de comida");
                 }
             } else if ($action == 'permiso') {
                 if ($rowRegistro['permisoSalida'] == null) {
                     $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET permisoSalida='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
+                    header("Location:  asistencias.php?success=$row[employeeName] , su salida por permiso ha sido registrada");
                 } else if ($rowRegistro['permisoEntrada'] == null) {
                     $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET permisoEntrada='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
+                    header("Location:  asistencias.php?success=$row[employeeName] , su entrada por permiso ha sido registrada");
                 } else if ($rowRegistro['permiso2Salida'] == null) {
                     $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET permiso2Salida='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
+                    header("Location:  asistencias.php?success=$row[employeeName] , su segunda salida por permiso ha sido registrada");
                 } else if ($rowRegistro['permiso2Entrada'] == null) {
                     $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET permiso2Entrada='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
+                    header("Location:  asistencias.php?success=$row[employeeName] , su segunda entrada por permiso ha sido registrada");
+                }else {
+                    header("Location:  asistencias.php?success=$row[employeeName] , ya registraste todas tus entradas y salidas por permiso, Si necesitas más permisos, por favor dirígete con recursos humanos");
                 }
             }
         }
     }
 }
 
-header("Location:  asistencias.php");
+//header("Location:  asistencias.php");

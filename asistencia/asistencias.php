@@ -1,18 +1,7 @@
 <?php
-$error=isset($_GET['error'])?$_GET['error']:"";
-$success=isset($_GET['success'])?$_GET['success']:"";
-
+$success = isset($_GET['success']) ? $_GET['success'] : "";
 ?>
-<script>
-    let error = "<?php echo $error; ?>";
-    let success = "<?php echo $success; ?>";
-    if (error === "tarjetaInvalida") {
-        alert("El código de tarjeta no es válido.");
-    }
-    if (success === "asistenciaRegistrada") {
-        alert("Asistencia registrada correctamente.");
-    }
-</script>
+
 <!doctype html>
 <html lang="en">
 
@@ -29,9 +18,13 @@ $success=isset($_GET['success'])?$_GET['success']:"";
         <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
             <img src="img/begstrsom.jpg" alt="Begstrsom" class="img-fluid" style="max-height: 350px; width: 100%;">
         </header>
+        <div id="alert" style="display:none;" class="alert alert-success text-center" role="alert">
+            <h2><strong> <?php echo $success; ?></strong></h2>
+        </div>
 
-        <div class="row">
-            <div class="col-md-12 mt-2 mb-2">
+
+        <div class="row" >
+            <div class="col-md-12 mt-2 mb-2"  id="registros">
                 <div class="form-group">
                     <h2 class="text-center">Bienvenido al sistema de asistencia</h2>
                     <h3 class="text-center">Por favor, utilice el codigo Qr de su tarjeta para registrar su entrada o salida</h3>
@@ -45,15 +38,15 @@ $success=isset($_GET['success'])?$_GET['success']:"";
                         <select class="form-select" id="action" name="action" required>
                             <?php
                             date_default_timezone_set("America/Mexico_City");
-                            $actions = ["Entrada turno"=>'entrada', "Salida turno"=>'salida', "Desayuno"=>'desayuno', "Comida"=>'comida', "Permiso"=>'permiso'];
-                                if(date("H")>=17 && date("i")>=30){
-                                   echo "<option value=\"salida\">Salida turno</option>";
-                                   unset($actions[array_search("Salida turno", $actions)]);
-                                   }   
-                                if(date("H")>=13 && date("i")>=0){
-                                   echo "<option value=\"comida\">Comida</option>";
-                                   unset($actions[array_search("Comida", $actions)]);
-                                   }
+                            $actions = ["Entrada turno" => 'entrada', "Salida turno" => 'salida', "Desayuno" => 'desayuno', "Comida" => 'comida', "Permiso" => 'permiso'];
+                            if (date("H") >= 17 && date("i") >= 30) {
+                                echo "<option value=\"salida\">Salida turno</option>";
+                                unset($actions[array_search("Salida turno", $actions)]);
+                            }
+                            if (date("H") >= 13 && date("i") >= 0) {
+                                echo "<option value=\"comida\">Comida</option>";
+                                unset($actions[array_search("Comida", $actions)]);
+                            }
                             if (date("H") >= 9 && date("i") >= 0) {
                                 echo "<option value=\"desayuno\">Desayuno</option>";
                                 unset($actions[array_search("Desayuno", $actions)]);
@@ -100,4 +93,17 @@ $success=isset($_GET['success'])?$_GET['success']:"";
 
     setInterval(timerPermin, 30000);
     window.onload = timerPermin;
+    
+    let success = "<?php echo $success; ?>";
+    if (success !== "") {
+       
+            document.getElementById("alert").style.display = "block";
+            document.getElementById("registros").style.display = "none";
+        setTimeout(function() {
+            window.location.href = "asistencias.php";
+        }, 3000);
+        clearInterval();
+
+    }
+
 </script>
