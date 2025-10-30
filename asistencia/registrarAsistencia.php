@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $buscarRegistro = mysqli_query($con, "SELECT * From relogchecador WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow' ORDER BY id DESC LIMIT 1");
         $rowRegistro = mysqli_fetch_assoc($buscarRegistro);
         if (mysqli_num_rows($buscarRegistro) <= 0) {
-            $insertarAsistencia = mysqli_query($con, "INSERT INTO relogchecador (employeeNumber,fechaRegistro,entrada) VALUES ('$cardCode','$dateNow','$timeNow')");
+            $insertarAsistencia = mysqli_query($con, "INSERT INTO relogchecador (employeeNumber,fechaRegistro,entrada,comentario) VALUES ('$cardCode','$dateNow','$timeNow','$comentario')");
            header("Location:  asistencias.php?success=Bienvenido $row[employeeName] , su entrada ha sido registrada");
         } else {
             if ($action == 'entrada') {
