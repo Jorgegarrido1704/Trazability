@@ -2,9 +2,9 @@
 require "../../app/conection.php";
 $numero=$_GET['pn']?$_GET['pn']:"";
 
-
-$routings = mysqli_query($con,"SELECT * FROM routing_process ORDER BY id_routing_process DESC");
-$registroDatos = mysqli_query($con,"SELECT * FROM routing_models WHERE pn_routing = '$numero' ");
+    
+$routings = mysqli_query($con,"SELECT * FROM routing_process ORDER BY routingNumber DESC");
+$registroDatos = mysqli_query($con,"SELECT * FROM routing_models WHERE pn_routing = '$numero' ORDER BY work_routing  DESC");
 if(isset($_GET['descripcionRuteo']) and isset($_GET['qtyTimes']) and isset($_GET['timeProcess'])){
     $descripcionRuteo=$_GET['descripcionRuteo']?$_GET['descripcionRuteo']:"";
     $qtyTimes=$_GET['qtyTimes']?$_GET['qtyTimes']:"";

@@ -16,7 +16,7 @@ if (isset($_GET['np'])) {
 }
 
 foreach ($datos as $np) {
-    $delete=(mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and work_routing='10341' and work_routing = '10301'"));
+    $delete=mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and (work_routing='10341' or work_routing = '10301')");
 $tipoSplice=[];   
 
     $splices = mysqli_query($con, "SELECT dataFrom FROM listascorte WHERE pn='$np' AND dataFrom IS NOT NULL and (dataFrom LIKE 'SPL%' or dataFrom LIKE 'spl%'

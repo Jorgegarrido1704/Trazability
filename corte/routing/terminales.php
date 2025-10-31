@@ -14,7 +14,7 @@ if (isset($_GET['np'])) {
     header("location:../registro.php");
 }
 foreach ($datos as $np) {
-    $delete=(mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and work_routing='10081'"));
+    $delete=mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and (work_routing='10081' or work_routing='10951')");
 
     $buscar = mysqli_query($con, "SELECT DataFrom,terminal1 FROM listascorte WHERE pn='$np' AND terminal1 IS NOT NULL and terminal1 !='' and 
     terminal1 not like 'Empalme%' AND terminal1 not like 'EMPALME%' and terminal1 not like 'SPL%' AND terminal1 not like 'SPLICE%'  
