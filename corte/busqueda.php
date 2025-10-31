@@ -110,13 +110,14 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
                 <button class="btn btn-primary">MPS</button>
             </form>
         </div>
-       <div class="col-lg-2 mb-4 border">
+      <!-- <div class="col-lg-2 mb-4 border">
             <h1>Differencia Inventarios</h1>
             <form action="../errores/diferenciaInvnetario.php" method="POST" >
                 <br>
                 <button class="btn btn-primary">Ajuste inventario</button>
             </form>
-        </div>
+        </div>-->
+    
     </div>
     <br>
 

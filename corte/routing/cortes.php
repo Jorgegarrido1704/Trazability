@@ -17,7 +17,7 @@ if (isset($_GET['np'])) {
 }
 
 foreach ($datos as $np) {
-                $delete=(mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and (work_routing>'10001' and work_routing<'10061')"));
+                $delete=(mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and (work_routing>=10001 and work_routing<=10061)"));
                 $delete=(mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and (work_routing='11501' or work_routing='11701')"));
            
     $buscar = mysqli_query($con, "SELECT cons, tipo, aws, color,tamano FROM listascorte WHERE pn='$np' and tamano>0  ");
