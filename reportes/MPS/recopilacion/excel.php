@@ -101,8 +101,8 @@ foreach ($data as $pn => $weeksData) {
         foreach ($weeks as $w) {
             $qty = $weeksData[$w] ?? 0;
             if($qty>0){
-            $timeSec = ($procesosBase[$proc] * $qty * 1.2) + ($assetsProcess[$proc]*300);
-
+            //$timeSec = ($procesosBase[$proc] * $qty * 1.2) + ($assetsProcess[$proc]*300);
+            $timeSec = ($procesosBase[$proc] * $qty * 1.2);
             $h = floor($timeSec/3600);
             $m = round(($timeSec%3600)/60,0);
             $row[] = ($h<1 && $m<1) ? "0" : "{$h} h : {$m} m";
