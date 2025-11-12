@@ -145,7 +145,7 @@ try {
     function excelReport() {
         window.location.href = "recopilacion/excel.php";
     }
-    function excelReport1() {
+    function excelReport2() {
         window.location.href = "recopilacion/excel2.php";
     }
 </script>
