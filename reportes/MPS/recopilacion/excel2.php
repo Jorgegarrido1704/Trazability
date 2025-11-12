@@ -131,7 +131,7 @@ foreach ($data as $pn => $weeksData) {
     while ($row = mysqli_fetch_assoc($timeProcess)) {
         $wr = $row['work_routing'];
         // Time in seconds for this routing step
-        $tpp = $row['QtyTimes'] * $row['timePerProcess'];
+        $tpp = ($row['QtyTimes'] * $row['timePerProcess'])*1.3;
         if (($wr >= 10440 && $wr < 10501) || ($wr >= 10950 && $wr < 11500)) {
             $procesosBase['Sub-Assembly'] += $tpp;
             $assetsProcess['Sub-Assembly']++;
@@ -165,7 +165,7 @@ foreach ($data as $pn => $weeksData) {
                 // Time calculation: (Base time per unit) * (Demand Quantity) * (1.2 multiplier)
                 // Note: The original line for assetsProcess was commented out:
                 // $timeSec = ($procesosBase[$proc] * $qty * 1.2) + ($assetsProcess[$proc]*300);
-                $timeSec = ($procesosBase[$proc] * $qty * 1.40);
+                $timeSec = ($procesosBase[$proc] * $qty * 1.2);
 
                 // Format time as "H h : M m"
                 $h = floor($timeSec / 3600);
