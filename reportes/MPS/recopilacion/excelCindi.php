@@ -18,6 +18,8 @@ OR pn='1000516139'OR pn='1001774292'OR pn='16517623'OR pn='16514775'OR pn='16514
 OR pn='1002186052'OR pn='1001073962' ");
 $data = [];
 $allWeeks = [];
+//only one week one time
+
 while ($row = mysqli_fetch_assoc($registrosMPS)) {
     $pn = $row['pn'];
     $week = date("W", strtotime($row['dq']));
