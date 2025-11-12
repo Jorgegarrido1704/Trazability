@@ -132,7 +132,7 @@ foreach ($data as $pn => $weeksData) {
         $wr = $row['work_routing'];
         // Time in seconds for this routing step
         $tpp = $row['QtyTimes'] * $row['timePerProcess'];
-        if (($wr > 10440 && $wr < 10501) || ($wr > 10950 && $wr < 11000)) {
+        if (($wr >= 10440 && $wr < 10501) || ($wr >= 10950 && $wr < 11500)) {
             $procesosBase['Sub-Assembly'] += $tpp;
             $assetsProcess['Sub-Assembly']++;
 
@@ -141,11 +141,11 @@ foreach ($data as $pn => $weeksData) {
             $procesosBase['Assembly'] += $tpp;
             $assetsProcess['Assembly']++;
         }
-        if ($wr > 11500 && $wr < 11700) {
+        if ($wr >= 11500 && $wr < 11700) {
             $procesosBase['Quality'] += $tpp;
             $assetsProcess['Quality']++;
         }
-        if ($wr > 11700 && $wr < 12000) {
+        if ($wr >= 11700 && $wr < 12000) {
             $procesosBase['Packaging'] += $tpp;
             $assetsProcess['Packaging']++;
         }
