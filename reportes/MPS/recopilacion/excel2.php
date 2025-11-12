@@ -101,7 +101,7 @@ $sheet2 = $spreadsheet->createSheet();
 $sheet2->setTitle("Times");
 
 // Processes defined for routing calculation
-$processes = ['Sub-Assembly','Assembly','Quality','Packaging'];
+$processes = ['Sub-Assembly','Assembly','Quality','Packaging','Total'];
 
 // Header
 $rowNum = 1;
@@ -165,7 +165,7 @@ foreach ($data as $pn => $weeksData) {
                 // Time calculation: (Base time per unit) * (Demand Quantity) * (1.2 multiplier)
                 // Note: The original line for assetsProcess was commented out:
                 // $timeSec = ($procesosBase[$proc] * $qty * 1.2) + ($assetsProcess[$proc]*300);
-                $timeSec = ($procesosBase[$proc] * $qty * 1.2);
+                $timeSec = ($procesosBase[$proc] * 1 * 1.2);
 
                 // Format time as "H h : M m"
                 $h = floor($timeSec / 3600);
