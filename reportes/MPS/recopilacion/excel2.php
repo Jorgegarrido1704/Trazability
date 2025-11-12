@@ -160,12 +160,12 @@ foreach ($data as $pn => $weeksData) {
         $row = [$pn . " - " . $proc];
         $rowTotal = 0;
         foreach ($weeks as $w) {
-            $qty = $weeksData[$w] ?? 0;
+            $qty = $weeksData[$w] ?? 1;
             if ($qty > 0) {
                 // Time calculation: (Base time per unit) * (Demand Quantity) * (1.2 multiplier)
                 // Note: The original line for assetsProcess was commented out:
                 // $timeSec = ($procesosBase[$proc] * $qty * 1.2) + ($assetsProcess[$proc]*300);
-                $timeSec = ($procesosBase[$proc] * 1 * 1.2);
+                $timeSec = ($procesosBase[$proc] * $qty * 1.35);
 
                 // Format time as "H h : M m"
                 $h = floor($timeSec / 3600);
