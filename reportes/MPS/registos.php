@@ -70,6 +70,7 @@ try {
     echo "<button onclick='redirectTotiempos();'>Build Times</button>";
     echo "<button onclick='redirectToItems();'>Items</button>";
     echo "<button onclick='excelReport();'>Excel Report</button>";
+    echo "<button onclick='excelReport2();'>Excel Report 2</button>";
 
     // --- Table ---
     echo "<table border='1' cellpadding='5' style='border-collapse:collapse; text-align:center;'>";
@@ -143,5 +144,8 @@ try {
     }
     function excelReport() {
         window.location.href = "recopilacion/excel.php";
+    }
+    function excelReport1() {
+        window.location.href = "recopilacion/excel2.php";
     }
 </script>
