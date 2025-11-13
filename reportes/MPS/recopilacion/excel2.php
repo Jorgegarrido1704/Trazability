@@ -170,7 +170,8 @@ foreach ($data as $pn => $weeksData) {
                 // Format time as "H h : M m"
                 $h = floor($timeSec / 3600);
                 $m = round(($timeSec % 3600) / 60, 0);
-                $row[] = ($h < 1 && $m < 1) ? "0" : "{$h} h : {$m} m";
+                $sec = intval(round(($timeSec % 360) % 60, 0)); //round((($timeSec % 3600) % 60), 0);
+                $row[] = ($h < 1 && $m < 1) ? "00 h : 00 m : 00 s" : "{$h} h : {$m} m : {$sec} s";
 
                 $totalsPerProcess[$proc][$w] += $timeSec;
                 $rowTotal += $timeSec;
@@ -182,7 +183,7 @@ foreach ($data as $pn => $weeksData) {
         // Format total time for the row
         $hTotal = floor($rowTotal / 3600);
         $mTotal = round(($rowTotal % 3600) / 60);
-        $row[] = ($hTotal < 1 && $mTotal < 1) ? "0" : "{$hTotal} h : {$mTotal} m";
+        $row[] = ($hTotal < 1 && $mTotal < 1) ? "00 h : 00 m" : "{$hTotal} h : {$mTotal} m";
 
         // Add row to sheet and apply color
         $sheet2->fromArray($row,NULL,"A$rowNum");
