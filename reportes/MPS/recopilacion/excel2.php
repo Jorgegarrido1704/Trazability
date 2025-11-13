@@ -117,6 +117,7 @@ foreach ($processes as $proc) $totalsPerProcess[$proc] = array_fill_keys($weeks,
 
 // Fill data
 foreach ($data as $pn => $weeksData) {
+    $color = $fillColors[($rowNum-2) % count($fillColors)];
     // Base time accumulators for the current PN
     $procesosBase = ['Cutting'=>0,'Terminals'=>0,'Sub-Assembly'=>0,'Assembly'=>0,'Quality'=>0,'Packaging'=>0,'Total'=>0];
     // Asset count accumulators (currently unused in time calculation logic)
@@ -149,15 +150,14 @@ foreach ($data as $pn => $weeksData) {
             $procesosBase['Packaging'] += $tpp;
             $assetsProcess['Packaging']++;
         }
-        $procesosBase['Total'] += $tpp;
+        
         $assetsProcess['Total']++;
     }
-
-   
+    $procesosBase['Total'] = $procesosBase['Sub-Assembly'] + $procesosBase['Assembly'] + $procesosBase['Quality'] + $procesosBase['Packaging'];
+    
 
     // Generate rows for each relevant process for this PN
     foreach ($processes as $proc) {
-         $color = $fillColors[($rowNum-2) % count($fillColors)];
         $row = [$pn . " - " . $proc];
         $rowTotal = 0;
         foreach ($weeks as $w) {
