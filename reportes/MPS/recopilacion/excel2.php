@@ -158,13 +158,13 @@ foreach ($data as $pn => $weeksData) {
         $assetsProcess['Total']++;
     }
    
-
+    $color = $fillColors[($rowNum-2) % count($fillColors)];
     // Generate rows for each relevant process for this PN
     foreach ($processes as $proc) {
         $row = [$pn . " - " . $proc];
         $rowTotal = 0;
         foreach ($weeks as $w) {
-            $color = $fillColors[($rowNum-2) % count($fillColors)];
+            
             $qty = $weeksData[$w] ?? 1;
             if ($qty > 0) {
                 // Time calculation: (Base time per unit) * (Demand Quantity) * (1.2 multiplier)
@@ -173,11 +173,11 @@ foreach ($data as $pn => $weeksData) {
                 $timeSec = ($procesosBase[$proc] * $qty );
 
                 // Format time as "H h : M m"
-                $h = floor($timeSec / 3600);
-                $m = round(($timeSec % 3600) / 60, 0);
-                $sec = round(($timeSec % 3600) % 60, 0); //round((($timeSec % 3600) % 60), 0);
-                $row[] = ($h < 1 && $m < 1) ? "00 h : 00 m : 00 s" : "{$h} h : {$m} m : {$sec} s";
-
+             //   $h = floor($timeSec / 3600);
+               // $m = round(($timeSec % 3600) / 60, 0);
+             //   $sec = round(($timeSec % 3600) % 60, 0); //round((($timeSec % 3600) % 60), 0);
+              //  $row[] = ($h < 1 && $m < 1) ? "00 h : 00 m : 00 s" : "{$h} h : {$m} m : {$sec} s";
+                    $row[] = ($h < 1 && $m < 1) ? "00 h : 00 m : 00 s" : "{$timeSec} s";
                 $totalsPerProcess[$proc][$w] += $timeSec;
                 $rowTotal += $timeSec;
             } else {
