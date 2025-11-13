@@ -174,8 +174,8 @@ foreach ($data as $pn => $weeksData) {
 
                 // Format time as "H h : M m"
             
-               $m = round(($timeSec ) / 60, 0);
-               $sec = round(($timeSec % 60), 0);
+               $m = intval(($timeSec ) / 60);
+               $sec = intval(($timeSec % 60));
                // $sec = round(($timeSec % 3600) % 60, 0); //round((($timeSec % 3600) % 60), 0);
                 $row[] = ( $m < 1 ) ? "00 m : 00 s " : "{$m} m : {$sec} s ";
               //      $row[] = ($timeSec < 1) ? "00 h : 00 m : 00 s" : "{$timeSec} s";
