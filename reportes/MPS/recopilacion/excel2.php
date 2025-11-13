@@ -177,7 +177,7 @@ foreach ($data as $pn => $weeksData) {
                // $m = round(($timeSec % 3600) / 60, 0);
              //   $sec = round(($timeSec % 3600) % 60, 0); //round((($timeSec % 3600) % 60), 0);
               //  $row[] = ($h < 1 && $m < 1) ? "00 h : 00 m : 00 s" : "{$h} h : {$m} m : {$sec} s";
-                    $row[] = ($h < 1 && $m < 1) ? "00 h : 00 m : 00 s" : "{$timeSec} s";
+                    $row[] = ($timeSec < 1) ? "00 h : 00 m : 00 s" : "{$timeSec} s";
                 $totalsPerProcess[$proc][$w] += $timeSec;
                 $rowTotal += $timeSec;
             } else {
