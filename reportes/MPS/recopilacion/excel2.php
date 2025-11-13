@@ -165,7 +165,7 @@ foreach ($data as $pn => $weeksData) {
                 // Time calculation: (Base time per unit) * (Demand Quantity) * (1.2 multiplier)
                 // Note: The original line for assetsProcess was commented out:
                 // $timeSec = ($procesosBase[$proc] * $qty * 1.2) + ($assetsProcess[$proc]*300);
-                $timeSec = ($procesosBase[$proc] * $qty * 1.2);
+                $timeSec = ($procesosBase[$proc] * $qty );
 
                 // Format time as "H h : M m"
                 $h = floor($timeSec / 3600);
