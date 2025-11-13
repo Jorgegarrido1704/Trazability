@@ -131,7 +131,7 @@ foreach ($data as $pn => $weeksData) {
     while ($row = mysqli_fetch_assoc($timeProcess)) {
         $wr = $row['work_routing'];
         // Time in seconds for this routing step
-        $tpp = ($row['QtyTimes'] * $row['timePerProcess'])*1.3;
+        $tpp = ($row['QtyTimes'] * $row['timePerProcess'])*(1.3*1.2);
         if (($wr >= 10440 && $wr < 10501) || ($wr >= 10950 && $wr < 11500)) {
             $procesosBase['Sub-Assembly'] += $tpp;
             $assetsProcess['Sub-Assembly']++;
@@ -153,10 +153,11 @@ foreach ($data as $pn => $weeksData) {
         $assetsProcess['Total']++;
     }
 
-    $color = $fillColors[($rowNum-2) % count($fillColors)];
+   
 
     // Generate rows for each relevant process for this PN
     foreach ($processes as $proc) {
+         $color = $fillColors[($rowNum-2) % count($fillColors)];
         $row = [$pn . " - " . $proc];
         $rowTotal = 0;
         foreach ($weeks as $w) {
