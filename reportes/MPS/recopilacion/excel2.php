@@ -136,25 +136,28 @@ foreach ($data as $pn => $weeksData) {
         if (($wr >= 10440 && $wr < 10501) || ($wr >= 10950 && $wr < 11500)) {
             $procesosBase['Sub-Assembly'] += $tpp;
             $assetsProcess['Sub-Assembly']++;
+            $procesosBase['Total'] += $tpp;
 
         }
         if ($wr > 10500 && $wr < 10950) {
             $procesosBase['Assembly'] += $tpp;
             $assetsProcess['Assembly']++;
+            $procesosBase['Total'] += $tpp;
         }
         if ($wr >= 11500 && $wr < 11700) {
             $procesosBase['Quality'] += $tpp;
             $assetsProcess['Quality']++;
+            $procesosBase['Total'] += $tpp;
         }
         if ($wr >= 11700 && $wr < 12000) {
             $procesosBase['Packaging'] += $tpp;
             $assetsProcess['Packaging']++;
+            $procesosBase['Total'] += $tpp;
         }
         
         $assetsProcess['Total']++;
     }
-    $procesosBase['Total'] = $procesosBase['Sub-Assembly'] + $procesosBase['Assembly'] + $procesosBase['Quality'] + $procesosBase['Packaging'];
-    
+   
 
     // Generate rows for each relevant process for this PN
     foreach ($processes as $proc) {
