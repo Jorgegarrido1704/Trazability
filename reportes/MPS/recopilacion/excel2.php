@@ -157,6 +157,7 @@ foreach ($data as $pn => $weeksData) {
         
         $assetsProcess['Total']++;
     }
+    
    
     $color = $fillColors[($rowNum-2) % count($fillColors)];
     // Generate rows for each relevant process for this PN
