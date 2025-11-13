@@ -173,13 +173,13 @@ foreach ($data as $pn => $weeksData) {
                 $timeSec = ($procesosBase[$proc] * $qty );
 
                 // Format time as "H h : M m"
-             //   $h = floor($timeSec / 3600);
-               // $m = round(($timeSec % 3600) / 60, 0);
-             //   $sec = round(($timeSec % 3600) % 60, 0); //round((($timeSec % 3600) % 60), 0);
-              //  $row[] = ($h < 1 && $m < 1) ? "00 h : 00 m : 00 s" : "{$h} h : {$m} m : {$sec} s";
-                    $row[] = ($timeSec < 1) ? "00 h : 00 m : 00 s" : "{$timeSec} s";
-                $totalsPerProcess[$proc][$w] += $timeSec;
-                $rowTotal += $timeSec;
+            
+               $m = round(($timeSec % 3600) / 60, 0);
+                $sec = round(($timeSec % 3600) % 60, 0); //round((($timeSec % 3600) % 60), 0);
+                $row[] = ( $m < 1 && $sec < 1) ? "00 h : 00 m : 00 s" : "{$h} h : {$m} m : {$sec} s";
+              //      $row[] = ($timeSec < 1) ? "00 h : 00 m : 00 s" : "{$timeSec} s";
+               // $totalsPerProcess[$proc][$w] += $timeSec;
+                //$rowTotal += $timeSec;
             } else {
                 $row[] = "0";
             }
