@@ -4,13 +4,12 @@ require '../app/conection.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $cardCode = $_POST["cardCode"];
     $action = $_POST["action"];
-    if (strpos($cardCode, '$')) {
-        $cardCode = explode('$', $cardCode)[0];
-        $comentario = "$" . "registro con QR";
+    if (strpos($cardCode, '|')) {
+        $cardCode = explode('|', $cardCode)[0];
+        $comentario = "|" . "registro con QR";
     } else {
         $comentario = "registro con codigo manual o codigo de barras";
     }
-    $cardCode = "i" . $cardCode;
     echo $cardCode . "<br>" . $comentario . "<br>";
     $dateNow = date("Y-m-d");
     $timeNow = date("H:i:s");
@@ -30,12 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
            header("Location:  asistencias.php?success=Bienvenido $row[employeeName] , su entrada ha sido registrada");
         } else {
             if ($action == 'entrada') {
-                header("Location:  asistencias.php?success=Entrada ya registrada");
+                header("Location:  asistencias.php?success= $row[employeeName] , su entrada ya registrada");
             } else if ($action == 'salida') {
                 if ($rowRegistro['entrada'] == null) {
-                    header("Location:  asistencias.php?success=Entrada no fue registrada, dirijase con recurson humanos");
+                    header("Location:  asistencias.php?success= $row[employeeName] , su entrada no fue registrada, dirijase con recurson humanos");
                 }else if ($rowRegistro['salida'] != null) {
-                    header("Location:  asistencias.php?success=Salida ya registrada");
+                    header("Location:  asistencias.php?success= $row[employeeName] , su salida ya registrada");
 
                 }else if($rowRegistro['salida'] == null) {                
                 $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET salida='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");

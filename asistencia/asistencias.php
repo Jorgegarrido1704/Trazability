@@ -64,7 +64,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : "";
                         </select>
                         <div class="form-group">
                             <label for="cardCode" class="form-label">Ingrese el código QR de su tarjeta:</label>
-                            <input type="text" class="form-control" id="cardCode" name="cardCode" minlength="4" required autofocus>
+                            <input type="text" class="form-control" id="cardCode" name="cardCode" minlength="6" maxlength="6" required autofocus>    
                         </div>
 
 
@@ -77,6 +77,14 @@ $success = isset($_GET['success']) ? $_GET['success'] : "";
 
 </html>
 <script>
+    
+document.getElementById("cardCode").addEventListener("input", function() {
+    if (this.value.length === 6) {
+        this.form.submit();
+    }
+});
+
+
     function timerPermin() {
         let time = new Date();
         // Get current hours and minutes in mexico city time zone
@@ -91,7 +99,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : "";
 
     }
 
-    setInterval(timerPermin, 30000);
+    setInterval(timerPermin, 25000);
     window.onload = timerPermin;
     
     let success = "<?php echo $success; ?>";
