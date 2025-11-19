@@ -1,7 +1,15 @@
 <?php
 require "../app/conection.php";
+try {
+    
+
 $delCore=mysqli_query($con,"DELETE FROM corte ");
-if($delCore){
+} catch (\Throwable $th) {
+    echo $th;
+}
+try {
+    
+
    // echo "<h1>Se Eliminaron Correctamente</h1>";
 $buscar=mysqli_query($con,"SELECT * FROM registro WHERE count<4");
 while($row=mysqli_fetch_array($buscar)){
@@ -40,4 +48,6 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
     header("location:busqueda.php");
 
 
+} catch (\Throwable $th) {
+    echo $th;
 }
