@@ -26,7 +26,7 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
         $cons=$rowList['cons'];
         $tipo=$rowList['tipo'];
         $aws=$rowList['aws'];
-        $tamano=$rowList['tamano'];
+        $tamano=doubleval($rowList['tamano']);//$rowList['tamano'];
         $color=$rowList['color'];
         $term1=$rowList['terminal1'];
         $term2=$rowList['terminal2'];
