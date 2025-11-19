@@ -64,7 +64,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : "";
                         </select>
                         <div class="form-group">
                             <label for="cardCode" class="form-label">Ingrese el código QR de su tarjeta:</label>
-                            <input type="text" class="form-control" id="cardCode" name="cardCode" minlength="6" maxlength="6" required autofocus>    
+                            <input type="text" class="form-control" id="cardCode" name="cardCode" minlength="4" maxlength="6" required autofocus>    
                         </div>
 
 

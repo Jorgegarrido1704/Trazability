@@ -3,10 +3,14 @@ require '../app/conection.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $cardCode = $_POST["cardCode"];
+    if(strlen($cardCode) == 4){
+        $cardCode = "i" . $cardCode;
+        
+    }
     $action = $_POST["action"];
     if (strpos($cardCode, '|')) {
         $cardCode = explode('|', $cardCode)[0];
-        $comentario = "|" . "registro con QR";
+        $comentario = "registro con QR";
     } else {
         $comentario = "registro con codigo manual o codigo de barras";
     }
@@ -30,6 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             if ($action == 'entrada') {
                 header("Location:  asistencias.php?success= $row[employeeName] , su entrada ya registrada");
+                
             } else if ($action == 'salida') {
                 if ($rowRegistro['entrada'] == null) {
                     header("Location:  asistencias.php?success= $row[employeeName] , su entrada no fue registrada, dirijase con recurson humanos");
