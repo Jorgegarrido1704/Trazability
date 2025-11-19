@@ -19,13 +19,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $timeNow = date("H:i:s");
 
     //Busqueda de empleado con tarjeta valida
-    $bucarEmpleado = mysqli_query($con, "SELECT * FROM personalberg WHERE employeeNumber='$cardCode'");
+    $bucarEmpleado = mysqli_query($con, "SELECT * FROM personalberg WHERE employeeNumber='$cardCode' AND `status` !='Baja'");
     if (mysqli_num_rows($bucarEmpleado) <= 0) {
         header("Location:  asistencias.php?success=tarjeta Invalida, vuelva a intentarlo");
     } else {
         $row = mysqli_fetch_assoc($bucarEmpleado);
         $cardCode = $row['employeeNumber'];
-
+        $type = $row['typeWorker'];
         $buscarRegistro = mysqli_query($con, "SELECT * From relogchecador WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow' ORDER BY id DESC LIMIT 1");
         $rowRegistro = mysqli_fetch_assoc($buscarRegistro);
         if (mysqli_num_rows($buscarRegistro) <= 0) {
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             if ($action == 'entrada') {
                 header("Location:  asistencias.php?success= $row[employeeName] , su entrada ya registrada");
-                
+
             } else if ($action == 'salida') {
                 if ($rowRegistro['entrada'] == null) {
                     header("Location:  asistencias.php?success= $row[employeeName] , su entrada no fue registrada, dirijase con recurson humanos");
