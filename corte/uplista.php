@@ -43,7 +43,7 @@ if (isset($_POST['upload'])) {
                 }
 
                 // Leer e insertar datos en bloques
-                while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                while (($data = fgetcsv($handle, 2000, ",")) !== FALSE) {
                     // Asignar los valores a las variables vinculadas
                     list($pn,$rev, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo) = $data;
                     $numerosDeParte[] = $pn;
