@@ -67,10 +67,25 @@ body {
                         </thead>
                         <tbody class="table-group-divider" id="tableBody">
                             <?php
-                        $query = "SELECT cliente,wo, NumPart, Qty, reqday FROM registro WHERE $count ORDER BY cliente  asc ";
+                        $query = "SELECT cliente, wo, NumPart, Qty, reqday
+                                    FROM registro
+                                    WHERE $count
+                                    ORDER BY STR_TO_DATE(reqday, '%d-%m-%Y') ASC, cliente ASC
+                                    LIMIT 15;";
                         $result = mysqli_query($con, $query);
                         while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>";
+                            $color = "";
+                            $dayNow = date("d-m-Y");
+                            $reqday = $row['reqday'];
+                            if(strtotime($dayNow) > strtotime($reqday)){
+                                $color = "table-danger";
+                            }else if (strtotime("+7 day", strtotime($reqday)) <= strtotime($reqday) ) {
+                                $color = "table-warning";
+                            } else {
+                                $color = "table-success";
+                            }
+                            
+                            echo "<tr class='$color'>";
                             echo "<td class='text-center'>" . $row['cliente'] . "</td>";
                             echo "<td class='text-center'>" . $row['NumPart'] . "</td>";
                             echo "<td class='text-center'>" . $row['wo'] . "</td>";
