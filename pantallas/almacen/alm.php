@@ -1,27 +1,63 @@
 <?php 
-require "../app/conection.php";
+require "../../app/conection.php";
  ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <style>
-        body{      background-color: lightblue;          }
-        #title{   font-size: xxx-large; text-align: center;           }
-        table{    width: 100%;   border-radius: 5px;    }
-        th{       text-align: center;   font-size: xx-large; border-radius: 5px; }
-        thead{    background-color: lightcyan; border-radius: 15%; }
-        td{       text-align: center;   font-size: xx-large; border-radius: 5px; }
-        #trid{ background-color: red;}
-        #ama{    background-color: yellow;     }
-        #green{  background-color: orange;     }
-        
+    body {
+        background-color: lightblue;
+    }
+
+    #title {
+        font-size: xxx-large;
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        border-radius: 5px;
+    }
+
+    th {
+        text-align: center;
+        font-size: xx-large;
+        border-radius: 5px;
+    }
+
+    thead {
+        background-color: lightcyan;
+        border-radius: 15%;
+    }
+
+    td {
+        text-align: center;
+        font-size: xx-large;
+        border-radius: 5px;
+    }
+
+    #trid {
+        background-color: red;
+    }
+
+    #ama {
+        background-color: yellow;
+    }
+
+    #green {
+        background-color: orange;
+    }
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CVTS By Jorge Garrido</title>
 </head>
+
 <body>
-    <div id="title"><h1>Kits status</h1></div>
+    <div id="title">
+        <h1>Kits status</h1>
+    </div>
     <table>
         <thead>
             <th>Numero de Parte</th>
@@ -99,4 +135,5 @@ $busqueda=mysqli_query($con,"SELECT * FROM kits  WHERE status!='Completo' ");
         </tbody>
     </table>
 </body>
+
 </html>
