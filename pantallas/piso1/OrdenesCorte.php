@@ -1,12 +1,3 @@
-<?php
-require "../../app/conection.php";
-require "registrosPrevios.php";
-
-$index = rand(0, count($registros) - 1);
-$count = $registros[$index]['count'];
-
-?>
-
 <!doctype html>
 <html lang="en">
 
@@ -14,7 +5,6 @@ $count = $registros[$index]['count'];
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Listas de cortes</title>
-    <link rel="stylesheet" href="css/estilis.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
@@ -32,12 +22,13 @@ body {
 
 <body>
     <div class="container">
-        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
-            <img src="img/begstrsom.jpg" alt="Begstrsom" class="img-fluid" style="max-height: 200px; width: 100%;">
+        <header class="d-flex flex-wrap justify-content-center py-3 border-bottom">
+            <img src="img/begstrsom.jpg" alt="Begstrsom" class="img-fluid" style="max-height: 70px; width: 30%;">
         </header>
         <div class="row">
-            <div class="col-md-12 mt-2 mb-2" id="infor">
-                <table class="table table-bordered table-striped table-hover table-responsive" style="width: 100%;">
+            <div class="col-md-12 " id="infor">
+                <table class="table table-bordered table-striped table-hover table-responsive"
+                    style="width: 100%; height: auto;">
                     <thaed>
                         <tr>
                             <th class="text-center">Zona</th>
@@ -47,15 +38,16 @@ body {
                     </thaed>
                     <tbody>
                         <tr>
-                            <td class="text-center"><?php echo $registros[$index]['zona']; ?></td>
-                            <td class="text-center"><?php echo $registros[$index]['lider']; ?></td>
+                            <td class="text-center"><span id="zona"></span></td>
+                            <td class="text-center"><span id="lider"></span></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             <div class="col-md-12 mt-2 mb-2 " id="registros">
-                <div class="form-group text-center mt-4 flex-column">
-                    <table class="table table-bordered table-striped table-hover table-responsive" style="width: 100%;">
+                <div class="form-group text-center  flex-column">
+                    <table class="table table-bordered table-striped table-hover table-responsive"
+                        style="width: 100% ; max-height: 300px;">
                         <thead>
                             <tr>
                                 <th class="text-center">Cliente</th>
@@ -66,34 +58,7 @@ body {
                             </tr>
                         </thead>
                         <tbody class="table-group-divider" id="tableBody">
-                            <?php
-                        $query = "SELECT cliente, wo, NumPart, Qty, reqday
-                                    FROM registro
-                                    WHERE $count
-                                    ORDER BY STR_TO_DATE(reqday, '%d-%m-%Y') ASC, cliente ASC
-                                    LIMIT 15;";
-                        $result = mysqli_query($con, $query);
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            $color = "";
-                            $dayNow = date("d-m-Y");
-                            $reqday = $row['reqday'];
-                            if(strtotime($dayNow) > strtotime($reqday)){
-                                $color = "table-danger";
-                            }else if (strtotime("+7 day", strtotime($reqday)) <= strtotime($reqday) ) {
-                                $color = "table-warning";
-                            } else {
-                                $color = "table-success";
-                            }
-                            
-                            echo "<tr class='$color'>";
-                            echo "<td class='text-center'>" . $row['cliente'] . "</td>";
-                            echo "<td class='text-center'>" . $row['NumPart'] . "</td>";
-                            echo "<td class='text-center'>" . $row['wo'] . "</td>";
-                            echo "<td class='text-center'>" . $row['Qty'] . "</td>";
-                            echo "<td class='text-center'>" . $row['reqday'] . "</td>";
-                            echo "</tr>";
-                        }
-                        ?>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -116,10 +81,17 @@ function scrollToBottom() {
 }
 
 function timerPermin() {
-    window.location.reload();
 
-
+    fetch('registrosPrevios.php')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('zona').innerText = data.zona;
+            document.getElementById('lider').innerText = data.lider;
+            document.getElementById('tableBody').innerHTML = data.tableRows;
+        })
+        .catch(error => console.error('Error fetching data:', error));
 }
+window.onload = timerPermin;
 setInterval(scrollToBottom, 330);
-setInterval(timerPermin, 15000);
+setInterval(timerPermin, 10000);
 </script>
