@@ -19,7 +19,7 @@
 try {
     const iframe = document.createElement("iframe");
 
-    iframe.src = "http://mxloficina.corp.internal.bergstrominc.com:8000/juntas/calidad";
+    iframe.src = "http://mxloficina.corp.internal.bergstrominc.com:8000/rhDashBoard";
     iframe.style.width = "100%";
     iframe.style.height = "2000px";
     iframe.style.border = "none";
@@ -32,15 +32,15 @@ try {
 
 function scrollWrapper() {
     const w = document.getElementById("iframe-wrapper");
-    w.scrollBy({ top: 280, behavior: "smooth" });
+    w.scrollBy({ top: 700, behavior: "smooth" });
 }
 
 function goback() {
-    window.location.href = "rh.html";
+    window.location.href = "OrdenesCorte.php";
 }
 
-setInterval(scrollWrapper, 35000);
-setInterval(goback, 60000);
+setInterval(scrollWrapper, 20000);
+setInterval(goback, 40000);
 </script>
 
 </body>
