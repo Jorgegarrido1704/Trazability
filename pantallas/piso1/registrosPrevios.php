@@ -32,10 +32,11 @@ $color = "table-danger";
 }else if (strtotime("+7 day", strtotime($reqday)) <= strtotime($reqday) ) { $color="table-warning" ; } 
 else {
     $color="table-success" ; }
+    
      $tableRows .=    "<tr class='$color'>" ; 
      $tableRows .= "<td class='text-center'>" . $row['cliente'] . "</td>";
       $tableRows .= "<td class='text-center'>" . $row['NumPart'] . "</td>" ; 
-      $tableRows .=          "<td class='text-center'>" . $row['wo']. "</td>" ; 
+      $tableRows .= "<td class='text-center'>" . $row['wo']. "</td>" ; 
       $tableRows .=  "<td class='text-center'>" . $row['Qty'] . "</td>" ; 
     $tableRows .= "<td class='text-center'>" .
     $row['reqday'] . "</td> </tr>" ; }

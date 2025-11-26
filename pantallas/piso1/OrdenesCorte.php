@@ -25,8 +25,8 @@ body {
         <header class="d-flex flex-wrap justify-content-center py-3 border-bottom">
             <img src="img/begstrsom.jpg" alt="Begstrsom" class="img-fluid" style="max-height: 70px; width: 30%;">
         </header>
-        <div class="row">
-            <div class="col-md-12 " id="infor">
+        <div class="row" id="contenido">
+            <div class=" col-md-12 " id=" infor">
                 <table class="table table-bordered table-striped table-hover table-responsive"
                     style="width: 100%; height: auto;">
                     <thaed>
@@ -62,6 +62,7 @@ body {
                     </table>
                 </div>
             </div>
+            <div id="image-container"></div>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -92,6 +93,11 @@ function timerPermin() {
         .catch(error => console.error('Error fetching data:', error));
 }
 window.onload = timerPermin;
-setInterval(scrollToBottom, 330);
+
+
+function goback() {
+    window.location.href = "cvts.html";
+}
+setInterval(goback, 50000);
 setInterval(timerPermin, 10000);
 </script>
