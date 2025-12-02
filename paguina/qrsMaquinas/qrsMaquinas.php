@@ -1,10 +1,7 @@
 <?php
 require '../conector.php';
 require '../vendor/autoload.php';
-
-
 use chillerlan\QRCode\{QRCode, QROptions};
-
 $datos=mysqli_query($con,"SELECT * FROM assets ");
 
 ?>
@@ -19,7 +16,6 @@ $datos=mysqli_query($con,"SELECT * FROM assets ");
 </head>
 
 <body>
-
     <div class="container mt-3">
         <div class="d-flex flex-wrap">
             <?php foreach ($datos as $data) { ?>
