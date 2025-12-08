@@ -214,7 +214,7 @@ $sheet3->setCellValue("C1","QTY");
 
 $items = [];
 // Iterate through each part number (PN) and its weekly demand
-foreach ($data as $pn => $weeksData) {
+foreach ($pn_list as $pn) {
     $i=2;    
     // Query for bill of materials (BOM) for the current PN
     $res = mysqli_query($con, "SELECT item, qty FROM datos WHERE part_num='$pn'");
