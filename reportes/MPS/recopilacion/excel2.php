@@ -212,19 +212,25 @@ $sheet3->setCellValue("A1","PN");
 $sheet3->setCellValue("B1","Item");
 $sheet3->setCellValue("C1","QTY");
 
-$items = [];
+$fillColors;
+ $i=2; 
 // Iterate through each part number (PN) and its weekly demand
 foreach ($pn_list as $pn) {
-    $i=2;    
+    $colores=$fillColors[($i-2) % count($fillColors)];
+      
     // Query for bill of materials (BOM) for the current PN
-    $res = mysqli_query($con, "SELECT item, qty FROM datos WHERE part_num='$pn'");
+    $res = mysqli_query($con, "SELECT item, qty FROM datos WHERE part_num = '$pn'");
     while ($r = mysqli_fetch_assoc($res)) {
+        $sheet3->getStyle("A$i:".$sheet3->getHighestColumn().$i)
+               ->getFill()->setFillType(Fill::FILL_SOLID)
+               ->getStartColor()->setARGB($colores);
         // Calculate item demand for each week
         $sheet3->setCellValue("A$i",$pn);
         $sheet3->setCellValue("B$i",$r['item']);
         $sheet3->setCellValue("C$i",$r['qty']);
         $i++;
     }
+    
 }
 
 
