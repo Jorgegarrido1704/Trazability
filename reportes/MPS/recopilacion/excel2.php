@@ -187,11 +187,7 @@ foreach ($data as $pn => $weeksData) {
             }
         }
 
-        // Format total time for the row
-        $hTotal = floor($rowTotal / 60);
-        $mTotal = round(($rowTotal % 60), 0);
-        $row[] = ($hTotal < 1 && $mTotal < 1) ? "00 m : 00 s" : "{$hTotal} m : {$mTotal} s";
-
+       
         // Add row to sheet and apply color
         $sheet2->fromArray($row,NULL,"A$rowNum");
         $sheet2->getStyle("A$rowNum:".$sheet2->getHighestColumn().$rowNum)
@@ -211,7 +207,37 @@ foreach(range('A',$sheet2->getHighestColumn()) as $col) {
 // ===== 3. ITEMS SHEET LOGIC =====
 // ====================================================================
 $sheet3 = $spreadsheet->createSheet();
-$sheet3->setTitle("Items");
+$sheet3->setTitle("Items per PN");
+$sheet3->setCellValue("A1","PN");
+$sheet3->setCellValue("B1","Item");
+$sheet3->setCellValue("C1","QTY");
+
+$items = [];
+// Iterate through each part number (PN) and its weekly demand
+foreach ($data as $pn => $weeksData) {
+    $i=2;    
+    // Query for bill of materials (BOM) for the current PN
+    $res = mysqli_query($con, "SELECT item, qty FROM datos WHERE part_num='$pn'");
+    while ($r = mysqli_fetch_assoc($res)) {
+        // Calculate item demand for each week
+        $sheet3->setCellValue("A$i",$pn);
+        $sheet3->setCellValue("B$i",$r['item']);
+        $sheet3->setCellValue("C$i",$r['qty']);
+        $i++;
+    }
+}
+
+
+
+// Auto size columns for Items sheet
+foreach(range('A',$sheet3->getHighestColumn()) as $col) {
+    $sheet3->getColumnDimension($col)->setAutoSize(true);
+}
+// ====================================================================
+// ===== 4. ITEMS SHEET LOGIC =====
+// ====================================================================
+$sheet4 = $spreadsheet->createSheet();
+$sheet4->setTitle("Items");
 
 $items = [];
 // Iterate through each part number (PN) and its weekly demand
@@ -228,22 +254,22 @@ foreach ($data as $pn => $weeksData) {
 }
 
 // Header
-$sheet3->setCellValue("A1","Item");
+$sheet4->setCellValue("A1","Item");
 $colIndex=2;
-foreach($weeks as $w) $sheet3->setCellValueByColumnAndRow($colIndex++,1,"W$w");
-foreach(['Max','Min','Avg','StdDev','Total'] as $h) $sheet3->setCellValueByColumnAndRow($colIndex++,1,$h);
+foreach($weeks as $w) $sheet4->setCellValueByColumnAndRow($colIndex++,1,"W$w");
+foreach(['Max','Min','Avg','StdDev','Total'] as $h) $sheet4->setCellValueByColumnAndRow($colIndex++,1,$h);
 
 // Rows
 $rowNum=2;
 foreach($items as $item => $weeksData) {
-    $sheet3->setCellValue("A$rowNum",$item);
+    $sheet4->setCellValue("A$rowNum",$item);
     $values = [];
     $colIndex = 2;
 
     // Output weekly values and collect for stats
     foreach ($weeks as $w) {
         $val = $weeksData[$w] ?? 0;
-        $sheet3->setCellValueByColumnAndRow($colIndex, $rowNum, $val);
+        $sheet4->setCellValueByColumnAndRow($colIndex, $rowNum, $val);
         $values[] = $val;
         $colIndex++;
     }
@@ -253,9 +279,9 @@ foreach($items as $item => $weeksData) {
     $avg = $count > 0 ? $sum / $count : 0;
 
     // Calculate and output statistical columns
-    $sheet3->setCellValueByColumnAndRow($colIndex++, $rowNum, max($values)); // Max
-    $sheet3->setCellValueByColumnAndRow($colIndex++, $rowNum, min($values)); // Min
-    $sheet3->setCellValueByColumnAndRow($colIndex++, $rowNum, round($avg, 2)); // Avg
+    $sheet4->setCellValueByColumnAndRow($colIndex++, $rowNum, max($values)); // Max
+    $sheet4->setCellValueByColumnAndRow($colIndex++, $rowNum, min($values)); // Min
+    $sheet4->setCellValueByColumnAndRow($colIndex++, $rowNum, round($avg, 2)); // Avg
 
     // Standard Deviation Calculation
     if ($count > 0) {
@@ -264,15 +290,15 @@ foreach($items as $item => $weeksData) {
     } else {
         $stdDev = 0;
     }
-    $sheet3->setCellValueByColumnAndRow($colIndex++, $rowNum, round($stdDev, 2)); // StdDev
+    $sheet4->setCellValueByColumnAndRow($colIndex++, $rowNum, round($stdDev, 2)); // StdDev
 
-    $sheet3->setCellValueByColumnAndRow($colIndex++, $rowNum, $sum); // Total
+    $sheet4->setCellValueByColumnAndRow($colIndex++, $rowNum, $sum); // Total
     $rowNum++;
 }
 
 // Auto size columns for Items sheet
-foreach(range('A',$sheet3->getHighestColumn()) as $col) {
-    $sheet3->getColumnDimension($col)->setAutoSize(true);
+foreach(range('A',$sheet4->getHighestColumn()) as $col) {
+    $sheet4->getColumnDimension($col)->setAutoSize(true);
 }
 
 
