@@ -103,7 +103,7 @@ function timerPermin() {
 
 }
 
-setInterval(timerPermin, 12500);
+setInterval(timerPermin, 500);
 window.onload = timerPermin;
 
 let success = "<?php echo $success; ?>";
