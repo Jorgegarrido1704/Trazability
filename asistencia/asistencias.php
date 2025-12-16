@@ -103,7 +103,7 @@ function timerPermin() {
 
 }
 
-setInterval(timerPermin, 500);
+setInterval(timerPermin, 50);
 window.onload = timerPermin;
 
 let success = "<?php echo $success; ?>";
@@ -113,7 +113,7 @@ if (success !== "") {
     document.getElementById("registros").style.display = "none";
     setTimeout(function() {
         window.location.href = "asistencias.php";
-    }, 1200);
+    }, 300);
     clearInterval();
 
 }
