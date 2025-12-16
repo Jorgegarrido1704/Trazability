@@ -193,7 +193,7 @@ if($cuentas<10){
             <div class="row1">
                 <div class="data-container">
                     <h6 class="datos"><?php echo $np; ?>|<?php echo $rev; ?></h6>
-                    <h6 class="datos"><?php echo $inicio; ?></h6>
+                    <h6 class="datos"><?php echo $datosRegistro; ?></h6>
                 </div>
 
                 <div class="textarea-container">
