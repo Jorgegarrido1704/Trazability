@@ -27,20 +27,23 @@ $ftWeight = [
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weight</title>
 </head>
+
 <body>
-<form action="index.php" method="post"><textarea name="weight" id="" cols="30" rows="10"></textarea> <input type="submit" value="Buscar"></form>
-<hr>
-<?php
+    <form action="index.php" method="post"><textarea name="weight" id="" cols="30" rows="10"></textarea> <input
+            type="submit" value="Buscar"></form>
+    <hr>
+    <?php
 if($weight != "") {
     foreach(explode(",", $weight) as $weig){
         
     
-    $registo = mysqli_query($con, "SELECT * FROM `datos` WHERE `part_num` = $weig  ORDER BY `item` ASC");
+    $registo = mysqli_query($con, "SELECT * FROM `datos` WHERE `part_num` = '$weig'   ORDER BY `item` ASC");
     if (mysqli_num_rows($registo) > 0) {
         while ($row = mysqli_fetch_array($registo)) {
             $part_num = $row['part_num'];
@@ -58,7 +61,7 @@ if($weight != "") {
     }
 }
 ?>
-    
-</body>
-</html>
 
+</body>
+
+</html>

@@ -10,7 +10,8 @@ $success = isset($_GET['success']) ? $_GET['success'] : "";
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Relog Checador</title>
     <link rel="stylesheet" href="css/estilis.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 
 <body style="background-color: rgba(87, 150, 252, 0.47);">
@@ -23,11 +24,12 @@ $success = isset($_GET['success']) ? $_GET['success'] : "";
         </div>
 
 
-        <div class="row" >
-            <div class="col-md-12 mt-2 mb-2"  id="registros">
+        <div class="row">
+            <div class="col-md-12 mt-2 mb-2" id="registros">
                 <div class="form-group">
                     <h2 class="text-center">Bienvenido al sistema de asistencia</h2>
-                    <h3 class="text-center">Por favor, utilice el codigo Qr de su tarjeta para registrar su entrada o salida</h3>
+                    <h3 class="text-center">Por favor, utilice el codigo Qr de su tarjeta para registrar su entrada o
+                        salida</h3>
                 </div>
                 <div class="form-group text-center mt-4">
                     <h4 class="text-center">LA hora actual es: <span id="time"></span></h4>
@@ -64,7 +66,8 @@ $success = isset($_GET['success']) ? $_GET['success'] : "";
                         </select>
                         <div class="form-group">
                             <label for="cardCode" class="form-label">Ingrese el código QR de su tarjeta:</label>
-                            <input type="text" class="form-control" id="cardCode" name="cardCode" minlength="4" maxlength="6" required autofocus>    
+                            <input type="text" class="form-control" id="cardCode" name="cardCode" minlength="4"
+                                maxlength="6" required autofocus>
                         </div>
 
 
@@ -72,12 +75,13 @@ $success = isset($_GET['success']) ? $_GET['success'] : "";
                     </div>
             </div>
 
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+                crossorigin="anonymous"></script>
 </body>
 
 </html>
 <script>
-    
 document.getElementById("cardCode").addEventListener("input", function() {
     if (this.value.length === 6) {
         this.form.submit();
@@ -85,33 +89,32 @@ document.getElementById("cardCode").addEventListener("input", function() {
 });
 
 
-    function timerPermin() {
-        let time = new Date();
-        // Get current hours and minutes in mexico city time zone
-        let options = {
-            timeZone: "America/Mexico_City",
-            hour: "2-digit",
-            minute: "2-digit"
-        };
-        let timeString = time.toLocaleTimeString("en-US", options);
-        document.getElementById("time").innerHTML = timeString;
+function timerPermin() {
+    let time = new Date();
+    // Get current hours and minutes in mexico city time zone
+    let options = {
+        timeZone: "America/Mexico_City",
+        hour: "2-digit",
+        minute: "2-digit"
+    };
+    let timeString = time.toLocaleTimeString("en-US", options);
+    document.getElementById("time").innerHTML = timeString;
 
 
-    }
+}
 
-    setInterval(timerPermin, 25000);
-    window.onload = timerPermin;
-    
-    let success = "<?php echo $success; ?>";
-    if (success !== "") {
-       
-            document.getElementById("alert").style.display = "block";
-            document.getElementById("registros").style.display = "none";
-        setTimeout(function() {
-            window.location.href = "asistencias.php";
-        }, 3000);
-        clearInterval();
+setInterval(timerPermin, 12500);
+window.onload = timerPermin;
 
-    }
+let success = "<?php echo $success; ?>";
+if (success !== "") {
 
+    document.getElementById("alert").style.display = "block";
+    document.getElementById("registros").style.display = "none";
+    setTimeout(function() {
+        window.location.href = "asistencias.php";
+    }, 3000);
+    clearInterval();
+
+}
 </script>
