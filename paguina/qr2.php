@@ -68,135 +68,156 @@ if($cuentas<10){
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <title>QR Codes</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        #label {
-            width: 38mm;
-            height: 24mm;
-            border-radius: 1px;
-            box-sizing: border-box;
-            display: inline-flex;
-            margin-top: 75px;
-            margin-left: 15px;
-            
-            
-           
-        }
-        .row {
-            display: block;
-            align-items: flex-start;
-            margin-bottom: 1px;
-            margin-right: 2px;
-        }
-         .row1 {
-            display: block;
-            align-items: flex-start;
-            margin-bottom: 1px;
-        }
-        .qrs {
-             margin-top: 2mm;
-            width: 20mm;
-            height: 19mm;
-        }
-        .qrss {
-          margin-top: 1mm;
-            width: 20mm;
-            height: 12mm;
-        }
-        .data-container{
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            padding-top: 15px; 
-            margin-left: 2px;
-        }
-        .textarea-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            
-            margin-left: 2px;
-        }
-        .datos {
-            width: 30mm;
-            border-radius: 1px;
-            border: solid 1px #000;
-            text-align: center;
-            margin: 1px 0;
-            padding-left: 1px;  
-            
-                    
-            box-sizing: border-box;
-        }
-        textarea {
-            width: 30mm;
-            height: 16mm;
-            border-radius: 1px;
-            border: solid 1px #000;
-            box-sizing: border-box;
-            resize: none;
-            font-size: xx-small;
-            overflow: hidden;
-            margin: 0;
-        }
-        #qrs_img {
-            width: 18mm;
-            height: 11mm;
-            margin-left: 3-2px;
-        }
-        .textarea-container {
-            margin-top: 0;
-        }
+    #label {
+        width: 38mm;
+        height: 24mm;
+        border-radius: 1px;
+        box-sizing: border-box;
+        display: inline-flex;
+        margin-top: 75px;
+        margin-left: 15px;
+
+
+
+    }
+
+    .row {
+        display: block;
+        align-items: flex-start;
+        margin-bottom: 1px;
+        margin-right: 2px;
+    }
+
+    .row1 {
+        display: block;
+        align-items: flex-start;
+        margin-bottom: 1px;
+    }
+
+    .qrs {
+        margin-top: 2mm;
+        width: 20mm;
+        height: 19mm;
+    }
+
+    .qrss {
+        margin-top: 1mm;
+        width: 20mm;
+        height: 12mm;
+    }
+
+    .data-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding-top: 15px;
+        margin-left: 2px;
+    }
+
+    .textarea-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+
+        margin-left: 2px;
+    }
+
+    .datos {
+        width: 30mm;
+        border-radius: 1px;
+        border: solid 1px #000;
+        text-align: center;
+        margin: 1px 0;
+        padding-left: 1px;
+
+
+        box-sizing: border-box;
+    }
+
+    textarea {
+        width: 30mm;
+        height: 16mm;
+        border-radius: 1px;
+        border: solid 1px #000;
+        box-sizing: border-box;
+        resize: none;
+        font-size: xx-small;
+        overflow: hidden;
+        margin: 0;
+    }
+
+    #qrs_img {
+        width: 18mm;
+        height: 11mm;
+        margin-left: 3-2px;
+    }
+
+    .textarea-container {
+        margin-top: 0;
+    }
     </style>
 </head>
+
 <body>
     <?php for ($inicio; $inicio <= $cuentas; $inicio++) { ?>
-    <div style="display:flex; width: 38mm; height: 162mm">    
-    <div id="label" class="container">
-        <div class="row">
-            <div class="qrs">
-                <?php
-                $data = '5703|'.$np.'|'.$rev.'|'.$today.'|'.$inicio;
+    <div style="display:flex; width: 38mm; height: 162mm">
+        <div id="label" class="container">
+            <div class="row">
+                <div class="qrs">
+                    <?php
+                    if($inicio<10){
+                        $datosRegistro="00".$inicio;
+                    }else if($inicio>9 and  $inicio<100){
+                        $datosRegistro="0".$inicio;
+                    }else{
+                        $datosRegistro=$inicio;
+                    }
+                $data = '5703|'.$np.'|'.$rev.'|'.$today.'|'.$datosRegistro;
                 $qrcode = (new QRCode)->render($data);
                 ?>
-                <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?> 
+                    <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?>
+                </div>
+                <div class="qrss">
+                    <img id="qrs_img" src="proterra_dark.png" alt="codigo" class="img-fluid">
+                </div>
+
             </div>
-             <div class="qrss">
-                <img id="qrs_img" src="proterra_dark.png" alt="codigo" class="img-fluid">
+            <div class="row1">
+                <div class="data-container">
+                    <h6 class="datos"><?php echo $np; ?>|<?php echo $rev; ?></h6>
+                    <h6 class="datos"><?php echo $inicio; ?></h6>
+                </div>
+
+                <div class="textarea-container">
+                    <textarea name="datost" id="datost"><?php echo $desc; ?></textarea>
+                </div>
             </div>
-            
         </div>
-        <div class="row1">
-            <div class="data-container">
-                <h6 class="datos"><?php echo $np; ?>|<?php echo $rev; ?></h6>
-                <h6 class="datos"><?php echo $inicio; ?></h6>
-            </div>
-           
-            <div class="textarea-container">
-                <textarea name="datost" id="datost"><?php echo $desc; ?></textarea>
-            </div>
-        </div>
-    </div>
     </div>
     <?php } ?>
     <script>
-        window.onload = function() {
-            print();
-        }
-         function returnqr() {
-            setTimeout(function() {
-                window.location.href = "qrs.php";
-            }, 1000);
-        }
+    window.onload = function() {
+        print();
+    }
 
-        returnqr();
+    function returnqr() {
+        setTimeout(function() {
+            window.location.href = "qrs.php";
+        }, 1000);
+    }
+
+    returnqr();
     </script>
 </body>
+
 </html>
 
 
