@@ -1,5 +1,9 @@
 <?php
 $success = isset($_GET['success']) ? $_GET['success'] : "";
+date_default_timezone_set("America/Mexico_City");
+                            
+$date= (date("H:i"));
+                          //  echo $date;
 ?>
 
 <!doctype html>
@@ -8,8 +12,10 @@ $success = isset($_GET['success']) ? $_GET['success'] : "";
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="5">
+
     <title>Relog Checador</title>
-    <link rel="stylesheet" href="css/estilis.css">
+    <link rel=" stylesheet" href="css/estilis.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
@@ -32,28 +38,29 @@ $success = isset($_GET['success']) ? $_GET['success'] : "";
                         salida</h3>
                 </div>
                 <div class="form-group text-center mt-4">
-                    <h4 class="text-center">LA hora actual es: <span id="time"></span></h4>
+                    <h4 class="text-center">La hora actual es: <span id="time"></span></h4>
                 </div>
                 <form action="registrarAsistencia.php" method="POST" class="mt-4">
                     <div class="form-group">
                         <label for="action" class="form-label">Seleccione la acción:</label>
                         <select class="form-select" id="action" name="action" required>
                             <?php
-                            date_default_timezone_set("America/Mexico_City");
+                            
+                            
                             $actions = ["Entrada turno" => 'entrada', "Salida turno" => 'salida', "Desayuno" => 'desayuno', "Comida" => 'comida', "Permiso" => 'permiso'];
-                            if (date("H") >= 17 && date("i") >= 30) {
+                            if (date("H:i") >= '17:30') {
                                 echo "<option value=\"salida\">Salida turno</option>";
                                 unset($actions[array_search("Salida turno", $actions)]);
                             }
-                            if (date("H") >= 13 && date("i") >= 0) {
+                            if (date("H:i") >= '13:00' && date("H:i") < "17:30"  ) {
                                 echo "<option value=\"comida\">Comida</option>";
                                 unset($actions[array_search("Comida", $actions)]);
                             }
-                            if (date("H") >= 9 && date("i") >= 0) {
+                            if (date("H:i") >= '09:00' && date("H:i") < "13:00") {
                                 echo "<option value=\"desayuno\">Desayuno</option>";
                                 unset($actions[array_search("Desayuno", $actions)]);
                             }
-                            if (date("H") <= 7 && date("i") <= 35) {
+                            if (date("H:i") <= '09:00' ) {
                                 echo "<option value=\"entrada\">Entrada turno</option>";
                                 unset($actions[array_search("Entrada turno", $actions)]);
                             }
