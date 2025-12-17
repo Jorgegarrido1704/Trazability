@@ -12,7 +12,7 @@ $date= (date("H:i"));
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="refresh" content="5">
+    <meta http-equiv="refresh" content="360">
 
     <title>Relog Checador</title>
     <link rel=" stylesheet" href="css/estilis.css">
