@@ -33,6 +33,11 @@ $today = date('mdY');
             $cuentas=$cons;
         }
          for($i=$inicio;$i<=$cuentas;$i++){
+            if($i<10){
+                $i="00".$i;
+            }else if($i>9 and  $i<100){
+                $i="0".$i;
+            }
             $data = '5703|'.$np.'|'.$rev.'|'.$today.'|'.$i;
             $todayDate = date('Y-m-d');
                 $insertarregistros=mysqli_query($con,"INSERT INTO `registroqrs`( `infoQr`, `CodigoIdentificaicon`, `fecha`) VALUES ('$info','$data','$todayDate')");
