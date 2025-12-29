@@ -48,7 +48,7 @@ if(isset($_POST['pn'])){
             <div class="p-2 text-center">
                 <?php
                
-                $fill = $cliente.' | '.$pn;
+                $fill = $cliente." | ".$pn;
                 $qrcode = (new QRCode)->render($fill);
                 if(!$data){
                     echo "<h3>Please enter a Part Number to generate QR Code.</h3>";
@@ -58,6 +58,7 @@ if(isset($_POST['pn'])){
 
                 <img src="<?php echo $qrcode; ?>" alt="QR Code" style="width: 125mm; height: 125mm;"
                     class="img-fluid" />
+               <h2><?php echo $fill; ?></h2>
                 <?php } ?>
 
 
