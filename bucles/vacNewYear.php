@@ -34,7 +34,7 @@ try {
             echo "</tr>";
         }
         echo "</table>";
-        if(date('m-d')=='12-32'){
+        if(date('m-d')=='12-31'){
             foreach ($employeesVacations as $employeeName => $vacations) {
                 $updateVacations=mysqli_query($con,"UPDATE personalberg SET lastYear=".$vacations['lastYear'].", currentYear=".$vacations['currentYear'].", nextYear=".$vacations['nextYear']." WHERE employeeName='".$employeeName."'");
             }
