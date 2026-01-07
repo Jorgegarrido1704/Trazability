@@ -353,7 +353,7 @@ $listasMRP =[
 
 ];
 
-foreach ($machines as $m) {
+foreach ($listasMRP as $m) {
       $buscar = mysqli_query($con, "SELECT  pn,rev FROM listascorte WHERE pn='$m[0]' AND rev='$m[1]' limit 1"); 
               if (mysqli_num_rows($buscar) <= 0) {
             echo "Part Number: $m[0], Revision: $m[1] <br>";
