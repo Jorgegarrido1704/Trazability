@@ -132,9 +132,9 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
             $revs = $row['rev'];
             if ($i % 10 == 0) {
                 echo "<tr>";
-                echo "<td>" . $nup . "-" . $revs . "</td>";
+                echo "<td>" . $nup . "|" . $revs . "</td>";
             } else {
-                echo "<td>" . $nup . "-" . $revs . "</td>";
+                echo "<td>" . $nup . "|" . $revs . "</td>";
             }
             if (($i + 1) % 10 == 0) {
                 echo "</tr>";
