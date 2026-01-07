@@ -45,7 +45,7 @@ $update=mysqli_query($con,"UPDATE tiempoharneses SET initPausedTime = '$resto', 
     }
      header("Location: tiemposQr.php");
 }
-   
+    header("Location: tiemposQr.php");
 }catch(Exception $e){
     echo "Error: " . $e->getMessage();
 }
