@@ -7,6 +7,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $cardCode = "i" . $cardCode;
         
     }
+    $days=['lunes','martes','miercoles','jueves','viernes','sabado','domingo'];
+    //day today
+    $dayToday=date('N')-1;
+    $todayIs=$days[$dayToday];
     $action = $_POST["action"];
     if (strpos($cardCode, '|')) {
         $cardCode = explode('|', $cardCode)[0];
@@ -17,6 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo $cardCode . "<br>" . $comentario . "<br>";
     $dateNow = date("Y-m-d");
     $timeNow = date("H:i:s");
+    $weekDay=date('w');
 
     //Busqueda de empleado con tarjeta valida
     $bucarEmpleado = mysqli_query($con, "SELECT * FROM personalberg WHERE employeeNumber='$cardCode' AND `status` !='Baja'");
@@ -26,10 +31,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $row = mysqli_fetch_assoc($bucarEmpleado);
         $cardCode = $row['employeeNumber'];
         $type = $row['typeWorker'];
+        
         $buscarRegistro = mysqli_query($con, "SELECT * From relogchecador WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow' ORDER BY id DESC LIMIT 1");
         $rowRegistro = mysqli_fetch_assoc($buscarRegistro);
         if (mysqli_num_rows($buscarRegistro) <= 0) {
             $insertarAsistencia = mysqli_query($con, "INSERT INTO relogchecador (employeeNumber,fechaRegistro,entrada,comentario) VALUES ('$cardCode','$dateNow','$timeNow','$comentario')");
+            if($type=='Indirecto' && $timeNow < '08:15:00'){
+                $updateregistro=mysqli_query($con,"UPDATE assistence SET $todayIs='OK' WHERE `week`='$weekDay' AND id_empleado='$cardCode' ");
+                }else if($type=='Indirecto' && $timeNow > '08:15:00'){
+                                $updateregistro=mysqli_query($con,"UPDATE assistence SET $todayIs='R' WHERE `week`='$weekDay' AND id_empleado='$cardCode' ");
+            }if($type=='Directo' && $timeNow < '07:35:00'){
+                                $updateregistro=mysqli_query($con,"UPDATE assistence SET $todayIs='OK' WHERE `week`='$weekDay' AND id_empleado='$cardCode' ");
+                }else if($type=='Directo' && $timeNow > '07:35:00'){
+                                $updateregistro=mysqli_query($con,"UPDATE assistence SET $todayIs='R' WHERE `week`='$weekDay' AND id_empleado='$cardCode' ");
+                }
            header("Location:  asistencias.php?success=Bienvenido $row[employeeName] , su entrada ha sido registrada");
         } else {
             if ($action == 'entrada') {

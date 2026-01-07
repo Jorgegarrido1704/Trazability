@@ -1,6 +1,5 @@
 <?php 
 require "../app/conection.php";
- 
 $personal=mysqli_query($con,"SELECT employeeNumber, employeeName,DaysVacationsAvailble FROM `personalberg` WHERE `status` != 'Baja' order by employeeNumber asc");
 if(mysqli_num_rows($personal) > 0){
 while($row=mysqli_fetch_array($personal)){
@@ -19,7 +18,7 @@ while($row=mysqli_fetch_array($personal)){
     echo $DaysVacationsAvailble;
     echo "</td>";
     echo "</tr>";
-    
+
     echo "</table>";
     echo "<br>";
     $vacaciones=mysqli_query($con,"SELECT fecha_de_solicitud,usedYear   FROM `registro_vacaciones` WHERE id_empleado='$employeeNumber' ");
