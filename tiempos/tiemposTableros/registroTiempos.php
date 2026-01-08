@@ -35,7 +35,7 @@ $update=mysqli_query($con,"UPDATE tiempoharneses SET initPausedTime = '$resto', 
     $success = "Error al actualizar el tiempo";
    }
     header("Location: tiemposQr.php");
-}else if(strpos($funcion, '|') !== false){
+}else if((strpos($funcion, '|') !== false) || (strpos($funcion, ']') !== false)){
     $insert=mysqli_query($con,"INSERT INTO tiempoharneses (partnumber,employeeNumber,initTime) VALUES ('$funcion','$cardCode','$dateTime')");
     if($insert){
         $success = "Tiempo registrado correctamente";
