@@ -39,7 +39,7 @@ $date= (date("H:i"));
                     </div>-->
                     <div class="form-group">
                         <label for="cardCode" class="form-label">Escanee el codigo QR de su tarjeta</label>
-                        <input type="text" class="form-control" id="cardCode" name="cardCode" maxlength="5"   required>
+                        <input type="text" class="form-control" id="cardCode" name="cardCode" maxlength="5"   required autofocus>
                     </div>
                     <div class="form-group">
                         <label for="funcion" class="form-label">Proceso de trabajo</label>
