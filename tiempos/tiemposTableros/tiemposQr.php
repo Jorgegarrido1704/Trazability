@@ -33,10 +33,10 @@ $date= (date("H:i"));
         <div class="row">
             <div class="col-md-5 mt-2 mb-2" >
                <form action="registroTiempos.php" method="GET" class="mt-4" id="formQrTiempos">
-                    <div class="form-group">
+                   <!-- <div class="form-group">
                         <label for="pn" class="form-label">Escanee su numero de parte</label>
                         <input type="text" class="form-control" id="pn" name="pn"  required autofocus >
-                    </div>
+                    </div>-->
                     <div class="form-group">
                         <label for="cardCode" class="form-label">Escanee el codigo QR de su tarjeta</label>
                         <input type="text" class="form-control" id="cardCode" name="cardCode" maxlength="5"   required>
@@ -77,10 +77,10 @@ $date= (date("H:i"));
 
 function tiempos() {
     var funcion = document.getElementById("funcion").value;
-    var pn = document.getElementById("pn").value;
+  //  var pn = document.getElementById("pn").value;
     var codigo = document.getElementById("cardCode").value;
 
-    if (funcion !== "" && pn !== "" && codigo !== "") {
+    if (funcion !== ""  && codigo !== "") {
         document.getElementById("formQrTiempos").submit();
 
           }

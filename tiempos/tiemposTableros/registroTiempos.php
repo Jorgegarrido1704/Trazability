@@ -8,8 +8,7 @@ $success = "";
 
 try{
 
-$coneccion=mysqli_query($con,"SELECT * FROM tiempoharneses WHERE 
-partnumber = '$pn' AND employeeNumber = '$cardCode' AND (estatus = 'INICIADO' or estatus = 'PAUSADO') ORDER BY id DESC LIMIT 1");
+$coneccion=mysqli_query($con,"SELECT id FROM tiempoharneses WHERE  employeeNumber = '$cardCode' AND (estatus = 'INICIADO' or estatus = 'PAUSADO') ORDER BY id DESC LIMIT 1");
 
 if($row=mysqli_fetch_array($coneccion)){
    if($funcion == "FIN"){
@@ -36,8 +35,8 @@ $update=mysqli_query($con,"UPDATE tiempoharneses SET initPausedTime = '$resto', 
     $success = "Error al actualizar el tiempo";
    }
     header("Location: tiemposQr.php");
-}else if($funcion == "INICIO"){
-    $insert=mysqli_query($con,"INSERT INTO tiempoharneses (partnumber,employeeNumber,initTime) VALUES ('$pn','$cardCode','$dateTime')");
+}else if(strpos($funcion, '|') !== false){
+    $insert=mysqli_query($con,"INSERT INTO tiempoharneses (partnumber,employeeNumber,initTime) VALUES ('$funcion','$cardCode','$dateTime')");
     if($insert){
         $success = "Tiempo registrado correctamente";
     }else{
