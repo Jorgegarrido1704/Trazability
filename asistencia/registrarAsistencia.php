@@ -36,9 +36,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $rowRegistro = mysqli_fetch_assoc($buscarRegistro);
         if (mysqli_num_rows($buscarRegistro) <= 0) {
             $insertarAsistencia = mysqli_query($con, "INSERT INTO relogchecador (employeeNumber,fechaRegistro,entrada,comentario) VALUES ('$cardCode','$dateNow','$timeNow','$comentario')");
-            if($type=='Indirecto' && $timeNow < '08:30:00'){
+            if($type=='Indirecto' && $timeNow < '08:15:00'){
                 $updateregistro=mysqli_query($con,"UPDATE assistence SET $todayIs='OK' WHERE `week`='$weekDay' AND id_empleado='$cardCode' ");
-                }else if($type=='Indirecto' && $timeNow > '08:30:00'){
+                }else if($type=='Indirecto' && $timeNow > '08:15:00'){
                                 $updateregistro=mysqli_query($con,"UPDATE assistence SET $todayIs='R' WHERE `week`='$weekDay' AND id_empleado='$cardCode' ");
             }if($type=='Directo' && $timeNow < '07:35:00'){
                                 $updateregistro=mysqli_query($con,"UPDATE assistence SET $todayIs='OK' WHERE `week`='$weekDay' AND id_empleado='$cardCode' ");
