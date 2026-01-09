@@ -6,7 +6,9 @@ $funcion=isset($_GET['funcion']) ? $_GET['funcion'] : '';
 $dateTime = date("Y-m-d H:i:s");
 $success = "";
 
+
 try{
+    if(strpos($cardCode, '|') !== false){ header("Location: tiemposQr.php");}
 
 $coneccion=mysqli_query($con,"SELECT id FROM tiempoharneses WHERE  employeeNumber = '$cardCode' AND (estatus = 'INICIADO' or estatus = 'PAUSADO') ORDER BY id DESC LIMIT 1");
 

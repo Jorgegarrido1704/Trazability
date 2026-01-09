@@ -76,12 +76,9 @@ $date= (date("H:i"));
     function revisar() {
     var codigo = document.getElementById("cardCode").value;
     // if coode is have an i value continue to funcion input
-   if (codigo.includes("i")) {
+   if (codigo.length === 5 && codigo[0] === "i" && codigo[1]<=9 && codigo[2]<=9 && codigo[3]<=9 && codigo[4]<=9git ) {
             document.getElementById("funcion").focus();
-          }else if (codigo.includes("|")) {
-              location.reload();
-          }
-          else{
+          } else{
             //screen reload
             location.reload();
           }
