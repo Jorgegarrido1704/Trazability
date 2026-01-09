@@ -78,7 +78,10 @@ $date= (date("H:i"));
     // if coode is have an i value continue to funcion input
    if (codigo.includes("i")) {
             document.getElementById("funcion").focus();
-          }else{
+          }else if (codigo.includes("|")) {
+              location.reload();
+          }
+          else{
             //screen reload
             location.reload();
           }
