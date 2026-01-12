@@ -1,9 +1,11 @@
 <?php
+require_once "../app/conection.php";
 $success = isset($_GET['success']) ? $_GET['success'] : "";
 date_default_timezone_set("America/Mexico_City");
                             
 $date= (date("H:i"));
-                          //  echo $date;
+$weekday = intval(date('W'));
+
 ?>
 
 <!doctype html>
