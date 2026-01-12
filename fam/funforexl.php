@@ -2,77 +2,74 @@
 
 require "family.php";  // Ensure this file contains necessary data and database connection
 $grupoCom = [];
+$comprarcion='H';
 
-foreach ($grupos as $grup) {
-    foreach ($grup as $subA) {
-        $i = 0;
+$stmtItems = $con->prepare("
+    SELECT item 
+    FROM datos 
+    WHERE part_num = ?
+      AND item NOT LIKE 'WTXL-%'
+      AND item NOT LIKE 'WGXL-%'
+      AND item NOT LIKE 'WSGX-%'
+      AND item NOT LIKE 'LTP%'
+      AND item NOT LIKE 'LW-%'
+      AND item NOT LIKE 'TAPE-25'
+");
+
+$stmtCompare = $con->prepare("
+    SELECT part_num 
+    FROM datos 
+    WHERE item = ? 
+      AND part_num != ?
+");
+
+
+    
+    foreach ($grupos[$comprarcion] as $partNum) {
+
         $items = [];
-        $compatativo = [];
+        $compatibilidad = [];
+   // echo $partNum."-".$grupo."<br>";
+        /** Obtener items del part number */
+        $stmtItems->bind_param("s", $partNum);
+        $stmtItems->execute();
+        $resultItems = $stmtItems->get_result();
 
-        // Query to get items related to the current part number ($subA)
-        $buscar = mysqli_query($con, "SELECT * FROM datos 
-                                      WHERE part_num = '$subA' 
-                                      AND item NOT LIKE 'WTXL-%' 
-                                      AND item NOT LIKE 'WGXL-%' 
-                                      AND item NOT LIKE 'WSGX-%' 
-                                      AND item NOT LIKE 'LTP%' 
-                                      AND item NOT LIKE 'LW-%' 
-                                      AND item NOT LIKE 'TAPE-25'");
+        while ($row = $resultItems->fetch_assoc()) {
+            $items[] = $row['item'];
+        }
 
-        if (!$buscar) {
-            echo "Error in query: " . mysqli_error($con);
+        $totalItems = count($items);
+        if ($totalItems === 0) {
             continue;
         }
 
-        // Process the first query results
-        while ($row = mysqli_fetch_array($buscar)) {
-            $item = $row['item'];
-            $items[$subA][$i] = $item;
-            $i++;
-        }
+        /** Comparar items contra otros part numbers */
+        foreach ($items as $item) {
+            $stmtCompare->bind_param("ss", $item, $partNum);
+            $stmtCompare->execute();
+            $resultCompare = $stmtCompare->get_result();
 
-        $totalItems = mysqli_num_rows($buscar); // Total items for compatibility percentage calculation
-
-        // Process the items to calculate compatibility with other part numbers
-        foreach ($items as $key => $valueArray) {
-            foreach ($valueArray as $value) {
-                // Query for comparing items with other part numbers
-                $buscarcomp1 = mysqli_query($con, "SELECT * FROM datos WHERE item = '$value' AND part_num != '$subA'");
-
-                if (!$buscarcomp1) {
-                    echo "Error in comparison query: " . mysqli_error($con);
-                    continue;
-                }
-
-                while ($row1 = mysqli_fetch_array($buscarcomp1)) {
-                    $part_num = $row1['part_num'];
-
-                    // Add to the comparison array
-                    if (isset($compatativo[$key][$part_num])) {
-                        $compatativo[$key][$part_num] += 1;
-                    } else {
-                        $compatativo[$key][$part_num] = 1;
-                    }
-                }
+            while ($row = $resultCompare->fetch_assoc()) {
+                $pn = $row['part_num'];
+                $compatibilidad[$pn] = ($compatibilidad[$pn] ?? 0) + 1;
             }
         }
 
-        // Calculate compatibility and store results based on thresholds (75% or 60%-74%)
-        foreach ($compatativo as $key => $comparisons) {
-            foreach ($comparisons as $part_num => $count) {
-                $compatibility = ($count / $totalItems) * 100;
+        /** Calcular porcentaje de compatibilidad */
+        foreach ($compatibilidad as $pn => $matches) {
+            $porcentaje = round(($matches / $totalItems) * 100, 2);
 
-                // If compatibility >= 75%, or 60% <= compatibility < 75%
-                if ($compatibility >= 75) {
-                    $grupoCom[$subA][$key][$part_num] = round($compatibility, 2);
-                } elseif ($compatibility >= 60 && $compatibility < 75) {
-                    $grupoCom[$subA][$key][$part_num] = round($compatibility, 2);
-                }
+            if ($porcentaje >= 60) {
+                $grupoCom[$partNum][$pn] = $porcentaje;
+               echo "<br>$partNum → $pn : $porcentaje%";
             }
         }
     }
-}
 
-// Return the results
-return $grupoCom;
+
+$stmtItems->close();
+$stmtCompare->close();
+
+
 ?>

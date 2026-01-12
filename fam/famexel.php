@@ -27,7 +27,7 @@ $sheet->setCellValue('B7', 'FROM 5 TO 9');
 $sheet->setCellValue('A8', 'Family H');
 $sheet->setCellValue('B8', 'LESS THAN 5');
 
-/*
+
 foreach($grupoCom as $fam){
     $sheet1 = $spreadsheet->createSheet();  
     $sheet1->setTitle('Family '.$fam);
@@ -45,7 +45,7 @@ foreach($grupoCom as $fam){
     }
    
 }
-/*
+
 $sheet1->setTitle('Family A');
 $registro = excels('A');
 $t=2;
@@ -85,7 +85,7 @@ $sheet7 = $spreadsheet->createSheet();
 $sheet7->setTitle('Family G');
 $sheet8 = $spreadsheet->createSheet();  
 $sheet8->setTitle('Family H');
-*/
+
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment;filename="WO Station '.$date.'.xlsx"');
