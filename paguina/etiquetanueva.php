@@ -109,13 +109,7 @@ try{
         <div id="label" class="container">
             <div class="row">
                 <div class="qrs">
-                    <?php
-                   
-                $data = $valor;
-                $registros=explode("|",$data);
-                $np=$registros[1]."|".$registros[2];
-               
-                ?>
+                 
                    
                 </div>
                
@@ -135,13 +129,7 @@ try{
         print();
     }
 
-    function returnqr() {
-        setTimeout(function() {
-            window.location.href = "qrs.php";
-        }, 10000);
-    }
-
-    returnqr();
+   
     </script>
 </body>
 
