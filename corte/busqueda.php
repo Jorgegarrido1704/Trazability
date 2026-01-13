@@ -117,6 +117,13 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
                 <button class="btn btn-primary">Ajuste inventario</button>
             </form>
         </div>-->
+        <div class="col-lg-2 mb-4 border">
+            <h1>Editar PO</h1>
+            <form action="../movimientosAdmin/editarOrden.php" method="POST" >
+                <br>
+                <button class="btn btn-primary">Editar PO</button>
+            </form>
+        </div>
     
     </div>
     <br>

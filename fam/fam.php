@@ -32,7 +32,7 @@ if ($sql) {
         }
         // Añadir el PN al grupo correspondiente
         $grupos[$grupo] = array_merge($grupos[$grupo], array($pn));
-     //   echo $pn."|".$rev."|".$cantidad."|".$grupo."<br>";
+        echo $pn."|".$rev."|".$cantidad."|".$grupo."<br>";
     }
 } /*
 
