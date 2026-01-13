@@ -108,10 +108,6 @@ try{
     <div style="display:flex; width: 38mm; height: 162mm">
         <div id="label" class="container">
             <div class="row">
-                <div class="qrs">
-                 
-                   
-                </div>
                
 
             </div>
