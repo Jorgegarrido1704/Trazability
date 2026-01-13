@@ -4,7 +4,7 @@ require 'conector.php';
 require 'vendor/autoload.php';
 use chillerlan\QRCode\{QRCode, QROptions};
 try{
-    $valores =[
+ /*   $valores =[
 "5703|185-4147|A.2|11212025|022",
 "5703|185-4147|A.2|11212025|023",
 "5703|185-4147|A.2|11212025|024",
@@ -23,7 +23,7 @@ try{
 
 ];
 $desc="HARNESS; PRECHARGE; JUMPER TYPE M4(MASTER)";
-/*
+*/
 $valores =[
 '5703|199-6660|A01|11242025|001',
 '5703|199-6660|A01|11242025|002',
@@ -46,7 +46,7 @@ $valores =[
 '5703|199-6660|A01|11242025|077'
 
 ];
-$desc="HARNESS; ASY; RESSISTOR; PRECHARGE; TYPE M4 (MASTER)";*/
+$desc="HARNESS; BMS-SENSOR(MASTER)";
 ?>
 <!DOCTYPE html>
 <html lang="en">
