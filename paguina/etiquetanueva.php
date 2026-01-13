@@ -34,7 +34,7 @@ try{
 
     .row {
        width: 38mm;
-        height: 12mm;
+        height: 24mm;
     }
 
     
@@ -63,6 +63,7 @@ try{
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
+        position: bottom;
 
         margin-left: 2px;
     }
@@ -110,7 +111,7 @@ try{
            
             <div class="row">
 
-                <div class="textarea-container" style="margin-top: 0;">
+                <div class="textarea-container" style="margin-bottom: 0;">
                    <h6><?php echo $valor; ?></h6>
                 </div>
             </div>
