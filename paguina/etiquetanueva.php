@@ -114,7 +114,7 @@ try{
             <div class="row">
 
                 <div class="textarea-container" style="margin-top: 0;">
-                    <textarea ><h4><?php echo $valor; ?></h4></textarea>
+                   <h4><?php echo $valor; ?></h4>
                 </div>
             </div>
         </div>
