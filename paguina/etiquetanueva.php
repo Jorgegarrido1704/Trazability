@@ -107,10 +107,7 @@ try{
     <?php foreach ($valores as $valor) {?>
     <div style="display:flex; width: 38mm; height: 162mm">
         <div id="label" class="container">
-            <div class="row">
-               
-
-            </div>
+           
             <div class="row">
 
                 <div class="textarea-container" style="margin-top: 0;">
