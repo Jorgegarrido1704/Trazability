@@ -22,7 +22,7 @@ $valores =[
 '5703|199-4942|A.2|12102025|015'
 
 ];
-$desc="HARNESS; VOLTGE SENSE; CONTACTOR; TYPE M4 (MASTER)";
+$desc="HARNESS; ASY; RESSISTOR; PRECHARGE; TYPE M4 (MASTER)";
 ?>
 <!DOCTYPE html>
 <html lang="en">
