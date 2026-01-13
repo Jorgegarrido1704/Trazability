@@ -39,7 +39,7 @@ $date= (date("H:i"));
                     </div>-->
                     <div class="form-group">
                         <label for="cardCode" class="form-label">Escanee el codigo QR de su tarjeta</label>
-                        <input type="text" class="form-control" id="cardCode" name="cardCode" maxlength="5"   required autofocus onchange="revisar();">
+                        <input type="text" class="form-control" id="cardCode" name="cardCode" maxlength="5"   required autofocus onchange="revisar()">
                     </div>
                     <div class="form-group">
                         <label for="funcion" class="form-label">Proceso de trabajo</label>
@@ -76,7 +76,7 @@ $date= (date("H:i"));
     function revisar() {
     var codigo = document.getElementById("cardCode").value;
     // if coode is have an i value continue to funcion input
-   if (codigo.length === 5 && codigo[0] === "i" && codigo[1]<=9 && codigo[2]<=9 && codigo[3]<=9 && codigo[4]<=9git ) {
+   if (codigo.length === 5 && codigo[0] === "i" && codigo[1]<=9 && codigo[2]<=9 && codigo[3]<=9 && codigo[4]<=9 ) {
             document.getElementById("funcion").focus();
           } else{
             //screen reload
