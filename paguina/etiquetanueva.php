@@ -105,7 +105,7 @@ try{
 
 <body>
     <?php foreach ($valores as $valor) {?>
-    <div style="display:flex; width: 38mm; height: 162mm">
+    
         <div id="label" class="container">
             <div class="row">
                
@@ -118,7 +118,7 @@ try{
                 </div>
             </div>
         </div>
-    </div>
+    
     <?php } ?>
     <script>
     window.onload = function() {
