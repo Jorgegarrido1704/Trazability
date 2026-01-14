@@ -5,8 +5,8 @@ require 'vendor/autoload.php';
 use chillerlan\QRCode\{QRCode, QROptions};
 try{
    $valores =[
-    "10JN097-119PM003",
-    "10JN097-118PM003",
+    "10JM097-118PM003",
+    "11JM097-119PM003",
    ]
 ?>
 <!DOCTYPE html>
