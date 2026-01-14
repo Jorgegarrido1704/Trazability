@@ -20,17 +20,18 @@ if($row=mysqli_fetch_array($coneccion)){
     if($update){
         $success = "Tiempo finalizado correctamente";
     }}
-    if($funcion == "PAUSA" && $row['finishPausedTime'] != NULL && $row['initPausedTime'] != NULL){
-    $differencia =strtotime($dateTime)-( strtotime($row['finishPausedTime']) - strtotime($row['initPausedTime']));
-    $resto = date("Y-m-d H:i:s",$differencia);
-$update=mysqli_query($con,"UPDATE tiempoharneses SET initPausedTime = '$resto', finishPausedTime = NULL, estatus = 'PAUSADO' WHERE id = ".$row['id']);
-    $success = "Tiempo pausado correctamente";
-   }elseif($funcion == "PAUSA" && $row['finishPausedTime'] == NULL && $row['initPausedTime'] != NULL){
-    $differencia =date("H:i:s")-( strtotime($row['finishPausedTime']) - strtotime($row['initPausedTime']));
-    $resto = round($differencia/60,2);
-    $update=mysqli_query($con,"UPDATE tiempoharneses SET finishPausedTime = '$dateTime',TotalTimePause = '$resto', estatus = 'INICIADO' WHERE id = ".$row['id']);
-    $success = "Pausa finalizada correctamente";
-   }elseif($funcion == "PAUSA" && $row['initPausedTime'] == NULL){
+    
+   if($funcion == "PAUSA" && $row['finishPausedTime'] == NULL && $row['initPausedTime'] != NULL){
+        $differencia =date("H:i:s")-( strtotime($row['finishPausedTime']) - strtotime($row['initPausedTime']));
+        $resto = round($differencia/60,2);
+        $update=mysqli_query($con,"UPDATE tiempoharneses SET finishPausedTime = '$dateTime',TotalTimePause = '$resto', estatus = 'INICIADO' WHERE id = ".$row['id']);
+        $success = "Pausa finalizada correctamente";
+   }elseif($funcion == "PAUSA" && $row['finishPausedTime'] != NULL && $row['initPausedTime'] != NULL){
+        $differencia =strtotime($dateTime)-( strtotime($row['finishPausedTime']) - strtotime($row['initPausedTime']));
+        $resto = date("Y-m-d H:i:s",$differencia);  
+        $update=mysqli_query($con,"UPDATE tiempoharneses SET initPausedTime = '$resto', finishPausedTime = NULL, estatus = 'PAUSADO' WHERE id = ".$row['id']);
+        $success = "Tiempo pausado correctamente";
+        }elseif($funcion == "PAUSA" && $row['initPausedTime'] == NULL){
      $update=mysqli_query($con,"UPDATE tiempoharneses SET initPausedTime = '$dateTime', estatus = 'PAUSADO' WHERE id = ".$row['id']);$success = "Tiempo pausado correctamente";
    }
    if(!$update){
