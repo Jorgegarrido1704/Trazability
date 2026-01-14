@@ -10,7 +10,7 @@ $success = "";
 try{
     if(strpos($cardCode, '|') !== false){ header("Location: tiemposQr.php");}
 
-$coneccion=mysqli_query($con,"SELECT id FROM tiempoharneses WHERE  employeeNumber = '$cardCode' AND (estatus = 'INICIADO' or estatus = 'PAUSADO') ORDER BY id DESC LIMIT 1");
+$coneccion=mysqli_query($con,"SELECT * FROM tiempoharneses WHERE  employeeNumber = '$cardCode' AND (estatus = 'INICIADO' or estatus = 'PAUSADO') ORDER BY id DESC LIMIT 1");
 
 if($row=mysqli_fetch_array($coneccion)){
    if($funcion == "FIN"){
