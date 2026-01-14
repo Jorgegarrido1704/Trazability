@@ -28,7 +28,7 @@ $datos=mysqli_query($con,"SELECT employeeNumber,employeeName,employeeArea,employ
                 $name = $data['employeeName'];
                 $area = $data['employeeArea'];
                 $lider = $data['employeeLider'];
-                $fill = $num . '|' . $name . '|' . $area . '|' . $lider;
+                $fill = $num;
                 $qrcode = (new QRCode)->render($fill);
                 ?>
 
