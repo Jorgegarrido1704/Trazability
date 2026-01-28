@@ -20,7 +20,7 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Quality' =
                                        FROM `routing_models` 
                                     WHERE pn_routing = '$pn' ORDER BY work_routing ASC");
     if(mysqli_num_rows($timeProcess) > 0) {
-       echo "<h3>{$pn}</h3>";
+      // echo "<h3>{$pn}</h3>";
     echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width: 100%;'>";
 
     while ($row = mysqli_fetch_assoc($timeProcess)) {
@@ -32,14 +32,14 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Quality' =
     }
     $totalsPerProcess =$totalSetup  =$granTotalGeneral= 0;
     foreach ($procesos as $key => $valor) {
-        echo "<tr><td>{$pn} - {$key}</td>";
+        echo "<tr><td>{$pn}</td><td>{$key}</td>";
        $valor = $procesos[$key]>0?round($procesos[$key]/60,2):0;
         $valor = round($valor*1.20,2);
         $totalsPerProcess+=$valor;
         
         $rowText = $valor;
         echo "<td style='font-weight:bold;'>{$rowText} min</td>";
-        echo "<td>{$pn}-setUp-{$key}</td>";
+      /*  echo "<td>{$pn}-setUp-{$key}</td>";
         $setup=$assetsProcess[$key]>0?round(($assetsProcess[$key]*300)/60,2):0;
         $totalSetup+=$setup;
         echo "<td>{$setup} min</td>";
@@ -54,7 +54,9 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Quality' =
       echo "<td style='font-weight:bold;'></td>";
     echo "<td style='font-weight:bold;'>{$totalSetup} min</td>";
     echo "<td style='font-weight:bold;'>{$granTotalGeneral} min</td>";
+    echo "</tr>";*/
     echo "</tr>";
+    }
 }
 
 echo "</table>";
