@@ -13,8 +13,8 @@ while ($row = mysqli_fetch_assoc($registrosMPS)) {
     $pn = $row['pn'];
     $qty = 1;
 
- $procesos = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Quality' => 0, 'Packaging' => 0];
-$assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Quality' => 0, 'Packaging' => 0];
+ $procesos = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Looming' => 0,  'Quality' => 0, 'Packaging' => 0];
+$assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Looming' => 0, 'Quality' => 0, 'Packaging' => 0];
     // Obtener tiempos de ruteo
     $timeProcess = mysqli_query($con, "SELECT `work_routing`, QtyTimes, timePerProcess, setUp_routing 
                                        FROM `routing_models` 
@@ -26,7 +26,8 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Quality' =
     while ($row = mysqli_fetch_assoc($timeProcess)) {
         if ($row['work_routing'] > 10000 && $row['work_routing'] < 10061) {$procesos['Cutting'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Cutting']++;}
         if ($row['work_routing'] > 10060 && $row['work_routing'] < 10441) {$procesos['Terminals'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Terminals']++;}
-        if ($row['work_routing'] > 10440 && $row['work_routing'] < 10999) {$procesos['Assembly'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Assembly']++;}
+        if ($row['work_routing'] > 10440 && $row['work_routing'] < 11000) {$procesos['Assembly'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Assembly']++;}
+        if ($row['work_routing'] > 10999 && $row['work_routing'] < 11500) {$procesos['Looming'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Looming']++;}
         if ($row['work_routing'] > 11500 && $row['work_routing'] < 11700) {$procesos['Quality'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Quality']++;}
         if ($row['work_routing'] > 11700 && $row['work_routing'] < 12000) {$procesos['Packaging'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Packaging']++;}
     }

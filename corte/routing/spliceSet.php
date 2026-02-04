@@ -73,8 +73,8 @@ $tipoSplice=[];
                   //  echo $key." ".$QtySpliceA.":".$QtySpliceB."<br>";
         }
     }
-
-    header("location:../registro.php");
+    header("location:loomProcess.php?np=" . implode(',', $datos));
+    
             
     
 
