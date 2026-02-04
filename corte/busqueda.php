@@ -72,7 +72,7 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
         <div class="col-lg-2 mb-4 border">
             <h3>Cargar Routing</h3>
             <form action="routing/cortes.php" method="GET">
-                <input type="text" name="np" id="np" required>
+                <input type="text" name="np" id="np" autofocus required>
                 <br>
                 <input type="submit" name="upload" value="Cargar Routing">
             </form>
