@@ -5,7 +5,10 @@ require "timesReg.php";
 
 if (isset($_GET['np'])) {
     $paramNp = $_GET['np'];
-    if (strpos($paramNp, ',') !== false) {
+    if(strpos($paramNp, ' ') !== false) {
+        $datos = explode(' ', $paramNp);
+    }
+    elseif (strpos($paramNp, ',') !== false) {
         $datos = explode(',', $paramNp);
     } else {
         $datos = [$paramNp];
