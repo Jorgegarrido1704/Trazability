@@ -39,7 +39,7 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Looming' =
         $totalsPerProcess+=$valor;
         
         $rowText = $valor;
-        echo "<td style='font-weight:bold;'>{$rowText} min</td>";
+        echo "<td style='font-weight:bold;'>{$rowText}</td>";
       /*  echo "<td>{$pn}-setUp-{$key}</td>";
         $setup=$assetsProcess[$key]>0?round(($assetsProcess[$key]*300)/60,2):0;
         $totalSetup+=$setup;
