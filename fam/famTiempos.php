@@ -8,7 +8,7 @@ $allWeeks = [];
 
 // Obtener registros MPS
 //$registrosMPS = mysqli_query($con, "SELECT pn, dq, qtymps FROM `datos_mps` WHERE pn='1001489409'OR pn='1001488939'OR pn='660925'OR pn='1002707335'OR pn='1001455147'OR pn='1003318064'OR pn='B222992'OR pn='1000109371'OR pn='16517630'OR pn='1003312301'OR pn='1000473129'OR pn='1002835774'OR pn='16516661'OR pn='1002835044'OR pn='1003544214'OR pn='660320'OR pn='16516612'OR pn='1000516139'OR pn='1001774292'OR pn='16517623'OR pn='16514775'OR pn='16514514'OR pn='1000230326'OR pn='1000312635'OR pn='1002719292'OR pn='16518485'OR pn='16518486'OR pn='1003359943'OR pn='1002186052'OR pn='1001073962' ");
-$registrosMPS = mysqli_query($con,"SELECT DISTINCT pn FROM `po`");
+$registrosMPS = mysqli_query($con,"SELECT DISTINCT pn_routing FROM `routing_models`");
 while ($row = mysqli_fetch_assoc($registrosMPS)) {
     $pn = $row['pn'];
     $qty = 1;
@@ -21,8 +21,7 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Looming' =
                                     WHERE pn_routing = '$pn' ORDER BY work_routing ASC");
     if(mysqli_num_rows($timeProcess) > 0) {
       // echo "<h3>{$pn}</h3>";
-    echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width: 100%;'>";
-
+    echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width: 60%;'>";
     while ($row = mysqli_fetch_assoc($timeProcess)) {
         if ($row['work_routing'] > 10000 && $row['work_routing'] < 10061) {$procesos['Cutting'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Cutting']++;}
         if ($row['work_routing'] > 10060 && $row['work_routing'] < 10441) {$procesos['Terminals'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Terminals']++;}
@@ -40,22 +39,7 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Looming' =
         
         $rowText = $valor;
         echo "<td style='font-weight:bold;'>{$rowText}</td>";
-      /*  echo "<td>{$pn}-setUp-{$key}</td>";
-        $setup=$assetsProcess[$key]>0?round(($assetsProcess[$key]*300)/60,2):0;
-        $totalSetup+=$setup;
-        echo "<td>{$setup} min</td>";
-        $totaGeneral=$valor+$setup;
-        echo "<td>{$totaGeneral} min</td>";
-        echo "</tr>";
-        $granTotalGeneral+=$totaGeneral;
-      //  $totalsPerProcess[$key]['total'] += $rowTotal;
-    }
-    echo "<tr><td style='font-weight:bold;'>Total</td>";
-    echo "<td style='font-weight:bold;'>{$totalsPerProcess} min</td>";
-      echo "<td style='font-weight:bold;'></td>";
-    echo "<td style='font-weight:bold;'>{$totalSetup} min</td>";
-    echo "<td style='font-weight:bold;'>{$granTotalGeneral} min</td>";
-    echo "</tr>";*/
+     
     echo "</tr>";
     }
 }
