@@ -34,7 +34,7 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Looming' =
     $totalsPerProcess =$totalSetup  =$granTotalGeneral= 0;
     foreach ($procesos as $key => $valor) {
         echo "<tr><td>{$pn}</td><td>{$key}</td>";
-       $valor = $procesos[$key]>0?round($procesos[$key]/60,2):0;
+       $valor = $procesos[$key]>0?round($procesos[$key]/60,3):0;
         $valor = round($valor*1.20,2);
         $totalsPerProcess+=$valor;
         
