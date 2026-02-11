@@ -5,6 +5,12 @@ $cardCode=isset($_GET['cardCode']) ? $_GET['cardCode'] : '';
 $funcion=isset($_GET['funcion']) ? $_GET['funcion'] : '';
 $dateTime = date("Y-m-d H:i:s");
 $success = "";
+if(strpos($funcion, ']') !== false){
+    $funcion = str_replace(']', '|', $funcion);
+ }
+ if(strpos($funcion, "'") !== false){
+    $funcion = str_replace("'", '-', $funcion);
+ }
 
 
 try{
