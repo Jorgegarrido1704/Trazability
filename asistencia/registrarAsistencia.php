@@ -1,8 +1,8 @@
 <?php
 require '../app/conection.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $cardCode = $_POST["cardCode"];
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    $cardCode = $_GET["cardCode"];
     if(strlen($cardCode) == 4){
         $cardCode = "i" . $cardCode;
         
@@ -12,13 +12,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $dayToday=date('N')-1;
     $todayIs=$days[$dayToday];
 
-    $action = $_POST["action"];
-    if (strpos($cardCode, '|')) {
-        $cardCode = explode('|', $cardCode)[0];
+    $action = $_GET["action"];
+    
         $comentario = "registro con QR";
-    } else {
-        $comentario = "registro con codigo manual o codigo de barras";
-    }
+    
    // echo $cardCode . "<br>" . $comentario . "<br>";
     $dateNow = date("Y-m-d");
     $timeNow = date("H:i:s");

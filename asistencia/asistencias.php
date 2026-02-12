@@ -42,7 +42,7 @@ $weekday = intval(date('W'));
                 <div class="form-group text-center mt-4">
                     <h4 class="text-center">La hora actual es: <span id="time"></span></h4>
                 </div>
-                <form action="registrarAsistencia.php" method="POST" class="mt-4">
+                <form action="registrarAsistencia.php" method="GET" class="mt-4">
                         <div class="form-group">
                             <label for="cardCode" class="form-label">Ingrese el código QR de su tarjeta:</label>
                             <input type="text" class="form-control" id="cardCode" name="cardCode" minlength="4"
