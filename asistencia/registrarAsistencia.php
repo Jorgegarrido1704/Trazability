@@ -67,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 header("Location:  asistencias.php?success=Gracias, $row[employeeName] , su salida ha sido registrada ");  
             }
         }
+        // header("Location:  asistencias.php");
     }
 }
                
