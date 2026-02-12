@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $comentario = "registro con codigo manual o codigo de barras";
     }
-    echo $cardCode . "<br>" . $comentario . "<br>";
+   // echo $cardCode . "<br>" . $comentario . "<br>";
     $dateNow = date("Y-m-d");
     $timeNow = date("H:i:s");
    $weekday = intval(date('W'));
@@ -51,10 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
            header("Location:  asistencias.php?success=Bienvenido $row[employeeName] , su entrada ha sido registrada");
         } else {
 
-            if(($rowRegistro['salida']== null) and $timeNow > '17:29:59'){
-                $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET salida='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
-                header("Location:  asistencias.php?success=Gracias, $row[employeeName] , su Salida ha sido registrada");
-            }else if($rowRegistro['permisoSalida']== '' and $rowRegistro['permisoEntrada']== '' and $timeNow < '17:29:59'){
+           if($rowRegistro['permisoSalida']== '' and $rowRegistro['permisoEntrada']== ''){
                  $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET salida='$timeNow', permisoSalida='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
                 header("Location:  asistencias.php?success=Gracias, $row[employeeName] , su salida ha sido registrada ");  
             }else if(($rowRegistro['permisoSalida']!= null) and ($rowRegistro['permisoEntrada']== null) and $timeNow < '17:29:59'){

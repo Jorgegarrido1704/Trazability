@@ -93,7 +93,7 @@ if (success !== "") {
     document.getElementById("registros").style.display = "none";
     setTimeout(function() {
         window.location.href = "asistencias.php";
-    }, 600);
+    }, 800);
     clearInterval();
 
 }
