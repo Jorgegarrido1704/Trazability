@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
            if($rowRegistro['permisoSalida']== '' and $rowRegistro['permisoEntrada']== ''){
                  $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET salida='$timeNow', permisoSalida='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
                 header("Location:  asistencias.php?success=Gracias, $row[employeeName] , su salida ha sido registrada ");  
-            }else if(($rowRegistro['permisoSalida']!= null) and ($rowRegistro['permisoEntrada']== null) and $timeNow < '17:29:59'){
+            }else if(($rowRegistro['permisoSalida']!= null) and ($rowRegistro['permisoEntrada']== null)){
                  $insertarAsistencia = mysqli_query($con, "UPDATE relogchecador SET salida=NULL, permisoEntrada='$timeNow' WHERE employeeNumber='$cardCode' AND fechaRegistro='$dateNow'");
                 header("Location:  asistencias.php?success=Gracias, $row[employeeName] , su entrada ha sido registrada ");  
             }else if($rowRegistro['salida'] == null and $rowRegistro['permisoEntrada']!= "" and $rowRegistro['permisoSalida']!= ""){
