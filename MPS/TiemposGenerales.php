@@ -81,6 +81,7 @@ foreach ($pnRegistros as $pn => $weeks) {
               //  echo "<td>{$value} - {$row['processtime']} - {$row['setupTime']}</td>";
                 $times = ($row['processtime'] * $value) + $row['setupTime'];
                 $perDay = $times / 5;
+                $perDay = round($perDay/60, 2);
                 for ($i = 0; $i < 5; $i++) {
                     if (!isset($totalsPerDay[$week])) {
                         $totalsPerDay[$week] = 0;
@@ -93,7 +94,7 @@ foreach ($pnRegistros as $pn => $weeks) {
                     echo "<td>0</td>";
                 }
             }
-            $rowTotal += $times;
+            $rowTotal += round($times/60,2);
         }
         echo "<td style='font-weight:bold;'>{$rowTotal}</td>";
         echo "</tr>";
@@ -106,6 +107,7 @@ echo "<tr style='font-weight:bold; background:#f0f0f0;'><td>TOTAL</td>";
 foreach ($allWeeks as $week => $_) {
     for ($i = 0; $i < 5; $i++) {
         $times = $totalsPerDay[$week]/5 ?? 0;
+        $times = round($times/60, 2);
         echo "<td>{$times}</td>";
     }
 }
