@@ -1,10 +1,13 @@
 <?php
 require_once "../app/conection.php";
 $success = isset($_GET['success']) ? $_GET['success'] : "";
+$color = isset($_GET['color']) ? $_GET['color'] : "";
+$color==""?$color="alert alert-success text-center":$color="alert alert-danger text-center";
 date_default_timezone_set("America/Mexico_City");
-                            
+//echo $color;                
 $date= (date("H:i"));
 $weekday = intval(date('W'));
+
 
 ?>
 
@@ -27,7 +30,7 @@ $weekday = intval(date('W'));
         <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
             <img src="img/begstrsom.jpg" alt="Begstrsom" class="img-fluid" style="max-height: 350px; width: 100%;">
         </header>
-        <div id="alert" style="display:none;" class="alert alert-success text-center" role="alert">
+        <div id="alert" style="display:none;" class="<?php echo $color; ?>" role="alert">
             <h2><strong> <?php echo $success; ?></strong></h2>
         </div>
 
