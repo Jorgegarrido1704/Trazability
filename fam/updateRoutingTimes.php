@@ -19,20 +19,20 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Looming' =
       // echo "<h3>{$pn}</h3>";
    // echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width: 60%;'>";
     while ($row = mysqli_fetch_assoc($timeProcess)) {
-        if ($row['work_routing'] > 10000 && $row['work_routing'] < 10061) {$procesos['Cutting'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Cutting']++;}
-        if ($row['work_routing'] > 10060 && $row['work_routing'] < 10441) {$procesos['Terminals'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Terminals']++;}
-        if ($row['work_routing'] > 10440 && $row['work_routing'] < 11000) {$procesos['Assembly'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Assembly']++;}
-        if ($row['work_routing'] > 10999 && $row['work_routing'] < 11500) {$procesos['Looming'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Looming']++;}
-        if ($row['work_routing'] > 11500 && $row['work_routing'] < 11700) {$procesos['Quality'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Quality']++;}
-        if ($row['work_routing'] > 11700 && $row['work_routing'] < 12000) {$procesos['Packaging'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Packaging']++;}
+        if ($row['work_routing'] > 10000 && $row['work_routing'] < 10061) {$procesos['Cutting'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Cutting']+=$row['setUp_routing'];}
+        if ($row['work_routing'] > 10060 && $row['work_routing'] < 10441) {$procesos['Terminals'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Terminals']+=$row['setUp_routing'];}
+        if ($row['work_routing'] > 10440 && $row['work_routing'] < 11000) {$procesos['Assembly'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Assembly']+=$row['setUp_routing'];}
+        if ($row['work_routing'] > 10999 && $row['work_routing'] < 11500) {$procesos['Looming'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Looming']+=$row['setUp_routing'];}
+        if ($row['work_routing'] > 11500 && $row['work_routing'] < 11700) {$procesos['Quality'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Quality']+=$row['setUp_routing'];}
+        if ($row['work_routing'] > 11700 && $row['work_routing'] < 12000) {$procesos['Packaging'] += ($row['QtyTimes'] * $row['timePerProcess']); $assetsProcess['Packaging']+=$row['setUp_routing'];}
     }
     $totalsPerProcess =$totalSetup  =$granTotalGeneral= 0;
     foreach ($procesos as $key => $valor) {
       //  echo "<tr><td>{$pn}</td><td>{$key}</td>";
        $valor = $procesos[$key]>0?round($procesos[$key]/60,3):0;
-       $setupt = $assetsProcess[$key]>0?round($assetsProcess[$key]*300*1.15/60,3):0;
+       $setupt = $assetsProcess[$key]>0?round($assetsProcess[$key]*1.40/60,3):0;
 
-        $valor = round($valor*1.20,2);
+        $valor = round($valor*1.40,2);
         $totalsPerProcess+=$valor; 
         //$rowText = $valor;
       //  echo "<td style='font-weight:bold;'>{$rowText}</td>";
