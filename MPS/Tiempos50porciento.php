@@ -39,8 +39,9 @@ uksort($pnRegistros, function($a, $b) use ($rowTotals) {
     return $rowTotals[$b] <=> $rowTotals[$a];
 });
 
-echo "<button><a href='registos.php'>Back</a></button>";
-echo "<h3>Production time per day in hours (80% efficiency)</h3>";
+echo "<button><a href='Tiempos60porciento.php'>60 %</a></button>";
+echo "<button><a href='Tiempos90porciento.php'> 75%</a></button>";
+echo "<h3>Production time per day in hours (60% efficiency)</h3>";
 echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width:100%; border-collapse:collapse; text-align:center;'>";
 
 // Header semanas
@@ -79,8 +80,8 @@ foreach ($pnRegistros as $pn => $weeks) {
 
             if ($value > 0) {
               //  echo "<td>{$value} - {$row['processtime']} - {$row['setupTime']}</td>";
-                $times = ($row['processtime'] * $value) + $row['setupTime'];
-                $perDay = $times / 5;
+                $times = (($row['processtime'] * $value) + $row['setupTime'])*1.3;
+                $perDay = ($times / 5);
                 $perDay = round($perDay/60, 2);
                 for ($i = 0; $i < 5; $i++) {
                     if (!isset($totalsPerDay[$week])) {
