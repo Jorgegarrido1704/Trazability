@@ -14,7 +14,7 @@ while ($row = mysqli_fetch_assoc($registrosMPS)) {
     //echo $pn;
     $week = date("W", strtotime($row['dq']));
     
-    echo $week. " || ".$row['dq']. "<br>";
+   // echo $week. " || ".$row['dq']. "<br>";
     $qty = (int)$row['qtymps'];
 
     $allWeeks[$week] = true;
