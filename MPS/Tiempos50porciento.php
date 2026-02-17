@@ -41,7 +41,7 @@ uksort($pnRegistros, function($a, $b) use ($rowTotals) {
 
 echo "<button><a href='Tiempos60porciento.php'>60 %</a></button>";
 echo "<button><a href='Tiempos90porciento.php'> 75%</a></button>";
-echo "<h3>Production time per day in hours (60% efficiency)</h3>";
+echo "<h3>Production time per day in hours (55% efficiency)</h3>";
 echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width:100%; border-collapse:collapse; text-align:center;'>";
 
 // Header semanas
