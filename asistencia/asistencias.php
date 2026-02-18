@@ -30,6 +30,7 @@ $weekday = intval(date('W'));
         <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
             <img src="img/begstrsom.jpg" alt="Begstrsom" class="img-fluid" style="max-height: 350px; width: 100%;">
         </header>
+        <button type="button" class="btn btn-success" id="listaAsistencia"><a href="listaDeAsistencia.php" class="text-white text-decoration-none">Lista de asistencia</a></button>
         <div id="alert" style="display:none;" class="<?php echo $color; ?>" role="alert">
             <h2><strong> <?php echo $success; ?></strong></h2>
         </div>
