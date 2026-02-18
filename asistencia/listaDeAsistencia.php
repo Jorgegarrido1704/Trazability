@@ -20,7 +20,7 @@ $sheet->setCellValue('C1', 'Supervisor');
 $sheet->setCellValue('D1', 'Fecha '.$today);
 $t=2;
 //echo $semana."-".$year."-".$diaNumber."-".$hoy;
-$select=mysqli_query($con,"SELECT id_empleado,lider,`name` FROM assistence WHERE `week`='$semana' AND `yearOfAssistence`='$year' AND ('$hoy'='OK' OR '$hoy'='R' OR '$hoy'='PCT' OR '$hoy'='ASM' or '$hoy'='SCE') ORDER BY lider DESC");
+$select=mysqli_query($con,"SELECT id_empleado,lider,`name` FROM assistence WHERE `week`='$semana' AND `yearOfAssistence`='$year' AND (`$hoy`='OK' OR `$hoy`='R' OR `$hoy`='PCT' OR `$hoy`='ASM' or `$hoy`='SCE') ORDER BY lider DESC");
 while($row=mysqli_fetch_array($select)){
     $sheet->setCellValue('A'.$t, $row['id_empleado'] );
     $sheet->setCellValue('B'.$t, $row['name'] );
