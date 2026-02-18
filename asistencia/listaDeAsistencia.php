@@ -19,21 +19,21 @@ $sheet->setCellValue('B1', 'Nombre empleado');
 $sheet->setCellValue('C1', 'Supervisor');
 $sheet->setCellValue('D1', 'Fecha '.$today);
 $t=2;
-echo $semana."-".$year."-".$diaNumber."-".$hoy;
+//echo $semana."-".$year."-".$diaNumber."-".$hoy;
 $select=mysqli_query($con,"SELECT id_empleado,lider,`name` FROM assistence WHERE `week`='$semana' AND `yearOfAssistence`='$year' AND ('$hoy'='OK' OR '$hoy'='R' OR '$hoy'='PCT' OR '$hoy'='ASM' or '$hoy'='SCE') ORDER BY lider DESC");
 while($row=mysqli_fetch_array($select)){
     $sheet->setCellValue('A'.$t, $row['id_empleado'] );
     $sheet->setCellValue('B'.$t, $row['name'] );
     $sheet->setCellValue('C'.$t, $row['lider'] );  
     $t++;
-    echo $row['id_empleado']."<br>";
+  //  echo $row['id_empleado']."<br>";
     }
-    /*
+    
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment;filename="Lista de asistencia ' . $today . '.xlsx"');
 header('Cache-Control: max-age=0');
 $writer = new Xlsx($spreadsheet);
 $writer->save('php://output');
 exit();
-*/
+
 
