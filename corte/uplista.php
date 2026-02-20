@@ -1,80 +1,130 @@
 <?php
 require "../app/conection.php";
 
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 $numerosDeParte = [];
 
-if (isset($_POST['upload'])) {
-    if (is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
-        $csvFile = $_FILES['csv_file']['tmp_name'];   
-        if (($handle = fopen($csvFile, 'r')) !== FALSE) {
-            // Conectar a la base de datos
-            try {
-                // Preparar la consulta de inserción
-                $insertQuery = "INSERT INTO listascorte (`pn`,`rev`, `cons`, `tipo`, `aws`, `color`, `tamano`, `strip1`, `terminal1`, `strip2`, `terminal2`, `conector`, `dataFrom`, `dataTo`) VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmt = mysqli_prepare($con, $insertQuery);
+if (!isset($_POST['upload'])) {
+    exit("Formulario no enviado.");
+}
 
-                if (!$stmt) {
-                    die('Error en la preparación de la consulta: ' . mysqli_error($con));
-                }
+if (!isset($_FILES['csv_file']) || !is_uploaded_file($_FILES['csv_file']['tmp_name'])) {
+    exit("No se ha subido ningún archivo válido.");
+}
 
-                // Variables para vincular los parámetros
-                $pn =$rev=$cons = $tipo = $aws = $color = $tamano = $strip1 = $terminal1 = $strip2 = $terminal2 = $conector = $dataFrom = $dataTo = '';
+$csvFile = $_FILES['csv_file']['tmp_name'];
 
-                // Vincular los parámetros
-                mysqli_stmt_bind_param($stmt, 'ssssssssssssss', $pn, $rev, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo);
+try {
 
-                // Contador de filas procesadas
-                $rowCount = 0;
-                $batchSize = 10000;
-
-                // Leer la primera línea y eliminar el BOM si está presente
-                $firstLine = fgets($handle);
-                if (strpos($firstLine, "\xEF\xBB\xBF") === 0) {
-                    $firstLine = substr($firstLine, 3);
-                }
-
-                // Convertir la primera línea en un array si no está vacía
-                if (!empty($firstLine)) {
-                    $data = str_getcsv($firstLine);
-                    list($pn,$rev, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo) = $data;
-                    mysqli_stmt_execute($stmt);
-                    $numerosDeParte[] = $pn;
-                    $rowCount++;
-                }
-
-                // Leer e insertar datos en bloques
-                while (($data = fgetcsv($handle, 2000, ",")) !== FALSE) {
-                    // Asignar los valores a las variables vinculadas
-                    list($pn,$rev, $cons, $tipo, $aws, $color, $tamano, $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo) = $data;
-                    $numerosDeParte[] = $pn;
-                    // Ejecutar la consulta de inserción
-                    mysqli_stmt_execute($stmt);
-                    $rowCount++;
-
-                    // Confirmar las inserciones después de cada lote
-                    if ($rowCount % $batchSize == 0) {
-                        mysqli_commit($con);
-                        echo "Se han procesado $rowCount filas<br>";
-                    }
-                }
-
-                // Confirmar las inserciones restantes
-                mysqli_commit($con);
-                echo "Carga completa. Total de filas procesadas: $rowCount";
-                fclose($handle);
-                $numerosDeParte = array_unique($numerosDeParte); // Eliminar duplicados
-
-                header("location:duplicados.php?np=" . implode(',', $numerosDeParte));
-            } catch (Exception $e) {
-                echo 'Error: ' . $e->getMessage();
-            }
-        } else {
-            echo "Error al abrir el archivo CSV.";
-        }
-    } else {
-        echo "No se ha subido ningún archivo.";
+    $handle = fopen($csvFile, 'r');
+    if (!$handle) {
+        throw new Exception("Error al abrir el archivo CSV.");
     }
-} else {
-    echo "Formulario no enviado.";
+
+    mysqli_begin_transaction($con);
+
+    $insertQuery = "
+        INSERT INTO listascorte
+        (`pn`,`rev`,`cons`,`tipo`,`aws`,`color`,`tamano`,
+         `strip1`,`terminal1`,`strip2`,`terminal2`,`conector`,`dataFrom`,`dataTo`)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    ";
+
+    $stmt = mysqli_prepare($con, $insertQuery);
+
+    $pn = $rev = $cons = $tipo = $aws = $color = $tamano =
+    $strip1 = $terminal1 = $strip2 = $terminal2 = $conector =
+    $dataFrom = $dataTo = '';
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        'ssssssssssssss',
+        $pn, $rev, $cons, $tipo, $aws, $color, $tamano,
+        $strip1, $terminal1, $strip2, $terminal2, $conector, $dataFrom, $dataTo
+    );
+
+    $rowCount = 0;
+    $maxRows = 600;
+
+    // Leer primera línea (remover BOM)
+    $firstLine = fgets($handle);
+
+    if ($firstLine !== false) {
+
+        if (strpos($firstLine, "\xEF\xBB\xBF") === 0) {
+            $firstLine = substr($firstLine, 3);
+        }
+
+        $data = str_getcsv($firstLine);
+
+        if (count($data) >= 14) {
+
+            $pn = trim($data[0]);
+
+            if ($pn !== "") {
+
+                list(
+                    $pn,$rev,$cons,$tipo,$aws,$color,$tamano,
+                    $strip1,$terminal1,$strip2,$terminal2,$conector,$dataFrom,$dataTo
+                ) = $data;
+
+                mysqli_stmt_execute($stmt);
+
+                $numerosDeParte[] = $pn;
+                $rowCount++;
+            }
+        }
+    }
+
+    // Leer máximo 600 filas
+    while (($data = fgetcsv($handle, 2000, ",")) !== false) {
+
+        // detener si llega a 600 filas
+        if ($rowCount >= $maxRows) {
+            break;
+        }
+
+        // validar columnas
+        if (count($data) < 14) {
+            continue;
+        }
+
+        $pn = trim($data[0]);
+
+        // detener si pn vacío
+        if ($pn === "") {
+            break;
+        }
+
+        list(
+            $pn,$rev,$cons,$tipo,$aws,$color,$tamano,
+            $strip1,$terminal1,$strip2,$terminal2,$conector,$dataFrom,$dataTo
+        ) = $data;
+
+        mysqli_stmt_execute($stmt);
+
+        $numerosDeParte[] = $pn;
+        $rowCount++;
+    }
+
+    mysqli_commit($con);
+
+    mysqli_stmt_close($stmt);
+    fclose($handle);
+
+    $numerosDeParte = array_unique($numerosDeParte);
+
+    header("Location: duplicados.php?np=" . urlencode(implode(',', $numerosDeParte)));
+    exit;
+
+} catch (Exception $e) {
+
+    mysqli_rollback($con);
+
+    if (isset($stmt)) mysqli_stmt_close($stmt);
+    if (isset($handle)) fclose($handle);
+
+    echo "Error: " . $e->getMessage();
 }
 ?>
