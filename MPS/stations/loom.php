@@ -1,5 +1,5 @@
 <?php
-require "../app/conection.php";
+require "../../app/conection.php";
 
 $currentWeek = date("W");
 $pnRegistros = [];
@@ -39,11 +39,14 @@ uksort($pnRegistros, function($a, $b) use ($rowTotals) {
     return $rowTotals[$b] <=> $rowTotals[$a];
 });
 
-echo "<button><a href='Tiempos60porciento.php'>60 %</a></button>";
-echo "<button><a href='Tiempos50porciento.php'> 55%</a></button>";
-echo "<button><a href='stations/corte.php'>Per stations</a></button>";
+echo "<button><a href='../Tiempos90porciento.php'>BACK</a></button>";
+echo "<button><a href='corte.php'> Cutting</a></button>";
+echo "<button><a href='liberacion.php'> Terminals</a></button>";
+echo "<button><a href='ensamble.php'> Assembly</a></button>";
+echo "<button><a href='loom.php'> lomming</a></button>";
+echo "<button><a href='calidad.php'> Quality</a></button>";
+echo "<button><a href='embarque.php'>Packing</a></button>";
 echo "<h3>Production time per day in hours (75% efficiency)</h3>";
-
 echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width:100%; border-collapse:collapse; text-align:center;'>";
 
 // Header semanas
@@ -68,7 +71,7 @@ echo "</tr>";
 foreach ($pnRegistros as $pn => $weeks) {
     
 
-    $timeProcess = mysqli_query($con, "SELECT * FROM tiemposderuteo WHERE pn = '$pn' ORDER BY id ASC ");
+    $timeProcess = mysqli_query($con, "SELECT * FROM tiemposderuteo WHERE pn = '$pn' and work = 'Looming' ORDER BY id ASC ");
 
     while ($row = mysqli_fetch_assoc($timeProcess)) {
 
