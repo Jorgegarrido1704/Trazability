@@ -35,7 +35,7 @@ echo "<h3>Production time per day in hours (80% efficiency)</h3>";
 echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width:100%; border-collapse:collapse; text-align:center;'>";
 
 // Header semanas
-echo "<tr><th rowspan='2'>PN - Process</th>";
+echo "<tr><th rowspan='2'>PN </th><th rowspan='2'> Process</th>";
 foreach ($allWeeks as $week => $_) echo "<th colspan='5' style='background:" . (($week % 2 == 0) ? "#e6f7ff" : "#ffe6e6") . "'>W{$week}</th>";
 echo "<th rowspan='2'>Total</th></tr>";
 
