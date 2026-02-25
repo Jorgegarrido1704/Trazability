@@ -92,10 +92,10 @@ foreach ($pnRegistros as $pn => $weeks) {
                 $times = (($valor*$value)*1.20) + ($assetsProcess[$key]*300);
                 $perDay = $times / 5;
                 for ($i=0;$i<5;$i++) {
-                    $hours = floor($perDay/3600);
-                    $min = round(($perDay%3600)/60);
-                    $qtyItems = ($hours<1 && $min<1)?"0":"{$hours} h : {$min} m";
-                    echo "<td>{$qtyItems}</td>";
+                   
+                    $hours = round($perDay/3600, 2)??0;
+                    
+                    echo "<td>{$hours}</td>";
                     $totalsPerDay[$week][$i] += $perDay;
                 }
             }
