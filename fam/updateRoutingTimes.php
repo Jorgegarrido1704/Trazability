@@ -43,4 +43,5 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Looming' =
 
 //echo "</table>";
 }
+header("Location: famTiempos.php");
 ?>
