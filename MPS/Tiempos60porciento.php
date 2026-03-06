@@ -38,7 +38,7 @@ foreach ($pnRegistros as $pn => $weeks) {
 uksort($pnRegistros, function($a, $b) use ($rowTotals) {
     return $rowTotals[$b] <=> $rowTotals[$a];
 });
-
+echo "<button><a href='tablaTiempos.php'>Tabla Tiempos</a></button>";
 echo "<button><a href='Tiempos50porciento.php'>55 %</a></button>";
 echo "<button><a href='Tiempos90porciento.php'> 75%</a></button>";
 echo "<h3>Production time per day in hours (60% efficiency)</h3>";
