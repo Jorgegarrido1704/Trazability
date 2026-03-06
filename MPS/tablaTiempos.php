@@ -1,7 +1,7 @@
 <?php
 require "../app/conection.php";
 
-$timeProcess = mysqli_query($con, "SELECT * FROM tiemposderuteo WHERE  ORDER BY pn ASC ");
+$timeProcess = mysqli_query($con, "SELECT * FROM tiemposderuteo  ORDER BY pn ASC ");
 echo "<button><a href='Tiempos60porciento.php'>60 %</a></button>";
 echo "<button><a href='Tiempos90porciento.php'> 75%</a></button>";
 echo "<h3>Production time per day in hours (55% efficiency)</h3>";
