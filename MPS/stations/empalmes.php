@@ -41,7 +41,6 @@ uksort($pnRegistros, function($a, $b) use ($rowTotals) {
 
 echo "<button><a href='../Tiempos90porciento.php'>BACK</a></button>";
 echo "<button><a href='corte.php'> Cutting</a></button>";
-echo "<button><a href='empalmes.php'> splicing</a></button>";
 echo "<button><a href='liberacion.php'> Terminals</a></button>";
 echo "<button><a href='ensamble.php'> Assembly</a></button>";
 echo "<button><a href='loom.php'> lomming</a></button>";
@@ -72,11 +71,11 @@ echo "</tr>";
 foreach ($pnRegistros as $pn => $weeks) {
     
 
-    $timeProcess = mysqli_query($con, "SELECT * FROM tiemposderuteo WHERE pn = '$pn' and work = 'Terminals' ORDER BY id ASC ");
+    $timeProcess = mysqli_query($con, "SELECT COUNT(*) as cuentas FROM `routing_models` WHERE `pn_routing`='$pn' and `work_routing`='10341' ORDER BY `id_routing` ASC; ");
 
     while ($row = mysqli_fetch_assoc($timeProcess)) {
 
-        echo "<tr><td>{$row['pn']} - {$row['work']}</td>";
+        echo "<tr><td>{$pn} - total splices: {$row['cuentas']}</td>";
         $rowTotal = 0;
 
         foreach ($allWeeks as $week => $_) {
@@ -85,8 +84,8 @@ foreach ($pnRegistros as $pn => $weeks) {
             $times = 0;
 
             if ($value > 0) {
-              //  echo "<td>{$value} - {$row['processtime']} - {$row['setupTime']}</td>";
-                $times = (($row['processtime'] * $value) + $row['setupTime'])*1.15;
+              // 
+                $times = (($row['cuentas']*10) * $value);
                 $perDay = $times / 5;
                 $perDay = round($perDay/60, 2);
                 for ($i = 0; $i < 5; $i++) {

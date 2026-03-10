@@ -41,6 +41,7 @@ uksort($pnRegistros, function($a, $b) use ($rowTotals) {
 
 echo "<button><a href='../Tiempos90porciento.php'>BACK</a></button>";
 echo "<button><a href='corte.php'> Cutting</a></button>";
+echo "<button><a href='empalmes.php'> splicing</a></button>";
 echo "<button><a href='liberacion.php'> Terminals</a></button>";
 echo "<button><a href='ensamble.php'> Assembly</a></button>";
 echo "<button><a href='loom.php'> lomming</a></button>";
