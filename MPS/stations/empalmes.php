@@ -87,12 +87,13 @@ foreach ($pnRegistros as $pn => $weeks) {
               // 
                 $times = (($row['cuentas']*10) * $value);
                 $perDay = $times / 5;
+                $valores=$value/5;
                 $perDay = round($perDay/60, 2);
                 for ($i = 0; $i < 5; $i++) {
                     if (!isset($totalsPerDay[$week])) {
                         $totalsPerDay[$week] = 0;
                     }
-                    echo "<td>{$perDay}</td>";
+                    echo "<td>{$valores}pzs -{$perDay}min</td>";
                 }
                 $totalsPerDay[$week] += $times;
             } else {
