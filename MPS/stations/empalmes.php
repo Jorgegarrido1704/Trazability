@@ -85,17 +85,38 @@ foreach ($pnRegistros as $pn => $weeks) {
 
             if ($value > 0) {
               // 
+              $valoresCorte=[];
                 $times = (($row['cuentas']*10) * $value);
                 $perDay = $times / 5;
                 $valores=$value/5;
+                for($i=0; $i<5; $i++){
+                    if($value/(5-$i)>1){
+                        $valoresCorte[$i]=intval($value/(5-$i));
+                        $value=$value-$valoresCorte[$i];
+                    }else{
+                        $valoresCorte[$i]=$value;
+                        $value=0;
+                    }
+                    
+                }
+                
                 $perDay = round($perDay/60, 2);
                 for ($i = 0; $i < 5; $i++) {
-                    if (!isset($totalsPerDay[$week])) {
-                        $totalsPerDay[$week] = 0;
+                    if (!isset($totalsPerDay[$week][$i])) {
+                        $totalsPerDay[$week][$i] = 0;
                     }
-                    echo "<td>{$valores}pzs -{$perDay}min</td>";
+                    if(($valoresCorte[$i]<=0)){
+                        $valoresCorte[$i]=0;
+                        $perDay=0;
+                    }else{
+                        $perDay=round(($row['cuentas']*10) * $valoresCorte[$i] / 60, 2);
+                         $totalsPerDay[$week][$i] += $perDay;
+                    }
+
+                    echo "<td>{$valoresCorte[$i]}pzs / {$perDay}min</td>";
+                   
                 }
-                $totalsPerDay[$week] += $times;
+                
             } else {
                 for ($i = 0; $i < 5; $i++) {
                     echo "<td>0</td>";
@@ -113,7 +134,7 @@ echo "<tr style='font-weight:bold; background:#f0f0f0;'><td>TOTAL</td>";
 
 foreach ($allWeeks as $week => $_) {
     for ($i = 0; $i < 5; $i++) {
-        $times = $totalsPerDay[$week]/5 ?? 0;
+        $times = $totalsPerDay[$week][$i] ?? 0;
         $times = round($times/60, 2);
         echo "<td>{$times}</td>";
     }
