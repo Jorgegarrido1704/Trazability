@@ -20,7 +20,10 @@ use chillerlan\QRCode\QRCode;
 
 
 .sheet{
-    width:38mm; height:24mm;
+    width:38.5mm; height:25.8mm;
+    border:1px solid black;
+    padding-top:10mm;
+    padding-left:10mm;
 }
 
 .label{
@@ -29,11 +32,11 @@ use chillerlan\QRCode\QRCode;
     border:1px solid black;
     border-radius:3mm;
     display:inline-block;
-    padding:1mm;
+    padding:0.5mm;
     font-family:Arial;
-    font-size:6px;
+    font-size:5px;
     box-sizing:border-box;
-    margin:2mm;
+    margin:1mm;
 }
 
 .row{
