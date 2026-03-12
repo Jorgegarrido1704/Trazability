@@ -2,12 +2,13 @@
 require '../conector.php';
 require '../vendor/autoload.php';
 session_start();
-date_default_timezone_set("america/Mexico_City");
-//$wo=isset($_POST['wo'])?$_POST['wo']:"";
+date_default_timezone_set("America/Mexico_City");
+
 $today = date('mdY');
 
-use chillerlan\QRCode\{QRCode, QROptions};
+use chillerlan\QRCode\QRCode;
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,86 +16,112 @@ use chillerlan\QRCode\{QRCode, QROptions};
 
 <style>
 
-    @page{
-        size: letter;
-        margin: 10mm;
-    }
-
-    .sheet{
-        width: 216mm;
-    }
-
-    .label{
-        width:25.4mm;
-        height:12.7mm;
-        border:1px solid black;
-        border-radius:3mm;
-        display:inline-block;
-        margin:5mm;
-        padding:1mm;
-        font-family: Arial;
-        font-size:6px;
-        box-sizing:border-box;
-    }
-
-    .row{
-        display:flex;
-        justify-content:space-between;
-    }
-
-    .qr{
-        width:8.5mm;
-        height:8.5mm;
-        background:#ddd;
-    }
-
-    .smallbox{
-        border:1px solid black;
-        padding:0.4mm;
-        text-align:center;
-        font-size:5px;
-    }
-    .smallbox1{
-        border:1px solid black;
-        padding:0.4mm;
-        text-align:center;
-        font-size:4px;
-    }
+@page{
 
 
-    .logo{
-        font-size:5px;
-        color:#555;
-    }
+    size: letter;
+    margin:10mm;
+}
+body{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center; /* centra horizontal */
+    align-items: center;     /* centra vertical */
+}
+
+.sheet{
+    width:216mm;
+}
+
+.label{
+    width:25.4mm;
+    height:12.7mm;
+    border:1px solid black;
+    border-radius:3mm;
+    display:inline-block;
+    padding:1mm;
+    font-family:Arial;
+    font-size:6px;
+    box-sizing:border-box;
+    margin:2mm;
+}
+
+.row{
+    display:flex;
+}
+
+.bloque1{
+    width:9mm;
+}
+
+.bloque2{
+    width:14mm;
+}
+
+.qr img{
+    width:8.5mm;
+    height:8.5mm;
+}
+
+.smallbox{
+    border:1px solid black;
+    text-align:center;
+    font-size:5px;
+    margin-bottom:3px;
+}
+
+.smallbox1{
+    border:1px solid black;
+    text-align:center;
+    font-size:6px;
+    margin-bottom:3px;
+}
+
+.logo{
+    font-size:5px;
+    text-align:center;
+}
 
 </style>
+
 </head>
 
 <body>
 
 <div class="sheet">
 
-    <div class="label">
+<div class="label">
 
-    <div class="row">
-    <div class="qr">
-        <?php
-                    $data = '5703|0000000|01|'.$today.'|001';
-                    $qrcode = (new QRCode)->render($data);
-                    ?>
-                    <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?> 
-    </div>
+<div class="row">
 
-    <div>
-    <div class="smallbox">1234</div>
-    <div class="smallbox1">300-1570-00-R01|A01</div>
-    <div class="smallbox">20250101|001</div>
-    </div>
+<div class="bloque1">
 
-    </div>
-    <div class="logo">PROTERRA</div>
-    </div>
+<div class="qr">
+<?php
+$data = '5703|0000000|01|'.$today.'|001';
+$qrcode = (new QRCode)->render($data);
+?>
+<img src="<?php echo $qrcode; ?>">
+</div>
 
+<div class="logo">PROTERRA</div>
+
+</div>
+
+<div class="bloque2">
+
+<div class="smallbox">1234</div>
+
+<div class="smallbox1">300-1570-00-R01 | A01</div>
+
+<div class="smallbox">20250101 | 001</div>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 
