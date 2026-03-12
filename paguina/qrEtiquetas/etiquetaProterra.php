@@ -22,8 +22,8 @@ use chillerlan\QRCode\QRCode;
 .sheet{
     width:38.5mm; height:25.8mm;
     border:1px solid black;
-    padding-top:30mm;
-    padding-left:12mm;
+    padding-top:10mm;
+    padding-left:4mm;
 }
 
 .label{
@@ -117,8 +117,8 @@ img{
     </div>
 
 </div>
-<?php } ?>
-</div>
 
+</div>
+<?php } ?>
 </body>
 </html>
