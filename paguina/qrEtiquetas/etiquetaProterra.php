@@ -20,15 +20,9 @@ use chillerlan\QRCode\QRCode;
 
 
     size: letter;
-    margin:10mm;
+    margin:5mm;
 }
-body{
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    justify-content: center; /* centra horizontal */
-    align-items: center;     /* centra vertical */
-}
+
 
 .sheet{
     width:216mm;
