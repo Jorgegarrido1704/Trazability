@@ -20,8 +20,10 @@ use chillerlan\QRCode\QRCode;
 
 
 .sheet{
-    width:38.5mm; height:102.5mm;
+    width:38.5mm; height:103mm;
     border:1px solid black;
+    padding-top:15mm;
+    padding-left:5mm;
 
 }
 
