@@ -22,8 +22,8 @@ use chillerlan\QRCode\QRCode;
 .sheet{
     width:38.5mm; height:25.8mm;
     border:1px solid black;
-    padding-top:20mm;
-    padding-left:13mm;
+    padding-top:30mm;
+    padding-left:12mm;
 }
 
 .label{
@@ -45,10 +45,12 @@ use chillerlan\QRCode\QRCode;
 
 .bloque1{
     width:9mm;
+    height:12.5mm;
 }
 
 .bloque2{
     width:14mm;
+    height:12.5mm;
 }
 
 .qr img{
@@ -72,7 +74,7 @@ use chillerlan\QRCode\QRCode;
 
 
 img{
-    width: 8.5mm;
+    width: 8mm;
     height: 3mm;
 }
 
@@ -81,41 +83,41 @@ img{
 </head>
 
 <body>
-
+<?php for($i = 0; $i < 5; $i++){ ?>
 <div class="sheet">
 
 <div class="label">
 
-<div class="row">
+    <div class="row">
 
-<div class="bloque1">
+        <div class="bloque1">
 
-<div class="qr">
-<?php
-$data = '5703|0000000|01|'.$today.'|001';
-$qrcode = (new QRCode)->render($data);
-?>
-<img src="<?php echo $qrcode; ?>">
+            <div class="qr">
+            <?php
+            $data = '5703|0000000|01|'.$today.'|001';
+            $qrcode = (new QRCode)->render($data);
+            ?>
+            <img src="<?php echo $qrcode; ?>">
+            </div>
+
+            <div class="logo"><img src="logo.jpg" alt="logo"></div>
+
+        </div>
+
+        <div class="bloque2">
+
+            <div class="smallbox">1234</div>
+
+            <div class="smallbox1">300-1570-00-R01 | A01</div>
+
+            <div class="smallbox">20250101 | 001</div>
+
+        </div>
+
+    </div>
+
 </div>
-
-<div class="logo"><img src="logo.jpg" alt="logo"></div>
-
-</div>
-
-<div class="bloque2">
-
-<div class="smallbox">1234</div>
-
-<div class="smallbox1">300-1570-00-R01 | A01</div>
-
-<div class="smallbox">20250101 | 001</div>
-
-</div>
-
-</div>
-
-</div>
-
+<?php } ?>
 </div>
 
 </body>
