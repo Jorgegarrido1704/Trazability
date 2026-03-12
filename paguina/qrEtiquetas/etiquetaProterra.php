@@ -16,16 +16,11 @@ use chillerlan\QRCode\QRCode;
 
 <style>
 
-@page{
 
-
-    size: letter;
-    margin:5mm;
-}
 
 
 .sheet{
-    width:216mm;
+    width:38mm; height:24mm;
 }
 
 .label{
