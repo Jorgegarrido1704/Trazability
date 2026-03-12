@@ -49,8 +49,8 @@ use chillerlan\QRCode\QRCode;
 }
 
 .qr img{
-    width:8.5mm;
-    height:8.5mm;
+    width:8mm;
+    height:8mm;
 }
 
 .smallbox{
@@ -67,9 +67,10 @@ use chillerlan\QRCode\QRCode;
     margin-bottom:3px;
 }
 
-.logo{
-    font-size:5px;
-    text-align:center;
+
+img{
+    width: 8.5mm;
+    height: 3mm;
 }
 
 </style>
@@ -94,7 +95,7 @@ $qrcode = (new QRCode)->render($data);
 <img src="<?php echo $qrcode; ?>">
 </div>
 
-<div class="logo">PROTERRA</div>
+<div class="logo"><img src="logo.jpg" alt="logo"></div>
 
 </div>
 
