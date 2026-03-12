@@ -22,8 +22,8 @@ use chillerlan\QRCode\QRCode;
 .sheet{
     width:38.5mm; height:25.8mm;
     border:1px solid black;
-    padding-top:10mm;
-    padding-left:10mm;
+    padding-top:20mm;
+    padding-left:13mm;
 }
 
 .label{
