@@ -20,15 +20,14 @@ use chillerlan\QRCode\QRCode;
 
 
 .sheet{
-    width:38.5mm; height:25.8mm;
+    width:38.5mm; height:162mm;
     border:1px solid black;
-    padding-top:10mm;
-    padding-left:4mm;
+
 }
 
 .label{
-    width:25.4mm;
-    height:12.7mm;
+    width:35.5mm;
+    height:17.5mm;
     border:1px solid black;
     border-radius:3mm;
     display:inline-block;
@@ -44,18 +43,18 @@ use chillerlan\QRCode\QRCode;
 }
 
 .bloque1{
-    width:9mm;
-    height:12.5mm;
+    width:12mm;
+    height:17.5mm;
 }
 
 .bloque2{
     width:14mm;
-    height:12.5mm;
+    height:17.5mm;
 }
 
 .qr img{
-    width:8mm;
-    height:8mm;
+    width:12mm;
+    height:12mm;
 }
 
 .smallbox{
@@ -74,8 +73,8 @@ use chillerlan\QRCode\QRCode;
 
 
 img{
-    width: 8mm;
-    height: 3mm;
+    width: 12mm;
+    height: 5mm;
 }
 
 </style>
