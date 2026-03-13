@@ -76,9 +76,10 @@ use chillerlan\QRCode\QRCode;
 }
 
 
-img{
+#logo{
+    padding-left:2px;
     width: 10mm;
-    height: 2mm;
+    height: 2.5mm;
 }
 
 </style>
@@ -112,7 +113,7 @@ img{
             <img src="<?php echo $qrcode; ?>">
             </div>
 
-            <div class="logo"><img src="logo.jpg" alt="logo"></div>
+            <div class="logo"><img src="logo.jpg" alt="logo" id="logo"></div>
 
         </div>
 
