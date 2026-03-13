@@ -4,7 +4,7 @@ require '../vendor/autoload.php';
 session_start();
 date_default_timezone_set("America/Mexico_City");
 
-$today = date('mdY');
+$today = date('Ymd');
 
 use chillerlan\QRCode\QRCode;
 ?>
@@ -86,7 +86,16 @@ img{
 </head>
 
 <body>
-<?php for($i = 0; $i < 5; $i++){ ?>
+<?php for($i = 0; $i < 5; $i++){ 
+    $consecutivoSerial=$i+1;
+    if($i<10){
+        $consecutivoSerial="00".$consecutivoSerial;
+    }elseif($i<100){
+        $consecutivoSerial="0".$consecutivoSerial;
+    }
+    $partNumber='300-1570-00-R01';
+    $revision='A01';
+    ?>
 <div class="sheet">
 
 <div class="label">
@@ -97,7 +106,7 @@ img{
 
             <div class="qr">
             <?php
-            $data = '5703|0000000|01|'.$today.'|001';
+            $data = '5703|'.$partNumber.'|'.$revision.'|'.$today.'|'.$consecutivoSerial;
             $qrcode = (new QRCode)->render($data);
             ?>
             <img src="<?php echo $qrcode; ?>">
@@ -109,11 +118,11 @@ img{
 
         <div class="bloque2">
 
-            <div class="smallbox">1234</div>
+            <div class="smallbox">5703</div>
 
-            <div class="smallbox1">300-1570-00-R01 | A01</div>
+            <div class="smallbox1"><?php echo $partNumber."|".$revision;?></div>
 
-            <div class="smallbox">20250101 | 001</div>
+            <div class="smallbox"><?php echo $today."|".$consecutivoSerial; ?></div>
 
         </div>
 
