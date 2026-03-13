@@ -57,8 +57,8 @@ use chillerlan\QRCode\QRCode;
 }
 
 .qr img{
-    width:12mm;
-    height:12mm;
+    width:11mm;
+    height:11mm;
 }
 
 .smallbox{
