@@ -22,22 +22,22 @@ use chillerlan\QRCode\QRCode;
 .sheet{
     width:38.5mm; height:104.5mm;
    
-    padding-top:25mm;
+    padding-top:23mm;
     padding-left:5mm;
 
 }
 
 .label{
     width:31.4mm;
-    height:14.6mm;
+    height:15.3mm;
     border:1px solid black;
-    border-radius:3mm;
+    border-radius:2mm;
     display:inline-block;
-    padding:0.5mm;
+    padding:0.3mm;
     font-family:Arial;
     font-size:5px;
     box-sizing:border-box;
-    margin:1mm;
+    margin:0.3mm;
 }
 
 .row{
@@ -46,19 +46,19 @@ use chillerlan\QRCode\QRCode;
 
 .bloque1{
     padding-left:3px;
-    width:13mm;
-    height:14.5mm;
+    width:14mm;
+    height:15mm;
 }
 
 .bloque2{
     width:16mm;
-    height:14.5mm;
+    height:14.9mm;
     padding-top:6px;
 }
 
 .qr img{
-    width:10.5mm;
-    height:10.5mm;
+    width:12mm;
+    height:12mm;
 }
 
 .smallbox{
@@ -111,10 +111,10 @@ use chillerlan\QRCode\QRCode;
             $qrcode = (new QRCode)->render($data);
             ?>
             <img src="<?php echo $qrcode; ?>">
+            <img src="logo.jpg" alt="logo" id="logo">
             </div>
 
-            <div class="logo"><img src="logo.jpg" alt="logo" id="logo"></div>
-
+           
         </div>
 
         <div class="bloque2">
