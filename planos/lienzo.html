@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Editor de Arneses - V5 (Cavidades Dinámicas y Terminales por Pin)</title>
+    <title>Editor de Arneses - V8 (Circuitos y Matemáticas en Longitud)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.css">
     <style>
         body { font-family: sans-serif; margin: 0; padding: 20px; background: #e9ecef; }
@@ -19,6 +19,7 @@
         button:hover { background: #5a6268; }
         .btn-primary { background: #007bff; } .btn-primary:hover { background: #0056b3; }
         .btn-success { background: #28a745; } .btn-success:hover { background: #218838; }
+        .btn-danger { background: #dc3545; } .btn-danger:hover { background: #c82333; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
@@ -32,14 +33,13 @@
         .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; font-weight: bold;}
         .form-group input, .form-group select { width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
         
-        /* Contenedor dinámico de cavidades */
         .cavity-container { background: #f8f9fa; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; }
         .cavity-row { display: flex; align-items: center; margin-bottom: 8px; }
         .cavity-row label { width: 60px; margin: 0; color: #d35400; }
         .cavity-row input { flex: 1; }
 
-        .modal-actions { text-align: right; margin-top: 15px; position: sticky; bottom: -20px; background: white; padding: 10px 0; border-top: 1px solid #eee;}
-        .btn-cancel { background: #dc3545; } .btn-cancel:hover { background: #c82333; }
+        .modal-actions { display: flex; justify-content: space-between; margin-top: 15px; position: sticky; bottom: -20px; background: white; padding: 10px 0; border-top: 1px solid #eee;}
+        .btn-cancel { background: #6c757d; } .btn-cancel:hover { background: #5a6268; }
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 99; }
     </style>
 </head>
@@ -55,6 +55,8 @@
         <div id="herramientas">
             <button class="btn-primary" id="btn-add-connector">Agregar Conector</button>
             <button class="btn-primary" id="btn-add-splice">Agregar Splice</button>
+            <button class="btn-danger" id="btn-clear-canvas" style="margin-left: 10px;">Limpiar Lienzo</button>
+            
             <span style="border-left: 2px solid #ccc; margin: 0 10px; height: 30px;"></span>
             <strong>Zoom:</strong>
             <button id="btn-zoom-out">-</button>
@@ -78,30 +80,198 @@
 
     <div id="modal-cable" class="modal">
         <h3>Propiedades del Cable</h3>
+        <div class="form-group">
+            <label>Nombre del Circuito:</label>
+            <input type="text" id="cable-circuito" placeholder="Ej. CIR-1, PWR, GND">
+        </div>
+        
         <div class="form-group"><label>Aislamiento:</label><select id="cable-tipo"><option value="GXL">GXL</option><option value="TXL">TXL</option><option value="SXL">SXL</option></select></div>
         <div class="form-group"><label>Calibre (AWG):</label><input type="number" id="cable-calibre" value="18"></div>
-        <div class="form-group"><label>Color:</label><input type="text" id="cable-color" value="RED"></div>
-        <div class="form-group"><label>Longitud (mm):</label><input type="number" id="cable-longitud" value="150"></div>
-        <div class="modal-actions"><button class="btn-cancel" onclick="cerrarModales()">Cancelar</button><button class="btn-success" id="btn-save-cable">Guardar</button></div>
+        <div class="form-group"><label>Color:</label>
+        <select id="cable-color">
+            <option value='YEBN'>YELLOW/BROWN</option>
+            <option value='YE'>YELLOW</option>
+            <option value='VTWH'>VIOLET/WHITE</option>
+            <option value='VTDG'>VIOLET/DAR GREEN</option>
+            <option value='VT'>VIOLET</option>
+            <option value='RDOG'>RED/ORANGE</option>
+            <option value='RDDB'>RED/DARK BLUE</option>
+            <option value='RDBK'>RED/BLACK</option>
+            <option value='RD'>RED</option>
+            <option value='GYLB'>GREY/LIGHT BLUE</option>
+            <option value='GYDG'>GREY/DARK GREEN</option>
+            <option value='GYBN'>GREY/BROWN</option>
+            <option value='DG'>DARK GREEN</option>
+            <option value='DB'>DARK BLUE</option>
+            <option value='BU'>BLUE</option>
+            <option value='BNYE'>BROWN/YELLOW</option>
+            <option value='BNWH'>BROWN/WHITE</option>
+            <option value='BNGN'>BROWN/GREEN</option>
+            <option value='BNDB'>BROWN/DARK BLUE</option>
+            <option value='BN'>BROWN</option>
+            <option value='BKWH'>BLACK/WHITE</option>
+            <option value='BKDG'>BLACK/DARK GREEN</option>
+            <option value='BKBN'>BLACK/BROWN</option>
+            <option value='BK'>BLACK</option>
+            <option value='DARK BLU/BLK'>DARK BLUE/BLACK</option>
+            <option value='YEL/WHT'>YELLOW/WHITE</option>
+            <option value='CLR'>CLEAR</option>
+            <option value='GRN/YEL'>GREEN/YELLOW</option>
+            <option value='YEL/GRN'>YELLOW/GREEN</option>
+            <option value='SLV'>SILVER</option>
+            <option value='DARK BLU/WHT'>DARK BLUE/WHITE</option>
+            <option value='DARK GRN/WHT'>DARK GREEN/WHITE</option>
+            <option value='LIGHT BLU/RED'>LIGHT BLUE/RED</option>
+            <option value='LIGHT BLU/BLK'>LIGHT BLUE/BLACK</option>
+            <option value='WHT/RED'>WHITE/RED</option>
+            <option value='WHT/GRN'>WHITE/GREEN</option>
+            <option value='WHT/BLU'>WHITE/BLUE</option>
+            <option value='LT GRN'>LIGHT GREEN</option>
+            <option value='GRY/BLK'>GREY/BLACK</option>
+            <option value='GRN/WHT'>GREEN/WHITE</option>
+            <option value='BRN/WHT'>BROWN/WHITE</option>
+            <option value='PUR'>PURPLE</option>
+            <option value='WHT/PNK'>WHITE/PINK</option>
+            <option value='WHT/TAN'>WHITE/TAN</option>
+            <option value='RED/BLK'>RED/BLACK</option>
+            <option value='GRY/WHT'>GREY/WHITE</option>
+            <option value='ORG/WHT'>ORANGE/WHITE</option>
+            <option value='RED/WHT'>RED/WHITE</option>
+            <option value='WHT/BLK'>WHITE/BLACK</option>
+            <option value='BLU/YEL'>BLUE/YELLOW</option>
+            <option value='PNK/GRN'>PINK/GREEN</option>
+            <option value='PNK/BLK'>PINK/BLACK</option>
+            <option value='PNK/WHT'>PINK/WHITE</option>
+            <option value='BLK/GRN'>BLACK/GREEN</option>
+            <option value='BLK/YEL'>BLACK/YELLOW</option>
+            <option value='ORG/BLK'>ORANGE/BLACK</option>
+            <option value='PUR/BLK'>PURPLE/BLACK</option>
+            <option value='RED/YEL'>RED/YELLOW</option>
+            <option value='WHT/ORG'>WHITE/ORANGE</option>
+            <option value='WHT/PUR'>WHITE/PURPLE</option>
+            <option value='YEL/BLU'>YELLOW/BLUE</option>
+            <option value='YEL/RED'>YELLOW/RED</option>
+            <option value='BLK/WHT'>BLACK/WHITE</option>
+            <option value='LIGHT GRN'>LIGHT GREEN</option>
+            <option value='LIGHT BLU'>LIGHT BLUE</option>
+            <option value='BLU/WHT'>BLUE/WHITE</option>
+            <option value='DARK GRN'>DARK GREEN</option>
+            <option value='DARK BLU'>DARK BLUE</option>
+            <option value='YEL/BLK'>YELLOW/BLACK</option>
+            <option value='VIO'>VIOLET</option>
+            <option value='GRN'>GREEN</option>
+            <option value='WHT'>WHITE</option>
+            <option value='ORG'>ORANGE</option>
+            <option value='BLU'>BLUE</option>
+            <option value='BLK'>BLACK</option>
+            <option value='BRN'>BROWN</option>
+            <option value='GRY'>GREY</option>
+            <option value='TAN'>TAN</option>
+            <option value='YEL'>YELLOW</option>
+            <option value='RED'>RED</option>
+            <option value='PNK'>PINK</option>
+            <option value='BLK/RED'>BLACK/RED</option>
+            <option value='BLU/RED'>BLUE/RED</option>
+            <option value='YEL/PUR'>YELLOW/PURPLE</option>
+            <option value='BLK/PNK'>BLACK/PINK</option>
+            <option value='RED/PNK'>RED/PINK</option>
+            <option value='GRY/BLU'>GREY/BLUE</option>
+            <option value='BRN/GRY'>BROWN/GREY</option>
+            <option value='LIGHT GRN/RED'>LIGHT GEERN/RED</option>
+            <option value='BLU/GRN'>BLUE/GREEN</option>
+            <option value='YEL/BRN'>YELLOW/BROWN</option>
+            <option value='BLU/BLK'>BLUE/BLACK</option>
+            <option value='BRN/RED'>BROWN/RED</option>
+            <option value='BLU/ORG'>BLUE/ORANGE</option>
+            <option value='BLU/GRY'>BLUE/GREY</option>
+            <option value='BRN/TAN'>BROWN/TAN</option>
+            <option value='BRN/YEL'>BROWN/YELLOW</option>
+            <option value='GRN/RED'>GEERN/RED</option>
+            <option value='GRY/RED'>GREY/RED</option>
+            <option value='PUR/RED'>PURPLE/RED</option>
+            <option value='GRN/BLK'>GREEN/BLACK</option>
+            <option value='TAN/RED'>TAN/RED</option>
+            <option value='LT GRN/BLK'>LIGHT GREEN/BLAK</option>
+            <option value='LT GRN/WHT'>LIGHT GRN/WHT</option>
+            <option value='RED/GRN'>RED/GREEN</option>
+            <option value='RED/BLU'>RED/BLUE</option>
+            <option value='TAN/ORG'>TAN/ORG</option>
+            <option value='TAN/BLK'>TAN/BLACK</option>
+            <option value='LIGHT BLU/WHT'>LIGHT BLUE/WHT</option>
+            <option value='LT BLU/BLK'>LIGHT BLUE/BLACK</option>
+            <option value='ORG/BRN'>ORG/BROWN</option>
+            <option value='PUR/YEL'>PURPLE/YELLOW</option>
+            <option value='TAN/WHT'>TAN/WHT</option>
+            <option value='PUR/WHT'>PUR/WHT</option>
+            <option value='BRN/BLK'>BROWN/BLACK</option>
+            <option value='COPP'>COPPER</option>
+            <option value='GRN/PUR'>GREEN/PURPLE</option>
+            <option value='LT BLU/ORG'>LIGHT BLUE/ORANGE</option>
+            <option value='WHT/YEL'>WHITE/YELLOW</option>
+            <option value='ORG/RED'>ORANGE/RED</option>
+            <option value='LT GRN/PUR'>LIGHT GREEN/PURPLE</option>
+            <option value='GRY/PNK'>GREY/PINK</option>
+            <option value='LT BLU/RED'>LIGHT BLUE/RED</option>
+            <option value='LT BLU/GRY'>LIGHT BLUE/GREY</option>
+            <option value='LT BLU/PUR'>LIGHT BLUE/PURPLE</option>
+            <option value='LT BLU/BRN'>LIGHT BLUE/BROWN</option>
+            <option value='LT BLU/PNK'>LIGHT BLUE/PINK</option>
+            <option value='LT BLU/BLK'>LIGHT BLUE/BLACK</option>
+            <option value='LT BLU/GRN'>LIGHT BLUE/GREEN</option>
+            <option value='LT BLU/YEL'>LIGHT BLUE/YELLOW</option>
+            <option value='LT BLU/ORG'>LIGHT BLUE/ORANGE</option>
+            <option value='LT BLU/COPP'>LIGHT BLUE/COPPER</option>
+            <option value='LT BLU/TAN'>LIGHT BLUE/TAN</option>
+        </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Longitud (mm) - Ej. 150+100+50:</label>
+            <input type="text" id="cable-longitud" value="150" placeholder="Ej. 150 o 100+50+50">
+        </div>
+        
+        <div class="modal-actions">
+            <button class="btn-danger" id="btn-delete-cable">Eliminar</button>
+            <div>
+                <button class="btn-cancel" onclick="cerrarModales()">Cancelar</button>
+                <button class="btn-success" id="btn-save-cable">Guardar</button>
+            </div>
+        </div>
     </div>
 
     <div id="modal-conector" class="modal">
         <h3>Configuración del Conector</h3>
         <div class="form-group"><label>Descripción / Locación:</label><input type="text" id="conn-desc" value="Conector Principal"></div>
         <div class="form-group"><label>No. Parte (Housing):</label><input type="text" id="conn-pn" value="12040953"></div>
-        
         <div class="form-group" style="border-top: 1px solid #ccc; padding-top: 10px; margin-top: 15px;">
-            <label>Cantidad de Vías (Pines):</label>
-            <input type="number" id="conn-vias" value="6" min="1" max="50">
+            <label>Cantidad de Vías (Pines):</label><input type="number" id="conn-vias" value="6" min="1" max="50">
         </div>
-        
         <div class="form-group">
             <label>Terminales por Vía (Part Number):</label>
-            <div id="lista-terminales" class="cavity-container">
-                </div>
+            <div id="lista-terminales" class="cavity-container"></div>
         </div>
+        <div class="modal-actions">
+            <button class="btn-danger" id="btn-delete-conn">Eliminar</button>
+            <div>
+                <button class="btn-cancel" onclick="cerrarModales()">Cerrar</button>
+                <button class="btn-success" id="btn-save-conn">Actualizar</button>
+            </div>
+        </div>
+    </div>
 
-        <div class="modal-actions"><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-conn">Actualizar</button></div>
+    <div id="modal-splice" class="modal">
+        <h3>Identificador del Splice</h3>
+        <div class="form-group">
+            <label>Nombre / Etiqueta:</label>
+            <input type="text" id="splice-name" value="SP-1" placeholder="Ej. SP-A, SP-Motor">
+        </div>
+        <div class="modal-actions">
+            <button class="btn-danger" id="btn-delete-splice">Eliminar</button>
+            <div>
+                <button class="btn-cancel" onclick="cerrarModales()">Cerrar</button>
+                <button class="btn-success" id="btn-save-splice">Actualizar</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
@@ -119,7 +289,21 @@
             if (idTab === 'bom') generarReporteBOM();
         }
 
+        // NUEVO: Función para evaluar operaciones matemáticas de forma segura
+        function evaluarMatematica(expresion) {
+            try {
+                // Removemos todo lo que no sea número, punto, o signos de suma/resta
+                let expLimpia = String(expresion).replace(/[^0-9\+\-\.\s]/g, '');
+                if(expLimpia.trim() === '') return 0;
+                // Evaluamos la expresión de forma segura
+                return Function('"use strict";return (' + expLimpia + ')')();
+            } catch (e) {
+                return 0; // Si hay error tipográfico, regresa 0
+            }
+        }
+
         let escalaActual = 1;
+        let contSplices = 1;
         const graph = new joint.dia.Graph();
         
         const paper = new joint.dia.Paper({
@@ -131,183 +315,181 @@
         $('#btn-zoom-in').click(() => { escalaActual += 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); });
         $('#btn-zoom-out').click(() => { if(escalaActual > 0.3) { escalaActual -= 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); } });
 
-        // ==========================================
-        // LÓGICA DE DIBUJO Y MODALES
-        // ==========================================
+        $('#btn-clear-canvas').click(() => {
+            if(confirm("¿Estás seguro de que deseas borrar todo el arnés? Esta acción no se puede deshacer.")) {
+                graph.clear();
+                contSplices = 1; 
+            }
+        });
+
         let enlaceActual = null;
         let nodoActual = null;
-        // Objeto temporal para guardar las terminales mientras se edita el modal
         let terminalesTemp = {}; 
 
         function crearConector(x, y, descripcion, partNumber, numVias) {
-            let pines = [];
-            let terminalesIniciales = {};
-
+            let pines = []; let terminalesIniciales = {};
             for(let i = 1; i <= numVias; i++) {
                 pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } });
-                terminalesIniciales[`via-${i}`] = '41412'; // Terminal por defecto
+                terminalesIniciales[`via-${i}`] = '41412';
             }
-
             const rect = new joint.shapes.standard.Rectangle({
                 position: { x: x, y: y }, size: { width: 140, height: Math.max(60, numVias * 25) }, 
                 attrs: { body: { fill: '#3498db', rx: 5, ry: 5, stroke: '#2980b9', strokeWidth: 2 }, label: { text: `${descripcion}\nPN: ${partNumber}`, fill: 'white', fontWeight: 'bold', fontSize: 12, refY: 15 } },
                 ports: { groups: { 'cavidades': { position: 'right', attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: { name: 'left', args: { x: -15 } } } } }, items: pines }
             });
-
             rect.set('bomData', { type: 'Connector', description: descripcion, housingPartNumber: partNumber, cavities: numVias, terminals: terminalesIniciales });
             rect.addTo(graph); return rect;
         }
 
-        function crearSplice(x, y) {
+        function crearSplice(x, y, nombre) {
             const circle = new joint.shapes.standard.Circle({ 
-                position: { x: x, y: y }, 
-                size: { width: 50, height: 50 }, // Lo hacemos un poco más grande
-                attrs: { 
-                    // 1. Quitamos el magnet:true de aquí para poder arrastrarlo
-                    body: { fill: '#e74c3c', stroke: '#c0392b', strokeWidth: 2 }, 
-                    // 2. Movemos el texto un poco hacia arriba para que no estorbe
-                    label: { text: 'SPLICE', fill: 'white', fontWeight: 'bold', fontSize: 10, refY: 12, pointerEvents: 'none' } 
-                },
-                // 3. Agregamos un "Pin" magnético en el centro para los cables
-                ports: {
-                    groups: {
-                        'conexion': {
-                            position: 'center',
-                            attrs: {
-                                circle: { r: 12, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2, cursor: 'crosshair' }
-                            }
-                        }
-                    },
-                    items: [ { id: 'centro', group: 'conexion' } ]
-                }
+                position: { x: x, y: y }, size: { width: 50, height: 50 },
+                attrs: { body: { fill: '#e74c3c', stroke: '#c0392b', strokeWidth: 2 }, label: { text: nombre, fill: '#c0392b', fontWeight: 'bold', fontSize: 13, textVerticalAnchor: 'bottom', refY: -5, pointerEvents: 'none' } },
+                ports: { groups: { 'conexion': { position: 'center', attrs: { circle: { r: 12, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2, cursor: 'crosshair' } } } }, items: [ { id: 'centro', group: 'conexion' } ] }
             });
-            circle.set('bomData', { type: 'Splice', qty: 1 }); 
-            circle.addTo(graph); 
-            return circle;
+            circle.set('bomData', { type: 'Splice', name: nombre, qty: 1 }); circle.addTo(graph); return circle;
         }
 
-        // Función para renderizar los inputs de terminales basados en el número de vías
         function renderizarInputsTerminales(vias) {
             let html = '';
             for(let i = 1; i <= vias; i++) {
-                let idVia = `via-${i}`;
-                // Recupera el PN si ya existía, o pone vacío
-                let valorPN = terminalesTemp[idVia] || ''; 
-                html += `
-                <div class="cavity-row">
-                    <label>Vía ${i}:</label>
-                    <input type="text" class="input-terminal" data-via="${idVia}" value="${valorPN}" placeholder="Part No. de Terminal">
-                </div>`;
+                let idVia = `via-${i}`; let valorPN = terminalesTemp[idVia] || ''; 
+                html += `<div class="cavity-row"><label>Vía ${i}:</label><input type="text" class="input-terminal" data-via="${idVia}" value="${valorPN}" placeholder="Part No. de Terminal"></div>`;
             }
             $('#lista-terminales').html(html);
         }
 
-        // Evento que detecta cuando cambias el número de vías en el Modal
         $('#conn-vias').on('input', function() {
             let nuevasVias = parseInt($(this).val()) || 1;
-            
-            // Guardar lo que el usuario haya escrito en los inputs actuales antes de re-renderizar
-            $('.input-terminal').each(function() {
-                terminalesTemp[$(this).data('via')] = $(this).val();
-            });
-
+            $('.input-terminal').each(function() { terminalesTemp[$(this).data('via')] = $(this).val(); });
             renderizarInputsTerminales(nuevasVias);
         });
 
-        function abrirModalCable(link) { enlaceActual = link; $('#overlay, #modal-cable').show(); }
+        // MODIFICADO: Llenar el campo de circuito y resetear el campo de longitud al abrir modal
+        function abrirModalCable(link) { 
+            enlaceActual = link; 
+            const d = link.get('bomData');
+            if(d) {
+                $('#cable-circuito').val(d.circuito || '');
+                $('#cable-tipo').val(d.insulation);
+                $('#cable-calibre').val(d.gage);
+                $('#cable-color').val(d.color);
+                $('#cable-longitud').val(d.length); // Muestra el total ya calculado
+            } else {
+                $('#cable-circuito').val('');
+                $('#cable-longitud').val('150'); // Default
+            }
+            $('#overlay, #modal-cable').show(); 
+        }
         
         function abrirModalConector(element) { 
-            nodoActual = element; 
-            const d = element.get('bomData'); 
-            
-            $('#conn-desc').val(d.description); 
-            $('#conn-pn').val(d.housingPartNumber); 
-            $('#conn-vias').val(d.cavities);
-            
-            // Cargar terminales actuales a la variable temporal y renderizar
-            terminalesTemp = Object.assign({}, d.terminals);
-            renderizarInputsTerminales(d.cavities);
-
+            nodoActual = element; const d = element.get('bomData'); 
+            $('#conn-desc').val(d.description); $('#conn-pn').val(d.housingPartNumber); $('#conn-vias').val(d.cavities);
+            terminalesTemp = Object.assign({}, d.terminals); renderizarInputsTerminales(d.cavities);
             $('#overlay, #modal-conector').show(); 
+        }
+
+        function abrirModalSplice(element) {
+            nodoActual = element; const d = element.get('bomData');
+            $('#splice-name').val(d.name); $('#overlay, #modal-splice').show();
         }
         
         function cerrarModales() { $('#overlay, .modal').hide(); if (enlaceActual && !enlaceActual.get('bomData')) { enlaceActual.remove(); } enlaceActual = null; nodoActual = null; }
 
+        $('#btn-delete-cable').click(() => { if(enlaceActual) { enlaceActual.remove(); } cerrarModales(); });
+        $('#btn-delete-conn').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
+        $('#btn-delete-splice').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
+
+        // MODIFICADO: Guardar cable calculando la longitud matemáticamente y asignando el circuito
         $('#btn-save-cable').click(() => {
             if (enlaceActual) {
-                const tipo = $('#cable-tipo').val(), cal = $('#cable-calibre').val(), color = $('#cable-color').val(), lon = $('#cable-longitud').val();
+                const circuito = $('#cable-circuito').val() || 'S/N';
+                const tipo = $('#cable-tipo').val();
+                const cal = $('#cable-calibre').val();
+                const color = $('#cable-color').val();
+                
+                // Extraemos el string ingresado (ej. "150+100") y calculamos el total
+                const strLongitud = $('#cable-longitud').val();
+                const longitudCalculada = evaluarMatematica(strLongitud);
+
                 enlaceActual.labels([]); 
-                enlaceActual.appendLabel({ attrs: { text: { text: `${lon}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5 } } });
-                enlaceActual.set('bomData', { type: 'Wire', insulation: tipo, gage: parseInt(cal), color: color, length: parseInt(lon) });
+                enlaceActual.appendLabel({ 
+                    attrs: { 
+                        // La etiqueta visual ahora muestra el circuito en corchetes y la longitud total calculada
+                        text: { text: `[${circuito}]\n${longitudCalculada}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, 
+                        rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5 } 
+                    } 
+                });
+                
+                // Guardamos los datos técnicos reales en el JSON del cable
+                enlaceActual.set('bomData', { 
+                    type: 'Wire', 
+                    circuito: circuito, 
+                    insulation: tipo, 
+                    gage: parseInt(cal), 
+                    color: color, 
+                    length: longitudCalculada 
+                });
             }
             cerrarModales();
         });
 
-        // Al Guardar el Conector (Lógica de Re-Dimensionamiento Dinámico)
         $('#btn-save-conn').click(() => {
             if (nodoActual) {
                 const desc = $('#conn-desc').val(), pn = $('#conn-pn').val(), vias = parseInt($('#conn-vias').val());
-                
-                // Recolectar terminales de los inputs
                 let terminalesFinales = {};
-                $('.input-terminal').each(function() {
-                    let pnTerminal = $(this).val();
-                    if(pnTerminal.trim() !== '') {
-                        terminalesFinales[$(this).data('via')] = pnTerminal;
-                    }
-                });
-
-                // 1. Actualizar Datos Ocultos (BOM)
-                let d = nodoActual.get('bomData'); 
-                d.description = desc; 
-                d.housingPartNumber = pn; 
-                d.cavities = vias;
-                d.terminals = terminalesFinales;
-                nodoActual.set('bomData', d);
-
-                // 2. Actualizar Visualmente el Conector (Texto, Tamaño y Puertos/Pines)
+                $('.input-terminal').each(function() { let pnTerminal = $(this).val(); if(pnTerminal.trim() !== '') { terminalesFinales[$(this).data('via')] = pnTerminal; } });
+                let d = nodoActual.get('bomData'); d.description = desc; d.housingPartNumber = pn; d.cavities = vias; d.terminals = terminalesFinales; nodoActual.set('bomData', d);
                 nodoActual.attr('label/text', `${desc}\nPN: ${pn}`);
-                
-                // Ajustar la altura visual dependiendo del número de pines
                 nodoActual.resize(140, Math.max(60, vias * 25));
+                let pines = []; for(let i = 1; i <= vias; i++) { pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); }
+                nodoActual.set('ports', { groups: { 'cavidades': { position: 'right', attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: { name: 'left', args: { x: -15 } } } } }, items: pines });
+            }
+            cerrarModales();
+        });
 
-                // Re-generar los puertos (pines)
-                let pines = [];
-                for(let i = 1; i <= vias; i++) {
-                    pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } });
-                }
-                
-                // Sobrescribir los puertos en JointJS
-                nodoActual.set('ports', {
-                    groups: {
-                        'cavidades': { position: 'right', attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: { name: 'left', args: { x: -15 } } } }
-                    },
-                    items: pines
-                });
+        $('#btn-save-splice').click(() => {
+            if (nodoActual) {
+                const nuevoNombre = $('#splice-name').val();
+                let d = nodoActual.get('bomData'); d.name = nuevoNombre; nodoActual.set('bomData', d);
+                nodoActual.attr('label/text', nuevoNombre);
             }
             cerrarModales();
         });
 
         graph.on('add', function(cell) { if (cell.isLink()) { cell.on('change:target', function(link) { if (link.get('target').id && link.get('source').id) { if (!link.get('bomData')) abrirModalCable(link); } }); } });
-        paper.on('element:pointerdblclick', function(cellView) { if (cellView.model.get('bomData').type === 'Connector') abrirModalConector(cellView.model); });
+        
+        paper.on('element:pointerdblclick', function(cellView) { 
+            const tipo = cellView.model.get('bomData').type;
+            if (tipo === 'Connector') abrirModalConector(cellView.model); 
+            if (tipo === 'Splice') abrirModalSplice(cellView.model); 
+        });
+        
+        paper.on('link:pointerdblclick', function(linkView) { abrirModalCable(linkView.model); });
         
         $('#btn-add-connector').click(() => { crearConector(50, 50, 'Conector A', '12064754', 4); });
-        $('#btn-add-splice').click(() => { crearSplice(300, 150); });
+        $('#btn-add-splice').click(() => { crearSplice(300, 150, `SP-${contSplices}`); contSplices++; });
 
         // ==========================================
         // GENERACIÓN DE REPORTES BOM Y RUTAS
         // ==========================================
+        
+        // MODIFICADO: Se agregó la columna de "Circuito" a la tabla de reportes
         function generarReporteRutas() {
             const links = graph.getLinks();
-            let html = `<table><tr><th>Origen</th><th>Vía/Pin</th><th>Destino</th><th>Vía/Pin</th><th>Cable</th><th>Longitud</th></tr>`;
+            let html = `<table><tr><th>Circuito</th><th>Origen</th><th>Vía/Pin</th><th>Destino</th><th>Vía/Pin</th><th>Especificación Cable</th><th>Longitud</th></tr>`;
             links.forEach(link => {
                 const data = link.get('bomData'); if(!data) return;
                 const srcNode = graph.getCell(link.get('source').id); const tgtNode = graph.getCell(link.get('target').id);
                 if(srcNode && tgtNode) {
                     const srcData = srcNode.get('bomData'); const tgtData = tgtNode.get('bomData');
+                    const srcName = srcData.type === 'Splice' ? srcData.name : `${srcData.description} (${srcData.housingPartNumber})`;
+                    const tgtName = tgtData.type === 'Splice' ? tgtData.name : `${tgtData.description} (${tgtData.housingPartNumber})`;
                     const srcPort = link.get('source').port ? link.get('source').port.replace('via-', '') : 'Centro';
                     const tgtPort = link.get('target').port ? link.get('target').port.replace('via-', '') : 'Centro';
-                    html += `<tr><td>${srcData.description || 'Splice'} (${srcData.housingPartNumber || 'SP'})</td><td><b>${srcPort}</b></td><td>${tgtData.description || 'Splice'} (${tgtData.housingPartNumber || 'SP'})</td><td><b>${tgtPort}</b></td><td>${data.gage} AWG ${data.insulation} ${data.color}</td><td>${data.length} mm</td></tr>`;
+                    
+                    // Columna Circuito insertada al inicio
+                    html += `<tr><td><b>${data.circuito || 'S/N'}</b></td><td>${srcName}</td><td><b>${srcPort}</b></td><td>${tgtName}</td><td><b>${tgtPort}</b></td><td>${data.gage} AWG ${data.insulation} ${data.color}</td><td>${data.length} mm</td></tr>`;
                 }
             });
             $('#tabla-rutas-container').html(html + '</table>');
@@ -319,25 +501,18 @@
 
             elements.forEach(el => {
                 const data = el.get('bomData'); if(!data) return;
-                
-                // Conteo de Housings / Splices
                 if(data.type === 'Connector') {
                     if(!componentes[data.housingPartNumber]) componentes[data.housingPartNumber] = { desc: data.description, qty: 0 };
                     componentes[data.housingPartNumber].qty += 1;
-
-                    // NUEVO: Conteo Individual de Terminales por Vía
                     if (data.terminals) {
                         for (let via in data.terminals) {
                             let pnTerminal = data.terminals[via];
-                            if(pnTerminal) { // Solo sumar si hay un PN de terminal escrito
-                                if(!terminalesTotales[pnTerminal]) terminalesTotales[pnTerminal] = 0;
-                                terminalesTotales[pnTerminal] += 1; 
-                            }
+                            if(pnTerminal) { if(!terminalesTotales[pnTerminal]) terminalesTotales[pnTerminal] = 0; terminalesTotales[pnTerminal] += 1; }
                         }
                     }
                 } else if(data.type === 'Splice') {
-                    if(!componentes['SPLICE-GEN']) componentes['SPLICE-GEN'] = { desc: 'Splice Genérico', qty: 0 };
-                    componentes['SPLICE-GEN'].qty += 1;
+                    if(!componentes[data.name]) componentes[data.name] = { desc: 'Splice / Empalme', qty: 0 };
+                    componentes[data.name].qty += 1;
                 }
             });
 
@@ -348,12 +523,10 @@
                 cablesTotales[llaveCable] += data.length;
             });
 
-            let html = `<h3>Conectores y Splices (Housing)</h3><table><tr><th>Part Number</th><th>Descripción</th><th>Cantidad</th></tr>`;
+            let html = `<h3>Conectores y Splices (Housing)</h3><table><tr><th>Part Number / Identificador</th><th>Descripción</th><th>Cantidad</th></tr>`;
             for(let pn in componentes) html += `<tr><td>${pn}</td><td>${componentes[pn].desc}</td><td>${componentes[pn].qty} pzas</td></tr>`;
-            
             html += `</table><br><h3>Terminales</h3><table><tr><th>Terminal Part Number</th><th>Cantidad Requerida</th></tr>`;
             for(let termPn in terminalesTotales) html += `<tr><td>${termPn}</td><td>${terminalesTotales[termPn]} pzas</td></tr>`;
-            
             html += `</table><br><h3>Longitud Total de Cables</h3><table><tr><th>Especificación de Cable</th><th>Longitud Total (mm)</th></tr>`;
             for(let cable in cablesTotales) html += `<tr><td>${cable}</td><td>${cablesTotales[cable]} mm</td></tr>`;
             $('#tabla-bom-container').html(html + '</table>');
