@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editor de Arneses - V10 (Troncos y Corrugados)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.css">
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 20px; background: #e9ecef; }
+        
+        .tab-menu { display: flex; border-bottom: 2px solid #adb5bd; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 20px; background: #dee2e6; border: none; border-radius: 5px 5px 0 0; cursor: pointer; font-size: 16px; font-weight: bold; margin-right: 5px; color: #495057; }
+        .tab-btn.active { background: #007bff; color: white; }
+        .tab-content { display: none; background: white; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .tab-content.active { display: block; }
+
+        #herramientas { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;}
+        #lienzo-arnes { border: 2px solid #adb5bd; background: #fff; width: 1000px; height: 600px; overflow: hidden; position: relative; }
+        button { padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #5a6268; }
+        .btn-primary { background: #007bff; } .btn-primary:hover { background: #0056b3; }
+        .btn-success { background: #28a745; } .btn-success:hover { background: #218838; }
+        .btn-danger { background: #dc3545; } .btn-danger:hover { background: #c82333; }
+        .btn-dark { background: #343a40; } .btn-dark:hover { background: #23272b; }
+        .btn-info { background: #17a2b8; } .btn-info:hover { background: #138496; }
+        .btn-warning { background: #f39c12; color: #fff;} .btn-warning:hover { background: #e67e22; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
+        th { background: #e9ecef; color: #495057; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+
+        /* Modales */
+        .modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 100; width: 340px; max-height: 80vh; overflow-y: auto; }
+        .modal h3 { margin-top: 0; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; position: sticky; top: 0; background: white; z-index: 2;}
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; font-weight: bold;}
+        .form-group input, .form-group select { width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        
+        .cavity-container { background: #f8f9fa; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; }
+        .cavity-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .cavity-row label { width: 60px; margin: 0; color: #d35400; }
+        .cavity-row input { flex: 1; }
+
+        .modal-actions { display: flex; justify-content: space-between; margin-top: 15px; position: sticky; bottom: -20px; background: white; padding: 10px 0; border-top: 1px solid #eee;}
+        .btn-cancel { background: #6c757d; } .btn-cancel:hover { background: #5a6268; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 99; }
+    </style>
+</head>
+<body>
+
+    <div class="tab-menu">
+        <button class="tab-btn active" onclick="abrirTab('editor', this)">Diseño</button>
+        <button class="tab-btn" onclick="abrirTab('rutas', this)">Lista de corte</button>
+        <button class="tab-btn" onclick="abrirTab('bom', this)">Lista de Materiales (BOM)</button>
+    </div>
+
+    <div id="tab-editor" class="tab-content active">
+        <div id="herramientas">
+            <button class="btn-primary" id="btn-add-connector">Agregar Conector</button>
+            <button class="btn-primary" id="btn-add-splice">Agregar Splice</button>
+            
+            <button class="btn-warning" id="btn-add-loom">Manga / Corrugado</button>
+            
+            <span style="border-left: 2px solid #ccc; margin: 0 5px; height: 30px;"></span>
+            
+            <button class="btn-success" id="btn-save-json">Guardar</button>
+            <input type="file" id="input-load-json" accept=".json" style="display:none;">
+            <button class="btn-info" onclick="document.getElementById('input-load-json').click()">Cargar</button>
+            
+            <span style="border-left: 2px solid #ccc; margin: 0 5px; height: 30px;"></span>
+            <button class="btn-danger" id="btn-clear-canvas">Limpiar</button>
+            
+            <span style="border-left: 2px solid #ccc; margin: 0 5px; height: 30px;"></span>
+            <strong>Zoom:</strong>
+            <button id="btn-zoom-out">-</button>
+            <span id="zoom-level">100%</span>
+            <button id="btn-zoom-in">+</button>
+        </div>
+        <div id="lienzo-arnes"></div>
+    </div>
+
+    <div id="tab-rutas" class="tab-content">
+        <h2>Lista de Conexiones (De -> A)</h2>
+        <div id="tabla-rutas-container">El reporte se generará al entrar a esta pestaña.</div>
+    </div>
+
+    <div id="tab-bom" class="tab-content">
+        <h2>Resumen de Materiales Requeridos</h2>
+        <div id="tabla-bom-container">El reporte se generará al entrar a esta pestaña.</div>
+    </div>
+
+    <div id="overlay"></div>
+
+    <div id="modal-cable" class="modal">
+        <h3>Propiedades del Cable</h3>
+        <div class="form-group"><label>Nombre del Circuito:</label><input type="text" id="cable-circuito" placeholder="Ej. CIR-1, PWR, GND"></div>
+        <div class="form-group"><label>Aislamiento:</label><select id="cable-tipo"><option value="GXL">GXL</option><option value="TXL">TXL</option><option value="SXL">SXL</option></select></div>
+        <div class="form-group"><label>Calibre (AWG):</label><input type="number" id="cable-calibre" value="18"></div>
+        <div class="form-group"><label>Color:</label>
+        <select id="cable-color">
+            <option value='RED'>RED</option>
+            <option value='BLK'>BLACK</option>
+            <option value='BLU'>BLUE</option>
+            <option value='GRN'>GREEN</option>
+            <option value='YEL'>YELLOW</option>
+            <option value='ORG'>ORANGE</option>
+            <option value='PUR'>PURPLE</option>
+            <option value='BRN'>BROWN</option>
+            <option value='WHT'>WHITE</option>
+            <option value='GRY'>GREY</option>
+        </select>
+        </div>
+        <div class="form-group"><label>Longitud (mm) - Ej. 150+100+50:</label><input type="text" id="cable-longitud" value="0"></div>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-cable">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cancelar</button><button class="btn-success" id="btn-save-cable">Guardar</button></div></div>
+    </div>
+
+    <div id="modal-conector" class="modal">
+        <h3>Configuración del Conector</h3>
+        <div class="form-group"><label>Descripción / Locación:</label><input type="text" id="conn-desc" value="Conector Principal"></div>
+        <div class="form-group"><label>No. Parte (Housing):</label><input type="text" id="conn-pn" value="12040953"></div>
+        <div class="form-group" style="border-top: 1px solid #ccc; padding-top: 10px; margin-top: 15px;"><label>Cantidad de Vías (Pines):</label><input type="number" id="conn-vias" value="6" min="1" max="50"></div>
+        <div class="form-group"><label>Terminales por Vía (Part Number):</label><div id="lista-terminales" class="cavity-container"></div></div>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-conn">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-conn">Actualizar</button></div></div>
+    </div>
+
+    <div id="modal-splice" class="modal">
+        <h3>Identificador del Splice</h3>
+        <div class="form-group"><label>Nombre / Etiqueta:</label><input type="text" id="splice-name" value="SP-1"></div>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-splice">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-splice">Actualizar</button></div></div>
+    </div>
+
+    <div id="modal-loom" class="modal">
+        <h3>Propiedades de Envolvente</h3>
+        <div class="form-group"><label>Descripción (Ej. Loom 1/2", Encintado PVC):</label><input type="text" id="loom-desc" value="Tubo Corrugado"></div>
+        <div class="form-group"><label>Orientación Visual:</label>
+            <select id="loom-orientacion">
+                <option value="horizontal">Horizontal</option>
+                <option value="vertical">Vertical</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Largo (px en el lienzo):</label><input type="number" id="loom-length" value="200"></div>
+        <div class="form-group"><label>Grosor (px en el lienzo):</label><input type="number" id="loom-width" value="40"></div>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-loom">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-loom">Actualizar</button></div></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.js"></script>
+    
+    <script>
+        function abrirTab(idTab, btn) { $('.tab-content').removeClass('active'); $('.tab-btn').removeClass('active'); $('#tab-' + idTab).addClass('active'); $(btn).addClass('active'); if (idTab === 'rutas') generarReporteRutas(); if (idTab === 'bom') generarReporteBOM(); }
+        function evaluarMatematica(expresion) { try { let expLimpia = String(expresion).replace(/[^0-9\+\-\.\s]/g, ''); if(expLimpia.trim() === '') return 0; return Function('"use strict";return (' + expLimpia + ')')(); } catch (e) { return 0; } }
+
+        let escalaActual = 1; let contSplices = 1; const graph = new joint.dia.Graph();
+        
+        const paper = new joint.dia.Paper({
+            el: document.getElementById('lienzo-arnes'), model: graph, width: 2000, height: 2000, gridSize: 10, drawGrid: true, background: { color: '#ffffff' },
+            defaultLink: new joint.shapes.standard.Link({ 
+                attrs: { line: { stroke: '#34495e', strokeWidth: 3, strokeLinejoin: 'round' } },
+                router: { name: 'orthogonal' }, // Cables rectos a 90 grados
+                connector: { name: 'rounded', args: { radius: 10 } } // Esquinas suaves
+            }), 
+            interactive: { linkMove: true, vertexAdd: true, vertexMove: true, vertexRemove: true }, // Permite crear y mover dobleces
+            linkPinning: false, snapLinks: { radius: 30 },
+            validateConnection: function(cellViewS, magnetS, cellViewT, magnetT) { if (cellViewS === cellViewT) return false; return magnetT != null; }
+        });
+
+        $('#btn-zoom-in').click(() => { escalaActual += 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); });
+        $('#btn-zoom-out').click(() => { if(escalaActual > 0.3) { escalaActual -= 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); } });
+        $('#btn-clear-canvas').click(() => { if(confirm("¿Estás seguro de que deseas borrar todo el arnés? Esta acción no se puede deshacer.")) { graph.clear(); contSplices = 1; } });
+
+        $('#btn-save-json').click(() => { const jsonStr = JSON.stringify(graph.toJSON(), null, 2); const blob = new Blob([jsonStr], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = "arnes_proyecto.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); });
+        $('#input-load-json').on('change', function(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(event) { try { const jsonData = JSON.parse(event.target.result); graph.clear(); graph.fromJSON(jsonData); let maxSplice = 0; graph.getElements().forEach(el => { const d = el.get('bomData'); if(d && d.type === 'Splice' && d.name) { const match = d.name.match(/SP-(\d+)/); if(match && parseInt(match[1]) > maxSplice) { maxSplice = parseInt(match[1]); } } }); contSplices = maxSplice + 1; alert("Proyecto cargado exitosamente."); } catch (error) { alert("Error al cargar el archivo."); } }; reader.readAsText(file); $(this).val(''); });
+
+        let enlaceActual = null; let nodoActual = null; let terminalesTemp = {}; 
+
+        function crearConector(x, y, descripcion, partNumber, numVias) {
+            let pines = []; let terminalesIniciales = {};
+            for(let i = 1; i <= numVias; i++) { pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); terminalesIniciales[`via-${i}`] = '41412'; }
+            const rect = new joint.shapes.standard.Rectangle({
+                position: { x: x, y: y }, size: { width: 140, height: Math.max(60, numVias * 25) }, 
+                attrs: { body: { fill: '#3498db', rx: 5, ry: 5, stroke: '#2980b9', strokeWidth: 2 }, label: { text: `${descripcion}\nPN: ${partNumber}`, fill: 'white', fontWeight: 'bold', fontSize: 12, refY: 15 } },
+                ports: { groups: { 'cavidades': { position: 'right', attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: { name: 'left', args: { x: -15 } } } } }, items: pines }
+            });
+            rect.set('bomData', { type: 'Connector', description: descripcion, housingPartNumber: partNumber, cavities: numVias, terminals: terminalesIniciales }); rect.addTo(graph); return rect;
+        }
+
+        function crearSplice(x, y, nombre) {
+            const circle = new joint.shapes.standard.Circle({ 
+                position: { x: x, y: y }, size: { width: 50, height: 50 },
+                attrs: { body: { fill: '#e74c3c', stroke: '#c0392b', strokeWidth: 2 }, label: { text: nombre, fill: '#c0392b', fontWeight: 'bold', fontSize: 13, textVerticalAnchor: 'bottom', refY: -5, pointerEvents: 'none' } },
+                ports: { groups: { 'conexion': { position: 'center', attrs: { circle: { r: 12, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2, cursor: 'crosshair' } } } }, items: [ { id: nombre, group: 'conexion' } ] }
+            });
+            circle.set('bomData', { type: 'Splice', name: nombre, qty: 1 }); circle.addTo(graph); return circle;
+        }
+
+        // NUEVA FIGURA: CORRUGADO / LOOM
+        function crearLoom(x, y) {
+            const rect = new joint.shapes.standard.Rectangle({
+                position: { x: x, y: y }, size: { width: 200, height: 40 },
+                attrs: { 
+                    // Translúcido para ver los cables por debajo, con borde punteado
+                    body: { fill: '#f1c40f', fillOpacity: 0.3, stroke: '#e67e22', strokeWidth: 2, strokeDasharray: '4,4' }, 
+                    label: { text: 'TUBO CORRUGADO', fill: '#d35400', fontWeight: 'bold', fontSize: 11 } 
+                }
+            });
+            rect.set('bomData', { type: 'Loom', description: 'Tubo Corrugado', len: 200, wid: 40, orientacion: 'horizontal' });
+            rect.addTo(graph);
+            rect.toBack(); // Envía el corrugado al fondo (atrás de los cables)
+            return rect;
+        }
+
+        function renderizarInputsTerminales(vias) { let html = ''; for(let i = 1; i <= vias; i++) { let idVia = `via-${i}`; let valorPN = terminalesTemp[idVia] || ''; html += `<div class="cavity-row"><label>Vía ${i}:</label><input type="text" class="input-terminal" data-via="${idVia}" value="${valorPN}" placeholder="Part No. de Terminal"></div>`; } $('#lista-terminales').html(html); }
+        $('#conn-vias').on('input', function() { let nuevasVias = parseInt($(this).val()) || 1; $('.input-terminal').each(function() { terminalesTemp[$(this).data('via')] = $(this).val(); }); renderizarInputsTerminales(nuevasVias); });
+
+        function abrirModalCable(link) { enlaceActual = link; const d = link.get('bomData'); if(d) { $('#cable-circuito').val(d.circuito || ''); $('#cable-tipo').val(d.insulation); $('#cable-calibre').val(d.gage); $('#cable-color').val(d.color); $('#cable-longitud').val(d.length); } else { $('#cable-circuito').val(''); $('#cable-longitud').val('150'); } $('#overlay, #modal-cable').show(); }
+        function abrirModalConector(element) { nodoActual = element; const d = element.get('bomData'); $('#conn-desc').val(d.description); $('#conn-pn').val(d.housingPartNumber); $('#conn-vias').val(d.cavities); terminalesTemp = Object.assign({}, d.terminals); renderizarInputsTerminales(d.cavities); $('#overlay, #modal-conector').show(); }
+        function abrirModalSplice(element) { nodoActual = element; const d = element.get('bomData'); $('#splice-name').val(d.name); $('#overlay, #modal-splice').show(); }
+        
+        // NUEVO: Abrir Modal de Loom
+        function abrirModalLoom(element) {
+            nodoActual = element; const d = element.get('bomData');
+            $('#loom-desc').val(d.description); $('#loom-length').val(d.len); $('#loom-width').val(d.wid); $('#loom-orientacion').val(d.orientacion);
+            $('#overlay, #modal-loom').show();
+        }
+
+        function cerrarModales() { $('#overlay, .modal').hide(); if (enlaceActual && !enlaceActual.get('bomData')) { enlaceActual.remove(); } enlaceActual = null; nodoActual = null; }
+
+        $('#btn-delete-cable').click(() => { if(enlaceActual) { enlaceActual.remove(); } cerrarModales(); });
+        $('#btn-delete-conn').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
+        $('#btn-delete-splice').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
+        $('#btn-delete-loom').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
+
+        $('#btn-save-cable').click(() => { if (enlaceActual) { const circuito = $('#cable-circuito').val() || 'S/N'; const tipo = $('#cable-tipo').val(); const cal = $('#cable-calibre').val(); const color = $('#cable-color').val(); const strLongitud = $('#cable-longitud').val(); const longitudCalculada = evaluarMatematica(strLongitud); enlaceActual.labels([]); enlaceActual.appendLabel({ attrs: { text: { text: `[${circuito}]\n${longitudCalculada}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5 } } }); enlaceActual.set('bomData', { type: 'Wire', circuito: circuito, insulation: tipo, gage: parseInt(cal), color: color, length: longitudCalculada }); } cerrarModales(); });
+        $('#btn-save-conn').click(() => { if (nodoActual) { const desc = $('#conn-desc').val(), pn = $('#conn-pn').val(), vias = parseInt($('#conn-vias').val()); let terminalesFinales = {}; $('.input-terminal').each(function() { let pnTerminal = $(this).val(); if(pnTerminal.trim() !== '') { terminalesFinales[$(this).data('via')] = pnTerminal; } }); let d = nodoActual.get('bomData'); d.description = desc; d.housingPartNumber = pn; d.cavities = vias; d.terminals = terminalesFinales; nodoActual.set('bomData', d); nodoActual.attr('label/text', `${desc}\nPN: ${pn}`); nodoActual.resize(140, Math.max(60, vias * 25)); let pines = []; for(let i = 1; i <= vias; i++) { pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); } nodoActual.set('ports', { groups: { 'cavidades': { position: 'right', attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: { name: 'left', args: { x: -15 } } } } }, items: pines }); } cerrarModales(); });
+        $('#btn-save-splice').click(() => { if (nodoActual) { const nuevoNombre = $('#splice-name').val(); let d = nodoActual.get('bomData'); d.name = nuevoNombre; nodoActual.set('bomData', d); nodoActual.attr('label/text', nuevoNombre); } cerrarModales(); });
+        
+        // NUEVO: Guardar y redimensionar Loom
+        $('#btn-save-loom').click(() => { 
+            if (nodoActual) { 
+                const desc = $('#loom-desc').val();
+                const orientacion = $('#loom-orientacion').val();
+                let len = parseInt($('#loom-length').val());
+                let wid = parseInt($('#loom-width').val());
+                
+                let d = nodoActual.get('bomData'); 
+                d.description = desc; d.len = len; d.wid = wid; d.orientacion = orientacion;
+                nodoActual.set('bomData', d); 
+                
+                nodoActual.attr('label/text', desc.toUpperCase());
+                
+                // Rotar lógicamente dependiendo si es horizontal o vertical
+                if(orientacion === 'horizontal') {
+                    nodoActual.resize(len, wid);
+                } else {
+                    nodoActual.resize(wid, len);
+                }
+            } 
+            cerrarModales(); 
+        });
+
+        graph.on('add', function(cell) { if (cell.isLink()) { cell.on('change:target', function(link) { if (link.get('target').id && link.get('source').id) { if (!link.get('bomData')) abrirModalCable(link); } }); } });
+        
+        paper.on('element:pointerdblclick', function(cellView) { 
+            const tipo = cellView.model.get('bomData').type;
+            if (tipo === 'Connector') abrirModalConector(cellView.model); 
+            if (tipo === 'Splice') abrirModalSplice(cellView.model); 
+            if (tipo === 'Loom') abrirModalLoom(cellView.model);
+        });
+        
+        paper.on('link:pointerdblclick', function(linkView) { abrirModalCable(linkView.model); });
+        
+        $('#btn-add-connector').click(() => { crearConector(50, 50, 'Conector A', '12064754', 4); });
+        $('#btn-add-splice').click(() => { crearSplice(300, 150, `SP-${contSplices}`); contSplices++; });
+        
+        // BOTÓN LOOM
+        $('#btn-add-loom').click(() => { crearLoom(150, 100); });
+
+        // ==========================================
+        // REPORTES
+        // ==========================================
+        function generarReporteRutas() {
+            const links = graph.getLinks();
+            let html = `<table style="font-size: 11px; white-space: nowrap;"><tr><th>ESTAMPADO (CIRCUITO)</th><th>CONS. RACK</th><th>TIPO DE CABLE</th><th>CALIBRE (AWG)</th><th>COLOR</th><th>LONGITUD (MM)</th><th>DESTINO 1 STRIP</th><th>DESTINO 1 TERMINAL</th><th>Herramienta 1</th><th>DESTINO 2 STRIP</th><th>DESTINO 2 TERMINAL</th><th>Herramienta 2</th><th>COLOR DE TINTA</th><th>QTY</th><th>DESTINO 1</th><th>DESTINO 2</th></tr>`;
+            links.forEach(link => {
+                const data = link.get('bomData'); if(!data) return;
+                const srcNode = graph.getCell(link.get('source').id); const tgtNode = graph.getCell(link.get('target').id);
+                if(srcNode && tgtNode) {
+                    const srcData = srcNode.get('bomData'); const tgtData = tgtNode.get('bomData');
+                    const rawSrcPort = link.get('source').port; const rawTgtPort = link.get('target').port;
+                    let term1 = '-'; let term2 = '-'; let dest1 = ''; let dest2 = '';
+
+                    if (srcData.type === 'Splice') { dest1 = srcData.name; } else { let numPin = rawSrcPort ? rawSrcPort.replace('via-', '') : ''; dest1 = `${srcData.description} - Pin ${numPin}`; if (srcData.terminals && srcData.terminals[rawSrcPort]) { term1 = srcData.terminals[rawSrcPort]; } }
+                    if (tgtData.type === 'Splice') { dest2 = tgtData.name; } else { let numPin = rawTgtPort ? rawTgtPort.replace('via-', '') : ''; dest2 = `${tgtData.description} - Pin ${numPin}`; if (tgtData.terminals && tgtData.terminals[rawTgtPort]) { term2 = tgtData.terminals[rawTgtPort]; } }
+
+                    html += `<tr><td><b>${data.circuito || 'S/N'}</b></td><td>-</td><td>${data.insulation}</td><td>${data.gage}</td><td>${data.color}</td><td>${data.length}</td><td>-</td><td><b>${term1}</b></td><td>-</td><td>-</td><td><b>${term2 || 'EMPALME'}</b></td><td>-</td><td>-</td><td>1</td><td>${dest1}</td><td>${dest2}</td></tr>`;
+                }
+            });
+            $('#tabla-rutas-container').html(html + '</table>');
+        }
+
+        function generarReporteBOM() {
+            const elements = graph.getElements(); const links = graph.getLinks();
+            let componentes = {}; let terminalesTotales = {}; let cablesTotales = {};
+
+            elements.forEach(el => {
+                const data = el.get('bomData'); if(!data) return;
+                if(data.type === 'Connector') {
+                    if(!componentes[data.housingPartNumber]) componentes[data.housingPartNumber] = { desc: data.description, qty: 0 }; componentes[data.housingPartNumber].qty += 1;
+                    if (data.terminals) { for (let via in data.terminals) { let pnTerminal = data.terminals[via]; if(pnTerminal) { if(!terminalesTotales[pnTerminal]) terminalesTotales[pnTerminal] = 0; terminalesTotales[pnTerminal] += 1; } } }
+                } else if(data.type === 'Splice') {
+                    if(!componentes[data.name]) componentes[data.name] = { desc: 'Splice / Empalme', qty: 0 }; componentes[data.name].qty += 1;
+                } else if(data.type === 'Loom') {
+                    // Agrega el Corrugado al BOM
+                    if(!componentes[data.description]) componentes[data.description] = { desc: 'Protección / Manga', qty: 0 }; componentes[data.description].qty += 1;
+                }
+            });
+
+            links.forEach(link => { const data = link.get('bomData'); if(!data) return; const llaveCable = `${data.gage} AWG ${data.insulation} ${data.color}`; if(!cablesTotales[llaveCable]) cablesTotales[llaveCable] = 0; cablesTotales[llaveCable] += data.length; });
+
+            let html = `<h3>Conectores, Splices y Protección</h3><table><tr><th>Part Number / Identificador</th><th>Descripción</th><th>Cantidad</th></tr>`;
+            for(let pn in componentes) html += `<tr><td>${pn}</td><td>${componentes[pn].desc}</td><td>${componentes[pn].qty} pzas</td></tr>`;
+            html += `</table><br><h3>Terminales</h3><table><tr><th>Terminal Part Number</th><th>Cantidad Requerida</th></tr>`;
+            for(let termPn in terminalesTotales) html += `<tr><td>${termPn}</td><td>${terminalesTotales[termPn]} pzas</td></tr>`;
+            html += `</table><br><h3>Longitud Total de Cables</h3><table><tr><th>Especificación de Cable</th><th>Longitud Total (mm)</th></tr>`;
+            for(let cable in cablesTotales) html += `<tr><td>${cable}</td><td>${cablesTotales[cable]} mm</td></tr>`;
+            $('#tabla-bom-container').html(html + '</table>');
+        }
+    </script>
+</body>
+</html>
