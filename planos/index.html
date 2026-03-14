@@ -474,16 +474,16 @@
                     let txtAnchor = Math.cos(angle) > 0 ? "start" : "end";
                     let offsetX = Math.cos(angle) > 0 ? 10 : -10;
                     
-                    svgHtml += `<rect x="${x2 - (txtAnchor === 'start' ? 0 : 150) + offsetX}" y="${y2 - 25}" width="150" height="50" fill="#ecf0f1" rx="4" ry="4" stroke="#bdc3c7" stroke-width="1"/>`;
+                    svgHtml += `<rect x="${x2 - (txtAnchor === 'start' ? 0 : 150) + offsetX}" y="${y2 - 25}" width="130" height="55" fill="#ecf0f1" rx="4" ry="4" stroke="#bdc3c7" stroke-width="1"/>`;
                     
                     // Texto: Circuito y Cable
-                    svgHtml += `<text x="${x2 + offsetX + (txtAnchor === 'start' ? 75 : -75)}" y="${y2 - 5}" font-family="sans-serif" font-size="11" fill="#2c3e50" font-weight="bold" text-anchor="middle">[${con.circuito}] ${con.cable}</text>`;
+                    svgHtml += `<text x="${x2 + offsetX + (txtAnchor === 'start' ? 75 : -75)}" y="${y2 - 5}" font-family="sans-serif" font-size="8" fill="#2c3e50" font-weight="bold" text-anchor="middle">[${con.circuito}] ${con.cable}</text>`;
                     
                     // Texto: Destino
-                    svgHtml += `<text x="${x2 + offsetX + (txtAnchor === 'start' ? 75 : -75)}" y="${y2 + 10}" font-family="sans-serif" font-size="10" fill="#d35400" font-weight="bold" text-anchor="middle">A: ${con.destino}</text>`;
+                    svgHtml += `<text x="${x2 + offsetX + (txtAnchor === 'start' ? 75 : -75)}" y="${y2 + 10}" font-family="sans-serif" font-size="7" fill="#d35400" font-weight="bold" text-anchor="middle">A: ${con.destino}</text>`;
                     
                     // Texto: Longitud
-                    svgHtml += `<text x="${x2 + offsetX + (txtAnchor === 'start' ? 75 : -75)}" y="${y2 + 22}" font-family="sans-serif" font-size="9" fill="#7f8c8d" text-anchor="middle">L: ${con.longitud} mm</text>`;
+                    svgHtml += `<text x="${x2 + offsetX + (txtAnchor === 'start' ? 75 : -75)}" y="${y2 + 22}" font-family="sans-serif" font-size="8" fill="#7f8c8d" text-anchor="middle">L: ${con.longitud} mm</text>`;
                 });
             } else {
                 svgHtml += `<text x="${cx}" y="${cy+60}" font-family="sans-serif" font-size="12" fill="#7f8c8d" text-anchor="middle">(Sin cables conectados)</text>`;
@@ -491,7 +491,7 @@
 
             // Dibujar el Splice central (Círculo rojo) ENCIMA de las líneas
             svgHtml += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#e74c3c" stroke="#c0392b" stroke-width="3"/>`;
-            svgHtml += `<text x="${cx}" y="${cy+5}" font-family="sans-serif" font-size="14" fill="white" font-weight="bold" text-anchor="middle">SP</text>`;
+            svgHtml += `<text x="${cx}" y="${cy+5}" font-family="sans-serif" font-size="14" fill="white" font-weight="bold" text-anchor="middle">SPL</text>`;
             
             svgHtml += `</svg></div>`;
             return svgHtml;
