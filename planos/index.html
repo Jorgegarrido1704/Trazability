@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Editor de Arneses - V10 (Troncos y Corrugados)</title>
+    <title>Editor de Arneses - V11 (Orientación de Pines y Esquemas Splice)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.css">
     <style>
         body { font-family: sans-serif; margin: 0; padding: 20px; background: #e9ecef; }
@@ -44,6 +44,10 @@
         .modal-actions { display: flex; justify-content: space-between; margin-top: 15px; position: sticky; bottom: -20px; background: white; padding: 10px 0; border-top: 1px solid #eee;}
         .btn-cancel { background: #6c757d; } .btn-cancel:hover { background: #5a6268; }
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 99; }
+
+        /* Contenedor Flex para los dibujos de los splices */
+        #tabla-splices-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .splice-diagram { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -52,24 +56,20 @@
         <button class="tab-btn active" onclick="abrirTab('editor', this)">Diseño</button>
         <button class="tab-btn" onclick="abrirTab('rutas', this)">Lista de corte</button>
         <button class="tab-btn" onclick="abrirTab('bom', this)">Lista de Materiales (BOM)</button>
+        <button class="tab-btn" onclick="abrirTab('splices', this)">Esquemas Splice</button>
     </div>
 
     <div id="tab-editor" class="tab-content active">
         <div id="herramientas">
             <button class="btn-primary" id="btn-add-connector">Agregar Conector</button>
             <button class="btn-primary" id="btn-add-splice">Agregar Splice</button>
-            
             <button class="btn-warning" id="btn-add-loom">Manga / Corrugado</button>
-            
             <span style="border-left: 2px solid #ccc; margin: 0 5px; height: 30px;"></span>
-            
             <button class="btn-success" id="btn-save-json">Guardar</button>
             <input type="file" id="input-load-json" accept=".json" style="display:none;">
             <button class="btn-info" onclick="document.getElementById('input-load-json').click()">Cargar</button>
-            
             <span style="border-left: 2px solid #ccc; margin: 0 5px; height: 30px;"></span>
             <button class="btn-danger" id="btn-clear-canvas">Limpiar</button>
-            
             <span style="border-left: 2px solid #ccc; margin: 0 5px; height: 30px;"></span>
             <strong>Zoom:</strong>
             <button id="btn-zoom-out">-</button>
@@ -89,6 +89,11 @@
         <div id="tabla-bom-container">El reporte se generará al entrar a esta pestaña.</div>
     </div>
 
+    <div id="tab-splices" class="tab-content">
+        <h2>Diagramas de Empalmes y Puntos de Reunión</h2>
+        <div id="tabla-splices-container">El esquema se generará al entrar a esta pestaña.</div>
+    </div>
+
     <div id="overlay"></div>
 
     <div id="modal-cable" class="modal">
@@ -98,16 +103,30 @@
         <div class="form-group"><label>Calibre (AWG):</label><input type="number" id="cable-calibre" value="18"></div>
         <div class="form-group"><label>Color:</label>
         <select id="cable-color">
-            <option value='RED'>RED</option>
-            <option value='BLK'>BLACK</option>
-            <option value='BLU'>BLUE</option>
-            <option value='GRN'>GREEN</option>
-            <option value='YEL'>YELLOW</option>
-            <option value='ORG'>ORANGE</option>
-            <option value='PUR'>PURPLE</option>
-            <option value='BRN'>BROWN</option>
-            <option value='WHT'>WHITE</option>
-            <option value='GRY'>GREY</option>
+            <option value='YEBN'>YELLOW/BROWN</option>
+            <option value='YE'>YELLOW</option>
+            <option value='VTWH'>VIOLET/WHITE</option>
+            <option value='VTDG'>VIOLET/DAR GREEN</option>
+            <option value='VT'>VIOLET</option>
+            <option value='RDOG'>RED/ORANGE</option>
+            <option value='RDDB'>RED/DARK BLUE</option>
+            <option value='RDBK'>RED/BLACK</option>
+            <option value='RD'>RED</option>
+            <option value='GYLB'>GREY/LIGHT BLUE</option>
+            <option value='GYDG'>GREY/DARK GREEN</option>
+            <option value='GYBN'>GREY/BROWN</option>
+            <option value='DG'>DARK GREEN</option>
+            <option value='DB'>DARK BLUE</option>
+            <option value='BU'>BLUE</option>
+            <option value='BNYE'>BROWN/YELLOW</option>
+            <option value='BNWH'>BROWN/WHITE</option>
+            <option value='BNGN'>BROWN/GREEN</option>
+            <option value='BNDB'>BROWN/DARK BLUE</option>
+            <option value='BN'>BROWN</option>
+            <option value='BKWH'>BLACK/WHITE</option>
+            <option value='BKDG'>BLACK/DARK GREEN</option>
+            <option value='BKBN'>BLACK/BROWN</option>
+            <option value='BK'>BLACK</option>
         </select>
         </div>
         <div class="form-group"><label>Longitud (mm) - Ej. 150+100+50:</label><input type="text" id="cable-longitud" value="0"></div>
@@ -118,6 +137,17 @@
         <h3>Configuración del Conector</h3>
         <div class="form-group"><label>Descripción / Locación:</label><input type="text" id="conn-desc" value="Conector Principal"></div>
         <div class="form-group"><label>No. Parte (Housing):</label><input type="text" id="conn-pn" value="12040953"></div>
+        
+        <div class="form-group">
+            <label>Posición de Conexión (Pines):</label>
+            <select id="conn-orientacion">
+                <option value="right">Derecha</option>
+                <option value="left">Izquierda</option>
+                <option value="top">Arriba</option>
+                <option value="bottom">Abajo</option>
+            </select>
+        </div>
+
         <div class="form-group" style="border-top: 1px solid #ccc; padding-top: 10px; margin-top: 15px;"><label>Cantidad de Vías (Pines):</label><input type="number" id="conn-vias" value="6" min="1" max="50"></div>
         <div class="form-group"><label>Terminales por Vía (Part Number):</label><div id="lista-terminales" class="cavity-container"></div></div>
         <div class="modal-actions"><button class="btn-danger" id="btn-delete-conn">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-conn">Actualizar</button></div></div>
@@ -132,12 +162,7 @@
     <div id="modal-loom" class="modal">
         <h3>Propiedades de Envolvente</h3>
         <div class="form-group"><label>Descripción (Ej. Loom 1/2", Encintado PVC):</label><input type="text" id="loom-desc" value="Tubo Corrugado"></div>
-        <div class="form-group"><label>Orientación Visual:</label>
-            <select id="loom-orientacion">
-                <option value="horizontal">Horizontal</option>
-                <option value="vertical">Vertical</option>
-            </select>
-        </div>
+        <div class="form-group"><label>Orientación Visual:</label><select id="loom-orientacion"><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option></select></div>
         <div class="form-group"><label>Largo (px en el lienzo):</label><input type="number" id="loom-length" value="200"></div>
         <div class="form-group"><label>Grosor (px en el lienzo):</label><input type="number" id="loom-width" value="40"></div>
         <div class="modal-actions"><button class="btn-danger" id="btn-delete-loom">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-loom">Actualizar</button></div></div>
@@ -149,184 +174,232 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.js"></script>
     
     <script>
-        function abrirTab(idTab, btn) { $('.tab-content').removeClass('active'); $('.tab-btn').removeClass('active'); $('#tab-' + idTab).addClass('active'); $(btn).addClass('active'); if (idTab === 'rutas') generarReporteRutas(); if (idTab === 'bom') generarReporteBOM(); }
+        function abrirTab(idTab, btn) { 
+            $('.tab-content').removeClass('active'); $('.tab-btn').removeClass('active'); 
+            $('#tab-' + idTab).addClass('active'); $(btn).addClass('active'); 
+            if (idTab === 'rutas') generarReporteRutas(); 
+            if (idTab === 'bom') generarReporteBOM(); 
+            if (idTab === 'splices') generarReporteSplices(); // Generar los dibujos
+        }
+        
         function evaluarMatematica(expresion) { try { let expLimpia = String(expresion).replace(/[^0-9\+\-\.\s]/g, ''); if(expLimpia.trim() === '') return 0; return Function('"use strict";return (' + expLimpia + ')')(); } catch (e) { return 0; } }
 
         let escalaActual = 1; let contSplices = 1; const graph = new joint.dia.Graph();
         
         const paper = new joint.dia.Paper({
             el: document.getElementById('lienzo-arnes'), model: graph, width: 2000, height: 2000, gridSize: 10, drawGrid: true, background: { color: '#ffffff' },
-            defaultLink: new joint.shapes.standard.Link({ 
-                attrs: { line: { stroke: '#34495e', strokeWidth: 3, strokeLinejoin: 'round' } },
-                router: { name: 'orthogonal' }, // Cables rectos a 90 grados
-                connector: { name: 'rounded', args: { radius: 10 } } // Esquinas suaves
-            }), 
-            interactive: { linkMove: true, vertexAdd: true, vertexMove: true, vertexRemove: true }, // Permite crear y mover dobleces
-            linkPinning: false, snapLinks: { radius: 30 },
+            defaultLink: new joint.shapes.standard.Link({ attrs: { line: { stroke: '#34495e', strokeWidth: 3, strokeLinejoin: 'round' } }, router: { name: 'orthogonal' }, connector: { name: 'rounded', args: { radius: 10 } } }), 
+            interactive: { linkMove: true, vertexAdd: true, vertexMove: true, vertexRemove: true }, linkPinning: false, snapLinks: { radius: 30 },
             validateConnection: function(cellViewS, magnetS, cellViewT, magnetT) { if (cellViewS === cellViewT) return false; return magnetT != null; }
         });
 
         $('#btn-zoom-in').click(() => { escalaActual += 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); });
         $('#btn-zoom-out').click(() => { if(escalaActual > 0.3) { escalaActual -= 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); } });
         $('#btn-clear-canvas').click(() => { if(confirm("¿Estás seguro de que deseas borrar todo el arnés? Esta acción no se puede deshacer.")) { graph.clear(); contSplices = 1; } });
-
         $('#btn-save-json').click(() => { const jsonStr = JSON.stringify(graph.toJSON(), null, 2); const blob = new Blob([jsonStr], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = "arnes_proyecto.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); });
         $('#input-load-json').on('change', function(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(event) { try { const jsonData = JSON.parse(event.target.result); graph.clear(); graph.fromJSON(jsonData); let maxSplice = 0; graph.getElements().forEach(el => { const d = el.get('bomData'); if(d && d.type === 'Splice' && d.name) { const match = d.name.match(/SP-(\d+)/); if(match && parseInt(match[1]) > maxSplice) { maxSplice = parseInt(match[1]); } } }); contSplices = maxSplice + 1; alert("Proyecto cargado exitosamente."); } catch (error) { alert("Error al cargar el archivo."); } }; reader.readAsText(file); $(this).val(''); });
 
         let enlaceActual = null; let nodoActual = null; let terminalesTemp = {}; 
 
-        function crearConector(x, y, descripcion, partNumber, numVias) {
+        // NUEVO: Función para calcular dimensiones y configuración de puertos según orientación
+        function getConfigConector(orientacion, vias) {
+            let config = { width: 140, height: Math.max(60, vias * 25), labelRefY: 15, labelRefX: 70, portLabelPos: { name: 'left', args: { x: -15 } } };
+            if (orientacion === 'left') { config.portLabelPos = { name: 'right', args: { x: 15 } }; } 
+            else if (orientacion === 'top') { config.width = Math.max(140, vias * 30); config.height = 80; config.labelRefY = 55; config.portLabelPos = { name: 'bottom', args: { y: 15 } }; } 
+            else if (orientacion === 'bottom') { config.width = Math.max(140, vias * 30); config.height = 80; config.labelRefY = 15; config.portLabelPos = { name: 'top', args: { y: -15 } }; }
+            return config;
+        }
+
+        function crearConector(x, y, descripcion, partNumber, numVias, orientacion = 'right') {
             let pines = []; let terminalesIniciales = {};
             for(let i = 1; i <= numVias; i++) { pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); terminalesIniciales[`via-${i}`] = '41412'; }
+            
+            let cnf = getConfigConector(orientacion, numVias);
             const rect = new joint.shapes.standard.Rectangle({
-                position: { x: x, y: y }, size: { width: 140, height: Math.max(60, numVias * 25) }, 
-                attrs: { body: { fill: '#3498db', rx: 5, ry: 5, stroke: '#2980b9', strokeWidth: 2 }, label: { text: `${descripcion}\nPN: ${partNumber}`, fill: 'white', fontWeight: 'bold', fontSize: 12, refY: 15 } },
-                ports: { groups: { 'cavidades': { position: 'right', attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: { name: 'left', args: { x: -15 } } } } }, items: pines }
+                position: { x: x, y: y }, size: { width: cnf.width, height: cnf.height }, 
+                attrs: { body: { fill: '#3498db', rx: 5, ry: 5, stroke: '#2980b9', strokeWidth: 2 }, label: { text: `${descripcion}\nPN: ${partNumber}`, fill: 'white', fontWeight: 'bold', fontSize: 12, refY: cnf.labelRefY, refX: '50%' } },
+                ports: { groups: { 'cavidades': { position: orientacion, attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: cnf.portLabelPos } } }, items: pines }
             });
-            rect.set('bomData', { type: 'Connector', description: descripcion, housingPartNumber: partNumber, cavities: numVias, terminals: terminalesIniciales }); rect.addTo(graph); return rect;
+            rect.set('bomData', { type: 'Connector', description: descripcion, housingPartNumber: partNumber, cavities: numVias, terminals: terminalesIniciales, orientacion: orientacion }); rect.addTo(graph); return rect;
         }
 
-        function crearSplice(x, y, nombre) {
-            const circle = new joint.shapes.standard.Circle({ 
-                position: { x: x, y: y }, size: { width: 50, height: 50 },
-                attrs: { body: { fill: '#e74c3c', stroke: '#c0392b', strokeWidth: 2 }, label: { text: nombre, fill: '#c0392b', fontWeight: 'bold', fontSize: 13, textVerticalAnchor: 'bottom', refY: -5, pointerEvents: 'none' } },
-                ports: { groups: { 'conexion': { position: 'center', attrs: { circle: { r: 12, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2, cursor: 'crosshair' } } } }, items: [ { id: nombre, group: 'conexion' } ] }
-            });
-            circle.set('bomData', { type: 'Splice', name: nombre, qty: 1 }); circle.addTo(graph); return circle;
-        }
-
-        // NUEVA FIGURA: CORRUGADO / LOOM
-        function crearLoom(x, y) {
-            const rect = new joint.shapes.standard.Rectangle({
-                position: { x: x, y: y }, size: { width: 200, height: 40 },
-                attrs: { 
-                    // Translúcido para ver los cables por debajo, con borde punteado
-                    body: { fill: '#f1c40f', fillOpacity: 0.3, stroke: '#e67e22', strokeWidth: 2, strokeDasharray: '4,4' }, 
-                    label: { text: 'TUBO CORRUGADO', fill: '#d35400', fontWeight: 'bold', fontSize: 11 } 
-                }
-            });
-            rect.set('bomData', { type: 'Loom', description: 'Tubo Corrugado', len: 200, wid: 40, orientacion: 'horizontal' });
-            rect.addTo(graph);
-            rect.toBack(); // Envía el corrugado al fondo (atrás de los cables)
-            return rect;
-        }
-
+        function crearSplice(x, y, nombre) { const circle = new joint.shapes.standard.Circle({ position: { x: x, y: y }, size: { width: 50, height: 50 }, attrs: { body: { fill: '#e74c3c', stroke: '#c0392b', strokeWidth: 2 }, label: { text: nombre, fill: '#c0392b', fontWeight: 'bold', fontSize: 13, textVerticalAnchor: 'bottom', refY: -5, pointerEvents: 'none' } }, ports: { groups: { 'conexion': { position: 'center', attrs: { circle: { r: 12, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2, cursor: 'crosshair' } } } }, items: [ { id: nombre, group: 'conexion' } ] } }); circle.set('bomData', { type: 'Splice', name: nombre, qty: 1 }); circle.addTo(graph); return circle; }
+        function crearLoom(x, y) { const rect = new joint.shapes.standard.Rectangle({ position: { x: x, y: y }, size: { width: 200, height: 40 }, attrs: { body: { fill: '#f1c40f', fillOpacity: 0.3, stroke: '#e67e22', strokeWidth: 2, strokeDasharray: '4,4' }, label: { text: 'TUBO CORRUGADO', fill: '#d35400', fontWeight: 'bold', fontSize: 11 } } }); rect.set('bomData', { type: 'Loom', description: 'Tubo Corrugado', len: 200, wid: 40, orientacion: 'horizontal' }); rect.addTo(graph); rect.toBack(); return rect; }
         function renderizarInputsTerminales(vias) { let html = ''; for(let i = 1; i <= vias; i++) { let idVia = `via-${i}`; let valorPN = terminalesTemp[idVia] || ''; html += `<div class="cavity-row"><label>Vía ${i}:</label><input type="text" class="input-terminal" data-via="${idVia}" value="${valorPN}" placeholder="Part No. de Terminal"></div>`; } $('#lista-terminales').html(html); }
         $('#conn-vias').on('input', function() { let nuevasVias = parseInt($(this).val()) || 1; $('.input-terminal').each(function() { terminalesTemp[$(this).data('via')] = $(this).val(); }); renderizarInputsTerminales(nuevasVias); });
-
         function abrirModalCable(link) { enlaceActual = link; const d = link.get('bomData'); if(d) { $('#cable-circuito').val(d.circuito || ''); $('#cable-tipo').val(d.insulation); $('#cable-calibre').val(d.gage); $('#cable-color').val(d.color); $('#cable-longitud').val(d.length); } else { $('#cable-circuito').val(''); $('#cable-longitud').val('150'); } $('#overlay, #modal-cable').show(); }
-        function abrirModalConector(element) { nodoActual = element; const d = element.get('bomData'); $('#conn-desc').val(d.description); $('#conn-pn').val(d.housingPartNumber); $('#conn-vias').val(d.cavities); terminalesTemp = Object.assign({}, d.terminals); renderizarInputsTerminales(d.cavities); $('#overlay, #modal-conector').show(); }
+        function abrirModalConector(element) { nodoActual = element; const d = element.get('bomData'); $('#conn-desc').val(d.description); $('#conn-pn').val(d.housingPartNumber); $('#conn-vias').val(d.cavities); $('#conn-orientacion').val(d.orientacion || 'right'); terminalesTemp = Object.assign({}, d.terminals); renderizarInputsTerminales(d.cavities); $('#overlay, #modal-conector').show(); }
         function abrirModalSplice(element) { nodoActual = element; const d = element.get('bomData'); $('#splice-name').val(d.name); $('#overlay, #modal-splice').show(); }
-        
-        // NUEVO: Abrir Modal de Loom
-        function abrirModalLoom(element) {
-            nodoActual = element; const d = element.get('bomData');
-            $('#loom-desc').val(d.description); $('#loom-length').val(d.len); $('#loom-width').val(d.wid); $('#loom-orientacion').val(d.orientacion);
-            $('#overlay, #modal-loom').show();
-        }
-
+        function abrirModalLoom(element) { nodoActual = element; const d = element.get('bomData'); $('#loom-desc').val(d.description); $('#loom-length').val(d.len); $('#loom-width').val(d.wid); $('#loom-orientacion').val(d.orientacion); $('#overlay, #modal-loom').show(); }
         function cerrarModales() { $('#overlay, .modal').hide(); if (enlaceActual && !enlaceActual.get('bomData')) { enlaceActual.remove(); } enlaceActual = null; nodoActual = null; }
 
-        $('#btn-delete-cable').click(() => { if(enlaceActual) { enlaceActual.remove(); } cerrarModales(); });
-        $('#btn-delete-conn').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
-        $('#btn-delete-splice').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
-        $('#btn-delete-loom').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
-
+        $('#btn-delete-cable').click(() => { if(enlaceActual) { enlaceActual.remove(); } cerrarModales(); }); $('#btn-delete-conn').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); }); $('#btn-delete-splice').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); }); $('#btn-delete-loom').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
         $('#btn-save-cable').click(() => { if (enlaceActual) { const circuito = $('#cable-circuito').val() || 'S/N'; const tipo = $('#cable-tipo').val(); const cal = $('#cable-calibre').val(); const color = $('#cable-color').val(); const strLongitud = $('#cable-longitud').val(); const longitudCalculada = evaluarMatematica(strLongitud); enlaceActual.labels([]); enlaceActual.appendLabel({ attrs: { text: { text: `[${circuito}]\n${longitudCalculada}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5 } } }); enlaceActual.set('bomData', { type: 'Wire', circuito: circuito, insulation: tipo, gage: parseInt(cal), color: color, length: longitudCalculada }); } cerrarModales(); });
-        $('#btn-save-conn').click(() => { if (nodoActual) { const desc = $('#conn-desc').val(), pn = $('#conn-pn').val(), vias = parseInt($('#conn-vias').val()); let terminalesFinales = {}; $('.input-terminal').each(function() { let pnTerminal = $(this).val(); if(pnTerminal.trim() !== '') { terminalesFinales[$(this).data('via')] = pnTerminal; } }); let d = nodoActual.get('bomData'); d.description = desc; d.housingPartNumber = pn; d.cavities = vias; d.terminals = terminalesFinales; nodoActual.set('bomData', d); nodoActual.attr('label/text', `${desc}\nPN: ${pn}`); nodoActual.resize(140, Math.max(60, vias * 25)); let pines = []; for(let i = 1; i <= vias; i++) { pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); } nodoActual.set('ports', { groups: { 'cavidades': { position: 'right', attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: { name: 'left', args: { x: -15 } } } } }, items: pines }); } cerrarModales(); });
-        $('#btn-save-splice').click(() => { if (nodoActual) { const nuevoNombre = $('#splice-name').val(); let d = nodoActual.get('bomData'); d.name = nuevoNombre; nodoActual.set('bomData', d); nodoActual.attr('label/text', nuevoNombre); } cerrarModales(); });
         
-        // NUEVO: Guardar y redimensionar Loom
-        $('#btn-save-loom').click(() => { 
+        // ACTUALIZADO: Re-dibujar el conector con su nueva orientación
+        $('#btn-save-conn').click(() => { 
             if (nodoActual) { 
-                const desc = $('#loom-desc').val();
-                const orientacion = $('#loom-orientacion').val();
-                let len = parseInt($('#loom-length').val());
-                let wid = parseInt($('#loom-width').val());
+                const desc = $('#conn-desc').val(), pn = $('#conn-pn').val(), vias = parseInt($('#conn-vias').val()), orientacion = $('#conn-orientacion').val();
+                let terminalesFinales = {}; $('.input-terminal').each(function() { let pnTerminal = $(this).val(); if(pnTerminal.trim() !== '') { terminalesFinales[$(this).data('via')] = pnTerminal; } }); 
+                let d = nodoActual.get('bomData'); d.description = desc; d.housingPartNumber = pn; d.cavities = vias; d.terminals = terminalesFinales; d.orientacion = orientacion; nodoActual.set('bomData', d); 
                 
-                let d = nodoActual.get('bomData'); 
-                d.description = desc; d.len = len; d.wid = wid; d.orientacion = orientacion;
-                nodoActual.set('bomData', d); 
+                let cnf = getConfigConector(orientacion, vias);
+                nodoActual.attr('label/text', `${desc}\nPN: ${pn}`);
+                nodoActual.attr('label/refY', cnf.labelRefY);
+                nodoActual.resize(cnf.width, cnf.height); 
                 
-                nodoActual.attr('label/text', desc.toUpperCase());
-                
-                // Rotar lógicamente dependiendo si es horizontal o vertical
-                if(orientacion === 'horizontal') {
-                    nodoActual.resize(len, wid);
-                } else {
-                    nodoActual.resize(wid, len);
-                }
+                let pines = []; for(let i = 1; i <= vias; i++) { pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); } 
+                nodoActual.set('ports', { groups: { 'cavidades': { position: orientacion, attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: cnf.portLabelPos } } }, items: pines }); 
             } 
             cerrarModales(); 
         });
 
+        $('#btn-save-splice').click(() => { if (nodoActual) { const nuevoNombre = $('#splice-name').val(); let d = nodoActual.get('bomData'); d.name = nuevoNombre; nodoActual.set('bomData', d); nodoActual.attr('label/text', nuevoNombre); } cerrarModales(); });
+        $('#btn-save-loom').click(() => { if (nodoActual) { const desc = $('#loom-desc').val(); const orientacion = $('#loom-orientacion').val(); let len = parseInt($('#loom-length').val()); let wid = parseInt($('#loom-width').val()); let d = nodoActual.get('bomData'); d.description = desc; d.len = len; d.wid = wid; d.orientacion = orientacion; nodoActual.set('bomData', d); nodoActual.attr('label/text', desc.toUpperCase()); if(orientacion === 'horizontal') { nodoActual.resize(len, wid); } else { nodoActual.resize(wid, len); } } cerrarModales(); });
+
         graph.on('add', function(cell) { if (cell.isLink()) { cell.on('change:target', function(link) { if (link.get('target').id && link.get('source').id) { if (!link.get('bomData')) abrirModalCable(link); } }); } });
-        
-        paper.on('element:pointerdblclick', function(cellView) { 
-            const tipo = cellView.model.get('bomData').type;
-            if (tipo === 'Connector') abrirModalConector(cellView.model); 
-            if (tipo === 'Splice') abrirModalSplice(cellView.model); 
-            if (tipo === 'Loom') abrirModalLoom(cellView.model);
-        });
-        
+        paper.on('element:pointerdblclick', function(cellView) { const tipo = cellView.model.get('bomData').type; if (tipo === 'Connector') abrirModalConector(cellView.model); if (tipo === 'Splice') abrirModalSplice(cellView.model); if (tipo === 'Loom') abrirModalLoom(cellView.model); });
         paper.on('link:pointerdblclick', function(linkView) { abrirModalCable(linkView.model); });
         
-        $('#btn-add-connector').click(() => { crearConector(50, 50, 'Conector A', '12064754', 4); });
+        $('#btn-add-connector').click(() => { crearConector(50, 50, 'Conector A', '12064754', 4, 'right'); });
         $('#btn-add-splice').click(() => { crearSplice(300, 150, `SP-${contSplices}`); contSplices++; });
-        
-        // BOTÓN LOOM
         $('#btn-add-loom').click(() => { crearLoom(150, 100); });
 
         // ==========================================
-        // REPORTES
+        // REPORTES Y DIBUJOS DE SPLICES
         // ==========================================
         function generarReporteRutas() {
-            const links = graph.getLinks();
-            let html = `<table style="font-size: 11px; white-space: nowrap;"><tr><th>ESTAMPADO (CIRCUITO)</th><th>CONS. RACK</th><th>TIPO DE CABLE</th><th>CALIBRE (AWG)</th><th>COLOR</th><th>LONGITUD (MM)</th><th>DESTINO 1 STRIP</th><th>DESTINO 1 TERMINAL</th><th>Herramienta 1</th><th>DESTINO 2 STRIP</th><th>DESTINO 2 TERMINAL</th><th>Herramienta 2</th><th>COLOR DE TINTA</th><th>QTY</th><th>DESTINO 1</th><th>DESTINO 2</th></tr>`;
+            let i=0;
+            const links = graph.getLinks(); let html = `<table style="font-size: 11px; white-space: nowrap;"><tr><th>ESTAMPADO (CIRCUITO)</th><th>CONS. RACK</th><th>TIPO DE CABLE</th><th>CALIBRE (AWG)</th><th>COLOR</th><th>LONGITUD (MM)</th><th>DESTINO 1 STRIP</th><th>DESTINO 1 TERMINAL</th><th>Herramienta 1</th><th>DESTINO 2 STRIP</th><th>DESTINO 2 TERMINAL</th><th>Herramienta 2</th><th>COLOR DE TINTA</th><th>QTY</th><th>DESTINO 1</th><th>DESTINO 2</th></tr>`;
             links.forEach(link => {
+                i=i+1;
                 const data = link.get('bomData'); if(!data) return;
                 const srcNode = graph.getCell(link.get('source').id); const tgtNode = graph.getCell(link.get('target').id);
                 if(srcNode && tgtNode) {
                     const srcData = srcNode.get('bomData'); const tgtData = tgtNode.get('bomData');
                     const rawSrcPort = link.get('source').port; const rawTgtPort = link.get('target').port;
                     let term1 = '-'; let term2 = '-'; let dest1 = ''; let dest2 = '';
-
                     if (srcData.type === 'Splice') { dest1 = srcData.name; } else { let numPin = rawSrcPort ? rawSrcPort.replace('via-', '') : ''; dest1 = `${srcData.description} - Pin ${numPin}`; if (srcData.terminals && srcData.terminals[rawSrcPort]) { term1 = srcData.terminals[rawSrcPort]; } }
                     if (tgtData.type === 'Splice') { dest2 = tgtData.name; } else { let numPin = rawTgtPort ? rawTgtPort.replace('via-', '') : ''; dest2 = `${tgtData.description} - Pin ${numPin}`; if (tgtData.terminals && tgtData.terminals[rawTgtPort]) { term2 = tgtData.terminals[rawTgtPort]; } }
-
-                    html += `<tr><td><b>${data.circuito || 'S/N'}</b></td><td>-</td><td>${data.insulation}</td><td>${data.gage}</td><td>${data.color}</td><td>${data.length}</td><td>-</td><td><b>${term1}</b></td><td>-</td><td>-</td><td><b>${term2 || 'EMPALME'}</b></td><td>-</td><td>-</td><td>1</td><td>${dest1}</td><td>${dest2}</td></tr>`;
+                    html += `<tr><td><b>${data.circuito || 'S/N'}</b></td><td>${i}</td><td>${data.insulation}</td><td>${data.gage}</td><td>${data.color}</td><td>${data.length}</td><td>-</td><td><b>${term1}</b></td><td>-</td><td>-</td><td><b>${term2 || 'EMPALME'}</b></td><td>-</td><td>-</td><td>1</td><td>${dest1}</td><td>${dest2}</td></tr>`;
+                    i=1+i;
                 }
-            });
-            $('#tabla-rutas-container').html(html + '</table>');
+            }); $('#tabla-rutas-container').html(html + '</table>');
         }
 
         function generarReporteBOM() {
-            const elements = graph.getElements(); const links = graph.getLinks();
-            let componentes = {}; let terminalesTotales = {}; let cablesTotales = {};
-
+            const elements = graph.getElements(); const links = graph.getLinks(); let componentes = {}; let terminalesTotales = {}; let cablesTotales = {};
             elements.forEach(el => {
                 const data = el.get('bomData'); if(!data) return;
-                if(data.type === 'Connector') {
-                    if(!componentes[data.housingPartNumber]) componentes[data.housingPartNumber] = { desc: data.description, qty: 0 }; componentes[data.housingPartNumber].qty += 1;
-                    if (data.terminals) { for (let via in data.terminals) { let pnTerminal = data.terminals[via]; if(pnTerminal) { if(!terminalesTotales[pnTerminal]) terminalesTotales[pnTerminal] = 0; terminalesTotales[pnTerminal] += 1; } } }
-                } else if(data.type === 'Splice') {
-                    if(!componentes[data.name]) componentes[data.name] = { desc: 'Splice / Empalme', qty: 0 }; componentes[data.name].qty += 1;
-                } else if(data.type === 'Loom') {
-                    // Agrega el Corrugado al BOM
-                    if(!componentes[data.description]) componentes[data.description] = { desc: 'Protección / Manga', qty: 0 }; componentes[data.description].qty += 1;
+                if(data.type === 'Connector') { if(!componentes[data.housingPartNumber]) componentes[data.housingPartNumber] = { desc: data.description, qty: 0 }; componentes[data.housingPartNumber].qty += 1; if (data.terminals) { for (let via in data.terminals) { let pnTerminal = data.terminals[via]; if(pnTerminal) { if(!terminalesTotales[pnTerminal]) terminalesTotales[pnTerminal] = 0; terminalesTotales[pnTerminal] += 1; } } } } else if(data.type === 'Splice') { if(!componentes[data.name]) componentes[data.name] = { desc: 'Splice / Empalme', qty: 0 }; componentes[data.name].qty += 1; } else if(data.type === 'Loom') { if(!componentes[data.description]) componentes[data.description] = { desc: 'Protección / Manga', qty: 0 }; componentes[data.description].qty += 1; }
+            });
+            links.forEach(link => { const data = link.get('bomData'); if(!data) return; const llaveCable = `${data.gage} AWG ${data.insulation} ${data.color}`; if(!cablesTotales[llaveCable]) cablesTotales[llaveCable] = 0; cablesTotales[llaveCable] += data.length; });
+            let html = `<h3>Conectores, Splices y Protección</h3><table><tr><th>Part Number / Identificador</th><th>Descripción</th><th>Cantidad</th></tr>`; for(let pn in componentes) html += `<tr><td>${pn}</td><td>${componentes[pn].desc}</td><td>${componentes[pn].qty} pzas</td></tr>`; html += `</table><br><h3>Terminales</h3><table><tr><th>Terminal Part Number</th><th>Cantidad Requerida</th></tr>`; for(let termPn in terminalesTotales) html += `<tr><td>${termPn}</td><td>${terminalesTotales[termPn]} pzas</td></tr>`; html += `</table><br><h3>Longitud Total de Cables</h3><table><tr><th>Especificación de Cable</th><th>Longitud Total (mm)</th></tr>`; for(let cable in cablesTotales) html += `<tr><td>${cable}</td><td>${cablesTotales[cable]} mm</td></tr>`; $('#tabla-bom-container').html(html + '</table>');
+        }
+
+        // NUEVO: Generador Dinámico de Dibujos SVG de Splices
+        function generarReporteSplices() {
+            let html = '';
+            const elements = graph.getElements();
+            let haySplices = false;
+
+            elements.forEach(el => {
+                const data = el.get('bomData');
+                if(data && data.type === 'Splice') {
+                    haySplices = true;
+                    const links = graph.getConnectedLinks(el);
+                    let conexiones = [];
+
+                    // Extraer la información de todos los cables que tocan este Splice
+                    links.forEach(link => {
+                        const lData = link.get('bomData'); if(!lData) return;
+                        
+                        // Saber si el splice es el origen o el destino
+                        const isSource = link.get('source').id === el.id;
+                        const otherId = isSource ? link.get('target').id : link.get('source').id;
+                        const otherPort = isSource ? link.get('target').port : link.get('source').port;
+                        const otherEl = graph.getCell(otherId);
+
+                        if(otherEl) {
+                            const oData = otherEl.get('bomData');
+                            let destName = '';
+                            if (oData.type === 'Splice') {
+                                destName = `Hacia ${oData.name}`;
+                            } else {
+                                let numPin = otherPort ? otherPort.replace('via-','') : '';
+                                destName = `${oData.description} (Pin ${numPin})`;
+                            }
+                            
+                            conexiones.push({
+                                circuito: lData.circuito || 'S/N',
+                                cable: `${lData.gage} AWG ${lData.color}`,
+                                longitud: lData.length,
+                                destino: destName
+                            });
+                        }
+                    });
+
+                    // Construir el dibujo en formato SVG Matemático
+                    html += buildSpliceSVG(data.name, conexiones);
                 }
             });
 
-            links.forEach(link => { const data = link.get('bomData'); if(!data) return; const llaveCable = `${data.gage} AWG ${data.insulation} ${data.color}`; if(!cablesTotales[llaveCable]) cablesTotales[llaveCable] = 0; cablesTotales[llaveCable] += data.length; });
+            if(!haySplices) {
+                html = '<p style="color: #666;">No hay empalmes (Splices) en tu diseño actual.</p>';
+            }
 
-            let html = `<h3>Conectores, Splices y Protección</h3><table><tr><th>Part Number / Identificador</th><th>Descripción</th><th>Cantidad</th></tr>`;
-            for(let pn in componentes) html += `<tr><td>${pn}</td><td>${componentes[pn].desc}</td><td>${componentes[pn].qty} pzas</td></tr>`;
-            html += `</table><br><h3>Terminales</h3><table><tr><th>Terminal Part Number</th><th>Cantidad Requerida</th></tr>`;
-            for(let termPn in terminalesTotales) html += `<tr><td>${termPn}</td><td>${terminalesTotales[termPn]} pzas</td></tr>`;
-            html += `</table><br><h3>Longitud Total de Cables</h3><table><tr><th>Especificación de Cable</th><th>Longitud Total (mm)</th></tr>`;
-            for(let cable in cablesTotales) html += `<tr><td>${cable}</td><td>${cablesTotales[cable]} mm</td></tr>`;
-            $('#tabla-bom-container').html(html + '</table>');
+            $('#tabla-splices-container').html(html);
         }
+
+        // Dibuja la estrella del Splice en SVG nativo
+        function buildSpliceSVG(name, conexiones) {
+            let svgHtml = `<div class="splice-diagram">`;
+            svgHtml += `<h3 style="color:#c0392b; margin-top:0;">Empalme: ${name}</h3>`;
+            
+            const w = 600, h = 300;
+            const cx = w / 2, cy = h / 2, r = 25;
+            
+            svgHtml += `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">`;
+            
+            // Si hay cables, dibujar las ramificaciones
+            if (conexiones.length > 0) {
+                const angleStep = (2 * Math.PI) / conexiones.length;
+                conexiones.forEach((con, index) => {
+                    // Matemáticas circulares para distribuir los cables
+                    const angle = index * angleStep;
+                    const x2 = cx + Math.cos(angle) * 120; // Largo de la línea
+                    const y2 = cy + Math.sin(angle) * 100;
+
+                    // Dibujar la línea del cable
+                    svgHtml += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#34495e" stroke-width="4"/>`;
+
+                    // Caja de texto del cable
+                    let txtAnchor = Math.cos(angle) > 0 ? "start" : "end";
+                    let offsetX = Math.cos(angle) > 0 ? 10 : -10;
+                    
+                    svgHtml += `<rect x="${x2 - (txtAnchor === 'start' ? 0 : 150) + offsetX}" y="${y2 - 25}" width="150" height="50" fill="#ecf0f1" rx="4" ry="4" stroke="#bdc3c7" stroke-width="1"/>`;
+                    
+                    // Texto: Circuito y Cable
+                    svgHtml += `<text x="${x2 + offsetX + (txtAnchor === 'start' ? 75 : -75)}" y="${y2 - 5}" font-family="sans-serif" font-size="11" fill="#2c3e50" font-weight="bold" text-anchor="middle">[${con.circuito}] ${con.cable}</text>`;
+                    
+                    // Texto: Destino
+                    svgHtml += `<text x="${x2 + offsetX + (txtAnchor === 'start' ? 75 : -75)}" y="${y2 + 10}" font-family="sans-serif" font-size="10" fill="#d35400" font-weight="bold" text-anchor="middle">A: ${con.destino}</text>`;
+                    
+                    // Texto: Longitud
+                    svgHtml += `<text x="${x2 + offsetX + (txtAnchor === 'start' ? 75 : -75)}" y="${y2 + 22}" font-family="sans-serif" font-size="9" fill="#7f8c8d" text-anchor="middle">L: ${con.longitud} mm</text>`;
+                });
+            } else {
+                svgHtml += `<text x="${cx}" y="${cy+60}" font-family="sans-serif" font-size="12" fill="#7f8c8d" text-anchor="middle">(Sin cables conectados)</text>`;
+            }
+
+            // Dibujar el Splice central (Círculo rojo) ENCIMA de las líneas
+            svgHtml += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#e74c3c" stroke="#c0392b" stroke-width="3"/>`;
+            svgHtml += `<text x="${cx}" y="${cy+5}" font-family="sans-serif" font-size="14" fill="white" font-weight="bold" text-anchor="middle">SP</text>`;
+            
+            svgHtml += `</svg></div>`;
+            return svgHtml;
+        }
+
     </script>
 </body>
 </html>
