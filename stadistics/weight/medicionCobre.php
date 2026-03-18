@@ -37,11 +37,6 @@ if($weight != "") {
         echo "$part_num;$item;$qty;$peso<br>";
         
     }
-
-
-
-    }else {
-        echo "0 results";
     }
     }
     
