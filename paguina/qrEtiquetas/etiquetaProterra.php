@@ -7,8 +7,8 @@ date_default_timezone_set("America/Mexico_City");
 use chillerlan\QRCode\{QRCode, QROptions};
 
 try{
-    $wo = isset($_POST['wo']) ? $_POST['wo'] : "";
-    $cons = isset($_POST['cons']) ? $_POST['cons'] : "";
+    $wo = isset($_GET['wo']) ? $_GET['wo'] : "";
+    $cons = isset($_GET['cons']) ? $_GET['cons'] : "";
     
     $today_db = date('mdY'); 
     $today_qr = date('Ymd'); 
