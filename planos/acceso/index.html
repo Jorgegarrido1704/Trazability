@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editor de Arneses - Modular</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.css">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <div class="tab-menu">
+        <button class="tab-btn active" onclick="abrirTab('editor', this)">Diseño</button>
+        <button class="tab-btn" onclick="abrirTab('rutas', this)">Lista de corte</button>
+        <button class="tab-btn" onclick="abrirTab('bom', this)">Lista de Materiales (BOM)</button>
+        <button class="tab-btn" onclick="abrirTab('splices', this)">Esquemas Splice</button>
+    </div>
+
+    <div id="tab-editor" class="tab-content active">
+        <div id="herramientas">
+            <button class="btn-primary" id="btn-add-connector">Agregar Conector</button>
+            <button class="btn-primary" id="btn-add-splice">Agregar Splice</button>
+            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
+            
+            <button class="btn-warning" id="btn-add-loom" title="Haz clic aquí y luego arrastra en el lienzo para dibujar">Dibujar Manga</button>
+            <button class="btn-purple" id="btn-add-tie" title="Haz clic aquí y luego arrastra en el lienzo para dibujar">Dibujar Cincho</button>
+            <button class="btn-dark" id="btn-add-break">Punto de Quiebre</button>
+            
+            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
+            <button class="btn-success" id="btn-save-json">Guardar</button>
+            <input type="file" id="input-load-json" accept=".json" style="display:none;">
+            <button class="btn-info" onclick="document.getElementById('input-load-json').click()">Cargar</button>
+            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
+            <button class="btn-danger" id="btn-clear-canvas">Limpiar</button>
+            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
+            <strong>Zoom:</strong>
+            <button id="btn-zoom-out">-</button>
+            <span id="zoom-level">100%</span>
+            <button id="btn-zoom-in">+</button>
+        </div>
+        <div id="lienzo-arnes"></div>
+    </div>
+
+    <div id="tab-rutas" class="tab-content">
+        <h2>Lista de Conexiones (De -> A)</h2>
+        <div id="tabla-rutas-container"></div>
+    </div>
+
+    <div id="tab-bom" class="tab-content">
+        <h2>Resumen de Materiales Requeridos</h2>
+        <div id="tabla-bom-container"></div>
+    </div>
+
+    <div id="tab-splices" class="tab-content">
+        <h2>Diagramas de Empalmes y Puntos de Reunión</h2>
+        <div id="tabla-splices-container"></div>
+    </div>
+
+    <div id="overlay"></div>
+
+    <div id="modal-cable" class="modal">
+        <h3>Propiedades del Cable</h3>
+        <div class="form-group"><label>Nombre del Circuito:</label><input type="text" id="cable-circuito" placeholder="Ej. CIR-1, PWR, GND"></div>
+        <div class="form-group"><label>Aislamiento:</label><select id="cable-tipo"><option value="GXL">GXL</option><option value="TXL">TXL</option><option value="SXL">SXL</option></select></div>
+        <div class="form-group"><label>Calibre (AWG):</label><input type="number" id="cable-calibre" value="18"></div>
+        <div class="form-group"><label>Color:</label>
+        <select id="cable-color">
+            <option value='YEBN'>YELLOW/BROWN</option>
+            <option value='YE'>YELLOW</option>
+            <option value='VTWH'>VIOLET/WHITE</option>
+            <option value='VTDG'>VIOLET/DARK GREEN</option>
+            <option value='VT'>VIOLET</option>
+            <option value='RDOG'>RED/ORANGE</option>
+            <option value='RDDB'>RED/DARK BLUE</option>
+            <option value='RDBK'>RED/BLACK</option>
+            <option value='RD'>RED</option>
+            <option value='GYLB'>GREY/LIGHT BLUE</option>
+            <option value='GYDG'>GREY/DARK GREEN</option>
+            <option value='GYBN'>GREY/BROWN</option>
+            <option value='DG'>DARK GREEN</option>
+            <option value='DB'>DARK BLUE</option>
+            <option value='BU'>BLUE</option>
+            <option value='BNYE'>BROWN/YELLOW</option>
+            <option value='BNWH'>BROWN/WHITE</option>
+            <option value='BNGN'>BROWN/GREEN</option>
+            <option value='BNDB'>BROWN/DARK BLUE</option>
+            <option value='BN'>BROWN</option>
+            <option value='BKWH'>BLACK/WHITE</option>
+            <option value='BKDG'>BLACK/DARK GREEN</option>
+            <option value='BKBN'>BLACK/BROWN</option>
+            <option value='BK'>BLACK</option>
+            <option value='WHT'>WHITE</option>
+            <option value='CLR'>CLEAR</option>
+        </select>
+        </div>
+        <div class="form-group"><label>Longitud (mm) - Ej. 150+100+50:</label><input type="text" id="cable-longitud" value="0"></div>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-cable">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cancelar</button><button class="btn-success" id="btn-save-cable">Guardar</button></div></div>
+    </div>
+
+    <div id="modal-conector" class="modal">
+        <h3>Configuración del Conector</h3>
+        <div class="form-group"><label>Descripción / Locación:</label><input type="text" id="conn-desc" value="Conector Principal"></div>
+        <div class="form-group"><label>No. Parte (Housing):</label><input type="text" id="conn-pn" value="12040953"></div>
+        <div class="form-group">
+            <label>Posición de Conexión (Pines):</label>
+            <select id="conn-orientacion">
+                <option value="right">Derecha</option>
+                <option value="left">Izquierda</option>
+                <option value="top">Arriba</option>
+                <option value="bottom">Abajo</option>
+            </select>
+        </div>
+        <div class="form-group" style="border-top: 1px solid #ccc; padding-top: 10px; margin-top: 15px;"><label>Cantidad de Vías (Pines):</label><input type="number" id="conn-vias" value="6" min="1" max="50"></div>
+        <div class="form-group"><label>Terminales por Vía (Part Number):</label><div id="lista-terminales" class="cavity-container"></div></div>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-conn">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-conn">Actualizar</button></div></div>
+    </div>
+
+    <div id="modal-splice" class="modal">
+        <h3>Identificador del Splice</h3>
+        <div class="form-group"><label>Nombre / Etiqueta:</label><input type="text" id="splice-name" value="SP-1"></div>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-splice">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-splice">Actualizar</button></div></div>
+    </div>
+
+    <div id="modal-loom" class="modal">
+        <h3>Propiedades de Protección / Cubierta</h3>
+        <div class="form-group">
+            <label>Tipo de Recubrimiento:</label>
+            <select id="loom-tipo">
+                <option value="corrugado">Tubo Corrugado (Loom)</option>
+                <option value="manga">Manga Expandible (Sleeve)</option>
+                <option value="pvc">Tubo PVC (Genérico)</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Descripción / Part Number:</label><input type="text" id="loom-desc" value="Corrugado 1/2"></div>
+        <div class="form-group"><label>Cantidad Requerida (mm, pzas):</label><input type="number" id="loom-qty" value="1"></div>
+        <p style="font-size: 11px; color: #666; margin-bottom: 10px;">* También puedes arrastrar la esquina inferior derecha de la figura en el lienzo para redimensionarla rápidamente.</p>
+        <div class="form-group"><label>Orientación Visual:</label><select id="loom-orientacion"><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option></select></div>
+        <div class="form-group"><label>Largo (px en lienzo):</label><input type="number" id="loom-length" value="200"></div>
+        <div class="form-group"><label>Grosor (px en lienzo):</label><input type="number" id="loom-width" value="40"></div>
+        <button id="btn-agrupar-loom" class="btn-info" style="width: 100%; margin-bottom: 5px;">Agrupar y Bloquear Cables</button>
+        <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-loom">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-loom">Actualizar</button></div></div>
+    </div>
+
+    <div id="modal-tie" class="modal">
+        <h3>Cincho / Punto de Cinta</h3>
+        <div class="form-group"><label>Tipo de Amarre:</label>
+            <select id="tie-tipo"><option value="cincho">Cincho Plástico (Zip Tie)</option><option value="cinta">Cinta (Tape Spot)</option></select>
+        </div>
+        <div class="form-group"><label>Descripción / Part Number:</label><input type="text" id="tie-desc" value="Cincho 4 pulgadas"></div>
+        <div class="form-group"><label>Cantidad (Ej. 2 amarres):</label><input type="number" id="tie-qty" value="1"></div>
+        <div class="form-group"><label>Orientación:</label><select id="tie-orientacion"><option value="vertical">Vertical (Arriba-Abajo)</option><option value="horizontal">Horizontal (Izq-Der)</option></select></div>
+        <p style="font-size: 11px; color: #666; margin-bottom: 10px;">* Si seleccionas "Cinta", cada amarre sumará 3 inches de Tape-25 al BOM.</p>
+        <button id="btn-agrupar-tie" class="btn-info" style="width: 100%; margin-bottom: 5px;">Agrupar y Bloquear Cables</button>
+        <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-tie">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-tie">Actualizar</button></div></div>
+    </div>
+
+    <div id="modal-break" class="modal">
+        <h3>Punto de Quiebre (Break Point)</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Al usar este punto se agruparán los cables y se sumarán automáticamente <strong>6 inches de Tape-25</strong> a la Lista de Materiales (BOM).</p>
+        <button id="btn-agrupar-break" class="btn-info" style="width: 100%; margin-bottom: 5px;">Agrupar y Bloquear Cables</button>
+        <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-break">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button></div></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.js"></script>
+    
+    <script src="scriptsFormulas.js"></script>
+</body>
+</html>

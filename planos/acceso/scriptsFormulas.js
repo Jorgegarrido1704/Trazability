@@ -1,183 +1,28 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Editor de Arneses - V19 (Importación Excel y Textos Dinámicos)</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.css">
-    <style>
-        body { font-family: sans-serif; margin: 0; padding: 20px; background: #e9ecef; }
+// ==========================================
+        // INICIALIZACIÓN Y CONFIGURACIÓN BASE
+        // ==========================================
+        function abrirTab(idTab, btn) { 
+            $('.tab-content').removeClass('active'); $('.tab-btn').removeClass('active'); 
+            $('#tab-' + idTab).addClass('active'); $(btn).addClass('active'); 
+            if (idTab === 'rutas') generarReporteRutas(); 
+            if (idTab === 'bom') generarReporteBOM(); 
+            if (idTab === 'splices') generarReporteSplices(); 
+        }
         
-        .tab-menu { display: flex; border-bottom: 2px solid #adb5bd; margin-bottom: 20px; }
-        .tab-btn { padding: 10px 20px; background: #dee2e6; border: none; border-radius: 5px 5px 0 0; cursor: pointer; font-size: 16px; font-weight: bold; margin-right: 5px; color: #495057; }
-        .tab-btn.active { background: #007bff; color: white; }
-        .tab-content { display: none; background: white; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .tab-content.active { display: block; }
-
-        #herramientas { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;}
-        #lienzo-arnes { border: 2px solid #adb5bd; background: #fff; width: 1000px; height: 600px; overflow: hidden; position: relative; }
-        button { padding: 8px 15px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #5a6268; }
-        .btn-primary { background: #007bff; } .btn-primary:hover { background: #0056b3; }
-        .btn-success { background: #28a745; } .btn-success:hover { background: #218838; }
-        .btn-danger { background: #dc3545; } .btn-danger:hover { background: #c82333; }
-        .btn-dark { background: #343a40; } .btn-dark:hover { background: #23272b; }
-        .btn-info { background: #17a2b8; } .btn-info:hover { background: #138496; }
-        .btn-warning { background: #f39c12; color: #fff;} .btn-warning:hover { background: #e67e22; }
-        .btn-purple { background: #8e44ad; color: #fff; } .btn-purple:hover { background: #732d91; }
-        .btn-excel { background: #27ae60; color: #fff; border: 2px solid #2ecc71; } .btn-excel:hover { background: #219653; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
-        th { background: #e9ecef; color: #495057; }
-        tr:nth-child(even) { background-color: #f8f9fa; }
-
-        /* Modales */
-        .modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 100; width: 340px; max-height: 80vh; overflow-y: auto; }
-        .modal h3 { margin-top: 0; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; position: sticky; top: 0; background: white; z-index: 2;}
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; font-weight: bold;}
-        .form-group input, .form-group select { width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        
-        .cavity-container { background: #f8f9fa; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; }
-        .cavity-row { display: flex; align-items: center; margin-bottom: 8px; }
-        .cavity-row label { width: 60px; margin: 0; color: #d35400; }
-        .cavity-row input { flex: 1; }
-
-        .modal-actions { display: flex; justify-content: space-between; margin-top: 15px; position: sticky; bottom: -20px; background: white; padding: 10px 0; border-top: 1px solid #eee;}
-        .btn-cancel { background: #6c757d; } .btn-cancel:hover { background: #5a6268; }
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 99; }
-
-        #tabla-splices-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-        .splice-diagram { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    </style>
-</head>
-<body>
-
-    <div class="tab-menu">
-        <button class="tab-btn active" onclick="abrirTab('editor', this)">Diseño</button>
-        <button class="tab-btn" onclick="abrirTab('rutas', this)">Lista de corte</button>
-        <button class="tab-btn" onclick="abrirTab('bom', this)">Lista de Materiales (BOM)</button>
-        <button class="tab-btn" onclick="abrirTab('splices', this)">Esquemas Splice</button>
-    </div>
-
-    <div id="tab-editor" class="tab-content active">
-        <div id="herramientas">
-            <button class="btn-primary" id="btn-add-connector">Conector</button>
-            <button class="btn-primary" id="btn-add-splice">Splice</button>
-            <button class="btn-warning" id="btn-add-loom" title="Dibujar Manga">Manga/Loom</button>
-            <button class="btn-purple" id="btn-add-tie" title="Dibujar Cincho">Cincho/spotCinta</button>
-            <button class="btn-dark" id="btn-add-break">Punto Quiebre</button>
-            
-            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
-            
-            <input type="file" id="input-import-excel" accept=".xlsx, .xls, .csv" style="display:none;">
-            <button class="btn-excel" onclick="document.getElementById('input-import-excel').click()">📄 Importar Excel</button>
-            
-            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
-            
-            <button class="btn-success" id="btn-save-json">Guardar cambios</button>
-            <input type="file" id="input-load-json" accept=".json" style="display:none;">
-            <button class="btn-info" onclick="document.getElementById('input-load-json').click()">Cargar trabajo</button>
-            <button class="btn-danger" id="btn-clear-canvas">Limpiar</button>
-            
-            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
-            <strong>Zoom:</strong> <button id="btn-zoom-out">-</button> <span id="zoom-level">100%</span> <button id="btn-zoom-in">+</button>
-        </div>
-        <div id="lienzo-arnes"></div>
-    </div>
-
-    <div id="tab-rutas" class="tab-content"><h2>Lista de Conexiones (De -> A)</h2><div id="tabla-rutas-container"></div></div>
-    <div id="tab-bom" class="tab-content"><h2>Resumen de Materiales Requeridos</h2><div id="tabla-bom-container"></div></div>
-    <div id="tab-splices" class="tab-content"><h2>Diagramas de Empalmes y Puntos de Reunión</h2><div id="tabla-splices-container"></div></div>
-    <div id="overlay"></div>
-
-    <div id="modal-cable" class="modal">
-        <h3>Propiedades del Cable</h3>
-        <p style="font-size: 11px; color: #666; margin-top:-10px;">*Tip: Puedes mover la etiqueta del cable en el lienzo arrastrándola.</p>
-        <div class="form-group"><label>Nombre del Circuito:</label><input type="text" id="cable-circuito" placeholder="Ej. CIR-1, PWR, GND"></div>
-        <div class="form-group"><label>Aislamiento:</label><select id="cable-tipo"><option value="GXL">GXL</option><option value="TXL">TXL</option><option value="SXL">SXL</option></select></div>
-        <div class="form-group"><label>Calibre (AWG):</label><input type="number" id="cable-calibre" value="18"></div>
-        <div class="form-group"><label>Color:</label>
-        <select id="cable-color">
-            <option value='YEBN'>YELLOW/BROWN</option><option value='YE'>YELLOW</option><option value='VTWH'>VIOLET/WHITE</option>
-            <option value='VTDG'>VIOLET/DARK GREEN</option><option value='VT'>VIOLET</option><option value='RDOG'>RED/ORANGE</option>
-            <option value='RDDB'>RED/DARK BLUE</option><option value='RDBK'>RED/BLACK</option><option value='RD'>RED</option>
-            <option value='GYLB'>GREY/LIGHT BLUE</option><option value='GYDG'>GREY/DARK GREEN</option><option value='GYBN'>GREY/BROWN</option>
-            <option value='DG'>DARK GREEN</option><option value='DB'>DARK BLUE</option><option value='BU'>BLUE</option>
-            <option value='BNYE'>BROWN/YELLOW</option><option value='BNWH'>BROWN/WHITE</option><option value='BNGN'>BROWN/GREEN</option>
-            <option value='BNDB'>BROWN/DARK BLUE</option><option value='BN'>BROWN</option><option value='BKWH'>BLACK/WHITE</option>
-            <option value='BKDG'>BLACK/DARK GREEN</option><option value='BKBN'>BLACK/BROWN</option><option value='BK'>BLACK</option>
-            <option value='WHT'>WHITE</option><option value='CLR'>CLEAR</option>
-        </select>
-        </div>
-        <div class="form-group"><label>Longitud (mm) - Ej. 150+100+50:</label><input type="text" id="cable-longitud" value="0"></div>
-        <div class="modal-actions"><button class="btn-danger" id="btn-delete-cable">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cancelar</button><button class="btn-success" id="btn-save-cable">Guardar</button></div></div>
-    </div>
-
-    <div id="modal-conector" class="modal">
-        <h3>Configuración del Conector</h3>
-        <div class="form-group"><label>Descripción / Locación:</label><input type="text" id="conn-desc" value="Conector Principal"></div>
-        <div class="form-group"><label>No. Parte (Housing):</label><input type="text" id="conn-pn" value="12040953"></div>
-        <div class="form-group"><label>Posición de Conexión (Pines):</label><select id="conn-orientacion"><option value="right">Derecha</option><option value="left">Izquierda</option><option value="top">Arriba</option><option value="bottom">Abajo</option></select></div>
-        <div class="form-group" style="border-top: 1px solid #ccc; padding-top: 10px; margin-top: 15px;"><label>Cantidad de Vías (Pines):</label><input type="number" id="conn-vias" value="6" min="1" max="50"></div>
-        <div class="form-group"><label>Terminales por Vía (Part Number):</label><div id="lista-terminales" class="cavity-container"></div></div>
-        <div class="modal-actions"><button class="btn-danger" id="btn-delete-conn">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-conn">Actualizar</button></div></div>
-    </div>
-
-    <div id="modal-splice" class="modal">
-        <h3>Identificador del Splice</h3>
-        <div class="form-group"><label>Nombre / Etiqueta:</label><input type="text" id="splice-name" value="SP-1"></div>
-        <div class="modal-actions"><button class="btn-danger" id="btn-delete-splice">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-splice">Actualizar</button></div></div>
-    </div>
-
-    <div id="modal-loom" class="modal">
-        <h3>Propiedades de Protección / Cubierta</h3>
-        <div class="form-group"><label>Tipo de Recubrimiento:</label><select id="loom-tipo"><option value="corrugado">Tubo Corrugado (Loom)</option><option value="manga">Manga Expandible (Sleeve)</option><option value="pvc">Tubo PVC (Genérico)</option></select></div>
-        <div class="form-group"><label>Descripción / Part Number:</label><input type="text" id="loom-desc" value="Corrugado 1/2"></div>
-        <div class="form-group"><label>Cantidad Requerida (mm, pzas):</label><input type="number" id="loom-qty" value="1"></div>
-        <div class="form-group"><label>Orientación Visual:</label><select id="loom-orientacion"><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option></select></div>
-        <div class="form-group"><label>Largo (px en lienzo):</label><input type="number" id="loom-length" value="200"></div>
-        <div class="form-group"><label>Grosor (px en lienzo):</label><input type="number" id="loom-width" value="40"></div>
-        <button id="btn-agrupar-loom" class="btn-info" style="width: 100%; margin-bottom: 5px;">Agrupar y Bloquear Cables</button>
-        <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
-        <div class="modal-actions"><button class="btn-danger" id="btn-delete-loom">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-loom">Actualizar</button></div></div>
-    </div>
-
-    <div id="modal-tie" class="modal">
-        <h3>Cincho / Punto de Cinta</h3>
-        <div class="form-group"><label>Tipo de Amarre:</label><select id="tie-tipo"><option value="cincho">Cincho Plástico (Zip Tie)</option><option value="cinta">Cinta (Tape Spot)</option></select></div>
-        <div class="form-group"><label>Descripción / Part Number:</label><input type="text" id="tie-desc" value="Cincho 4 pulgadas"></div>
-        <div class="form-group"><label>Cantidad (Ej. 2 amarres):</label><input type="number" id="tie-qty" value="1"></div>
-        <div class="form-group"><label>Orientación:</label><select id="tie-orientacion"><option value="vertical">Vertical (Arriba-Abajo)</option><option value="horizontal">Horizontal (Izq-Der)</option></select></div>
-        <button id="btn-agrupar-tie" class="btn-info" style="width: 100%; margin-bottom: 5px;">Agrupar y Bloquear Cables</button>
-        <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
-        <div class="modal-actions"><button class="btn-danger" id="btn-delete-tie">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-tie">Actualizar</button></div></div>
-    </div>
-
-    <div id="modal-break" class="modal">
-        <h3>Punto de Quiebre (Break Point)</h3>
-        <button id="btn-agrupar-break" class="btn-info" style="width: 100%; margin-bottom: 5px;">Agrupar y Bloquear Cables</button>
-        <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
-        <div class="modal-actions"><button class="btn-danger" id="btn-delete-break">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button></div></div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
-    <script>
-        function abrirTab(idTab, btn) { $('.tab-content').removeClass('active'); $('.tab-btn').removeClass('active'); $('#tab-' + idTab).addClass('active'); $(btn).addClass('active'); if (idTab === 'rutas') generarReporteRutas(); if (idTab === 'bom') generarReporteBOM(); if (idTab === 'splices') generarReporteSplices(); }
         function evaluarMatematica(expresion) { try { let expLimpia = String(expresion).replace(/[^0-9\+\-\.\s]/g, ''); if(expLimpia.trim() === '') return 0; return Function('"use strict";return (' + expLimpia + ')')(); } catch (e) { return 0; } }
 
-        let escalaActual = 1; let contSplices = 1; const graph = new joint.dia.Graph(); let elementoRedimensionando = null; 
+        let escalaActual = 1; let contSplices = 1; const graph = new joint.dia.Graph();
+        let elementoRedimensionando = null; 
         
         const paper = new joint.dia.Paper({
-            el: document.getElementById('lienzo-arnes'), model: graph, width: 3000, height: 2000, gridSize: 10, drawGrid: true, background: { color: '#ffffff' },
+            el: document.getElementById('lienzo-arnes'), model: graph, width: 2000, height: 2000, gridSize: 10, drawGrid: true, background: { color: '#ffffff' },
             defaultLink: new joint.shapes.standard.Link({ attrs: { line: { stroke: '#34495e', strokeWidth: 3, strokeLinejoin: 'round', strokeLinecap: 'round' } }, router: { name: 'manhattan', args: {step: 10, padding: 20} }, connector: { name: 'rounded', args: { radius: 10 } } }), 
+            
+            // REGLA DE BLOQUEO DE CABLES
             interactive: function(cellView) {
-                if (cellView.model.isLink() && cellView.model.get('locked')) return { vertexAdd: false, vertexMove: false, vertexRemove: false, linkMove: false };
+                if (cellView.model.isLink() && cellView.model.get('locked')) {
+                    return { vertexAdd: false, vertexMove: false, vertexRemove: false, linkMove: false };
+                }
                 return { linkMove: true, vertexAdd: true, vertexMove: true, vertexRemove: true };
             },
             linkPinning: false, snapLinks: { radius: 30 },
@@ -185,176 +30,127 @@
         });
 
         // ==========================================
-        // NUEVO: SISTEMA DE ARRASTRE DE ETIQUETAS (LABELS)
+        // SISTEMA DE DIBUJO MANUAL (SÓLO LOOM)
         // ==========================================
-        let dragLabelState = { active: false, linkView: null, startX: 0, startY: 0, initialOffset: {x:0, y:0} };
+        let drawingState = { active: false, type: '', startX: 0, startY: 0, shape: null };
 
-        paper.on('link:pointerdown', function(linkView, evt, x, y) {
-            const target = evt.target;
-            // Verifica si el usuario hizo clic en la etiqueta (label)
-            if (target.tagName === 'rect' && target.parentNode && target.parentNode.classList.contains('label')) {
-                evt.stopPropagation(); // Previene que se creen vértices por accidente
+        // Activa modo dibujo SOLO para Loom
+        $('#btn-add-loom').click(() => { 
+            drawingState = { active: true, type: 'Loom', startX: 0, startY: 0, shape: null };
+            $('#lienzo-arnes').css('cursor', 'crosshair'); 
+        });
+
+        // Los demás botones cancelan el modo dibujo y agregan directamente
+        $('#btn-add-tie').click(() => { 
+            drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default');
+            crearTie(250, 100); 
+        });
+        $('#btn-add-break').click(() => { 
+            drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default');
+            crearBreakPoint(300, 200); 
+        });
+        $('#btn-add-connector').click(() => { 
+            drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default');
+            crearConector(50, 50, 'Conector A', '12064754', 4, 'right'); 
+        });
+        $('#btn-add-splice').click(() => { 
+            drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default');
+            crearSplice(300, 150, `SP-${contSplices}`); contSplices++; 
+        });
+
+        // Eventos del ratón para dibujar el Loom
+        paper.on('blank:pointerdown', function(evt, x, y) {
+            if (drawingState.active && drawingState.type === 'Loom') {
+                drawingState.startX = x; drawingState.startY = y;
+                drawingState.shape = crearLoomDinamico(x, y, 1, 1);
+            }
+        });
+
+        paper.on('blank:pointermove', function(evt, x, y) {
+            if (drawingState.active && drawingState.shape && drawingState.type === 'Loom') {
+                let newX = Math.min(x, drawingState.startX);
+                let newY = Math.min(y, drawingState.startY);
+                let newWidth = Math.max(Math.abs(x - drawingState.startX), 1);
+                let newHeight = Math.max(Math.abs(y - drawingState.startY), 1);
                 
-                dragLabelState.active = true;
-                dragLabelState.linkView = linkView;
-                dragLabelState.startX = x;
-                dragLabelState.startY = y;
+                drawingState.shape.position(newX, newY);
+                drawingState.shape.resize(newWidth, newHeight);
+            }
+        });
 
-                // Leer la posición actual o asignar una por defecto
-                const labels = linkView.model.labels();
-                if (labels.length > 0 && labels[0].position && labels[0].position.offset) {
-                    let offset = labels[0].position.offset;
-                    dragLabelState.initialOffset = (typeof offset === 'object') ? { x: offset.x || 0, y: offset.y || 0 } : { x: 0, y: offset };
-                } else {
-                    dragLabelState.initialOffset = { x: 0, y: -20 };
+        paper.on('blank:pointerup', function(evt, x, y) {
+            if (drawingState.active && drawingState.shape && drawingState.type === 'Loom') {
+                let bbox = drawingState.shape.getBBox();
+                
+                // Si hizo clic corto sin arrastrar, asignar tamaño estándar
+                if (bbox.width < 15 && bbox.height < 15) {
+                    drawingState.shape.resize(200, 40);
+                    bbox = drawingState.shape.getBBox();
                 }
-            } else {
-                // Si no fue en la etiqueta, activa las herramientas normales de Link
-                paper.removeTools();
-                if (linkView.model.get('locked')) linkView.model.set('locked', false);
-                const toolsView = new joint.dia.ToolsView({ tools: [new joint.linkTools.Vertices(), new joint.linkTools.Segments()] });
-                linkView.addTools(toolsView);
-            }
-        });
 
-        // Arrastrar la etiqueta por el lienzo
-        $(document).on('mousemove', function(evt) {
-            if (dragLabelState.active) {
-                const localPoint = paper.clientToLocalPoint({ x: evt.clientX, y: evt.clientY });
-                const dx = localPoint.x - dragLabelState.startX;
-                const dy = localPoint.y - dragLabelState.startY;
+                let d = drawingState.shape.get('bomData');
+                d.orientacion = bbox.width >= bbox.height ? 'horizontal' : 'vertical';
+                d.len = Math.round(bbox.width >= bbox.height ? bbox.width : bbox.height);
+                d.wid = Math.round(bbox.width >= bbox.height ? bbox.height : bbox.width);
+                drawingState.shape.set('bomData', d);
+
+                let formaCreada = drawingState.shape;
+                drawingState.active = false;
+                drawingState.shape = null;
+                $('#lienzo-arnes').css('cursor', 'default');
                 
-                // Actualiza dinámicamente la propiedad offset de la etiqueta 0
-                dragLabelState.linkView.model.prop('labels/0/position/offset', {
-                    x: dragLabelState.initialOffset.x + dx,
-                    y: dragLabelState.initialOffset.y + dy
-                });
+                // Abre modal automáticamente
+                abrirModalLoom(formaCreada); 
             }
         });
 
-        $(document).on('mouseup', function() {
-            if (dragLabelState.active) dragLabelState.active = false;
+        // REDIMENSIÓN CON ESQUINA (Para figuras ya creadas)
+        paper.on('element:pointerdown', function(elementView, evt, x, y) {
+            const target = evt.target;
+            const selector = target.getAttribute('joint-selector') || target.getAttribute('selector');
+            if (selector === 'resizeHandle') {
+                elementoRedimensionando = elementView.model;
+                evt.stopPropagation(); 
+            }
+        });
+
+        paper.on('blank:pointermove element:pointermove', function(evt, x, y) {
+            if (elementoRedimensionando) {
+                const bbox = elementoRedimensionando.getBBox();
+                const newWidth = Math.max(20, x - bbox.x);
+                const newHeight = Math.max(20, y - bbox.y);
+                elementoRedimensionando.resize(newWidth, newHeight);
+                
+                const d = elementoRedimensionando.get('bomData');
+                if (d && (d.type === 'Loom' || d.type === 'Tie')) {
+                    d.orientacion = newWidth >= newHeight ? 'horizontal' : 'vertical';
+                    if(d.type === 'Loom') {
+                        d.len = newWidth >= newHeight ? newWidth : newHeight;
+                        d.wid = newWidth >= newHeight ? newHeight : newWidth;
+                    }
+                    elementoRedimensionando.set('bomData', d);
+                }
+            }
+        });
+
+        $(window).on('mouseup', function() {
+            if (elementoRedimensionando) {
+                actualizarEscaneoLooms();
+                elementoRedimensionando = null;
+            }
+        });
+
+        // INTERACCIÓN PARA MOVER CABLES CON UN CLIC
+        paper.on('link:pointerclick', function(linkView) {
+            paper.removeTools();
+            if (linkView.model.get('locked')) { linkView.model.set('locked', false); }
+            const verticesTool = new joint.linkTools.Vertices();
+            const segmentsTool = new joint.linkTools.Segments();
+            const toolsView = new joint.dia.ToolsView({ tools: [verticesTool, segmentsTool] });
+            linkView.addTools(toolsView);
         });
 
         paper.on('blank:pointerclick element:pointerclick', function() { paper.removeTools(); });
-
-        // ==========================================
-        // NUEVO: IMPORTACIÓN DE EXCEL A DIBUJO CAD
-        // ==========================================
-        $('#input-import-excel').on('change', function(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                try {
-                    const data = new Uint8Array(evt.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-                    procesarListaDeCorteExcel(jsonData);
-                } catch (err) {
-                    alert("Error al leer el archivo Excel. Asegúrate de que no esté corrupto.");
-                }
-            };
-            reader.readAsArrayBuffer(file);
-            $(this).val(''); // Limpia el input para permitir recargar el mismo archivo
-        });
-
-        function procesarListaDeCorteExcel(datos) {
-            if (datos.length === 0) return alert("El archivo Excel está vacío.");
-            
-            if(!confirm("Esto borrará el diseño actual y dibujará uno nuevo basado en el Excel. ¿Deseas continuar?")) return;
-            graph.clear();
-            contSplices = 1;
-
-            let conectoresMap = {}; 
-            // 1. Escanear el Excel para encontrar todos los Nodos (Conectores y Splices) y contar cuántos pines necesitan
-            datos.forEach(row => {
-                // Soporta varias formas de nombrar las columnas en Excel
-                let orig = row['ORIGEN'] || row['DESTINO 1'] || row['FROM'];
-                let dest = row['DESTINO'] || row['DESTINO 2'] || row['TO'];
-                let pinOrig = parseInt(row['PIN_ORIGEN'] || row['PIN 1'] || 1);
-                let pinDest = parseInt(row['PIN_DESTINO'] || row['PIN 2'] || 1);
-
-                if(orig) {
-                    orig = String(orig).trim();
-                    if(!conectoresMap[orig]) conectoresMap[orig] = { type: orig.startsWith('SP') ? 'Splice' : 'Connector', maxPin: 0 };
-                    if(pinOrig > conectoresMap[orig].maxPin) conectoresMap[orig].maxPin = pinOrig;
-                }
-                if(dest) {
-                    dest = String(dest).trim();
-                    if(!conectoresMap[dest]) conectoresMap[dest] = { type: dest.startsWith('SP') ? 'Splice' : 'Connector', maxPin: 0 };
-                    if(pinDest > conectoresMap[dest].maxPin) conectoresMap[dest].maxPin = pinDest;
-                }
-            });
-
-            // 2. Dibujar los Nodos en el Lienzo (Layout Espaciado)
-            let celdasCreadas = {};
-            let currentX = 100, currentY = 100;
-            
-            Object.keys(conectoresMap).forEach((nombre, index) => {
-                let info = conectoresMap[nombre];
-                // Alternar derecha/izquierda para que los cables crucen el centro
-                let orientacion = (index % 2 === 0) ? 'right' : 'left'; 
-                
-                if(info.type === 'Splice') {
-                    celdasCreadas[nombre] = crearSplice(currentX, currentY + 50, nombre);
-                } else {
-                    // Forzamos mínimo 2 pines para que el conector no se vea mal
-                    let vias = Math.max(info.maxPin, 2);
-                    celdasCreadas[nombre] = crearConector(currentX, currentY, nombre, 'Importado', vias, orientacion);
-                }
-
-                // Lógica de grilla simple para acomodarlos
-                currentY += 250;
-                if(currentY > 1200) { currentY = 100; currentX += 450; }
-            });
-
-            // 3. Dibujar los Cables conectando los Nodos
-            datos.forEach(row => {
-                let orig = String(row['ORIGEN'] || row['DESTINO 1'] || row['FROM']).trim();
-                let dest = String(row['DESTINO'] || row['DESTINO 2'] || row['TO']).trim();
-                let pinOrig = row['PIN_ORIGEN'] || row['PIN 1'] || 1;
-                let pinDest = row['PIN_DESTINO'] || row['PIN 2'] || 1;
-
-                if(orig && dest && celdasCreadas[orig] && celdasCreadas[dest]) {
-                    
-                    let sourceObj = { id: celdasCreadas[orig].id };
-                    sourceObj.port = conectoresMap[orig].type === 'Connector' ? `via-${pinOrig}` : orig;
-
-                    let targetObj = { id: celdasCreadas[dest].id };
-                    targetObj.port = conectoresMap[dest].type === 'Connector' ? `via-${pinDest}` : dest;
-
-                    // Leer propiedades de Excel
-                    const cal = row['CALIBRE'] || row['AWG'] || 18;
-                    const tipo = row['TIPO'] || row['TIPO DE CABLE'] || 'TXL';
-                    const color = row['COLOR'] || 'BK';
-                    const longitud = row['LONGITUD'] || row['LONGITUD (MM)'] || 150;
-                    const circ = row['CIRCUITO'] || row['ESTAMPADO'] || 'S/N';
-                    const hexColor = getWireColorHex(color);
-
-                    const link = new joint.shapes.standard.Link({
-                        source: sourceObj, target: targetObj,
-                        attrs: { line: { stroke: hexColor, strokeWidth: 3, strokeLinejoin: 'round', strokeLinecap: 'round' } },
-                        router: { name: 'manhattan', args: {step: 10, padding: 20} },
-                        connector: { name: 'rounded', args: { radius: 10 } }
-                    });
-
-                    // Agrega la etiqueta con propiedad 'cursor: move'
-                    link.appendLabel({
-                        attrs: { 
-                            text: { text: `[${circ}]\n${longitud}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, 
-                            rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5, cursor: 'move' } 
-                        },
-                        position: { distance: 0.5, offset: {x: 0, y: -20} }
-                    });
-
-                    link.set('bomData', { type: 'Wire', circuito: circ, insulation: tipo, gage: parseInt(cal), color: color, length: parseInt(longitud) });
-                    link.addTo(graph);
-                }
-            });
-            alert("¡Importación exitosa! Se han generado los conectores y cables. Puedes arrastrar los conectores para acomodar tu diseño.");
-        }
 
 
         $('#btn-zoom-in').click(() => { escalaActual += 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); });
@@ -366,8 +162,9 @@
 
         let enlaceActual = null; let nodoActual = null; let terminalesTemp = {}; 
 
+        // COLORES
         const loomColors = { 'corrugado': { fill: '#95a5a6', stroke: '#7f8c8d' }, 'manga': { fill: '#2ecc71', stroke: '#27ae60' }, 'pvc': { fill: '#f1c40f', stroke: '#f39c12' } };
-        const tieColors = { 'cincho': { fill: '#2c3e50', stroke: '#1a252f' }, 'cinta': { fill: '#111111', stroke: '#000000' } }; 
+        const tieColors = { 'cincho': { fill: '#2c3e50', stroke: '#1a252f' }, 'cinta': { fill: '#111111', stroke: '#000000' } }; // Cinta ahora es negra/oscura
 
         function getWireColorHex(colorCode) {
             if(!colorCode) return '#34495e';
@@ -405,99 +202,57 @@
         function crearLoomDinamico(x, y, w, h) { 
             const colores = loomColors['corrugado'];
             const rect = new joint.shapes.standard.Rectangle({ 
-                markup: [{ tagName: 'rect', selector: 'body' }, { tagName: 'text', selector: 'label' }, { tagName: 'polygon', selector: 'resizeHandle' }],
+                markup: [
+                    { tagName: 'rect', selector: 'body' },
+                    { tagName: 'text', selector: 'label' },
+                    { tagName: 'polygon', selector: 'resizeHandle' }
+                ],
                 position: { x: x, y: y }, size: { width: w, height: h }, 
                 attrs: { 
                     body: { fill: colores.fill, fillOpacity: 0.4, stroke: colores.stroke, strokeWidth: 2, strokeDasharray: '4,4' }, 
                     label: { text: 'NUEVO RECUBRIMIENTO', fill: '#2c3e50', fontWeight: 'bold', fontSize: 11 },
-                    resizeHandle: { points: '0,15 15,15 15,0', fill: '#34495e', cursor: 'nwse-resize', refX: '100%', refDx: -15, refY: '100%', refDy: -15 }
+                    resizeHandle: { 
+                        points: '0,15 15,15 15,0', fill: '#34495e', cursor: 'nwse-resize',
+                        refX: '100%', refDx: -15, refY: '100%', refDy: -15 
+                    }
                 } 
             }); 
-            rect.set('bomData', { type: 'Loom', recubrimiento: 'corrugado', description: 'Tubo Corrugado', qty: 1, len: w, wid: h, orientacion: 'horizontal' }); rect.addTo(graph); rect.toBack(); return rect; 
+            rect.set('bomData', { type: 'Loom', recubrimiento: 'corrugado', description: 'Tubo Corrugado', qty: 1, len: w, wid: h, orientacion: 'horizontal' }); 
+            rect.addTo(graph); rect.toBack(); return rect; 
         }
 
-        function crearTieDinamico(x, y, w, h) {
+        // Función estática para el Cincho
+        function crearTie(x, y) {
             const rect = new joint.shapes.standard.Rectangle({ 
-                markup: [{ tagName: 'rect', selector: 'body' }, { tagName: 'text', selector: 'label' }, { tagName: 'polygon', selector: 'resizeHandle' }],
-                position: { x: x, y: y }, size: { width: w, height: h }, 
+                markup: [
+                    { tagName: 'rect', selector: 'body' },
+                    { tagName: 'text', selector: 'label' },
+                    { tagName: 'polygon', selector: 'resizeHandle' }
+                ],
+                position: { x: x, y: y }, size: { width: 15, height: 50 }, 
                 attrs: { 
                     body: { fill: '#2c3e50', rx: 3, ry: 3, stroke: '#1a252f', strokeWidth: 2 }, 
                     label: { text: 'TIE', fill: '#ffffff', fontSize: 8, fontWeight: 'bold', transform: 'rotate(-90)' },
-                    resizeHandle: { points: '0,10 10,10 10,0', fill: '#ffffff', cursor: 'nwse-resize', refX: '100%', refDx: -10, refY: '100%', refDy: -10 }
+                    resizeHandle: { 
+                        points: '0,10 10,10 10,0', fill: '#ffffff', cursor: 'nwse-resize',
+                        refX: '100%', refDx: -10, refY: '100%', refDy: -10 
+                    }
                 } 
             });
-            rect.set('bomData', { type: 'Tie', recubrimiento: 'cincho', description: 'Cincho Plástico', qty: 1, orientacion: 'vertical' }); rect.addTo(graph); rect.toFront(); return rect;
+            rect.set('bomData', { type: 'Tie', recubrimiento: 'cincho', description: 'Cincho Plástico', qty: 1, orientacion: 'vertical' }); 
+            rect.addTo(graph); rect.toFront(); return rect;
         }
 
         function crearBreakPoint(x, y) {
-            const circle = new joint.shapes.standard.Circle({ position: { x: x, y: y }, size: { width: 20, height: 20 }, attrs: { body: { fill: '#34495e', stroke: '#000000', strokeWidth: 3, strokeDasharray: '4,2' }, label: { text: 'BP', fill: '#ffffff', fontSize: 9, fontWeight: 'bold' } } });
+            const circle = new joint.shapes.standard.Circle({ 
+                position: { x: x, y: y }, size: { width: 20, height: 20 }, 
+                attrs: { 
+                    body: { fill: '#34495e', stroke: '#000000', strokeWidth: 3, strokeDasharray: '4,2' }, 
+                    label: { text: 'BP', fill: '#ffffff', fontSize: 9, fontWeight: 'bold' } 
+                } 
+            });
             circle.set('bomData', { type: 'BreakPoint', orientacion: 'horizontal', description: 'Tape-25', qty: 6, unit: 'inches' }); circle.addTo(graph); circle.toBack(); return circle;
         }
-
-        // ==========================================
-        // DIBUJO MANUAL (SÓLO LOOM Y TIE)
-        // ==========================================
-        let drawingState = { active: false, type: '', startX: 0, startY: 0, shape: null };
-
-        $('#btn-add-loom').click(() => { drawingState = { active: true, type: 'Loom', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
-        $('#btn-add-tie').click(() => { drawingState = { active: true, type: 'Tie', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
-
-        $('#btn-add-break').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearBreakPoint(300, 200); });
-        $('#btn-add-connector').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearConector(50, 50, 'Conector A', '12064754', 4, 'right'); });
-        $('#btn-add-splice').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearSplice(300, 150, `SP-${contSplices}`); contSplices++; });
-
-        paper.on('blank:pointerdown', function(evt, x, y) {
-            if (drawingState.active) {
-                drawingState.startX = x; drawingState.startY = y;
-                if(drawingState.type === 'Loom') drawingState.shape = crearLoomDinamico(x, y, 1, 1);
-                else if(drawingState.type === 'Tie') drawingState.shape = crearTieDinamico(x, y, 1, 1);
-            }
-        });
-
-        paper.on('blank:pointermove', function(evt, x, y) {
-            if (drawingState.active && drawingState.shape) {
-                let newX = Math.min(x, drawingState.startX); let newY = Math.min(y, drawingState.startY);
-                let newWidth = Math.max(Math.abs(x - drawingState.startX), 1); let newHeight = Math.max(Math.abs(y - drawingState.startY), 1);
-                drawingState.shape.position(newX, newY); drawingState.shape.resize(newWidth, newHeight);
-            }
-        });
-
-        paper.on('blank:pointerup', function(evt, x, y) {
-            if (drawingState.active && drawingState.shape) {
-                let bbox = drawingState.shape.getBBox(); let isLoom = drawingState.type === 'Loom';
-                if (bbox.width < 15 && bbox.height < 15) { drawingState.shape.resize(isLoom ? 200 : 15, isLoom ? 40 : 50); bbox = drawingState.shape.getBBox(); }
-                let d = drawingState.shape.get('bomData'); d.orientacion = bbox.width >= bbox.height ? 'horizontal' : 'vertical';
-                if(isLoom) { d.len = Math.round(bbox.width >= bbox.height ? bbox.width : bbox.height); d.wid = Math.round(bbox.width >= bbox.height ? bbox.height : bbox.width); }
-                drawingState.shape.set('bomData', d);
-                if(!isLoom) { drawingState.shape.attr('label/transform', d.orientacion === 'vertical' ? 'rotate(-90)' : 'rotate(0)'); }
-
-                let formaCreada = drawingState.shape; drawingState.active = false; drawingState.shape = null; $('#lienzo-arnes').css('cursor', 'default');
-                if(isLoom) abrirModalLoom(formaCreada); else abrirModalTie(formaCreada);
-            }
-        });
-
-        paper.on('element:pointerdown', function(elementView, evt, x, y) {
-            const target = evt.target; const selector = target.getAttribute('joint-selector') || target.getAttribute('selector');
-            if (selector === 'resizeHandle') { elementoRedimensionando = elementView.model; evt.stopPropagation(); }
-        });
-
-        paper.on('blank:pointermove element:pointermove', function(evt, x, y) {
-            if (elementoRedimensionando) {
-                const bbox = elementoRedimensionando.getBBox(); const newWidth = Math.max(20, x - bbox.x); const newHeight = Math.max(20, y - bbox.y);
-                elementoRedimensionando.resize(newWidth, newHeight);
-                const d = elementoRedimensionando.get('bomData');
-                if (d && (d.type === 'Loom' || d.type === 'Tie')) {
-                    d.orientacion = newWidth >= newHeight ? 'horizontal' : 'vertical';
-                    if(d.type === 'Loom') { d.len = newWidth >= newHeight ? newWidth : newHeight; d.wid = newWidth >= newHeight ? newHeight : newWidth; }
-                    elementoRedimensionando.set('bomData', d);
-                }
-            }
-        });
-
-        $(window).on('mouseup', function() {
-            if (elementoRedimensionando) { actualizarEscaneoLooms(); elementoRedimensionando = null; }
-        });
-
 
         // LÓGICA DE MODALES
         function renderizarInputsTerminales(vias) { let html = ''; for(let i = 1; i <= vias; i++) { let idVia = `via-${i}`; let valorPN = terminalesTemp[idVia] || ''; html += `<div class="cavity-row"><label>Vía ${i}:</label><input type="text" class="input-terminal" data-via="${idVia}" value="${valorPN}" placeholder="Part No. de Terminal"></div>`; } $('#lista-terminales').html(html); }
@@ -524,7 +279,7 @@
             if (enlaceActual) { 
                 const circuito = $('#cable-circuito').val() || 'S/N'; const tipo = $('#cable-tipo').val(); const cal = $('#cable-calibre').val(); const color = $('#cable-color').val(); const strLongitud = $('#cable-longitud').val(); const longitudCalculada = evaluarMatematica(strLongitud); 
                 const hexColor = getWireColorHex(color); enlaceActual.attr('line/stroke', hexColor);
-                enlaceActual.labels([]); enlaceActual.appendLabel({ attrs: { text: { text: `[${circuito}]\n${longitudCalculada}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5, cursor: 'move' } }, position: { distance: 0.5, offset: {x: 0, y: -20} } }); 
+                enlaceActual.labels([]); enlaceActual.appendLabel({ attrs: { text: { text: `[${circuito}]\n${longitudCalculada}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5 } } }); 
                 enlaceActual.set('bomData', { type: 'Wire', circuito: circuito, insulation: tipo, gage: parseInt(cal), color: color, length: longitudCalculada }); 
             } cerrarModales(); 
         });
@@ -562,6 +317,7 @@
             } cerrarModales(); 
         });
 
+        graph.on('add', function(cell) { if (cell.isLink()) { cell.on('change:target', function(link) { if (link.get('target').id && link.get('source').id) { if (!link.get('bomData')) abrirModalCable(link); } }); } });
         paper.on('element:pointerdblclick', function(cellView) { 
             const tipo = cellView.model.get('bomData').type; 
             if (tipo === 'Connector') abrirModalConector(cellView.model); 
@@ -571,7 +327,7 @@
             if (tipo === 'Tie') abrirModalTie(cellView.model); 
         });
         paper.on('link:pointerdblclick', function(linkView) { abrirModalCable(linkView.model); });
-
+        
         // ==========================================
         // CÁLCULO DE DIÁMETROS Y AGRUPACIÓN
         // ==========================================
@@ -625,7 +381,7 @@
         function liberarAgrupacion(nodoCentral) {
             const bbox = nodoCentral.getBBox(); const puntoCentro = new joint.g.Point(bbox.x + (bbox.width/2), bbox.y + (bbox.height/2));
             graph.getLinks().forEach(link => { const view = link.findView(paper); if (view) { const rectLink = new joint.g.Rect(view.getBBox()).inflate(50); if (rectLink.distance(puntoCentro) <= 250) { link.set('locked', false); } } });
-            alert("Los cables cercanos han sido DESBLOQUEADOS."); cerrarModales();
+            alert("Los cables cercanos han sido DESBLOQUEADOS. Puedes darles un clic para editar sus vértices manualmente."); cerrarModales();
         }
 
         $('#btn-agrupar-loom, #btn-agrupar-break, #btn-agrupar-tie').click(() => { if (nodoActual) forzarAgrupacion(nodoActual); });
@@ -734,6 +490,3 @@
             svgHtml += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#e74c3c" stroke="#c0392b" stroke-width="3"/><text x="${cx}" y="${cy+5}" font-family="sans-serif" font-size="14" fill="white" font-weight="bold" text-anchor="middle">SPL</text></svg></div>`;
             return svgHtml;
         }
-    </script>
-</body>
-</html>

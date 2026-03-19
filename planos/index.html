@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Editor de Arneses - V11 (Mazo, Diámetros y Splices)</title>
+    <title>Editor de Arneses - V17 (Redimensión de Mangas con Ratón)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.css">
     <style>
         body { font-family: sans-serif; margin: 0; padding: 20px; background: #e9ecef; }
@@ -23,6 +23,7 @@
         .btn-dark { background: #343a40; } .btn-dark:hover { background: #23272b; }
         .btn-info { background: #17a2b8; } .btn-info:hover { background: #138496; }
         .btn-warning { background: #f39c12; color: #fff;} .btn-warning:hover { background: #e67e22; }
+        .btn-purple { background: #8e44ad; color: #fff; } .btn-purple:hover { background: #732d91; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
@@ -45,7 +46,6 @@
         .btn-cancel { background: #6c757d; } .btn-cancel:hover { background: #5a6268; }
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 99; }
 
-        /* Contenedor Flex para los dibujos de los splices */
         #tabla-splices-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
         .splice-diagram { background: #fff; border: 1px solid #ccc; border-radius: 8px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     </style>
@@ -63,14 +63,17 @@
         <div id="herramientas">
             <button class="btn-primary" id="btn-add-connector">Agregar Conector</button>
             <button class="btn-primary" id="btn-add-splice">Agregar Splice</button>
+            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
             <button class="btn-warning" id="btn-add-loom">Manga / Corrugado</button>
-            <span style="border-left: 2px solid #ccc; margin: 0 5px; height: 30px;"></span>
+            <button class="btn-purple" id="btn-add-tie">Cincho / Cinta</button>
+            <button class="btn-dark" id="btn-add-break">Punto de Quiebre</button>
+            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
             <button class="btn-success" id="btn-save-json">Guardar</button>
             <input type="file" id="input-load-json" accept=".json" style="display:none;">
             <button class="btn-info" onclick="document.getElementById('input-load-json').click()">Cargar</button>
-            <span style="border-left: 2px solid #ccc; margin: 0 5px; height: 30px;"></span>
+            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
             <button class="btn-danger" id="btn-clear-canvas">Limpiar</button>
-            <span style="border-left: 2px solid #ccc; margin: 0 5px; height: 30px;"></span>
+            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
             <strong>Zoom:</strong>
             <button id="btn-zoom-out">-</button>
             <span id="zoom-level">100%</span>
@@ -81,17 +84,17 @@
 
     <div id="tab-rutas" class="tab-content">
         <h2>Lista de Conexiones (De -> A)</h2>
-        <div id="tabla-rutas-container">El reporte se generará al entrar a esta pestaña.</div>
+        <div id="tabla-rutas-container"></div>
     </div>
 
     <div id="tab-bom" class="tab-content">
         <h2>Resumen de Materiales Requeridos</h2>
-        <div id="tabla-bom-container">El reporte se generará al entrar a esta pestaña.</div>
+        <div id="tabla-bom-container"></div>
     </div>
 
     <div id="tab-splices" class="tab-content">
         <h2>Diagramas de Empalmes y Puntos de Reunión</h2>
-        <div id="tabla-splices-container">El esquema se generará al entrar a esta pestaña.</div>
+        <div id="tabla-splices-container"></div>
     </div>
 
     <div id="overlay"></div>
@@ -106,7 +109,7 @@
             <option value='YEBN'>YELLOW/BROWN</option>
             <option value='YE'>YELLOW</option>
             <option value='VTWH'>VIOLET/WHITE</option>
-            <option value='VTDG'>VIOLET/DAR GREEN</option>
+            <option value='VTDG'>VIOLET/DARK GREEN</option>
             <option value='VT'>VIOLET</option>
             <option value='RDOG'>RED/ORANGE</option>
             <option value='RDDB'>RED/DARK BLUE</option>
@@ -127,6 +130,7 @@
             <option value='BKDG'>BLACK/DARK GREEN</option>
             <option value='BKBN'>BLACK/BROWN</option>
             <option value='BK'>BLACK</option>
+            <option value='WHT'>WHITE</option>
             <option value='CLR'>CLEAR</option>
         </select>
         </div>
@@ -138,7 +142,6 @@
         <h3>Configuración del Conector</h3>
         <div class="form-group"><label>Descripción / Locación:</label><input type="text" id="conn-desc" value="Conector Principal"></div>
         <div class="form-group"><label>No. Parte (Housing):</label><input type="text" id="conn-pn" value="12040953"></div>
-        
         <div class="form-group">
             <label>Posición de Conexión (Pines):</label>
             <select id="conn-orientacion">
@@ -148,7 +151,6 @@
                 <option value="bottom">Abajo</option>
             </select>
         </div>
-
         <div class="form-group" style="border-top: 1px solid #ccc; padding-top: 10px; margin-top: 15px;"><label>Cantidad de Vías (Pines):</label><input type="number" id="conn-vias" value="6" min="1" max="50"></div>
         <div class="form-group"><label>Terminales por Vía (Part Number):</label><div id="lista-terminales" class="cavity-container"></div></div>
         <div class="modal-actions"><button class="btn-danger" id="btn-delete-conn">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-conn">Actualizar</button></div></div>
@@ -167,20 +169,44 @@
             <select id="loom-tipo">
                 <option value="corrugado">Tubo Corrugado (Loom)</option>
                 <option value="manga">Manga Expandible (Sleeve)</option>
-                <option value="cinta">Cinta (Tape)</option>
                 <option value="pvc">Tubo PVC (Genérico)</option>
             </select>
         </div>
         <div class="form-group"><label>Descripción / Part Number:</label><input type="text" id="loom-desc" value="Corrugado 1/2"></div>
-        <div class="form-group"><label>Cantidad Requerida (mm, rollos, pzas):</label><input type="number" id="loom-qty" value="1"></div>
+        <div class="form-group"><label>Cantidad Requerida (mm, pzas):</label><input type="number" id="loom-qty" value="1"></div>
+        
+        <p style="font-size: 11px; color: #666; margin-bottom: 10px;">* También puedes arrastrar la esquina inferior derecha de la figura en el lienzo para redimensionarla rápidamente.</p>
         
         <div class="form-group"><label>Orientación Visual:</label><select id="loom-orientacion"><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option></select></div>
-        <div class="form-group"><label>Largo (px en el lienzo):</label><input type="number" id="loom-length" value="200"></div>
-        <div class="form-group"><label>Grosor (px en el lienzo):</label><input type="number" id="loom-width" value="40"></div>
+        <div class="form-group"><label>Largo (px en lienzo):</label><input type="number" id="loom-length" value="200"></div>
+        <div class="form-group"><label>Grosor (px en lienzo):</label><input type="number" id="loom-width" value="40"></div>
         
-        <button id="btn-agrupar-loom" class="btn-info" style="width: 100%; margin-bottom: 15px;">Agrupar cables en el centro</button>
-        
+        <button id="btn-agrupar-loom" class="btn-info" style="width: 100%; margin-bottom: 5px;">Agrupar y Bloquear Cables</button>
+        <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
         <div class="modal-actions"><button class="btn-danger" id="btn-delete-loom">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-loom">Actualizar</button></div></div>
+    </div>
+
+    <div id="modal-tie" class="modal">
+        <h3>Cincho / Punto de Cinta</h3>
+        <div class="form-group"><label>Tipo de Amarre:</label>
+            <select id="tie-tipo"><option value="cincho">Cincho Plástico (Zip Tie)</option><option value="cinta">Cinta (Tape Spot)</option></select>
+        </div>
+        <div class="form-group"><label>Descripción / Part Number:</label><input type="text" id="tie-desc" value="Cincho 4 pulgadas"></div>
+        <div class="form-group"><label>Cantidad (Ej. 2 amarres):</label><input type="number" id="tie-qty" value="1"></div>
+        <div class="form-group"><label>Orientación:</label><select id="tie-orientacion"><option value="vertical">Vertical (Arriba-Abajo)</option><option value="horizontal">Horizontal (Izq-Der)</option></select></div>
+        <p style="font-size: 11px; color: #666; margin-bottom: 10px;">* Si seleccionas "Cinta", cada amarre sumará 3 inches de Tape-25 al BOM.</p>
+
+        <button id="btn-agrupar-tie" class="btn-info" style="width: 100%; margin-bottom: 5px;">Agrupar y Bloquear Cables</button>
+        <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-tie">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-tie">Actualizar</button></div></div>
+    </div>
+
+    <div id="modal-break" class="modal">
+        <h3>Punto de Quiebre (Break Point)</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 10px;">Al usar este punto se agruparán los cables y se sumarán automáticamente <strong>6 inches de Tape-25</strong> a la Lista de Materiales (BOM).</p>
+        <button id="btn-agrupar-break" class="btn-info" style="width: 100%; margin-bottom: 5px;">Agrupar y Bloquear Cables</button>
+        <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-break">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button></div></div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
@@ -200,48 +226,113 @@
         function evaluarMatematica(expresion) { try { let expLimpia = String(expresion).replace(/[^0-9\+\-\.\s]/g, ''); if(expLimpia.trim() === '') return 0; return Function('"use strict";return (' + expLimpia + ')')(); } catch (e) { return 0; } }
 
         let escalaActual = 1; let contSplices = 1; const graph = new joint.dia.Graph();
+        let elementoRedimensionando = null; // Variable global para controlar el estiramiento manual
         
         const paper = new joint.dia.Paper({
             el: document.getElementById('lienzo-arnes'), model: graph, width: 2000, height: 2000, gridSize: 10, drawGrid: true, background: { color: '#ffffff' },
             defaultLink: new joint.shapes.standard.Link({ attrs: { line: { stroke: '#34495e', strokeWidth: 3, strokeLinejoin: 'round', strokeLinecap: 'round' } }, router: { name: 'manhattan', args: {step: 10, padding: 20} }, connector: { name: 'rounded', args: { radius: 10 } } }), 
-            interactive: { linkMove: true, vertexAdd: true, vertexMove: true, vertexRemove: true }, linkPinning: false, snapLinks: { radius: 30 },
+            
+            // REGLA DE BLOQUEO DE CABLES
+            interactive: function(cellView) {
+                if (cellView.model.isLink() && cellView.model.get('locked')) {
+                    return { vertexAdd: false, vertexMove: false, vertexRemove: false, linkMove: false };
+                }
+                return { linkMove: true, vertexAdd: true, vertexMove: true, vertexRemove: true };
+            },
+            linkPinning: false, snapLinks: { radius: 30 },
             validateConnection: function(cellViewS, magnetS, cellViewT, magnetT) { if (cellViewS === cellViewT) return false; return magnetT != null; }
         });
 
+        // INTERACCIÓN PARA REDIMENSIONAR FIGURAS CON EL RATÓN
+        paper.on('element:pointerdown', function(elementView, evt, x, y) {
+            const target = evt.target;
+            const selector = target.getAttribute('joint-selector') || target.getAttribute('selector');
+            if (selector === 'resizeHandle') {
+                elementoRedimensionando = elementView.model;
+                evt.stopPropagation(); // Evita arrastrar la figura
+            }
+        });
+
+        paper.on('blank:pointermove element:pointermove', function(evt, x, y) {
+            if (elementoRedimensionando) {
+                const bbox = elementoRedimensionando.getBBox();
+                const newWidth = Math.max(30, x - bbox.x);
+                const newHeight = Math.max(30, y - bbox.y);
+                
+                elementoRedimensionando.resize(newWidth, newHeight);
+                
+                // Actualizar las propiedades internas en vivo
+                const d = elementoRedimensionando.get('bomData');
+                if (d && d.type === 'Loom') {
+                    d.orientacion = newWidth >= newHeight ? 'horizontal' : 'vertical';
+                    d.len = newWidth >= newHeight ? newWidth : newHeight;
+                    d.wid = newWidth >= newHeight ? newHeight : newWidth;
+                    elementoRedimensionando.set('bomData', d);
+                }
+            }
+        });
+
+        $(window).on('mouseup', function() {
+            if (elementoRedimensionando) {
+                actualizarEscaneoLooms();
+                elementoRedimensionando = null;
+            }
+        });
+
+        // INTERACCIÓN PARA MOVER CABLES CON UN CLIC
+        paper.on('link:pointerclick', function(linkView) {
+            paper.removeTools();
+            if (linkView.model.get('locked')) { linkView.model.set('locked', false); }
+            const verticesTool = new joint.linkTools.Vertices();
+            const segmentsTool = new joint.linkTools.Segments();
+            const toolsView = new joint.dia.ToolsView({ tools: [verticesTool, segmentsTool] });
+            linkView.addTools(toolsView);
+        });
+
+        paper.on('blank:pointerclick element:pointerclick', function() { paper.removeTools(); });
+
+
         $('#btn-zoom-in').click(() => { escalaActual += 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); });
         $('#btn-zoom-out').click(() => { if(escalaActual > 0.3) { escalaActual -= 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); } });
-        $('#btn-clear-canvas').click(() => { if(confirm("¿Estás seguro de que deseas borrar todo el arnés? Esta acción no se puede deshacer.")) { graph.clear(); contSplices = 1; } });
+        $('#btn-clear-canvas').click(() => { if(confirm("¿Estás seguro de que deseas borrar todo el arnés?")) { graph.clear(); contSplices = 1; } });
+        
         $('#btn-save-json').click(() => { const jsonStr = JSON.stringify(graph.toJSON(), null, 2); const blob = new Blob([jsonStr], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = "arnes_proyecto.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); });
         $('#input-load-json').on('change', function(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(event) { try { const jsonData = JSON.parse(event.target.result); graph.clear(); graph.fromJSON(jsonData); let maxSplice = 0; graph.getElements().forEach(el => { const d = el.get('bomData'); if(d && d.type === 'Splice' && d.name) { const match = d.name.match(/SP-(\d+)/); if(match && parseInt(match[1]) > maxSplice) { maxSplice = parseInt(match[1]); } } }); contSplices = maxSplice + 1; alert("Proyecto cargado exitosamente."); } catch (error) { alert("Error al cargar el archivo."); } }; reader.readAsText(file); $(this).val(''); });
 
         let enlaceActual = null; let nodoActual = null; let terminalesTemp = {}; 
 
-        // Diccionario de colores para los Looms/Mangas
-        const loomColors = {
-            'corrugado': { fill: '#95a5a6', stroke: '#7f8c8d' }, // Gris Claro
-            'manga': { fill: '#2ecc71', stroke: '#27ae60' }, // Verde Claro
-            'cinta': { fill: '#3498db', stroke: '#2980b9' }, // Azul Claro
-            'pvc': { fill: '#f1c40f', stroke: '#f39c12' }    // Amarillo Original
-        };
+        // COLORES
+        const loomColors = { 'corrugado': { fill: '#95a5a6', stroke: '#7f8c8d' }, 'manga': { fill: '#2ecc71', stroke: '#27ae60' }, 'pvc': { fill: '#f1c40f', stroke: '#f39c12' } };
+        const tieColors = { 'cincho': { fill: '#2c3e50', stroke: '#1a252f' }, 'cinta': { fill: '#111111', stroke: '#000000' } };
 
+        function getWireColorHex(colorCode) {
+            if(!colorCode) return '#34495e';
+            const c = colorCode.toUpperCase();
+            if(c.includes('BK') || c.includes('BLK') || c.includes('BLACK')) return '#212121';
+            if(c.includes('RD') || c.includes('RED')) return '#e74c3c';
+            if(c.includes('BU') || c.includes('BLU')) return '#3498db';
+            if(c.includes('YE') || c.includes('YEL')) return '#f1c40f';
+            if(c.includes('GN') || c.includes('GRN')) return '#2ecc71';
+            if(c.includes('VT') || c.includes('VIO') || c.includes('PUR')) return '#9b59b6';
+            if(c.includes('BN') || c.includes('BRN')) return '#8d6e63';
+            if(c.includes('GY') || c.includes('GRY')) return '#95a5a6';
+            if(c.includes('WH') || c.includes('WHT')) return '#bdc3c7'; 
+            if(c.includes('ORG')) return '#e67e22';
+            if(c.includes('PNK')) return '#ff9ff3';
+            return '#34495e'; 
+        }
+
+        // FUNCIONES DE CREACIÓN DE FIGURAS
         function getConfigConector(orientacion, vias) {
             let config = { width: 140, height: Math.max(60, vias * 25), labelRefY: 15, labelRefX: 70, portLabelPos: { name: 'left', args: { x: -15 } } };
-            if (orientacion === 'left') { config.portLabelPos = { name: 'right', args: { x: 15 } }; } 
-            else if (orientacion === 'top') { config.width = Math.max(140, vias * 30); config.height = 80; config.labelRefY = 55; config.portLabelPos = { name: 'bottom', args: { y: 15 } }; } 
-            else if (orientacion === 'bottom') { config.width = Math.max(140, vias * 30); config.height = 80; config.labelRefY = 15; config.portLabelPos = { name: 'top', args: { y: -15 } }; }
+            if (orientacion === 'left') { config.portLabelPos = { name: 'right', args: { x: 15 } }; } else if (orientacion === 'top') { config.width = Math.max(140, vias * 30); config.height = 80; config.labelRefY = 55; config.portLabelPos = { name: 'bottom', args: { y: 15 } }; } else if (orientacion === 'bottom') { config.width = Math.max(140, vias * 30); config.height = 80; config.labelRefY = 15; config.portLabelPos = { name: 'top', args: { y: -15 } }; }
             return config;
         }
 
         function crearConector(x, y, descripcion, partNumber, numVias, orientacion = 'right') {
-            let pines = []; let terminalesIniciales = {};
-            for(let i = 1; i <= numVias; i++) { pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); terminalesIniciales[`via-${i}`] = '41412'; }
-            
+            let pines = []; let terminalesIniciales = {}; for(let i = 1; i <= numVias; i++) { pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); terminalesIniciales[`via-${i}`] = '41412'; }
             let cnf = getConfigConector(orientacion, numVias);
-            const rect = new joint.shapes.standard.Rectangle({
-                position: { x: x, y: y }, size: { width: cnf.width, height: cnf.height }, 
-                attrs: { body: { fill: '#3498db', rx: 5, ry: 5, stroke: '#2980b9', strokeWidth: 2 }, label: { text: `${descripcion}\nPN: ${partNumber}`, fill: 'white', fontWeight: 'bold', fontSize: 12, refY: cnf.labelRefY, refX: '50%' } },
-                ports: { groups: { 'cavidades': { position: orientacion, attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: cnf.portLabelPos } } }, items: pines }
-            });
+            const rect = new joint.shapes.standard.Rectangle({ position: { x: x, y: y }, size: { width: cnf.width, height: cnf.height }, attrs: { body: { fill: '#3498db', rx: 5, ry: 5, stroke: '#2980b9', strokeWidth: 2 }, label: { text: `${descripcion}\nPN: ${partNumber}`, fill: 'white', fontWeight: 'bold', fontSize: 12, refY: cnf.labelRefY, refX: '50%' } }, ports: { groups: { 'cavidades': { position: orientacion, attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: cnf.portLabelPos } } }, items: pines } });
             rect.set('bomData', { type: 'Connector', description: descripcion, housingPartNumber: partNumber, cavities: numVias, terminals: terminalesIniciales, orientacion: orientacion }); rect.addTo(graph); return rect;
         }
 
@@ -250,187 +341,187 @@
         function crearLoom(x, y) { 
             const colores = loomColors['corrugado'];
             const rect = new joint.shapes.standard.Rectangle({ 
+                // NUEVO MARKUP: Se inyecta un polígono (triángulo) para funcionar como esquina de arrastre
+                markup: [
+                    { tagName: 'rect', selector: 'body' },
+                    { tagName: 'text', selector: 'label' },
+                    { tagName: 'polygon', selector: 'resizeHandle' }
+                ],
                 position: { x: x, y: y }, size: { width: 200, height: 40 }, 
                 attrs: { 
                     body: { fill: colores.fill, fillOpacity: 0.4, stroke: colores.stroke, strokeWidth: 2, strokeDasharray: '4,4' }, 
-                    label: { text: 'TUBO CORRUGADO', fill: '#2c3e50', fontWeight: 'bold', fontSize: 11 } 
+                    label: { text: 'TUBO CORRUGADO', fill: '#2c3e50', fontWeight: 'bold', fontSize: 11 },
+                    resizeHandle: { 
+                        points: '0,15 15,15 15,0', fill: '#34495e', cursor: 'nwse-resize',
+                        refX: '100%', refDx: -15, refY: '100%', refDy: -15 
+                    }
                 } 
             }); 
-            rect.set('bomData', { type: 'Loom', recubrimiento: 'corrugado', description: 'Tubo Corrugado', qty: 1, len: 200, wid: 40, orientacion: 'horizontal' }); 
-            rect.addTo(graph); 
-            rect.toBack(); 
-            return rect; 
+            rect.set('bomData', { type: 'Loom', recubrimiento: 'corrugado', description: 'Tubo Corrugado', qty: 1, len: 200, wid: 40, orientacion: 'horizontal' }); rect.addTo(graph); rect.toBack(); return rect; 
         }
 
+        function crearTie(x, y) {
+            const rect = new joint.shapes.standard.Rectangle({ position: { x: x, y: y }, size: { width: 15, height: 50 }, attrs: { body: { fill: '#2c3e50', rx: 3, ry: 3, stroke: '#1a252f', strokeWidth: 2 }, label: { text: 'TIE', fill: '#ffffff', fontSize: 8, fontWeight: 'bold', transform: 'rotate(-90)' } } });
+            rect.set('bomData', { type: 'Tie', recubrimiento: 'cincho', description: 'Cincho Plástico', qty: 1, orientacion: 'vertical' }); rect.addTo(graph); rect.toFront(); return rect;
+        }
+
+        function crearBreakPoint(x, y) {
+            const circle = new joint.shapes.standard.Circle({ 
+                position: { x: x, y: y }, size: { width: 45, height: 45 }, 
+                attrs: { 
+                    body: { fill: '#34495e', stroke: '#000000', strokeWidth: 3, strokeDasharray: '4,2' }, 
+                    label: { text: 'BP', fill: '#ffffff', fontSize: 9, fontWeight: 'bold' } 
+                } 
+            });
+            circle.set('bomData', { type: 'BreakPoint', orientacion: 'horizontal', description: 'Tape-25', qty: 6, unit: 'inches' }); circle.addTo(graph); circle.toBack(); return circle;
+        }
+
+        // LÓGICA DE MODALES
         function renderizarInputsTerminales(vias) { let html = ''; for(let i = 1; i <= vias; i++) { let idVia = `via-${i}`; let valorPN = terminalesTemp[idVia] || ''; html += `<div class="cavity-row"><label>Vía ${i}:</label><input type="text" class="input-terminal" data-via="${idVia}" value="${valorPN}" placeholder="Part No. de Terminal"></div>`; } $('#lista-terminales').html(html); }
         $('#conn-vias').on('input', function() { let nuevasVias = parseInt($(this).val()) || 1; $('.input-terminal').each(function() { terminalesTemp[$(this).data('via')] = $(this).val(); }); renderizarInputsTerminales(nuevasVias); });
         
         function abrirModalCable(link) { enlaceActual = link; const d = link.get('bomData'); if(d) { $('#cable-circuito').val(d.circuito || ''); $('#cable-tipo').val(d.insulation); $('#cable-calibre').val(d.gage); $('#cable-color').val(d.color); $('#cable-longitud').val(d.length); } else { $('#cable-circuito').val(''); $('#cable-longitud').val('150'); } $('#overlay, #modal-cable').show(); }
         function abrirModalConector(element) { nodoActual = element; const d = element.get('bomData'); $('#conn-desc').val(d.description); $('#conn-pn').val(d.housingPartNumber); $('#conn-vias').val(d.cavities); $('#conn-orientacion').val(d.orientacion || 'right'); terminalesTemp = Object.assign({}, d.terminals); renderizarInputsTerminales(d.cavities); $('#overlay, #modal-conector').show(); }
         function abrirModalSplice(element) { nodoActual = element; const d = element.get('bomData'); $('#splice-name').val(d.name); $('#overlay, #modal-splice').show(); }
+        function abrirModalBreak(element) { nodoActual = element; $('#overlay, #modal-break').show(); }
         
-        function abrirModalLoom(element) { 
-            nodoActual = element; 
-            const d = element.get('bomData'); 
-            $('#loom-tipo').val(d.recubrimiento || 'corrugado');
-            $('#loom-desc').val(d.description); 
-            $('#loom-qty').val(d.qty || 1);
-            $('#loom-length').val(d.len); 
-            $('#loom-width').val(d.wid); 
-            $('#loom-orientacion').val(d.orientacion); 
-            $('#overlay, #modal-loom').show(); 
-        }
+        function abrirModalLoom(element) { nodoActual = element; const d = element.get('bomData'); $('#loom-tipo').val(d.recubrimiento || 'corrugado'); $('#loom-desc').val(d.description); $('#loom-qty').val(d.qty || 1); $('#loom-length').val(d.len); $('#loom-width').val(d.wid); $('#loom-orientacion').val(d.orientacion); $('#overlay, #modal-loom').show(); }
+        function abrirModalTie(element) { nodoActual = element; const d = element.get('bomData'); $('#tie-tipo').val(d.recubrimiento || 'cincho'); $('#tie-desc').val(d.description); $('#tie-qty').val(d.qty || 1); $('#tie-orientacion').val(d.orientacion); $('#overlay, #modal-tie').show(); }
+        
         function cerrarModales() { $('#overlay, .modal').hide(); if (enlaceActual && !enlaceActual.get('bomData')) { enlaceActual.remove(); } enlaceActual = null; nodoActual = null; }
 
-        $('#btn-delete-cable').click(() => { if(enlaceActual) { enlaceActual.remove(); } cerrarModales(); }); $('#btn-delete-conn').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); }); $('#btn-delete-splice').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); }); $('#btn-delete-loom').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
-        $('#btn-save-cable').click(() => { if (enlaceActual) { const circuito = $('#cable-circuito').val() || 'S/N'; const tipo = $('#cable-tipo').val(); const cal = $('#cable-calibre').val(); const color = $('#cable-color').val(); const strLongitud = $('#cable-longitud').val(); const longitudCalculada = evaluarMatematica(strLongitud); enlaceActual.labels([]); enlaceActual.appendLabel({ attrs: { text: { text: `[${circuito}]\n${longitudCalculada}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5 } } }); enlaceActual.set('bomData', { type: 'Wire', circuito: circuito, insulation: tipo, gage: parseInt(cal), color: color, length: longitudCalculada }); } cerrarModales(); });
+        $('#btn-delete-cable').click(() => { if(enlaceActual) { enlaceActual.remove(); } cerrarModales(); }); 
+        $('#btn-delete-conn').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); }); 
+        $('#btn-delete-splice').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); }); 
+        $('#btn-delete-loom').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
+        $('#btn-delete-tie').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
+        $('#btn-delete-break').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
+
+        $('#btn-save-cable').click(() => { 
+            if (enlaceActual) { 
+                const circuito = $('#cable-circuito').val() || 'S/N'; const tipo = $('#cable-tipo').val(); const cal = $('#cable-calibre').val(); const color = $('#cable-color').val(); const strLongitud = $('#cable-longitud').val(); const longitudCalculada = evaluarMatematica(strLongitud); 
+                const hexColor = getWireColorHex(color); enlaceActual.attr('line/stroke', hexColor);
+                enlaceActual.labels([]); enlaceActual.appendLabel({ attrs: { text: { text: `[${circuito}]\n${longitudCalculada}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5 } } }); 
+                enlaceActual.set('bomData', { type: 'Wire', circuito: circuito, insulation: tipo, gage: parseInt(cal), color: color, length: longitudCalculada }); 
+            } cerrarModales(); 
+        });
         
         $('#btn-save-conn').click(() => { 
             if (nodoActual) { 
                 const desc = $('#conn-desc').val(), pn = $('#conn-pn').val(), vias = parseInt($('#conn-vias').val()), orientacion = $('#conn-orientacion').val();
                 let terminalesFinales = {}; $('.input-terminal').each(function() { let pnTerminal = $(this).val(); if(pnTerminal.trim() !== '') { terminalesFinales[$(this).data('via')] = pnTerminal; } }); 
                 let d = nodoActual.get('bomData'); d.description = desc; d.housingPartNumber = pn; d.cavities = vias; d.terminals = terminalesFinales; d.orientacion = orientacion; nodoActual.set('bomData', d); 
-                
-                let cnf = getConfigConector(orientacion, vias);
-                nodoActual.attr('label/text', `${desc}\nPN: ${pn}`);
-                nodoActual.attr('label/refY', cnf.labelRefY);
-                nodoActual.resize(cnf.width, cnf.height); 
-                
+                let cnf = getConfigConector(orientacion, vias); nodoActual.attr('label/text', `${desc}\nPN: ${pn}`); nodoActual.attr('label/refY', cnf.labelRefY); nodoActual.resize(cnf.width, cnf.height); 
                 let pines = []; for(let i = 1; i <= vias; i++) { pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); } 
                 nodoActual.set('ports', { groups: { 'cavidades': { position: orientacion, attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: cnf.portLabelPos } } }, items: pines }); 
-            } 
-            cerrarModales(); 
+            } cerrarModales(); 
         });
 
         $('#btn-save-splice').click(() => { if (nodoActual) { const nuevoNombre = $('#splice-name').val(); let d = nodoActual.get('bomData'); d.name = nuevoNombre; nodoActual.set('bomData', d); nodoActual.attr('label/text', nuevoNombre); } cerrarModales(); });
         
         $('#btn-save-loom').click(() => { 
             if (nodoActual) { 
-                const tipoRecubrimiento = $('#loom-tipo').val();
-                const desc = $('#loom-desc').val(); 
-                const qty = parseFloat($('#loom-qty').val()) || 1;
-                const orientacion = $('#loom-orientacion').val(); 
-                let len = parseInt($('#loom-length').val()); 
-                let wid = parseInt($('#loom-width').val()); 
-                
-                let d = nodoActual.get('bomData'); 
-                d.recubrimiento = tipoRecubrimiento;
-                d.description = desc; 
-                d.qty = qty;
-                d.len = len; 
-                d.wid = wid; 
-                d.orientacion = orientacion; 
-                nodoActual.set('bomData', d); 
-                
+                const tipoRecubrimiento = $('#loom-tipo').val(); const desc = $('#loom-desc').val(); const qty = parseFloat($('#loom-qty').val()) || 1; const orientacion = $('#loom-orientacion').val(); let len = parseInt($('#loom-length').val()); let wid = parseInt($('#loom-width').val()); 
+                let d = nodoActual.get('bomData'); d.recubrimiento = tipoRecubrimiento; d.description = desc; d.qty = qty; d.len = len; d.wid = wid; d.orientacion = orientacion; nodoActual.set('bomData', d); 
                 nodoActual.attr('label/text', desc.toUpperCase() + ` (Qty: ${qty})`); 
-                
-                const colores = loomColors[tipoRecubrimiento];
-                nodoActual.attr('body/fill', colores.fill);
-                nodoActual.attr('body/stroke', colores.stroke);
+                const colores = loomColors[tipoRecubrimiento]; nodoActual.attr('body/fill', colores.fill); nodoActual.attr('body/stroke', colores.stroke);
+                if(orientacion === 'horizontal') { nodoActual.resize(len, wid); } else { nodoActual.resize(wid, len); } 
+            } cerrarModales(); 
+        });
 
-                if(orientacion === 'horizontal') { 
-                    nodoActual.resize(len, wid); 
-                } else { 
-                    nodoActual.resize(wid, len); 
-                } 
-            } 
-            cerrarModales(); 
+        $('#btn-save-tie').click(() => { 
+            if (nodoActual) { 
+                const tipoTie = $('#tie-tipo').val(); const desc = $('#tie-desc').val(); const qty = parseFloat($('#tie-qty').val()) || 1; const orientacion = $('#tie-orientacion').val(); 
+                let d = nodoActual.get('bomData'); d.recubrimiento = tipoTie; d.description = desc; d.qty = qty; d.orientacion = orientacion; nodoActual.set('bomData', d); 
+                
+                const colores = tieColors[tipoTie]; nodoActual.attr('body/fill', colores.fill); nodoActual.attr('body/stroke', colores.stroke);
+                if(orientacion === 'vertical') { nodoActual.resize(15, 50); nodoActual.attr('label/transform', 'rotate(-90)'); } else { nodoActual.resize(50, 15); nodoActual.attr('label/transform', 'rotate(0)');} 
+            } cerrarModales(); 
         });
 
         graph.on('add', function(cell) { if (cell.isLink()) { cell.on('change:target', function(link) { if (link.get('target').id && link.get('source').id) { if (!link.get('bomData')) abrirModalCable(link); } }); } });
-        paper.on('element:pointerdblclick', function(cellView) { const tipo = cellView.model.get('bomData').type; if (tipo === 'Connector') abrirModalConector(cellView.model); if (tipo === 'Splice') abrirModalSplice(cellView.model); if (tipo === 'Loom') abrirModalLoom(cellView.model); });
+        paper.on('element:pointerdblclick', function(cellView) { 
+            const tipo = cellView.model.get('bomData').type; 
+            if (tipo === 'Connector') abrirModalConector(cellView.model); 
+            if (tipo === 'Splice') abrirModalSplice(cellView.model); 
+            if (tipo === 'Loom') abrirModalLoom(cellView.model); 
+            if (tipo === 'BreakPoint') abrirModalBreak(cellView.model); 
+            if (tipo === 'Tie') abrirModalTie(cellView.model); 
+        });
         paper.on('link:pointerdblclick', function(linkView) { abrirModalCable(linkView.model); });
         
         $('#btn-add-connector').click(() => { crearConector(50, 50, 'Conector A', '12064754', 4, 'right'); });
         $('#btn-add-splice').click(() => { crearSplice(300, 150, `SP-${contSplices}`); contSplices++; });
         $('#btn-add-loom').click(() => { crearLoom(150, 100); });
+        $('#btn-add-tie').click(() => { crearTie(250, 100); });
+        $('#btn-add-break').click(() => { crearBreakPoint(300, 200); });
 
         // ==========================================
-        // CÁLCULO DE DIÁMETROS Y AGRUPACIÓN DE CABLES
+        // CÁLCULO DE DIÁMETROS Y AGRUPACIÓN
         // ==========================================
         function calcularDiametroMazo(awgs) {
             if(awgs.length === 0) return 0;
             const diamsAWG = { 22: 1.5, 20: 1.7, 18: 2.0, 16: 2.3, 14: 2.7, 12: 3.3, 10: 4.0 };
-            
-            let areaTotal = 0;
-            awgs.forEach(awg => {
-                let diametro = diamsAWG[awg] || 2.0;
-                let radio = diametro / 2;
-                areaTotal += Math.PI * (radio * radio);
-            });
-            
-            areaTotal = areaTotal * 1.3;
-            let diametroFinal = 2 * Math.sqrt(areaTotal / Math.PI);
-            return diametroFinal.toFixed(1);
+            let areaTotal = 0; awgs.forEach(awg => { let diametro = diamsAWG[awg] || 2.0; let radio = diametro / 2; areaTotal += Math.PI * (radio * radio); });
+            return (2 * Math.sqrt((areaTotal * 1.3) / Math.PI)).toFixed(1);
         }
 
         function actualizarEscaneoLooms() {
-            const elements = graph.getElements();
-            const looms = elements.filter(el => el.get('bomData') && el.get('bomData').type === 'Loom');
-            
+            const elements = graph.getElements(); const looms = elements.filter(el => el.get('bomData') && el.get('bomData').type === 'Loom');
             looms.forEach(loom => {
-                const bbox = loom.getBBox();
-                const vistasEnArea = paper.findViewsInArea(bbox);
-                const cables = vistasEnArea.filter(v => v.model.isLink()); 
-                
-                let awgs = [];
-                cables.forEach(c => {
-                    const data = c.model.get('bomData');
-                    if(data && data.gage) awgs.push(parseInt(data.gage));
-                    else awgs.push(18); 
-                });
-                
-                const numCables = awgs.length;
-                const d = loom.get('bomData');
-                const titulo = (d.description || '').toUpperCase();
-                
-                if(numCables > 0) {
-                    const diametroTotal = calcularDiametroMazo(awgs);
-                    loom.attr('label/text', `${titulo} (Qty: ${d.qty})\n${numCables} Cables | Ø ~${diametroTotal}mm`);
-                } else {
-                    loom.attr('label/text', `${titulo} (Qty: ${d.qty})`);
-                }
+                const bbox = loom.getBBox(); const areaBusqueda = new joint.g.Rect(bbox).inflate(20); 
+                const vistasEnArea = paper.findViewsInArea(areaBusqueda); const cables = vistasEnArea.filter(v => v.model.isLink()); 
+                let awgs = []; cables.forEach(c => { const data = c.model.get('bomData'); if(data && data.gage) awgs.push(parseInt(data.gage)); else awgs.push(18); });
+                const numCables = awgs.length; const d = loom.get('bomData'); const titulo = (d.description || '').toUpperCase();
+                if(numCables > 0) { loom.attr('label/text', `${titulo} (Qty: ${d.qty})\n${numCables} Cables | Ø ~${calcularDiametroMazo(awgs)}mm`); } else { loom.attr('label/text', `${titulo} (Qty: ${d.qty})`); }
             });
         }
+        graph.on('change:position change:vertices change:size', _.debounce(actualizarEscaneoLooms, 300));
 
-        graph.on('change:position change:vertices', _.debounce(actualizarEscaneoLooms, 300));
+        function forzarAgrupacion(nodoCentral) {
+            const bbox = nodoCentral.getBBox(); const centroX = bbox.x + (bbox.width / 2); const centroY = bbox.y + (bbox.height / 2); const puntoCentro = new joint.g.Point(centroX, centroY);
+            const cablesAtrapados = [];
+            graph.getLinks().forEach(link => { const view = link.findView(paper); if (view) { const rectLink = new joint.g.Rect(view.getBBox()).inflate(10); if (rectLink.distance(puntoCentro) <= 250) { cablesAtrapados.push(link); } } });
+            
+            if (cablesAtrapados.length === 0) { alert("No se detectaron cables cerca."); return; }
 
-        // NUEVA ACCIÓN CORREGIDA: Agrupar cables con router 'normal'
-        $('#btn-agrupar-loom').click(() => {
-            if (nodoActual && nodoActual.get('bomData').type === 'Loom') {
-                const bbox = nodoActual.getBBox();
-                const centroX = bbox.x + (bbox.width / 2);
-                const centroY = bbox.y + (bbox.height / 2);
-                
-                const vistasEnArea = paper.findViewsInArea(bbox);
-                const cables = vistasEnArea.filter(v => v.model.isLink());
-                
-                if (cables.length === 0) {
-                    alert("No se detectaron cables. Asegúrate de mover el Corrugado/Manga para que quede ENCIMA de los cables antes de agruparlos.");
-                    return;
-                }
+            const dataNodo = nodoCentral.get('bomData');
+            const isHorizontal = dataNodo.orientacion === 'horizontal' || dataNodo.type === 'BreakPoint';
 
-                cables.forEach(c => {
-                    // 1. Desactivamos el router manhattan para que cruce en línea recta
-                    c.model.set('router', { name: 'normal' });
-                    // 2. Colocamos un único vértice en el centro de la manga
-                    c.model.vertices([{ x: centroX, y: centroY }]);
-                });
+            cablesAtrapados.forEach(link => {
+                link.set('router', { name: 'normal' }); link.set('connector', { name: 'rounded', args: { radius: 15 } }); 
+                link.set('locked', true); 
+
+                const sp = link.getSourcePoint() || {x: 0, y:0}; const tp = link.getTargetPoint() || {x: 0, y:0};
+                let v1 = { x: sp.x, y: sp.y }; let v4 = { x: tp.x, y: tp.y };
+                const srcNode = graph.getCell(link.get('source').id); const tgtNode = graph.getCell(link.get('target').id); const stubLen = 40; 
                 
-                actualizarEscaneoLooms();
-                cerrarModales();
-            }
-        });
+                if(srcNode && srcNode.get('bomData')) { const ori = srcNode.get('bomData').orientacion; if(ori === 'right') v1.x += stubLen; if(ori === 'left') v1.x -= stubLen; if(ori === 'top') v1.y -= stubLen; if(ori === 'bottom') v1.y += stubLen; }
+                if(tgtNode && tgtNode.get('bomData')) { const ori = tgtNode.get('bomData').orientacion; if(ori === 'right') v4.x += stubLen; if(ori === 'left') v4.x -= stubLen; if(ori === 'top') v4.y -= stubLen; if(ori === 'bottom') v4.y += stubLen; }
+
+                let v2, v3;
+                if (isHorizontal) { v2 = { x: v1.x, y: centroY }; v3 = { x: v4.x, y: centroY }; } else { v2 = { x: centroX, y: v1.y }; v3 = { x: centroX, y: v4.y }; }
+                link.vertices([v1, v2, v3, v4]); 
+            });
+            actualizarEscaneoLooms(); cerrarModales();
+        }
+
+        function liberarAgrupacion(nodoCentral) {
+            const bbox = nodoCentral.getBBox(); const puntoCentro = new joint.g.Point(bbox.x + (bbox.width/2), bbox.y + (bbox.height/2));
+            graph.getLinks().forEach(link => { const view = link.findView(paper); if (view) { const rectLink = new joint.g.Rect(view.getBBox()).inflate(50); if (rectLink.distance(puntoCentro) <= 250) { link.set('locked', false); } } });
+            alert("Los cables cercanos han sido DESBLOQUEADOS. Puedes darles un clic para editar sus vértices manualmente."); cerrarModales();
+        }
+
+        $('#btn-agrupar-loom, #btn-agrupar-break, #btn-agrupar-tie').click(() => { if (nodoActual) forzarAgrupacion(nodoActual); });
+        $('.btn-desbloquear').click(() => { if (nodoActual) liberarAgrupacion(nodoActual); });
 
         // ==========================================
-        // REPORTES
+        // REPORTES Y BOM
         // ==========================================
         function generarReporteRutas() {
-            let i=0;
-            const links = graph.getLinks(); let html = `<table style="font-size: 11px; white-space: nowrap;"><tr><th>ESTAMPADO (CIRCUITO)</th><th>CONS. RACK</th><th>TIPO DE CABLE</th><th>CALIBRE (AWG)</th><th>COLOR</th><th>LONGITUD (MM)</th><th>DESTINO 1 STRIP</th><th>DESTINO 1 TERMINAL</th><th>Herramienta 1</th><th>DESTINO 2 STRIP</th><th>DESTINO 2 TERMINAL</th><th>Herramienta 2</th><th>COLOR DE TINTA</th><th>QTY</th><th>DESTINO 1</th><th>DESTINO 2</th></tr>`;
+            let i=0; const links = graph.getLinks(); let html = `<table style="font-size: 11px; white-space: nowrap;"><tr><th>ESTAMPADO (CIRCUITO)</th><th>CONS. RACK</th><th>TIPO DE CABLE</th><th>CALIBRE (AWG)</th><th>COLOR</th><th>LONGITUD (MM)</th><th>DESTINO 1 STRIP</th><th>DESTINO 1 TERMINAL</th><th>Herramienta 1</th><th>DESTINO 2 STRIP</th><th>DESTINO 2 TERMINAL</th><th>Herramienta 2</th><th>COLOR DE TINTA</th><th>QTY</th><th>DESTINO 1</th><th>DESTINO 2</th></tr>`;
             links.forEach(link => {
-                i=i+1;
-                const data = link.get('bomData'); if(!data) return;
+                i=i+1; const data = link.get('bomData'); if(!data) return;
                 const srcNode = graph.getCell(link.get('source').id); const tgtNode = graph.getCell(link.get('target').id);
                 if(srcNode && tgtNode) {
                     const srcData = srcNode.get('bomData'); const tgtData = tgtNode.get('bomData');
@@ -448,29 +539,31 @@
             elements.forEach(el => {
                 const data = el.get('bomData'); if(!data) return;
                 if(data.type === 'Connector') { 
-                    if(!componentes[data.housingPartNumber]) componentes[data.housingPartNumber] = { desc: data.description, qty: 0 }; 
+                    if(!componentes[data.housingPartNumber]) componentes[data.housingPartNumber] = { desc: data.description, qty: 0, unit: 'pzas' }; 
                     componentes[data.housingPartNumber].qty += 1; 
-                    if (data.terminals) { 
-                        for (let via in data.terminals) { 
-                            let pnTerminal = data.terminals[via]; 
-                            if(pnTerminal) { 
-                                if(!terminalesTotales[pnTerminal]) terminalesTotales[pnTerminal] = 0; 
-                                terminalesTotales[pnTerminal] += 1; 
-                            } 
-                        } 
-                    } 
+                    if (data.terminals) { for (let via in data.terminals) { let pnTerminal = data.terminals[via]; if(pnTerminal) { if(!terminalesTotales[pnTerminal]) terminalesTotales[pnTerminal] = 0; terminalesTotales[pnTerminal] += 1; } } } 
                 } else if(data.type === 'Splice') { 
-                    if(!componentes[data.name]) componentes[data.name] = { desc: 'Splice / Empalme', qty: 0 }; 
-                    componentes[data.name].qty += 1; 
+                    if(!componentes[data.name]) componentes[data.name] = { desc: 'Splice / Empalme', qty: 0, unit: 'pzas' }; componentes[data.name].qty += 1; 
                 } else if(data.type === 'Loom') { 
-                    if(!componentes[data.description]) componentes[data.description] = { desc: `Recubrimiento (${data.recubrimiento})`, qty: 0 }; 
-                    componentes[data.description].qty += (data.qty || 1); 
+                    if(!componentes[data.description]) componentes[data.description] = { desc: `Recubrimiento (${data.recubrimiento})`, qty: 0, unit: 'unidades' }; componentes[data.description].qty += (data.qty || 1); 
+                } else if(data.type === 'Tie') { 
+                    if (data.recubrimiento === 'cinta') {
+                        const descTape = 'Cinta Tape-25 (Puntos de Amarre / Quiebres)';
+                        if(!componentes[descTape]) componentes[descTape] = { desc: descTape, qty: 0, unit: 'inches' }; 
+                        componentes[descTape].qty += (data.qty * 3); 
+                    } else {
+                        if(!componentes[data.description]) componentes[data.description] = { desc: `Amarre (${data.recubrimiento})`, qty: 0, unit: 'pzas' }; componentes[data.description].qty += (data.qty || 1); 
+                    }
+                } else if(data.type === 'BreakPoint') { 
+                    const descTape = 'Cinta Tape-25 (Puntos de Amarre / Quiebres)';
+                    if(!componentes[descTape]) componentes[descTape] = { desc: descTape, qty: 0, unit: 'inches' }; 
+                    componentes[descTape].qty += 6; 
                 }
             });
             links.forEach(link => { const data = link.get('bomData'); if(!data) return; const llaveCable = `${data.gage} AWG ${data.insulation} ${data.color}`; if(!cablesTotales[llaveCable]) cablesTotales[llaveCable] = 0; cablesTotales[llaveCable] += data.length; });
             
             let html = `<h3>Conectores, Splices y Recubrimientos</h3><table><tr><th>Part Number / Identificador</th><th>Descripción / Tipo</th><th>Cantidad Requerida</th></tr>`; 
-            for(let pn in componentes) html += `<tr><td>${pn}</td><td>${componentes[pn].desc}</td><td>${componentes[pn].qty}</td></tr>`; 
+            for(let pn in componentes) html += `<tr><td>${pn}</td><td>${componentes[pn].desc}</td><td>${componentes[pn].qty} ${componentes[pn].unit}</td></tr>`; 
             html += `</table><br><h3>Terminales</h3><table><tr><th>Terminal Part Number</th><th>Cantidad Requerida</th></tr>`; 
             for(let termPn in terminalesTotales) html += `<tr><td>${termPn}</td><td>${terminalesTotales[termPn]} pzas</td></tr>`; 
             html += `</table><br><h3>Longitud Total de Cables</h3><table><tr><th>Especificación de Cable</th><th>Longitud Total (mm)</th></tr>`; 
@@ -479,119 +572,50 @@
         }
 
         function generarReporteSplices() {
-            let html = '';
-            const elements = graph.getElements();
-            let haySplices = false;
-
+            let html = ''; const elements = graph.getElements(); let haySplices = false;
             elements.forEach(el => {
                 const data = el.get('bomData');
                 if(data && data.type === 'Splice') {
-                    haySplices = true;
-                    const links = graph.getConnectedLinks(el);
-                    let conexiones = [];
-
+                    haySplices = true; const links = graph.getConnectedLinks(el); let conexiones = [];
                     links.forEach(link => {
                         const lData = link.get('bomData'); if(!lData) return;
-                        
-                        const isSource = link.get('source').id === el.id;
-                        const otherId = isSource ? link.get('target').id : link.get('source').id;
-                        const otherPort = isSource ? link.get('target').port : link.get('source').port;
-                        const otherEl = graph.getCell(otherId);
-
+                        const isSource = link.get('source').id === el.id; const otherId = isSource ? link.get('target').id : link.get('source').id; const otherPort = isSource ? link.get('target').port : link.get('source').port; const otherEl = graph.getCell(otherId);
                         if(otherEl) {
-                            const oData = otherEl.get('bomData');
-                            let destName = '';
-                            if (oData.type === 'Splice') {
-                                destName = `Hacia ${oData.name}`;
-                            } else {
-                                let numPin = otherPort ? otherPort.replace('via-','') : '';
-                                destName = `${oData.description} (Pin ${numPin})`;
-                            }
-                            
-                            conexiones.push({
-                                circuito: lData.circuito || 'S/N',
-                                cable: `${lData.gage} AWG ${lData.color}`,
-                                longitud: lData.length,
-                                destino: destName
-                            });
+                            const oData = otherEl.get('bomData'); let destName = '';
+                            if (oData.type === 'Splice') { destName = `Hacia ${oData.name}`; } else { let numPin = otherPort ? otherPort.replace('via-','') : ''; destName = `${oData.description} (Pin ${numPin})`; }
+                            conexiones.push({ circuito: lData.circuito || 'S/N', cable: `${lData.gage} AWG ${lData.color}`, longitud: lData.length, destino: destName });
                         }
                     });
                     html += buildSpliceSVG(data.name, conexiones);
                 }
             });
-
-            if(!haySplices) { html = '<p style="color: #666;">No hay empalmes (Splices) en tu diseño actual.</p>'; }
-            $('#tabla-splices-container').html(html);
+            if(!haySplices) { html = '<p style="color: #666;">No hay empalmes (Splices) en tu diseño actual.</p>'; } $('#tabla-splices-container').html(html);
         }
 
-        function escapeHTML(str) {
-            if (!str) return "";
-            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
+        function escapeHTML(str) { if (!str) return ""; return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
         function buildSpliceSVG(name, conexiones) {
             const groups = {};
-            conexiones.forEach(con => {
-                const match = con.destino.match(/^(.*?)(?:\s*\()/);
-                const baseDest = match ? match[1].trim() : con.destino.trim();
-                if (!groups[baseDest]) groups[baseDest] = [];
-                groups[baseDest].push(con);
-            });
+            conexiones.forEach(con => { const match = con.destino.match(/^(.*?)(?:\s*\()/); const baseDest = match ? match[1].trim() : con.destino.trim(); if (!groups[baseDest]) groups[baseDest] = []; groups[baseDest].push(con); });
+            const leftConns = []; const rightConns = []; const sortedGroups = Object.values(groups).sort((a, b) => b.length - a.length);
+            if (sortedGroups.length === 1 && sortedGroups[0].length > 1) { const allConns = sortedGroups[0]; leftConns.push(allConns[0]); rightConns.push(...allConns.slice(1)); } else { sortedGroups.forEach((group, index) => { if (index === 0) { leftConns.push(...group); } else { rightConns.push(...group); } }); }
 
-            const leftConns = []; const rightConns = [];
-            const sortedGroups = Object.values(groups).sort((a, b) => b.length - a.length);
-
-            if (sortedGroups.length === 1 && sortedGroups[0].length > 1) {
-                const allConns = sortedGroups[0];
-                leftConns.push(allConns[0]);
-                rightConns.push(...allConns.slice(1));
-            } else {
-                sortedGroups.forEach((group, index) => {
-                    if (index === 0) { leftConns.push(...group); } 
-                    else { rightConns.push(...group); }
-                });
-            }
-
-            const spacingY = 70; const boxWidth = 140; const boxHeight = 55; const lineLengthX = 160;  
-            const maxSideCount = Math.max(leftConns.length, rightConns.length);
-            const h = Math.max(300, (maxSideCount * spacingY) + 100);
-            const w = 800; 
-            const cx = w / 2; const cy = h / 2; const r = 25;
-
-            let svgHtml = `<div class="splice-diagram" style="max-width: 100%; overflow-x: auto;">`;
-            svgHtml += `<h3 style="color:#c0392b; margin-top:0; text-align:center;">Empalme: ${escapeHTML(name)}</h3>`;
-            svgHtml += `<svg viewBox="0 0 ${w} ${h}" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">`;
+            const spacingY = 70; const boxWidth = 140; const boxHeight = 55; const lineLengthX = 160; const maxSideCount = Math.max(leftConns.length, rightConns.length); const h = Math.max(300, (maxSideCount * spacingY) + 100); const w = 800; const cx = w / 2; const cy = h / 2; const r = 25;
+            let svgHtml = `<div class="splice-diagram" style="max-width: 100%; overflow-x: auto;"><h3 style="color:#c0392b; margin-top:0; text-align:center;">Empalme: ${escapeHTML(name)}</h3><svg viewBox="0 0 ${w} ${h}" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">`;
 
             const drawSide = (conns, isLeft) => {
-                const count = conns.length;
-                const startY = cy - ((count - 1) * spacingY) / 2;
-                
+                const count = conns.length; const startY = cy - ((count - 1) * spacingY) / 2;
                 conns.forEach((con, index) => {
-                    const currentY = startY + (index * spacingY);
-                    const endX = isLeft ? cx - lineLengthX : cx + lineLengthX;
-
+                    const currentY = startY + (index * spacingY); const endX = isLeft ? cx - lineLengthX : cx + lineLengthX;
                     svgHtml += `<line x1="${cx}" y1="${cy}" x2="${endX}" y2="${currentY}" stroke="#34495e" stroke-width="4"/>`;
-                    const rectX = isLeft ? endX - boxWidth - 10 : endX + 10;
-                    const rectY = currentY - (boxHeight / 2);
-
+                    const rectX = isLeft ? endX - boxWidth - 10 : endX + 10; const rectY = currentY - (boxHeight / 2);
                     svgHtml += `<rect x="${rectX}" y="${rectY}" width="${boxWidth}" height="${boxHeight}" fill="#ecf0f1" rx="4" ry="4" stroke="#bdc3c7" stroke-width="1"/>`;
-                    
                     const textCenterX = rectX + (boxWidth / 2);
-                    svgHtml += `<text x="${textCenterX}" y="${rectY + 18}" font-family="sans-serif" font-size="10" fill="#2c3e50" font-weight="bold" text-anchor="middle">[${escapeHTML(con.circuito)}] ${escapeHTML(con.cable)}</text>`;
-                    svgHtml += `<text x="${textCenterX}" y="${rectY + 33}" font-family="sans-serif" font-size="9" fill="#d35400" font-weight="bold" text-anchor="middle">A: ${escapeHTML(con.destino)}</text>`;
-                    svgHtml += `<text x="${textCenterX}" y="${rectY + 46}" font-family="sans-serif" font-size="9" fill="#7f8c8d" text-anchor="middle">L: ${escapeHTML(con.longitud)} mm</text>`;
+                    svgHtml += `<text x="${textCenterX}" y="${rectY + 18}" font-family="sans-serif" font-size="10" fill="#2c3e50" font-weight="bold" text-anchor="middle">[${escapeHTML(con.circuito)}] ${escapeHTML(con.cable)}</text><text x="${textCenterX}" y="${rectY + 33}" font-family="sans-serif" font-size="9" fill="#d35400" font-weight="bold" text-anchor="middle">A: ${escapeHTML(con.destino)}</text><text x="${textCenterX}" y="${rectY + 46}" font-family="sans-serif" font-size="9" fill="#7f8c8d" text-anchor="middle">L: ${escapeHTML(con.longitud)} mm</text>`;
                 });
             };
-
-            if (conexiones.length > 0) {
-                drawSide(leftConns, true); drawSide(rightConns, false);
-            } else {
-                svgHtml += `<text x="${cx}" y="${cy+60}" font-family="sans-serif" font-size="12" fill="#7f8c8d" text-anchor="middle">(Sin cables conectados)</text>`;
-            }
-
-            svgHtml += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#e74c3c" stroke="#c0392b" stroke-width="3"/>`;
-            svgHtml += `<text x="${cx}" y="${cy+5}" font-family="sans-serif" font-size="14" fill="white" font-weight="bold" text-anchor="middle">SPL</text>`;
-            svgHtml += `</svg></div>`;
+            if (conexiones.length > 0) { drawSide(leftConns, true); drawSide(rightConns, false); } else { svgHtml += `<text x="${cx}" y="${cy+60}" font-family="sans-serif" font-size="12" fill="#7f8c8d" text-anchor="middle">(Sin cables conectados)</text>`; }
+            svgHtml += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#e74c3c" stroke="#c0392b" stroke-width="3"/><text x="${cx}" y="${cy+5}" font-family="sans-serif" font-size="14" fill="white" font-weight="bold" text-anchor="middle">SPL</text></svg></div>`;
             return svgHtml;
         }
     </script>
