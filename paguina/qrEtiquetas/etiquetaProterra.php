@@ -8,7 +8,7 @@ use chillerlan\QRCode\QRCode;
 
 try{
     $wo = isset($_POST['wo']) ? $_POST['wo'] : "";
-    $cons = isset($_POST['const']) ? $_POST['const'] : "";
+    $cons = isset($_POST['cons']) ? $_POST['cons'] : "";
     
     $today_db = date('mdY'); 
     $today_qr = date('Ymd'); 
@@ -192,7 +192,7 @@ try{
     function returnqr() {
         setTimeout(function() {
             window.location.href = "../qrs.php";
-        }, 1000);
+        }, 10000);
     }
 
     returnqr();

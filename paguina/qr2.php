@@ -20,7 +20,7 @@ $today = date('mdY');
             $rev = substr($rev, 5);
         }
         if($np=='300-1570-00-R01'){
-            header("Location:qrEtiquetas/etiquetaProterra.php?wo=$wo&const=$cons");
+            header("Location:qrEtiquetas/etiquetaProterra.php?wo=$wo&cons=$cons");
         }
         if ($np == '1003647380' or $np == '1003617118' or $np == '1003622360') {
             header("Location:label.php?rev=$rev&np=$np&desc=$desc");
