@@ -14,7 +14,7 @@ try{
     $today_qr = date('Ymd'); 
     $todayDate = date('Y-m-d'); 
 
-    $buscar = mysqli_query($con, "SELECT * FROM `registro` where `wo` = '$wo' ");
+    $buscar = mysqli_query($con, "SELECT * FROM `registro` where `wo` = '$wo' limit 1");
     if (mysqli_num_rows($buscar) > 0) {
         $rows = mysqli_fetch_array($buscar);
         $np = $rows['NumPart'];

@@ -21,9 +21,11 @@ $today = date('mdY');
         }
         if($np=='300-1570-00-R01'){
             header("Location:qrEtiquetas/etiquetaProterra.php?wo=$wo&cons=$cons");
+            exit;
         }
         if ($np == '1003647380' or $np == '1003617118' or $np == '1003622360') {
             header("Location:label.php?rev=$rev&np=$np&desc=$desc");
+            exit;
         }
         $regstroCuenta=mysqli_query($con,"SELECT cuenta FROM `consterm` where `dias` = '$today' order by id desc limit 1");
         if(mysqli_num_rows($regstroCuenta)>0){
