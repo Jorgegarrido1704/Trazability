@@ -4,7 +4,7 @@ require '../vendor/autoload.php';
 session_start();
 date_default_timezone_set("America/Mexico_City");
 
-use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\{QRCode, QROptions};
 
 try{
     $wo = isset($_POST['wo']) ? $_POST['wo'] : "";
