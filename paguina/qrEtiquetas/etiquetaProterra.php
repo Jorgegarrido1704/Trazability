@@ -36,8 +36,10 @@ try{
             $inicio = 1;
             $cuentas = $cons;
         }
+        $i=$j=$inicio;
+        
 
-        for($i = $inicio; $i <= $cuentas; $i++){
+        for($i; $i <= $cuentas; $i++){
             $consecutivo = $i;
             if($consecutivo < 10){
                 $consecutivo = "00".$consecutivo;
@@ -137,8 +139,8 @@ try{
 </head>
 
 <body>
-<?php for($i = $inicio; $i <= $cuentas; $i++){ 
-    $consecutivoSerial = $i;
+<?php for($j; $j <= $cuentas; $j++){ 
+    $consecutivoSerial = $j;
     if($consecutivoSerial < 10){
         $consecutivoSerial = "00".$consecutivoSerial;
     }elseif($consecutivoSerial < 100){
