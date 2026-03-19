@@ -60,10 +60,7 @@ try{
             mysqli_query($con, "UPDATE `consterm` SET `cuenta` = '$cuentas' WHERE `dias` = '$today_db' ");
         }
 
-    } else {
-        header("Location:../qrs.php");
-        exit;
-    }
+    } 
 ?>
 
 <!DOCTYPE html>
