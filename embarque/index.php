@@ -17,7 +17,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12 mt-5" id="Datos">
-                <h2>Formulario para Registrar Datos</h2>
+                <h2>Cotejo de arnes y cajas</h2>
                 <form action="#" method="GET">
                     <div class="mb-3 mt-3">
                         <label for="partNumber" class="form-label">Numero de parte arnes</label>
