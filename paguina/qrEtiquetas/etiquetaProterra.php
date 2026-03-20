@@ -109,8 +109,8 @@ try{
     }
 
     .qr img{
-        width:11mm;
-        height:10.5mm;
+        width:11.5mm;
+        height:11.5mm;
     }
 
     .smallbox{
@@ -131,7 +131,7 @@ try{
     #logo{
         padding-left:2px;
         width: 11mm;
-        height: 3.5mm;
+        height: 2.5mm;
     }
 
 </style>
