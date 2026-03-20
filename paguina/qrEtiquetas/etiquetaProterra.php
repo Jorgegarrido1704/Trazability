@@ -116,15 +116,15 @@ try{
     .smallbox{
         border:1px solid black;
         text-align:center;
-        font-size:6px;
-        margin-bottom:3px;
+        font-size:7px;
+        margin-bottom:1px;
     }
 
     .smallbox1{
         border:1px solid black;
         text-align:center;
         font-size:7px;
-        margin-bottom:3px;
+        margin-bottom:1px;
     }
 
 
