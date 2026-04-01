@@ -4,11 +4,11 @@ require '../conector.php';
 require '../vendor/autoload.php';
 use chillerlan\QRCode\{QRCode, QROptions};
 try{
-$po=isset($_POST['po'])?$_POST['po']:"";
+$pn=isset($_POST['pn'])?$_POST['pn']:"";
 $cons=isset($_POST['const'])?$_POST['const']:"";
 $today = date('mdY');
 
-    $buscar = mysqli_query($con, "SELECT `CodigoIdentificaicon` FROM `registroqrs` where `CodigoIdentificaicon` Like '%$pn%$cons' order by id desc limit 1");
+    $buscar = mysqli_query($con, "SELECT `CodigoIdentificaicon` FROM `registroqrs` where `CodigoIdentificaicon` Like '%$pn%$cons' order by id_qr desc limit 1");
     if (mysqli_num_rows($buscar) > 0) {
         $rows = mysqli_fetch_array($buscar);
         $codigo = $rows['CodigoIdentificaicon'];
