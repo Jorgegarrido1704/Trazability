@@ -1,7 +1,7 @@
 <?php
 
-require 'conector.php';
-require 'vendor/autoload.php';
+require '../conector.php';
+require '../vendor/autoload.php';
 use chillerlan\QRCode\{QRCode, QROptions};
 try{
 $po=isset($_POST['po'])?$_POST['po']:"";
