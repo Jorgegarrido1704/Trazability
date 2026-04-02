@@ -19,7 +19,7 @@ $weekday = intval(date('W'));
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="refresh" content="360">
 
-    <title>Relog Checador</title>
+    <title>Reloj Checador</title>
     <link rel=" stylesheet" href="css/estilis.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -50,7 +50,7 @@ $weekday = intval(date('W'));
                         <div class="form-group">
                             <label for="cardCode" class="form-label">Ingrese el código QR de su tarjeta:</label>
                             <input type="text" class="form-control" id="cardCode" name="cardCode" minlength="4"
-                                maxlength="5" required autofocus>
+                                maxlength="5" required autofocus pattern="^\d{4,5}[iI][0-9]+$" placeholder="Ingrese el código QR de su tarjeta">
                         </div>
                         </form>
 
