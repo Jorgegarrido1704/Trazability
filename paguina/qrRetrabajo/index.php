@@ -11,8 +11,8 @@ $datos = null;
 $desc = null;
 $codigo = null;
     if($pn!="" and $cons !=""){
-        echo "Part Number: $pn <br>";
-        echo "Consignment: $cons <br>";
+      //  echo "Part Number: $pn <br>";
+        //echo "Consignment: $cons <br>";
     $buscar = mysqli_query($con, "SELECT `CodigoIdentificaicon` FROM `registroqrs` where `CodigoIdentificaicon` Like '%$pn%$cons' order by id_qr desc limit 1");
     if (mysqli_num_rows($buscar) > 0) {
         $rows = mysqli_fetch_array($buscar);
