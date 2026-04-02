@@ -7,6 +7,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $cardCode = "i" . $cardCode;
         
     }
+    if(strlen($cardCode) >6){
+        header("Location:  asistencias.php?success=tarjeta Invalida, vuelva a intentarlo&color=Red");
+    }
     $days=['lunes','martes','miercoles','jueves','viernes','sabado','domingo'];
     //day today
     $dayToday=date('N')-1;
