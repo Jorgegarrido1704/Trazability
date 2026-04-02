@@ -4,20 +4,24 @@ require '../conector.php';
 require '../vendor/autoload.php';
 use chillerlan\QRCode\{QRCode, QROptions};
 try{
-$pn=isset($_POST['pn'])?$_POST['pn']:"";
-$cons=isset($_POST['const'])?$_POST['const']:"";
+$pn=isset($_GET['pn'])?$_GET['pn']:"";
+$cons=isset($_GET['const'])?$_GET['const']:"";
 $today = date('mdY');
-
+$datos = null;
+$desc = null;
+$codigo = null;
+    if($pn and $cons){
     $buscar = mysqli_query($con, "SELECT `CodigoIdentificaicon` FROM `registroqrs` where `CodigoIdentificaicon` Like '%$pn%$cons' order by id_qr desc limit 1");
     if (mysqli_num_rows($buscar) > 0) {
         $rows = mysqli_fetch_array($buscar);
         $codigo = $rows['CodigoIdentificaicon'];
         $datos = explode("|", $codigo);
     }
-    $budcardesc=mysqli_query($con,"SELECT description FROM `registro` where `NumPart` = '$pn' order by id desc limit 1");
+    $budcardesc=mysqli_query($con,"SELECT `description` FROM `registro` where `NumPart` = '$pn' order by id desc limit 1");
     if(mysqli_num_rows($budcardesc)>0){
         $rowsdesc = mysqli_fetch_array($budcardesc);
         $desc = $rowsdesc['description'];
+    }
     }
 
 
@@ -138,7 +142,7 @@ $today = date('mdY');
                     <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?>
                 </div>
                 <div class="qrss">
-                    <img id="qrs_img" src="proterra_dark.png" alt="codigo" class="img-fluid">
+                    <img id="qrs_img" src="../proterra_dark.png" alt="codigo" class="img-fluid">
                 </div>
 
             </div>
@@ -154,17 +158,7 @@ $today = date('mdY');
             </div>
         </div>
     </div>
-    <?php }else{ ?>
-    <div style="display:flex; width: 38mm; height: 162mm">
-        <form action="index.php" method="POST">
-            <input type="text" name="pn" placeholder="Enter Part Number">
-            <input type="text" name="cons" placeholder="Enter Consignment">
-            <button type="submit">Search</button>
-        </form>
-    </div>
-   <?php } ?>
-
-    <script>
+     <script>
     window.onload = function() {
         print();
     }
@@ -177,6 +171,17 @@ $today = date('mdY');
 
     returnqr();
     </script>
+    <?php }else{ ?>
+    <div style="display:flex; width: 38mm; height: 162mm">
+        <form action="index.php" method="GET">
+            <input type="text" name="pn" placeholder="Enter Part Number">
+            <input type="text" name="cons" placeholder="Enter Consignment">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+   <?php } ?>
+
+   
 </body>
 
 </html>
