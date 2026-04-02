@@ -50,7 +50,7 @@ $weekday = intval(date('W'));
                         <div class="form-group">
                             <label for="cardCode" class="form-label">Ingrese el código QR de su tarjeta:</label>
                             <input type="text" class="form-control" id="cardCode" name="cardCode" minlength="4"
-                                maxlength="5" required autofocus pattern="^\d{4,5}[iI][0-9]+$" placeholder="Ingrese el código QR de su tarjeta">
+                                maxlength="5" required autofocus  placeholder="Ingrese el código QR de su tarjeta">
                         </div>
                         </form>
 
