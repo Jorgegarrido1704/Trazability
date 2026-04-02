@@ -13,8 +13,11 @@ $today = date('mdY');
         $rows = mysqli_fetch_array($buscar);
         $codigo = $rows['CodigoIdentificaicon'];
         $datos = explode("|", $codigo);
-
-
+    }
+    $budcardesc=mysqli_query($con,"SELECT description FROM `registro` where `NumPart` = '$pn' order by id desc limit 1");
+    if(mysqli_num_rows($budcardesc)>0){
+        $rowsdesc = mysqli_fetch_array($budcardesc);
+        $desc = $rowsdesc['description'];
     }
 
 
@@ -29,93 +32,93 @@ $today = date('mdY');
     <title>QR Codes</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-    #label {
-        width: 38mm;
-        height: 24mm;
-        border-radius: 1px;
-        box-sizing: border-box;
-        display: inline-flex;
-        margin-top: 75px;
-        margin-left: 15px;
+                #label {
+                    width: 38mm;
+                    height: 24mm;
+                    border-radius: 1px;
+                    box-sizing: border-box;
+                    display: inline-flex;
+                    margin-top: 75px;
+                    margin-left: 15px;
 
 
 
-    }
+                }
 
-    .row {
-        display: block;
-        align-items: flex-start;
-        margin-bottom: 1px;
-        margin-right: 2px;
-    }
+                .row {
+                    display: block;
+                    align-items: flex-start;
+                    margin-bottom: 1px;
+                    margin-right: 2px;
+                }
 
-    .row1 {
-        display: block;
-        align-items: flex-start;
-        margin-bottom: 1px;
-    }
+                .row1 {
+                    display: block;
+                    align-items: flex-start;
+                    margin-bottom: 1px;
+                }
 
-    .qrs {
-        margin-top: 2mm;
-        width: 20mm;
-        height: 19mm;
-    }
+                .qrs {
+                    margin-top: 2mm;
+                    width: 20mm;
+                    height: 19mm;
+                }
 
-    .qrss {
-        margin-top: 1mm;
-        width: 20mm;
-        height: 12mm;
-    }
+                .qrss {
+                    margin-top: 1mm;
+                    width: 20mm;
+                    height: 12mm;
+                }
 
-    .data-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        padding-top: 15px;
-        margin-left: 2px;
-    }
+                .data-container {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    padding-top: 15px;
+                    margin-left: 2px;
+                }
 
-    .textarea-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
+                .textarea-container {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-start;
 
-        margin-left: 2px;
-    }
+                    margin-left: 2px;
+                }
 
-    .datos {
-        width: 30mm;
-        border-radius: 1px;
-        border: solid 1px #000;
-        text-align: center;
-        margin: 1px 0;
-        padding-left: 1px;
+                .datos {
+                    width: 30mm;
+                    border-radius: 1px;
+                    border: solid 1px #000;
+                    text-align: center;
+                    margin: 1px 0;
+                    padding-left: 1px;
 
 
-        box-sizing: border-box;
-    }
+                    box-sizing: border-box;
+                }
 
-    textarea {
-        width: 30mm;
-        height: 16mm;
-        border-radius: 1px;
-        border: solid 1px #000;
-        box-sizing: border-box;
-        resize: none;
-        font-size: xx-small;
-        overflow: hidden;
-        margin: 0;
-    }
+                textarea {
+                    width: 30mm;
+                    height: 16mm;
+                    border-radius: 1px;
+                    border: solid 1px #000;
+                    box-sizing: border-box;
+                    resize: none;
+                    font-size: xx-small;
+                    overflow: hidden;
+                    margin: 0;
+                }
 
-    #qrs_img {
-        width: 18mm;
-        height: 11mm;
-        margin-left: 3-2px;
-    }
+                #qrs_img {
+                    width: 18mm;
+                    height: 11mm;
+                    margin-left: 3-2px;
+                }
 
-    .textarea-container {
-        margin-top: 0;
-    }
+                .textarea-container {
+                    margin-top: 0;
+                }
     </style>
 </head>
 
@@ -129,7 +132,7 @@ $today = date('mdY');
                 <div class="qrs">
                     <?php
                   
-                $data = '5703|'.$np.'|'.$rev.'|'.$today.'|'.$datosRegistro;
+                $data = $codigo;
                 $qrcode = (new QRCode)->render($data);
                 ?>
                     <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?>
@@ -141,8 +144,8 @@ $today = date('mdY');
             </div>
             <div class="row1">
                 <div class="data-container">
-                    <h6 class="datos"><?php echo $np; ?>|<?php echo $rev; ?></h6>
-                    <h6 class="datos"><?php echo $datosRegistro; ?></h6>
+                    <h6 class="datos"><?php echo $datos[1]; ?>|<?php echo $datos[2]; ?></h6>
+                    <h6 class="datos"><?php echo $datos[4]; ?></h6>
                 </div>
 
                 <div class="textarea-container">
