@@ -19,7 +19,7 @@ $codigo = null;
         $codigo = $rows['CodigoIdentificaicon'];
         $datos = explode("|", $codigo);
     }
-    echo $codigo;
+    //echo $codigo;
     $budcardesc=mysqli_query($con,"SELECT `description` FROM `registro` where `NumPart` = '$pn' order by id desc limit 1");
     if(mysqli_num_rows($budcardesc)>0){
         $rowsdesc = mysqli_fetch_array($budcardesc);
