@@ -5,18 +5,21 @@ require '../vendor/autoload.php';
 use chillerlan\QRCode\{QRCode, QROptions};
 try{
 $pn=isset($_GET['pn'])?$_GET['pn']:"";
-$cons=isset($_GET['const'])?$_GET['const']:"";
+$cons=isset($_GET['cons'])?$_GET['cons']:"";
 $today = date('mdY');
 $datos = null;
 $desc = null;
 $codigo = null;
-    if($pn and $cons){
+    if($pn!="" and $cons !=""){
+        echo "Part Number: $pn <br>";
+        echo "Consignment: $cons <br>";
     $buscar = mysqli_query($con, "SELECT `CodigoIdentificaicon` FROM `registroqrs` where `CodigoIdentificaicon` Like '%$pn%$cons' order by id_qr desc limit 1");
     if (mysqli_num_rows($buscar) > 0) {
         $rows = mysqli_fetch_array($buscar);
         $codigo = $rows['CodigoIdentificaicon'];
         $datos = explode("|", $codigo);
     }
+    echo $codigo;
     $budcardesc=mysqli_query($con,"SELECT `description` FROM `registro` where `NumPart` = '$pn' order by id desc limit 1");
     if(mysqli_num_rows($budcardesc)>0){
         $rowsdesc = mysqli_fetch_array($budcardesc);
