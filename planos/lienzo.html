@@ -81,7 +81,15 @@
     </div>
 
     <div id="tab-rutas" class="tab-content"><h2>Lista de Conexiones (De -> A)</h2><div id="tabla-rutas-container"></div></div>
-    <div id="tab-bom" class="tab-content"><h2>Resumen de Materiales Requeridos</h2><div id="tabla-bom-container"></div></div>
+    
+    <div id="tab-bom" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 15px;">
+            <h2 style="margin: 0;">Resumen de Materiales Requeridos</h2>
+            <button class="btn-excel" onclick="descargarExcel()">📊 Descargar BOM y Lista de Corte</button>
+        </div>
+        <div id="tabla-bom-container"></div>
+    </div>
+
     <div id="tab-splices" class="tab-content"><h2>Diagramas de Empalmes y Puntos de Reunión</h2><div id="tabla-splices-container"></div></div>
     <div id="overlay"></div>
 
@@ -765,7 +773,7 @@
                                 terminalesTotales[t.pn] += 1; 
                             }
                             if(t.soldadura) {
-                                if(!componentes['SOLDADURA']) componentes['SOLDADURA'] = { desc: 'Proceso de Soldadura (1 vía)', qty: 0, unit: 'vías' };
+                                if(!componentes['SOLDADURA']) componentes['SOLDADURA'] = { desc: 'Proceso de Soldadura (Vías)', qty: 0, unit: 'vías' };
                                 componentes['SOLDADURA'].qty += 1;
                             }
                             if(t.sello) {
@@ -810,6 +818,47 @@
             html += `</table><br><h3>Longitud Total de Cables</h3><table><tr><th>Especificación de Cable</th><th>Longitud Total (mm)</th><th>Total de cable en FT</th></tr>`; 
             for(let cable in cablesTotales) html += `<tr><td>${cable}</td><td>${cablesTotales[cable]} mm</td><td>${(cablesTotales[cable] / 304.8).toFixed(2)} ft</td></tr>`;
             $('#tabla-bom-container').html(html + '</table>');
+        }
+
+        // ==========================================
+        // 10. EXPORTACIÓN A EXCEL (NUEVA FUNCIÓN)
+        // ==========================================
+        function descargarExcel() {
+            // Asegurarnos de que los datos estén generados y actualizados antes de descargar
+            generarReporteRutas();
+            generarReporteBOM();
+
+            const wb = XLSX.utils.book_new();
+
+            // --- Construir Pestaña 1: Lista de Materiales (BOM) ---
+            let bomAoA = [];
+            const bomTables = document.querySelectorAll('#tabla-bom-container table');
+            const bomHeaders = document.querySelectorAll('#tabla-bom-container h3');
+            
+            bomTables.forEach((table, index) => {
+                if(bomHeaders[index]) bomAoA.push([bomHeaders[index].innerText]); // Título de la sección
+                
+                const rows = table.querySelectorAll('tr');
+                rows.forEach(row => {
+                    let rowData = [];
+                    row.querySelectorAll('th, td').forEach(cell => {
+                        rowData.push(cell.innerText);
+                    });
+                    bomAoA.push(rowData);
+                });
+                bomAoA.push([]); // Espacio en blanco entre tablas
+            });
+            
+            const wsBom = bomAoA.length > 0 ? XLSX.utils.aoa_to_sheet(bomAoA) : XLSX.utils.aoa_to_sheet([["No hay datos"]]);
+            XLSX.utils.book_append_sheet(wb, wsBom, "Lista de Materiales");
+
+            // --- Construir Pestaña 2: Lista de Corte (Rutas) ---
+            const tableRutas = document.querySelector('#tabla-rutas-container table');
+            const wsRutas = tableRutas ? XLSX.utils.table_to_sheet(tableRutas) : XLSX.utils.aoa_to_sheet([["No hay datos"]]);
+            XLSX.utils.book_append_sheet(wb, wsRutas, "Lista de Corte");
+
+            // --- Disparar la Descarga ---
+            XLSX.writeFile(wb, "Reportes_MasterCAD.xlsx");
         }
 
         function generarReporteSplices() {
