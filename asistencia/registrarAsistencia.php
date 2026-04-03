@@ -7,6 +7,9 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $cardCode = "i" . $cardCode;
         
     }
+    if(strlen($cardCode) >6){
+        header("Location:  asistencias.php?success=tarjeta Invalida, vuelva a intentarlo&color=Red");
+    }
     $days=['lunes','martes','miercoles','jueves','viernes','sabado','domingo'];
     //day today
     $dayToday=date('N')-1;
@@ -34,7 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $rowRegistro = mysqli_fetch_assoc($buscarRegistro);
         if (mysqli_num_rows($buscarRegistro) <= 0) {
             $insertarAsistencia = mysqli_query($con, "INSERT INTO relogchecador (employeeNumber,fechaRegistro,entrada,comentario) VALUES ('$cardCode','$dateNow','$timeNow','$comentario')");
-            if($type=='Indirecto' and $timeNow < '08:15:00'){ 
+            if($type=='Practicante'){
+                $status='PCT';
+            }elseif($type=='Asimilado'){
+                $status='ASM';
+            }elseif($type=='Servicio comprado'){
+                $status='SCE';
+            }elseif($type=='Indirecto' and $timeNow < '08:15:00'){ 
                         $status='OK';
             }else if($type=='Indirecto'  and $timeNow > '08:15:00'){
                         $status='R';
