@@ -61,7 +61,12 @@
             <button class="btn-warning" id="btn-add-loom" title="Dibujar Manga (Click y arrastrar)">Dibujar Manga</button>
             <button class="btn-purple" id="btn-add-tie" title="Dibujar Cincho (Click y arrastrar)">Dibujar Cincho</button>
             <button class="btn-dark" id="btn-add-break">Punto de Quiebre</button>
+            <button class="btn-info" id="btn-add-cota" title="Dibujar Cota (Click y arrastrar)" style="background-color: #00bcd4; border: 1px solid #0097a7; color: white;">📏 Dibujar Cota</button>
             
+            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
+
+            <button class="btn-warning" id="btn-calcular-looms" style="background-color: #e67e22; color: white;">⚡ Calcular Looms y Diámetros</button>
+
             <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
             
             <input type="file" id="input-import-excel" accept=".xlsx, .xls, .csv" style="display:none;">
@@ -73,6 +78,7 @@
             <input type="file" id="input-load-json" accept=".json" style="display:none;">
             <button class="btn-info" onclick="document.getElementById('input-load-json').click()">Cargar Proyecto</button>
             <button class="btn-danger" id="btn-clear-canvas">Limpiar</button>
+            <button class="btn-info" style="background-color: #00bcd4; color: white;" onclick="imprimirAEscala()">🖨️ Imprimir a Escala</button>
             
             <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
             <strong>Zoom:</strong> <button id="btn-zoom-out">-</button> <span id="zoom-level">100%</span> <button id="btn-zoom-in">+</button>
@@ -80,17 +86,33 @@
         <div id="lienzo-arnes"></div>
     </div>
 
-    <div id="tab-rutas" class="tab-content"><h2>Lista de Conexiones (De -> A)</h2><div id="tabla-rutas-container"></div></div>
+    <div id="tab-rutas" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="margin: 0;">Lista de Conexiones (De -> A)</h2>
+            <button class="btn-primary" onclick="generarReporteRutas()">🔄 Generar Lista de Corte</button>
+        </div>
+        <div id="tabla-rutas-container"></div>
+    </div>
     
     <div id="tab-bom" class="tab-content">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 15px;">
             <h2 style="margin: 0;">Resumen de Materiales Requeridos</h2>
-            <button class="btn-excel" onclick="descargarExcel()">📊 Descargar BOM y Lista de Corte</button>
+            <div>
+                <button class="btn-primary" onclick="generarReporteBOM()" style="margin-right: 10px;">🔄 Calcular BOM</button>
+                <button class="btn-excel" onclick="descargarExcel()">📊 Descargar BOM y Lista de Corte</button>
+            </div>
         </div>
         <div id="tabla-bom-container"></div>
     </div>
 
-    <div id="tab-splices" class="tab-content"><h2>Diagramas de Empalmes y Puntos de Reunión</h2><div id="tabla-splices-container"></div></div>
+    <div id="tab-splices" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="margin: 0;">Diagramas de Empalmes y Puntos de Reunión</h2>
+            <button class="btn-primary" onclick="generarReporteSplices()">🔄 Generar Splices</button>
+        </div>
+        <div id="tabla-splices-container"></div>
+    </div>
+
     <div id="overlay"></div>
 
     <div id="modal-cable" class="modal">
@@ -187,9 +209,8 @@
         function abrirTab(idTab, btn) { 
             $('.tab-content').removeClass('active'); $('.tab-btn').removeClass('active'); 
             $('#tab-' + idTab).addClass('active'); $(btn).addClass('active'); 
-            if (idTab === 'rutas') generarReporteRutas(); 
-            if (idTab === 'bom') generarReporteBOM(); 
-            if (idTab === 'splices') generarReporteSplices(); 
+            
+            // Hemos quitado las llamadas automáticas aquí para evitar lentitud
         }
         
         function evaluarMatematica(expresion) { try { let expLimpia = String(expresion).replace(/[^0-9\+\-\.\s]/g, ''); if(expLimpia.trim() === '') return 0; return Function('"use strict";return (' + expLimpia + ')')(); } catch (e) { return 0; } }
@@ -286,7 +307,41 @@
             const circle = new joint.shapes.standard.Circle({ position: { x: x, y: y }, size: { width: 20, height: 20 }, attrs: { body: { fill: '#34495e', stroke: '#000000', strokeWidth: 3, strokeDasharray: '4,2' }, label: { text: 'BP', fill: '#ffffff', fontSize: 9, fontWeight: 'bold' } } });
             circle.set('bomData', { type: 'BreakPoint', orientacion: 'horizontal', description: 'Tape-25', qty: 6, unit: 'inches' }); circle.addTo(graph); circle.toBack(); return circle;
         }
-
+        function crearCotaDimensional(x1, y1, x2, y2) {
+    // Creamos un link especial que no se conecta a nada, solo flota en el lienzo
+    const link = new joint.shapes.standard.Link({
+        source: { x: x1, y: y1 },
+        target: { x: x2, y: y2 },
+        attrs: {
+            line: {
+                stroke: '#16a085', // Color verde azulado
+                strokeWidth: 1.5,
+                // Agregamos flechas en AMBOS extremos
+                targetMarker: { type: 'path', d: 'M 10 -5 0 0 10 5 Z', fill: '#16a085' },
+                sourceMarker: { type: 'path', d: 'M 10 -5 0 0 10 5 Z', fill: '#16a085', transform: 'rotate(180)' }
+            }
+        }
+    });
+    
+    // Calculamos la distancia inicial
+    const dx = x2 - x1; const dy = y2 - y1;
+    const longitudMm = Math.round(Math.sqrt(dx*dx + dy*dy));
+    
+    // Le pegamos una etiqueta con la medida en el centro
+    link.appendLabel({
+        attrs: {
+            text: { text: `${longitudMm} mm`, fill: '#16a085', fontSize: 11, fontWeight: 'bold' },
+            rect: { fill: '#ffffff', stroke: '#16a085', strokeWidth: 1, rx: 3, ry: 3, padding: 4 }
+        },
+        position: { distance: 0.5 }
+    });
+    
+    // Identificador para que el sistema sepa que no es un cable eléctrico
+    link.set('bomData', { type: 'Cota' }); 
+    link.addTo(graph);
+    link.toBack(); // Mandar al fondo para que no estorbe a los conectores
+    return link;
+}
         // ==========================================
         // 4. EVENTOS DEL RATÓN
         // ==========================================
@@ -348,7 +403,10 @@
         });
 
         $(window).on('mouseup', function() {
-            if (elementoRedimensionando) { actualizarEscaneoLooms(); elementoRedimensionando = null; }
+            if (elementoRedimensionando) { 
+                // Actualización automática eliminada aquí
+                elementoRedimensionando = null; 
+            }
             if (dragLabelState.active) dragLabelState.active = false;
         });
 
@@ -528,7 +586,7 @@
                 const hexColor = getWireColorHex(color); enlaceActual.attr('line/stroke', hexColor);
                 enlaceActual.labels([]); enlaceActual.appendLabel({ attrs: { text: { text: `[${circuito}]\n${longitudCalculada}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5, cursor: 'move' } }, position: { distance: 0.5, offset: {x: 0, y: -20} } }); 
                 enlaceActual.set('bomData', { type: 'Wire', circuito: circuito, insulation: tipo, gage: cal, color: color, length: longitudCalculada }); 
-            } cerrarModales(); actualizarEscaneoLooms();
+            } cerrarModales();
         });
         
         $('#btn-save-conn').click(() => { 
@@ -563,7 +621,7 @@
                     d.recubrimiento = tipoRecubrimiento; d.qty = qty; nodoActual.set('bomData', d); 
                     const colores = loomColors[tipoRecubrimiento]; nodoActual.attr('body/fill', colores.fill); nodoActual.attr('body/stroke', colores.stroke);
                 } 
-                cerrarModales(); actualizarEscaneoLooms();
+                cerrarModales(); 
             });
 
         $('#btn-save-tie').click(() => { 
@@ -669,9 +727,7 @@
             });
         }
         
-        paper.on('element:pointerup', function() { actualizarEscaneoLooms(); });
-        paper.on('link:pointerup', function() { actualizarEscaneoLooms(); });
-        paper.on('blank:pointerup', function() { setTimeout(actualizarEscaneoLooms, 50); });
+        // Las funciones automáticas de ratón fueron eliminadas de aquí
 
         // ==========================================
         // 8. RUTEO ORTOGONAL
@@ -696,7 +752,7 @@
                 if (isHorizontal) { v2 = { x: v1.x, y: centroY }; v3 = { x: v4.x, y: centroY }; } else { v2 = { x: centroX, y: v1.y }; v3 = { x: centroX, y: v4.y }; }
                 link.vertices([v1, v2, v3, v4]); 
             });
-            actualizarEscaneoLooms(); cerrarModales();
+            cerrarModales();
         }
 
         function liberarAgrupacion(nodoCentral) {
@@ -825,7 +881,7 @@
         }
 
         // ==========================================
-        // 10. EXPORTACIÓN A EXCEL (NUEVA FUNCIÓN)
+        // 10. EXPORTACIÓN A EXCEL
         // ==========================================
         function descargarExcel() {
             // Asegurarnos de que los datos estén generados y actualizados antes de descargar
@@ -912,6 +968,29 @@
             svgHtml += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#e74c3c" stroke="#c0392b" stroke-width="3"/><text x="${cx}" y="${cy+5}" font-family="sans-serif" font-size="14" fill="white" font-weight="bold" text-anchor="middle">SPL</text></svg></div>`;
             return svgHtml;
         }
+
+        // ==========================================
+        // 11. NUEVO EVENTO PARA CÁLCULO MANUAL (BOTÓN)
+        // ==========================================
+        $('#btn-calcular-looms').click(function() {
+            let btn = $(this);
+            let textoOriginal = btn.text();
+            
+            // Cambiar visualmente el botón para avisar que está trabajando
+            btn.text('Calculando...');
+            btn.css('background-color', '#d35400');
+            
+            // Usamos setTimeout para que el navegador tenga tiempo de actualizar el botón
+            // antes de congelarse un segundo haciendo todas las matemáticas
+            setTimeout(function() {
+                actualizarEscaneoLooms();
+                
+                // Regresar el botón a su estado normal
+                btn.text(textoOriginal);
+                btn.css('background-color', '#e67e22');
+            }, 50);
+        });
+
     </script>
 </body>
 </html>
