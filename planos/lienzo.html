@@ -110,15 +110,19 @@
         </div>
         <div class="form-group"><label>Color:</label>
         <select id="cable-color">
-            <option value='YEBN'>YELLOW/BROWN</option><option value='YE'>YELLOW</option><option value='VTWH'>VIOLET/WHITE</option>
+            <option value='YEBN'>YELLOW/BROWN</option><option value='YE'>YELLOW</option>
+            <option value='BNYE'>BROWN/YELLOW</option><option value='BNWH'>BROWN/WHITE</option><option value='BNGN'>BROWN/GREEN</option>
+            <option value='YEBK'>YELLOW/BLACK</option><option value='YERD'>YELLOW/RED</option><option value='VTWH'>VIOLET/WHITE</option>
             <option value='VTDG'>VIOLET/DARK GREEN</option><option value='VT'>VIOLET</option><option value='RDOG'>RED/ORANGE</option>
             <option value='RDDB'>RED/DARK BLUE</option><option value='RDBK'>RED/BLACK</option><option value='RD'>RED</option>
             <option value='GYLB'>GREY/LIGHT BLUE</option><option value='GYDG'>GREY/DARK GREEN</option><option value='GYBN'>GREY/BROWN</option>
             <option value='DG'>DARK GREEN</option><option value='DB'>DARK BLUE</option><option value='BU'>BLUE</option>
+            <option value="GN">GREEN</option><option value='GNWH'>GREEN/WHITE</option><option value='GNDG'>GREEN/DARK GREEN</option><option value='GNYE'>GREEN/YELLOW</option> 
+            <option value="GR">GRAY</option><option value='GRWH'>GRAY/WHITE</option><option value='GRBN'>GRAY/BROWN</option><option value='GRGN'>GRAY/GREEN</option><option value='GRDB'>GRAY/DARK BLUE</option><option value="GRBK">GRAY/BLACK</option>
             <option value='BNYE'>BROWN/YELLOW</option><option value='BNWH'>BROWN/WHITE</option><option value='BNGN'>BROWN/GREEN</option>
             <option value='BNDB'>BROWN/DARK BLUE</option><option value='BN'>BROWN</option><option value='BKWH'>BLACK/WHITE</option>
             <option value='BKDG'>BLACK/DARK GREEN</option><option value='BKBN'>BLACK/BROWN</option><option value='BK'>BLACK</option>
-            <option value='WHT'>WHITE</option><option value='CLR'>CLEAR</option>
+            <option value='WHT'>WHITE</option><option value='CLR'>CLEAR</option><option value='ORG'>ORANGE</option><option value='PNK'>PINK</option><option value='TAN'>TAN</option><option value='LGTBLU'>LIGHT BLUE</option>
         </select>
         </div>
         <div class="form-group"><label>Longitud (mm) - Ej. 150+100+50:</label><input type="text" id="cable-longitud" value="0"></div>
@@ -219,7 +223,7 @@
             if(c.includes('GN') || c.includes('GRN')) return '#2ecc71';
             if(c.includes('VT') || c.includes('VIO') || c.includes('PUR')) return '#9b59b6';
             if(c.includes('BN') || c.includes('BRN')) return '#8d6e63';
-            if(c.includes('GY') || c.includes('GRY')) return '#95a5a6';
+            if(c.includes('GR') || c.includes('GRY')) return '#95a5a6';
             if(c.includes('WH') || c.includes('WHT')) return '#bdc3c7'; 
             if(c.includes('ORG')) return '#e67e22';
             if(c.includes('PNK')) return '#ff9ff3';
