@@ -17,6 +17,7 @@ while ($row = mysqli_fetch_assoc($registrosMPS)) {
    // echo $week. " || ".$row['dq']. "<br>";
     $qty = (int)$row['qtymps'];
 
+    if ($week < $currentWeek) $week = $currentWeek;
     $allWeeks[$week] = true;
 
     if (!isset($pnRegistros[$pn][$week])) {
