@@ -16,8 +16,7 @@ while ($row = mysqli_fetch_assoc($registrosMPS)) {
     
    // echo $week. " || ".$row['dq']. "<br>";
     $qty = (int)$row['qtymps'];
-    
-    if ($week < $currentWeek) $week = $currentWeek;
+if($week < $currentWeek) $week = $currentWeek;
     $allWeeks[$week] = true;
 
     if (!isset($pnRegistros[$pn][$week])) {
@@ -86,23 +85,26 @@ foreach ($pnRegistros as $pn => $weeks) {
             $times = 0;
 
             if ($value > 0) {
-              //  echo "<td>{$value} - {$row['processtime']} - {$row['setupTime']}</td>";
-                $times = (($row['processtime'] * $value) + $row['setupTime'])*1.15;
+             $times = (($row['processtime'] * $value) + $row['setupTime'])*1.15;
                 $perDay = $times / 5;
+                
                 $perDay = round($perDay/60, 2);
                 for ($i = 0; $i < 5; $i++) {
+                    
                     if (!isset($totalsPerDay[$week])) {
                         $totalsPerDay[$week] = 0;
                     }
-                    echo "<td>{$perDay}</td>";
+                    $pzs = $value / 5;
+                    echo "<td>{$perDay} Hr/{$pzs} Pzs</td>";
                 }
                 $totalsPerDay[$week] += $times;
+                
             } else {
                 for ($i = 0; $i < 5; $i++) {
                     echo "<td>0</td>";
                 }
             }
-            $rowTotal += round($times/60,2);
+           
         }
         echo "<td style='font-weight:bold;'>{$rowTotal}</td>";
         echo "</tr>";
