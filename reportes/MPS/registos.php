@@ -18,9 +18,9 @@ try {
         $qty = (int)$row['qtymps'];
 
         // Adjust week for next year
-        /*if ($week < $currentWeek) {
-            $week += 52;
-        }*/
+        if ($week < $currentWeek) {
+            $week =$currentWeek;
+        }
 
         // --- Split into 5 working days ---
         $baseQty   = intdiv($qty, 5);
