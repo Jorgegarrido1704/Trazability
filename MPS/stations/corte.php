@@ -98,13 +98,12 @@ foreach ($pnRegistros as $pn => $weeks) {
                     echo "<td>{$perDay} Hr/{$pzs} Pzs</td>";
                 }
                 $totalsPerDay[$week] += $times;
-                
             } else {
                 for ($i = 0; $i < 5; $i++) {
                     echo "<td>0</td>";
                 }
             }
-           
+            $rowTotal += round($times/60,2);
         }
         echo "<td style='font-weight:bold;'>{$rowTotal}</td>";
         echo "</tr>";
