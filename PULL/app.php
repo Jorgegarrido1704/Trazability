@@ -23,12 +23,13 @@ $fecha=date("d-m-Y H:i");
 //echo $maquina,$quien,$trabajo,$fecha,$aplicador,$qry;
 if( $maquina!="" and $quien!="" and $trabajo!=""){
     $sql=mysqli_query($con,"INSERT INTO registro_paro ( `fecha`, `equipo`, `nombreEquipo`, `dano`, `quien`, `area`, `atiende`) VALUES   ( '$fecha','Bancos para terminales', '$qry/$aplicador', '$trabajo', '$quien', '$maquina', 'Nadie aun')");
+     $con->close();
     header("Location: solicitar.php");
 }
 }else if($aplicador !="No esta(preguntar y agregar)"){
     $fecha=date("d-m-Y H:i");
-
     $sql=mysqli_query($con,"INSERT INTO registro_paro ( `fecha`, `equipo`, `nombreEquipo`, `dano`, `quien`, `area`, `atiende`) VALUES   ( '$fecha','Bancos para terminales', '$aplicador', '$trabajo', '$quien', '$maquina', 'Nadie aun')");
+    $con->close();
     header("Location: solicitar.php");
 
 }
