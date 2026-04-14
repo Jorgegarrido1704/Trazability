@@ -28,7 +28,7 @@ $fecha=date("d-m-Y H:i");
 // Validación básica
 
 
-
+try{
 
    // Preparar consulta segura
 $stmt = $con->prepare("
@@ -58,7 +58,10 @@ if ($stmt->execute()) {
     echo "Error al insertar: " . $stmt->error;
 }
 
-
+}
+catch(Exception $e){
+    echo "Error: " . $e->getMessage();
+}
 
 
 
