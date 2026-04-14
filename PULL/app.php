@@ -14,6 +14,7 @@ $aplicador=isset($_GET['aplicador1'])?$_GET['aplicador1']:"";
 $maquina=isset($_GET['maquina1'])?$_GET['maquina1']:"";
 $quien=isset($_GET['quien1'])?$_GET['quien1']:"";
 $trabajo=isset($_GET['trabajo1'])?$_GET['trabajo1']:"";
+try{
 if($aplicador !="No esta(preguntar y agregar)" or $aplicador != ""){
 $herra=mysqli_query($con,"SELECT * FROM mant_golpes_diarios WHERE terminal='$aplicador'");
 while($row=mysqli_fetch_array($herra)){
@@ -32,4 +33,8 @@ if( $maquina!="" and $quien!="" and $trabajo!=""){
     $con->close();
     header("Location: solicitar.php");
 
+}}
+catch(Exception $e){
+    echo $e->getMessage();
 }
+?>
