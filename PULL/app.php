@@ -23,12 +23,13 @@ $herra=mysqli_query($con,"SELECT * FROM mant_golpes_diarios WHERE terminal='$apl
 while($row=mysqli_fetch_array($herra)){
 $qry=$row['herramental'];
 }
+}
 $fecha=date("d-m-Y H:i");
 // Validación básica
 
 
 
-if( $maquina!="" and $quien!="" and $trabajo!=""){
+
    // Preparar consulta segura
 $stmt = $con->prepare("
     INSERT INTO registro_paro 
@@ -57,48 +58,10 @@ if ($stmt->execute()) {
     echo "Error al insertar: " . $stmt->error;
 }
 
-$stmt->close();
-$con->close();
-    header("Location: solicitar.php");
-}else if($aplicador !="No esta(preguntar y agregar)"){
-    
-  // Preparar consulta segura
-$stmt = $con->prepare("
-    INSERT INTO registro_paro 
-    (`fecha`, `equipo`, `nombreEquipo`, `dano`, `quien`, `area`, `atiende`) 
-    VALUES (?, 'Bancos para terminales', ?, ?, ?, ?, 'Nadie aun')
-");
-
-if (!$stmt) {
-    die("Error al preparar la consulta: " . $con->error);
-}
-
-// Concatenar $qry y $aplicador de forma segura
-$nombreEquipo =  $aplicador;
-
-// Vincular parámetros (s = string)
-$stmt->bind_param("sssss", $fecha, $nombreEquipo, $trabajo, $quien, $maquina);
-
-// Ejecutar y verificar
-if ($stmt->execute()) {
-    // Cerrar y redirigir
-    $stmt->close();
-    $con->close();
-    header("Location: solicitar.php");
-    exit;
-} else {
-    echo "Error al insertar: " . $stmt->error;
-}
-
-$stmt->close();
-$con->close();
-    header("Location: solicitar.php");
-
-}
 
 
 
-}
+
 
 
 
