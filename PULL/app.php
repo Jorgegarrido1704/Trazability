@@ -4,9 +4,12 @@ $user = "pcadmin";
 $clave = "SupAdmin1212";
 $db_name = "trazabilidad";
 
-$con = mysqli_connect($host, $user, $clave, $db_name);
-if (mysqli_connect_errno()) {
-    die("Failed to connect with MySQL: " . mysqli_connect_error());
+$con = new mysqli($host, $user, $clave, $db_name);
+
+if (!$con->connect_error) {
+    echo "Conexión exitosa";
+} else {
+    die("Error en la conexión: " . $con->connect_error);
 }
 date_default_timezone_set('America/Mexico_City');
 
