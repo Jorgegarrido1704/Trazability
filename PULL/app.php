@@ -1,11 +1,11 @@
 <?php 
-$host = "localhost";
-$user = "pcadmin";
-$clave = "SupAdmin1212";
+$host = "127.0.0.1";
+$user = "root";
+$clave = "";
 $db_name = "trazabilidad";
 
 // 1. Conexión
-$con = mysqli_connect($host, $user, $clave, $db_name);
+$con = new mysqli($host, $user, $clave, $db_name);
 
 if ($con->connect_error) {
     die("Error en la conexión: " . $con->connect_error);
