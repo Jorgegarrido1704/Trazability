@@ -4,70 +4,68 @@ $user = "pcadmin";
 $clave = "SupAdmin1212";
 $db_name = "trazabilidad";
 
+// 1. Conexión
 $con = new mysqli($host, $user, $clave, $db_name);
 
-if (!$con->connect_error) {
-    echo "Conexión exitosa";
-} else {
-    die("Error en la conexión: " . $con->connect_error);
+if ($con->connect_error) {
+    die("Error en la conexión: " . $con->connect_error);
 }
+
 date_default_timezone_set('America/Mexico_City');
 
-$aplicador=isset($_GET['aplicador1'])?$_GET['aplicador1']:"";
-$maquina=isset($_GET['maquina1'])?$_GET['maquina1']:"";
-$quien=isset($_GET['quien1'])?$_GET['quien1']:"";
-$trabajo=isset($_GET['trabajo1'])?$_GET['trabajo1']:"";
+// 2. Inicializar variables
+$aplicador = isset($_GET['aplicador1']) ? $_GET['aplicador1'] : "";
+$maquina   = isset($_GET['maquina1'])   ? $_GET['maquina1']   : "";
+$quien     = isset($_GET['quien1'])     ? $_GET['quien1']     : "";
+$trabajo   = isset($_GET['trabajo1'])   ? $_GET['trabajo1']   : "";
+$qry       = ""; // Valor por defecto para evitar que la variable no exista
 
-if($aplicador !="No esta(preguntar y agregar)" or $aplicador != ""){
-$herra=mysqli_query($con,"SELECT * FROM mant_golpes_diarios WHERE terminal='$aplicador'");
-while($row=mysqli_fetch_array($herra)){
-$qry=$row['herramental'];
-}
-}
-$fecha=date("d-m-Y H:i");
-// Validación básica
-
-
-try{
-
-   // Preparar consulta segura
-$stmt = $con->prepare("
-    INSERT INTO registro_paro 
-    (`fecha`, `equipo`, `nombreEquipo`, `dano`, `quien`, `area`, `atiende`) 
-    VALUES (?, 'Bancos para terminales', ?, ?, ?, ?, 'Nadie aun')
-");
-
-if (!$stmt) {
-    die("Error al preparar la consulta: " . $con->error);
+// 3. Lógica de búsqueda (Corregida con AND)
+if ($aplicador != "No esta(preguntar y agregar)" && $aplicador != "") {
+    // Usar Sentencias Preparadas también aquí es más seguro
+    $stmt_search = $con->prepare("SELECT herramental FROM mant_golpes_diarios WHERE terminal = ?");
+    $stmt_search->bind_param("s", $aplicador);
+    $stmt_search->execute();
+    $result = $stmt_search->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        $qry = $row['herramental'];
+    }
+    $stmt_search->close();
 }
 
-// Concatenar $qry y $aplicador de forma segura
-$nombreEquipo = $qry . '/' . $aplicador;
+// 4. Formato de fecha correcto para MySQL
+$fecha = date("Y-m-d H:i:s");
 
-// Vincular parámetros (s = string)
-$stmt->bind_param("sssss", $fecha, $nombreEquipo, $trabajo, $quien, $maquina);
+try {
+    // Preparar consulta de inserción
+    $stmt = $con->prepare("
+        INSERT INTO registro_paro 
+        (`fecha`, `equipo`, `nombreEquipo`, `dano`, `quien`, `area`, `atiende`) 
+        VALUES (?, 'Bancos para terminales', ?, ?, ?, ?, 'Nadie aun')
+    ");
 
-// Ejecutar y verificar
-if ($stmt->execute()) {
-    // Cerrar y redirigir
-    $stmt->close();
-    $con->close();
-    header("Location: solicitar.php");
-    exit;
-} else {
-    echo "Error al insertar: " . $stmt->error;
+    if (!$stmt) {
+        throw new Exception("Error al preparar: " . $con->error);
+    }
+
+    // Concatenar nombre de equipo
+    $nombreEquipo = $qry . ' / ' . $aplicador;
+
+    // Vincular parámetros
+    $stmt->bind_param("sssss", $fecha, $nombreEquipo, $trabajo, $quien, $maquina);
+
+    if ($stmt->execute()) {
+        $stmt->close();
+        $con->close();
+        // Redirigir
+        header("Location: solicitar.php");
+        exit;
+    } else {
+        echo "Error al insertar: " . $stmt->error;
+    }
+
+} catch (Exception $e) {
+    echo "Error de ejecución: " . $e->getMessage();
 }
-
-}
-catch(Exception $e){
-    echo "Error: " . $e->getMessage();
-}
-
-
-
-
-
-
-
-
-
+?>
