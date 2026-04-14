@@ -5,7 +5,7 @@ $clave = "SupAdmin1212";
 $db_name = "trazabilidad";
 
 // 1. Conexión
-$con = new mysqli($host, $user, $clave, $db_name);
+$con = mysqli_connect($host, $user, $clave, $db_name);
 
 if ($con->connect_error) {
     die("Error en la conexión: " . $con->connect_error);
