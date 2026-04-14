@@ -22,9 +22,7 @@ $qry=$row['herramental'];
 }
 $fecha=date("d-m-Y H:i");
 // Validación básica
-if (!$fecha || !$qry || !$aplicador || !$trabajo || !$quien || !$maquina) {
-    die("Datos incompletos.");
-}
+
 
 
 if( $maquina!="" and $quien!="" and $trabajo!=""){
