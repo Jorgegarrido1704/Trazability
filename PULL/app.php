@@ -42,7 +42,7 @@ try {
     $stmt = $con->prepare("
         INSERT INTO registro_paro 
         (`fecha`, `equipo`, `nombreEquipo`, `dano`, `quien`, `area`, `atiende`) 
-        VALUES (?, 'Bancos para terminales', ?, ?, ?, ?, 'Nadie aun')
+        VALUES (?, 'Bancos para terminales', ?, ?, ?, ?, '')
     ");
 
     if (!$stmt) {
