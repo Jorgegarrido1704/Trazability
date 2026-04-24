@@ -59,7 +59,7 @@ if (isset($_POST['upload'])) {
                 mysqli_commit($con);
                 echo "Carga completa. Total de filas procesadas: $rowCount";
                 fclose($handle);
-                header("location:../corte/busqueda.php");
+                header("location:../../corte/busqueda.php");
             } catch (Exception $e) {
                 echo 'Error: ' . $e->getMessage();
             }
