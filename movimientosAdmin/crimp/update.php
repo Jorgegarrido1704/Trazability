@@ -8,7 +8,7 @@ if (isset($_POST['upload'])) {
             // Conectar a la base de datos
             try {
                 // Preparar la consulta de inserción
-                $insertQuery = "INSERT INTO   `crimpers_tools`( `dateRegistered`, `startHour`, `endHour`, `toolingCrimperName`, `TerminalsUsed`, `minutesStop`, `reasonStop`, `observations`,) VALUES  (?,?, ?, ?, ? )";
+                $insertQuery = "INSERT INTO   `crimpers_tools`( `dateRegistered`, `startHour`, `endHour`, `toolingCrimperName`, `TerminalsUsed`, `minutesStop`, `reasonStop`, `observations`) VALUES  (?,?, ?, ?, ?, ?, ?, ?)";
                 $stmt = mysqli_prepare($con, $insertQuery);
 
                 if (!$stmt) {
@@ -19,7 +19,7 @@ if (isset($_POST['upload'])) {
                 $date =$sth=$endh = $tool = $qtyTerm = $min = $reason = $obs =  '';
 
                 // Vincular los parámetros
-                mysqli_stmt_bind_param($stmt, 'dttsssss', $date, $sth, $endh, $tool, $qtyTerm, $min, $reason, $obs);
+                mysqli_stmt_bind_param($stmt, 'ssssssss', $date, $sth, $endh, $tool, $qtyTerm, $min, $reason, $obs);
 
                 // Contador de filas procesadas
                 $rowCount = 0;
