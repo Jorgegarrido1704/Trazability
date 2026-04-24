@@ -126,6 +126,23 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
         </div>
     
     </div>
+    <div class="row">
+        <div class="col-lg-2 mb-4 border">
+            <h1>Agregar CrimpInformation</h1>
+            <form action="../movimientosAdmin/crimp/update.php.php" method="POST" >
+                <input type="file" name="csv_file" accept=".csv">
+                <br>
+                <button class="btn btn-primary">Agregar crimp Informacion</button>
+            </form>
+        </div>
+        <div class="col-lg-2 mb-4 border">
+            <h1>Eliminar PO</h1>
+            <form action="#" method="POST" >
+                <br>
+                <button class="btn btn-primary">Eliminar PO</button>
+            </form>
+        </div>
+    </div>
     <br>
 
     <?php
