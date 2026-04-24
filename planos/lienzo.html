@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Editor de Arneses - Master CAD (Excel, Escáner, Ruteo)</title>
+    <title>Editor de Arneses - Master CAD (Excel, Escáner, Ruteo, Cotas, Trenzados)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.5/joint.min.css">
     <style>
         body { font-family: sans-serif; margin: 0; padding: 20px; background: #e9ecef; }
@@ -27,15 +27,15 @@
         th, td { border: 1px solid #dee2e6; padding: 10px; text-align: left; font-size: 13px;}
         th { background: #e9ecef; color: #495057; }
         tr:nth-child(even) { background-color: #f8f9fa; }
-        .modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 100; width: 340px; max-height: 80vh; overflow-y: auto; }
+        .modal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 100; width: 380px; max-height: 80vh; overflow-y: auto; }
         .modal h3 { margin-top: 0; font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; position: sticky; top: 0; background: white; z-index: 2;}
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; font-weight: bold;}
         .form-group input, .form-group select { width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
         .cavity-container { background: #f8f9fa; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; border-left: 3px solid #007bff; }
-        .cavity-row { display: flex; align-items: center; margin-bottom: 8px; }
-        .cavity-row label { width: 65px; margin: 0; color: #d35400; font-size: 11px; }
-        .cavity-row input { flex: 1; }
+        .cavity-row { display: flex; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 5px;}
+        .cavity-row label { margin: 0; font-size: 11px; }
+        .cavity-row input[type="text"] { flex: 1; min-width: 60px;}
         .modal-actions { display: flex; justify-content: space-between; margin-top: 15px; position: sticky; bottom: -20px; background: white; padding: 10px 0; border-top: 1px solid #eee;}
         .btn-cancel { background: #6c757d; } .btn-cancel:hover { background: #5a6268; }
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 99; }
@@ -61,11 +61,12 @@
             <button class="btn-warning" id="btn-add-loom" title="Dibujar Manga (Click y arrastrar)">Dibujar Manga</button>
             <button class="btn-purple" id="btn-add-tie" title="Dibujar Cincho (Click y arrastrar)">Dibujar Cincho</button>
             <button class="btn-dark" id="btn-add-break">Punto de Quiebre</button>
-            <button class="btn-info" id="btn-add-cota" title="Dibujar Cota (Click y arrastrar)" style="background-color: #00bcd4; border: 1px solid #0097a7; color: white;">📏 Dibujar Cota</button>
             
             <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
 
-            <button class="btn-warning" id="btn-calcular-looms" style="background-color: #e67e22; color: white;">⚡ Calcular Looms y Diámetros</button>
+            <button class="btn-info" id="btn-add-cota" title="Dibujar Cota (Click y arrastrar)" style="background-color: #00bcd4; border: 1px solid #0097a7; color: white;">📏 Dibujar Cota</button>
+
+            <button class="btn-warning" id="btn-calcular-looms" style="background-color: #e67e22; color: white;">⚡ Calcular Looms</button>
 
             <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
             
@@ -76,11 +77,24 @@
             
             <button class="btn-success" id="btn-save-json">Guardar Proyecto</button>
             <input type="file" id="input-load-json" accept=".json" style="display:none;">
-            <button class="btn-info" onclick="document.getElementById('input-load-json').click()">Cargar Proyecto</button>
+            <button class="btn-info" onclick="document.getElementById('input-load-json').click()">Cargar</button>
             <button class="btn-danger" id="btn-clear-canvas">Limpiar</button>
-            <button class="btn-info" style="background-color: #00bcd4; color: white;" onclick="imprimirAEscala()">🖨️ Imprimir a Escala</button>
+
+            <button class="btn-info" style="background-color: #2c3e50; color: white;" onclick="imprimirAEscala()">🖨️ Imprimir a Escala</button>
             
             <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
+            <span style="border-left: 2px solid #ccc; margin: 0 5px; height: 30px;"></span>
+            <div id="capas-control" style="display: inline-flex; gap: 10px; font-size: 12px; background: #f8f9fa; padding: 5px 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <label><input type="checkbox" class="toggle-layer" data-type="Wire" checked> Cables</label>
+                <label><input type="checkbox" class="toggle-layer" data-type="Loom" checked> Mangas</label>
+                <label><input type="checkbox" class="toggle-layer" data-type="Tie" checked> Cinta/Cinchos</label>
+                <label><input type="checkbox" id="toggle-labels" checked> Etiquetas</label>
+            </div>
+            <div class="unit-switcher" style="background: #fff3cd; padding: 5px 12px; border: 1px solid #ffeeba; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; margin: 0 10px;">
+                Unidad:
+                <label><input type="radio" name="unit-toggle" value="mm" checked> mm</label>
+                <label><input type="radio" name="unit-toggle" value="in"> in</label>
+            </div>
             <strong>Zoom:</strong> <button id="btn-zoom-out">-</button> <span id="zoom-level">100%</span> <button id="btn-zoom-in">+</button>
         </div>
         <div id="lienzo-arnes"></div>
@@ -132,23 +146,144 @@
         </div>
         <div class="form-group"><label>Color:</label>
         <select id="cable-color">
-            <option value='YEBN'>YELLOW/BROWN</option><option value='YE'>YELLOW</option>
-            <option value='BNYE'>BROWN/YELLOW</option><option value='BNWH'>BROWN/WHITE</option><option value='BNGN'>BROWN/GREEN</option>
-            <option value='YEBK'>YELLOW/BLACK</option><option value='YERD'>YELLOW/RED</option><option value='VTWH'>VIOLET/WHITE</option>
-            <option value='VTDG'>VIOLET/DARK GREEN</option><option value='VT'>VIOLET</option><option value='RDOG'>RED/ORANGE</option>
-            <option value='RDDB'>RED/DARK BLUE</option><option value='RDBK'>RED/BLACK</option><option value='RD'>RED</option>
-            <option value='GYLB'>GREY/LIGHT BLUE</option><option value='GYDG'>GREY/DARK GREEN</option><option value='GYBN'>GREY/BROWN</option>
-            <option value='DG'>DARK GREEN</option><option value='DB'>DARK BLUE</option><option value='BU'>BLUE</option>
-            <option value="GN">GREEN</option><option value='GNWH'>GREEN/WHITE</option><option value='GNDG'>GREEN/DARK GREEN</option><option value='GNYE'>GREEN/YELLOW</option> 
-            <option value="GR">GRAY</option><option value='GRWH'>GRAY/WHITE</option><option value='GRBN'>GRAY/BROWN</option><option value='GRGN'>GRAY/GREEN</option><option value='GRDB'>GRAY/DARK BLUE</option><option value="GRBK">GRAY/BLACK</option>
-            <option value='BNYE'>BROWN/YELLOW</option><option value='BNWH'>BROWN/WHITE</option><option value='BNGN'>BROWN/GREEN</option>
-            <option value='BNDB'>BROWN/DARK BLUE</option><option value='BN'>BROWN</option><option value='BKWH'>BLACK/WHITE</option>
-            <option value='BKDG'>BLACK/DARK GREEN</option><option value='BKBN'>BLACK/BROWN</option><option value='BK'>BLACK</option>
-            <option value='WHT'>WHITE</option><option value='CLR'>CLEAR</option><option value='ORG'>ORANGE</option><option value='PNK'>PINK</option><option value='TAN'>TAN</option><option value='LGTBLU'>LIGHT BLUE</option>
-        </select>
+    <optgroup label="Sólidos Base">
+        <option value='BK'>BLACK (BK)</option>
+        <option value='WH'>WHITE (WH)</option>
+        <option value='RD'>RED (RD)</option>
+        <option value='BL'>BLUE (BL)</option>
+        <option value='GN'>GREEN (GN)</option>
+        <option value='YE'>YELLOW (YE)</option>
+        <option value='BN'>BROWN (BN)</option>
+        <option value='GR'>GRAY (GR)</option>
+        <option value='OR'>ORANGE (OR)</option>
+        <option value='VT'>VIOLET (VT)</option>
+        <option value='PK'>PINK (PK)</option>
+        <option value='TN'>TAN (TN)</option>
+        <option value='LB'>LIGHT BLUE (LB)</option>
+        <option value='LG'>LIGHT GREEN (LG)</option>
+        <option value='DG'>DARK GREEN (DG)</option>
+        <option value='DB'>DARK BLUE (DB)</option>
+    </optgroup>
+
+    <optgroup label="Base Light Green">
+        <option value='LGBK'>LIGHT GREEN/BLACK (LG/BK)</option>
+        <option value='LGWH'>LIGHT GREEN/WHITE (LG/WH)</option>
+        <option value='LGRD'>LIGHT GREEN/RED (LG/RD)</option>
+        <option value='LGBL'>LIGHT GREEN/BLUE (LG/BL)</option>
+        <option value='LGYE'>LIGHT GREEN/YELLOW (LG/YE)</option>
+        <option value='LGOR'>LIGHT GREEN/ORANGE (LG/OR)</option>
+    </optgroup>
+
+    <optgroup label="Base Violeta">
+        <option value='VTBK'>VIOLET/BLACK (VT/BK)</option>
+        <option value='VTWH'>VIOLET/WHITE (VT/WH)</option>
+        <option value='VTRD'>VIOLET/RED (VT/RD)</option>
+        <option value='VTBL'>VIOLET/BLUE (VT/BL)</option>
+        <option value='VTYE'>VIOLET/YELLOW (VT/YE)</option>
+        <option value='VTOR'>VIOLET/ORANGE (VT/OR)</option>
+        <option value='VTGN'>VIOLET/GREEN (VT/GN)</option>
+        <option value='VTBN'>VIOLET/BROWN (VT/BN)</option>
+    </optgroup>
+
+    <optgroup label="Base Negro">
+        <option value='BKWH'>BLACK/WHITE (BK/WH)</option>
+        <option value='BKRD'>BLACK/RED (BK/RD)</option>
+        <option value='BKBL'>BLACK/BLUE (BK/BL)</option>
+        <option value='BKGN'>BLACK/GREEN (BK/GN)</option>
+        <option value='BKYE'>BLACK/YELLOW (BK/YE)</option>
+        <option value='BKOR'>BLACK/ORANGE (BK/OR)</option>
+        <option value='BKVT'>BLACK/VIOLET (BK/VT)</option>
+        <option value='BKGR'>BLACK/GRAY (BK/GR)</option>
+    </optgroup>
+
+    <optgroup label="Base Blanco">
+        <option value='WHBK'>WHITE/BLACK (WH/BK)</option>
+        <option value='WHRD'>WHITE/RED (WH/RD)</option>
+        <option value='WHBL'>WHITE/BLUE (WH/BL)</option>
+        <option value='WHGN'>WHITE/GREEN (WH/GN)</option>
+        <option value='WHYE'>WHITE/YELLOW (WH/YE)</option>
+        <option value='WHOR'>WHITE/ORANGE (WH/OR)</option>
+        <option value='WHVT'>WHITE/VIOLET (WH/VT)</option>
+        <option value='WHBN'>WHITE/BROWN (WH/BN)</option>
+    </optgroup>
+
+    <optgroup label="Base Azul / Celeste">
+        <option value='BLBK'>BLUE/BLACK (BL/BK)</option>
+        <option value='BLWH'>BLUE/WHITE (BL/WH)</option>
+        <option value='BLRD'>BLUE/RED (BL/RD)</option>
+        <option value='BLYE'>BLUE/YELLOW (BL/YE)</option>
+        <option value='BLGN'>BLUE/GREEN (BL/GN)</option>
+        <option value='BLOR'>BLUE/ORANGE (BL/OR)</option>
+        <option value='LBBK'>LIGHT BLUE/BLACK (LB/BK)</option>
+        <option value='LBWH'>LIGHT BLUE/WHITE (LB/WH)</option>
+        <option value='LBRD'>LIGHT BLUE/RED (LB/RD)</option>
+        <option value='DBWH'>DARK BLUE/WHITE (DB/WH)</option>
+    </optgroup>
+
+    <optgroup label="Base Verde / Verde Oscuro">
+        <option value='GNBK'>GREEN/BLACK (GN/BK)</option>
+        <option value='GNWH'>GREEN/WHITE (GN/WH)</option>
+        <option value='GNRD'>GREEN/RED (GN/RD)</option>
+        <option value='GNYE'>GREEN/YELLOW (GN/YE)</option>
+        <option value='GNOR'>GREEN/ORANGE (GN/OR)</option>
+        <option value='DGBK'>DARK GREEN/BLACK (DG/BK)</option>
+        <option value='DGWH'>DARK GREEN/WHITE (DG/WH)</option>
+        <option value='DGYE'>DARK GREEN/YELLOW (DG/YE)</option>
+    </optgroup>
+
+    <optgroup label="Base Amarillo">
+        <option value='YEBK'>YELLOW/BLACK (YE/BK)</option>
+        <option value='YEWH'>YELLOW/WHITE (YE/WH)</option>
+        <option value='YERD'>YELLOW/RED (YE/RD)</option>
+        <option value='YEBL'>YELLOW/BLUE (YE/BL)</option>
+        <option value='YEGN'>YELLOW/GREEN (YE/GN)</option>
+        <option value='YEOR'>YELLOW/ORANGE (YE/OR)</option>
+        <option value='YEBN'>YELLOW/BROWN (YE/BN)</option>
+    </optgroup>
+    <optgroup label="Base Rojo">
+        <option value='RDBK'>RED/BLACK (RD/BK)</option>
+        <option value='RDWH'>RED/WHITE (RD/WH)</option>
+        <option value='RDRD'>RED/RED (RD/RD)</option>
+        <option value='RDBL'>RED/BLUE (RD/BL)</option>
+        <option value='RDGN'>RED/GREEN (RD/GN)</option>
+        <option value='RDOR'>RED/ORANGE (RD/OR)</option>
+        <option value='RDBN'>RED/BROWN (RD/BN)</option>
+    </optgroup>
+
+    <optgroup label="Base Naranja">
+        <option value='ORBK'>ORANGE/BLACK (OR/BK)</option>
+        <option value='ORWH'>ORANGE/WHITE (OR/WH)</option>
+        <option value='ORRD'>ORANGE/RED (OR/RD)</option>
+        <option value='ORBL'>ORANGE/BLUE (OR/BL)</option>
+        <option value='ORGN'>ORANGE/GREEN (OR/GN)</option>
+    </optgroup>
+
+    <optgroup label="Otros Colores">
+        <option value='BNBK'>BROWN/BLACK (BN/BK)</option>
+        <option value='BNWH'>BROWN/WHITE (BN/WH)</option>
+        <option value='BNYE'>BROWN/YELLOW (BN/YE)</option>
+        <option value='GRBK'>GRAY/BLACK (GR/BK)</option>
+        <option value='GRWH'>GRAY/WHITE (GR/WH)</option>
+        <option value='GRRD'>GRAY/RED (GR/RD)</option>
+        <option value='PKBK'>PINK/BLACK (PK/BK)</option>
+        <option value='PKWH'>PINK/WHITE (PK/WH)</option>
+    </optgroup>
+</select>
         </div>
-        <div class="form-group"><label>Longitud (mm) - Ej. 150+100+50:</label><input type="text" id="cable-longitud" value="0"></div>
+        <div class="form-group"><label>Longitud base (MM or IN) Ej. 150+100:</label><input type="text" id="cable-longitud" value="0"></div>
+        <div class="form-group" style="background:#fff3cd; padding:8px; border-left:3px solid #ffc107;">
+            <label style="color:#856404; font-weight:bold;">Grupo Trenzado (Ej. T1, TR-1):</label>
+            <input type="text" id="cable-trenzado" placeholder="Dejar vacío si no es trenzado">
+            <p style="font-size: 10px; margin:4px 0 0 0; color:#856404;">Agrega 8% de longitud extra al BOM y Lista de Corte.</p>
+        </div>
         <div class="modal-actions"><button class="btn-danger" id="btn-delete-cable">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cancelar</button><button class="btn-success" id="btn-save-cable">Guardar</button></div></div>
+    </div>
+
+    <div id="modal-cota" class="modal">
+        <h3 style="color: #0097a7;">Ajustar Medida (Cota)</h3>
+        <div class="form-group"><label>Longitud exacta (mm):</label><input type="number" id="cota-longitud" value="0" min="1"></div>
+        <p style="font-size: 11px; color: #666; margin-bottom: 10px;">* Al cambiar este valor, la flecha se estirará o encogerá automáticamente.</p>
+        <div class="modal-actions"><button class="btn-danger" id="btn-delete-cota">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cancelar</button><button class="btn-info" id="btn-save-cota" style="background-color: #00bcd4; color:white; font-weight:bold; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Ajustar</button></div></div>
     </div>
 
     <div id="modal-conector" class="modal">
@@ -203,14 +338,49 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <script>
+        let unidadActual = 'mm';
+
+                function convertirDistancia(valorMm, unidad) {
+                    if (unidad === 'in') return (valorMm / 25.4).toFixed(3);
+                    return Math.round(valorMm);
+                }
+
+                // Escuchador para el cambio de unidad
+                $(document).on('change', 'input[name="unit-toggle"]', function() {
+                    unidadActual = $(this).val();
+                    actualizarVisualizacionUnidades();
+                });
+
+                function actualizarVisualizacionUnidades() {
+                    // Actualiza etiquetas de cables y cotas
+                    graph.getLinks().forEach(link => {
+                        const data = link.get('bomData');
+                        if (!data) return;
+
+                        if (data.type === 'Wire') {
+                            let len = convertirDistancia(data.length, unidadActual);
+                            let texto = `[${data.circuito}]\n${len}${unidadActual}\n${data.gage} AWG ${data.color}`;
+                            if (data.trenzado) texto += `\n(T: ${data.trenzado})`;
+                            link.label(0, { attrs: { text: { text: texto } } });
+                        } 
+                        else if (data.type === 'Cota') {
+                            const source = link.get('source'); 
+                            const target = link.get('target');
+                            if(source.x !== undefined && target.x !== undefined) {
+                                const mm = Math.sqrt(Math.pow(target.x - source.x, 2) + Math.pow(target.y - source.y, 2));
+                                link.label(0, { attrs: { text: { text: `${convertirDistancia(mm, unidadActual)} ${unidadActual}` } } });
+                            }
+                        }
+                    });
+                    // Si tienes activa la función de escaneo de looms, la llamamos aquí
+                    if(typeof actualizarEscaneoLooms === "function") actualizarEscaneoLooms();
+                }
         // ==========================================
         // 1. CONFIGURACIÓN BASE Y PESTAÑAS
         // ==========================================
         function abrirTab(idTab, btn) { 
             $('.tab-content').removeClass('active'); $('.tab-btn').removeClass('active'); 
             $('#tab-' + idTab).addClass('active'); $(btn).addClass('active'); 
-            
-            // Hemos quitado las llamadas automáticas aquí para evitar lentitud
         }
         
         function evaluarMatematica(expresion) { try { let expLimpia = String(expresion).replace(/[^0-9\+\-\.\s]/g, ''); if(expLimpia.trim() === '') return 0; return Function('"use strict";return (' + expLimpia + ')')(); } catch (e) { return 0; } }
@@ -239,15 +409,19 @@
             const c = colorCode.toUpperCase();
             if(c.includes('BK') || c.includes('BLK') || c.includes('BLACK')) return '#212121';
             if(c.includes('RD') || c.includes('RED')) return '#e74c3c';
-            if(c.includes('BU') || c.includes('BLU')) return '#3498db';
-            if(c.includes('YE') || c.includes('YEL')) return '#f1c40f';
-            if(c.includes('GN') || c.includes('GRN')) return '#2ecc71';
-            if(c.includes('VT') || c.includes('VIO') || c.includes('PUR')) return '#9b59b6';
+            if(c.includes('BU') || c.includes('BLU') || c.includes('BE') || c.includes('BLUE')) return '#3498db';
+            if(c.includes('YE') || c.includes('YEL') || c.includes('YELLOW') || c.includes('YL')) return '#f1c40f';
+            if(c.includes('GN') || c.includes('GRN') || c.includes('GREEN')) return '#2ecc71';
+            if(c.includes('VT') || c.includes('VIO') || c.includes('PUR') || c.includes('PR')) return '#9b59b6';
             if(c.includes('BN') || c.includes('BRN')) return '#8d6e63';
             if(c.includes('GR') || c.includes('GRY')) return '#95a5a6';
-            if(c.includes('WH') || c.includes('WHT')) return '#bdc3c7'; 
-            if(c.includes('ORG')) return '#e67e22';
-            if(c.includes('PNK')) return '#ff9ff3';
+            if(c.includes('WH') || c.includes('WHT') || c.includes('WHITE')|| c.includes('WT')) return '#bdc3c7'; 
+            if(c.includes('ORG') || c.includes('ORANGE') || c.includes('OR') || c.includes('OE')) return '#e67e22';
+            if(c.includes('PNK') || c.includes('PINK') || c.includes('PK')) return '#ff9ff3';
+            if(c.includes('TAN') || c.includes('TN')) return '#EDE8D0';
+            if(c.includes('LB') || c.includes('LTBL') || c.includes('LIGHT BLUE') || c.includes('LIGHT BE') || c.includes('LT BE')) return '#5DADE2';
+            if(c.includes('LG') || c.includes('LTGN') || c.includes('LIGHT GREEN') || c.includes('LT GN')|| c.includes('LT GRN')) return '#58D68D';
+            if(c.includes('DG') || c.includes('DARK GREEN')) return '#27ae60';
             return '#34495e'; 
         }
 
@@ -264,7 +438,7 @@
             let pines = []; let terminalesIniciales = {}; 
             for(let i = 1; i <= numVias; i++) { 
                 pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); 
-                terminalesIniciales[`via-${i}`] = { pn: '41412', sello: '', soldadura: false }; 
+                terminalesIniciales[`via-${i}`] = { pn: '', sello: '', soldadura: false, manga: false }; 
             }
             let cnf = getConfigConector(orientacion, numVias);
             const rect = new joint.shapes.standard.Rectangle({ position: { x: x, y: y }, size: { width: cnf.width, height: cnf.height }, attrs: { body: { fill: '#3498db', rx: 5, ry: 5, stroke: '#2980b9', strokeWidth: 2 }, label: { text: `${descripcion}\nPN: ${partNumber}`, fill: 'white', fontWeight: 'bold', fontSize: 12, refY: cnf.labelRefY, refX: '50%' } }, ports: { groups: { 'cavidades': { position: orientacion, attrs: { circle: { r: 7, magnet: true, fill: '#f1c40f', stroke: '#d35400', strokeWidth: 2 }, text: { fill: '#ffffff', fontSize: 11, fontWeight: 'bold' } }, label: { position: cnf.portLabelPos } } }, items: pines } });
@@ -307,41 +481,46 @@
             const circle = new joint.shapes.standard.Circle({ position: { x: x, y: y }, size: { width: 20, height: 20 }, attrs: { body: { fill: '#34495e', stroke: '#000000', strokeWidth: 3, strokeDasharray: '4,2' }, label: { text: 'BP', fill: '#ffffff', fontSize: 9, fontWeight: 'bold' } } });
             circle.set('bomData', { type: 'BreakPoint', orientacion: 'horizontal', description: 'Tape-25', qty: 6, unit: 'inches' }); circle.addTo(graph); circle.toBack(); return circle;
         }
+
         function crearCotaDimensional(x1, y1, x2, y2) {
-    // Creamos un link especial que no se conecta a nada, solo flota en el lienzo
-    const link = new joint.shapes.standard.Link({
-        source: { x: x1, y: y1 },
-        target: { x: x2, y: y2 },
-        attrs: {
-            line: {
-                stroke: '#16a085', // Color verde azulado
-                strokeWidth: 1.5,
-                // Agregamos flechas en AMBOS extremos
-                targetMarker: { type: 'path', d: 'M 10 -5 0 0 10 5 Z', fill: '#16a085' },
-                sourceMarker: { type: 'path', d: 'M 10 -5 0 0 10 5 Z', fill: '#16a085', transform: 'rotate(180)' }
+                const link = new joint.shapes.standard.Link({
+                    source: { x: x1, y: y1 },
+                    target: { x: x2, y: y2 },
+                    attrs: {
+                        line: {
+                            stroke: '#16a085', strokeWidth: 1.5,
+                            targetMarker: { type: 'path', d: 'M 10 -5 0 0 10 5 Z', fill: '#16a085' },
+                            sourceMarker: { type: 'path', d: 'M 10 -5 0 0 10 5 Z', fill: '#16a085', transform: 'rotate(180)' }
+                        }
+                    }
+                });
+
+                const dx = x2 - x1; 
+                const dy = y2 - y1;
+                const longitudMm = Math.sqrt(dx*dx + dy*dy); // No redondeamos aquí para mantener precisión
+
+                // AJUSTE: Usamos la función de conversión y la unidad actual
+                let valorMostrado = convertirDistancia(longitudMm, unidadActual);
+
+                link.appendLabel({
+                    attrs: {
+                        text: { 
+                            text: `${valorMostrado} ${unidadActual}`, // Muestra mm o in dinámicamente
+                            fill: '#16a085', 
+                            fontSize: 11, 
+                            fontWeight: 'bold' 
+                        },
+                        rect: { fill: '#ffffff', stroke: '#16a085', strokeWidth: 1, rx: 3, ry: 3, padding: 4 }
+                    },
+                    position: { distance: 0.5 }
+                });
+
+                link.set('bomData', { type: 'Cota' }); 
+                link.addTo(graph); 
+                link.toBack(); 
+                return link;
             }
-        }
-    });
-    
-    // Calculamos la distancia inicial
-    const dx = x2 - x1; const dy = y2 - y1;
-    const longitudMm = Math.round(Math.sqrt(dx*dx + dy*dy));
-    
-    // Le pegamos una etiqueta con la medida en el centro
-    link.appendLabel({
-        attrs: {
-            text: { text: `${longitudMm} mm`, fill: '#16a085', fontSize: 11, fontWeight: 'bold' },
-            rect: { fill: '#ffffff', stroke: '#16a085', strokeWidth: 1, rx: 3, ry: 3, padding: 4 }
-        },
-        position: { distance: 0.5 }
-    });
-    
-    // Identificador para que el sistema sepa que no es un cable eléctrico
-    link.set('bomData', { type: 'Cota' }); 
-    link.addTo(graph);
-    link.toBack(); // Mandar al fondo para que no estorbe a los conectores
-    return link;
-}
+
         // ==========================================
         // 4. EVENTOS DEL RATÓN
         // ==========================================
@@ -349,6 +528,7 @@
 
         $('#btn-add-loom').click(() => { drawingState = { active: true, type: 'Loom', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
         $('#btn-add-tie').click(() => { drawingState = { active: true, type: 'Tie', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
+        $('#btn-add-cota').click(() => { drawingState = { active: true, type: 'Cota', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
 
         $('#btn-add-break').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearBreakPoint(300, 200); });
         $('#btn-add-connector').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearConector(50, 50, 'Conector A', '12064754', 4, 'right'); });
@@ -359,28 +539,43 @@
                 drawingState.startX = x; drawingState.startY = y;
                 if(drawingState.type === 'Loom') drawingState.shape = crearLoomDinamico(x, y, 1, 1);
                 else if(drawingState.type === 'Tie') drawingState.shape = crearTieDinamico(x, y, 1, 1);
+                else if(drawingState.type === 'Cota') drawingState.shape = crearCotaDimensional(x, y, x, y);
             }
         });
 
         paper.on('blank:pointermove', function(evt, x, y) {
             if (drawingState.active && drawingState.shape) {
-                let newX = Math.min(x, drawingState.startX); let newY = Math.min(y, drawingState.startY);
-                let newWidth = Math.max(Math.abs(x - drawingState.startX), 1); let newHeight = Math.max(Math.abs(y - drawingState.startY), 1);
-                drawingState.shape.position(newX, newY); drawingState.shape.resize(newWidth, newHeight);
+                if (drawingState.type === 'Cota') {
+                    drawingState.shape.target({ x: x, y: y });
+                    const dx = x - drawingState.startX; const dy = y - drawingState.startY;
+                    const dist = Math.round(Math.sqrt(dx*dx + dy*dy));
+                    drawingState.shape.label(0, { attrs: { text: { text: `${dist} mm` } } });
+                } else {
+                    let newX = Math.min(x, drawingState.startX); let newY = Math.min(y, drawingState.startY);
+                    let newWidth = Math.max(Math.abs(x - drawingState.startX), 1); let newHeight = Math.max(Math.abs(y - drawingState.startY), 1);
+                    drawingState.shape.position(newX, newY); drawingState.shape.resize(newWidth, newHeight);
+                }
             }
         });
 
         paper.on('blank:pointerup', function(evt, x, y) {
             if (drawingState.active && drawingState.shape) {
-                let bbox = drawingState.shape.getBBox(); let isLoom = drawingState.type === 'Loom';
-                if (bbox.width < 15 && bbox.height < 15) { drawingState.shape.resize(isLoom ? 200 : 15, isLoom ? 40 : 50); bbox = drawingState.shape.getBBox(); }
-                let d = drawingState.shape.get('bomData'); d.orientacion = bbox.width >= bbox.height ? 'horizontal' : 'vertical';
-                if(isLoom) { d.len = Math.round(bbox.width >= bbox.height ? bbox.width : bbox.height); d.wid = Math.round(bbox.width >= bbox.height ? bbox.height : bbox.width); }
-                drawingState.shape.set('bomData', d);
-                if(!isLoom) { drawingState.shape.attr('label/transform', d.orientacion === 'vertical' ? 'rotate(-90)' : 'rotate(0)'); }
+                let formaCreada = drawingState.shape;
+                
+                if (drawingState.type === 'Cota') {
+                    const dx = x - drawingState.startX; const dy = y - drawingState.startY;
+                    if (Math.sqrt(dx*dx + dy*dy) < 10) formaCreada.remove();
+                } else {
+                    let bbox = formaCreada.getBBox(); let isLoom = drawingState.type === 'Loom';
+                    if (bbox.width < 15 && bbox.height < 15) { formaCreada.resize(isLoom ? 200 : 15, isLoom ? 40 : 50); bbox = formaCreada.getBBox(); }
+                    let d = formaCreada.get('bomData'); d.orientacion = bbox.width >= bbox.height ? 'horizontal' : 'vertical';
+                    if(isLoom) { d.len = Math.round(bbox.width >= bbox.height ? bbox.width : bbox.height); d.wid = Math.round(bbox.width >= bbox.height ? bbox.height : bbox.width); }
+                    formaCreada.set('bomData', d);
+                    if(!isLoom) { formaCreada.attr('label/transform', d.orientacion === 'vertical' ? 'rotate(-90)' : 'rotate(0)'); }
+                    if(isLoom) abrirModalLoom(formaCreada); else abrirModalTie(formaCreada);
+                }
 
-                let formaCreada = drawingState.shape; drawingState.active = false; drawingState.shape = null; $('#lienzo-arnes').css('cursor', 'default');
-                if(isLoom) abrirModalLoom(formaCreada); else abrirModalTie(formaCreada);
+                drawingState.active = false; drawingState.shape = null; $('#lienzo-arnes').css('cursor', 'default');
             }
         });
 
@@ -403,10 +598,7 @@
         });
 
         $(window).on('mouseup', function() {
-            if (elementoRedimensionando) { 
-                // Actualización automática eliminada aquí
-                elementoRedimensionando = null; 
-            }
+            if (elementoRedimensionando) { elementoRedimensionando = null; }
             if (dragLabelState.active) dragLabelState.active = false;
         });
 
@@ -456,52 +648,137 @@
         });
 
         function procesarListaDeCorteExcel(datos) {
-            if (datos.length === 0) return alert("El archivo Excel está vacío.");
-            if(!confirm("Esto borrará el diseño actual. ¿Deseas continuar?")) return;
-            graph.clear(); contSplices = 1;
+    if (datos.length === 0) return alert("El archivo Excel está vacío.");
+    
+    // 1. Confirmación de limpieza
+    if (!confirm("Esto borrará el diseño actual. ¿Deseas continuar?")) return;
 
-            let conectoresMap = {}; 
-            datos.forEach(row => {
-                let orig = row['ORIGEN'] || row['DESTINO 1'] || row['FROM']; let dest = row['DESTINO'] || row['DESTINO 2'] || row['TO'];
-                let pinOrig = parseInt(row['PIN_ORIGEN'] || row['PIN 1'] || 1); let pinDest = parseInt(row['PIN_DESTINO'] || row['PIN 2'] || 1);
-                if(orig) { orig = String(orig).trim(); if(!conectoresMap[orig]) conectoresMap[orig] = { type: orig.startsWith('SP') ? 'Splice' : 'Connector', maxPin: 0 }; if(pinOrig > conectoresMap[orig].maxPin) conectoresMap[orig].maxPin = pinOrig; }
-                if(dest) { dest = String(dest).trim(); if(!conectoresMap[dest]) conectoresMap[dest] = { type: dest.startsWith('SP') ? 'Splice' : 'Connector', maxPin: 0 }; if(pinDest > conectoresMap[dest].maxPin) conectoresMap[dest].maxPin = pinDest; }
-            });
+    // 2. Preguntar unidad del archivo de origen
+    // Si el usuario acepta, se asume pulgadas (Factor 25.4). Si cancela, milímetros (Factor 1).
+    let archivoEnPulgadas = confirm("¿El archivo de Excel que está importando viene en PULGADAS?\n\n(Aceptar = Pulgadas, Cancelar = Milímetros)");
+    let factorConversion = archivoEnPulgadas ? 25.4 : 1;
 
-            let celdasCreadas = {}; let currentX = 100, currentY = 100;
-            Object.keys(conectoresMap).forEach((nombre, index) => {
-                let info = conectoresMap[nombre]; let orientacion = (index % 2 === 0) ? 'right' : 'left'; 
-                if(info.type === 'Splice') { celdasCreadas[nombre] = crearSplice(currentX, currentY + 50, nombre); } 
-                else { celdasCreadas[nombre] = crearConector(currentX, currentY, nombre, 'Importado', Math.max(info.maxPin, 2), orientacion); }
-                currentY += 250; if(currentY > 1200) { currentY = 100; currentX += 450; }
-            });
+    graph.clear(); 
+    contSplices = 1;
 
-            datos.forEach(row => {
-                let orig = String(row['ORIGEN'] || row['DESTINO 1'] || row['FROM']).trim(); let dest = String(row['DESTINO'] || row['DESTINO 2'] || row['TO']).trim();
-                let pinOrig = row['PIN_ORIGEN'] || row['PIN 1'] || 1; let pinDest = row['PIN_DESTINO'] || row['PIN 2'] || 1;
+    let conectoresMap = {}; 
+    
+    // 3. Mapeo preliminar de conectores y splices para determinar cavidades
+    datos.forEach(row => {
+        let orig = String(row['ORIGEN'] || row['DESTINO 1'] || row['FROM'] || '').trim(); 
+        let dest = String(row['DESTINO'] || row['DESTINO 2'] || row['TO'] || '').trim();
+        let pinOrig = parseInt(row['PIN_ORIGEN'] || row['PIN 1'] || 1); 
+        let pinDest = parseInt(row['PIN_DESTINO'] || row['PIN 2'] || 1);
 
-                if(orig && dest && celdasCreadas[orig] && celdasCreadas[dest]) {
-                    let sourceObj = { id: celdasCreadas[orig].id };
-                    if (conectoresMap[orig].type === 'Connector') sourceObj.port = `via-${pinOrig}`;
-
-                    let targetObj = { id: celdasCreadas[dest].id };
-                    if (conectoresMap[dest].type === 'Connector') targetObj.port = `via-${pinDest}`;
-                    const cal = String(row['CALIBRE'] || row['AWG'] || '18').trim();
-                    const tipo = row['TIPO'] || row['TIPO DE CABLE'] || 'TXL';
-                    const color = row['COLOR'] || 'BK';
-                    const longitud = row['LONGITUD'] || row['LONGITUD (MM)'] || 150;
-                    const circ = row['CIRCUITO'] || row['ESTAMPADO'] || 'S/N';
-                    const hexColor = getWireColorHex(color);
-
-                    const link = new joint.shapes.standard.Link({ source: sourceObj, target: targetObj, attrs: { line: { stroke: hexColor, strokeWidth: 3, strokeLinejoin: 'round', strokeLinecap: 'round' } }, router: { name: 'manhattan', args: {step: 10, padding: 20} }, connector: { name: 'rounded', args: { radius: 10 } } });
-                    link.appendLabel({ attrs: { text: { text: `[${circ}]\n${longitud}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5, cursor: 'move' } }, position: { distance: 0.5, offset: {x: 0, y: -20} } });
-                    link.set('bomData', { type: 'Wire', circuito: circ, insulation: tipo, gage: cal, color: color, length: parseInt(longitud)||150 });
-                    link.addTo(graph);
-                }
-            });
-            alert("¡Importación exitosa!");
+        if(orig) { 
+            if(!conectoresMap[orig]) conectoresMap[orig] = { type: orig.startsWith('SP') ? 'Splice' : 'Connector', maxPin: 0 }; 
+            if(pinOrig > conectoresMap[orig].maxPin) conectoresMap[orig].maxPin = pinOrig; 
         }
+        if(dest) { 
+            if(!conectoresMap[dest]) conectoresMap[dest] = { type: dest.startsWith('SP') ? 'Splice' : 'Connector', maxPin: 0 }; 
+            if(pinDest > conectoresMap[dest].maxPin) conectoresMap[dest].maxPin = pinDest; 
+        }
+    });
 
+    // 4. Creación física de los elementos en el lienzo
+    let celdasCreadas = {}; 
+    let currentX = 100, currentY = 100;
+    
+    Object.keys(conectoresMap).forEach((nombre, index) => {
+        let info = conectoresMap[nombre];
+        let orientacion = (index % 2 === 0) ? 'right' : 'left'; 
+        
+        if(info.type === 'Splice') { 
+            celdasCreadas[nombre] = crearSplice(currentX, currentY + 50, nombre); 
+        } else { 
+            celdasCreadas[nombre] = crearConector(currentX, currentY, nombre, 'Importado', Math.max(info.maxPin, 2), orientacion); 
+        }
+        
+        currentY += 250; 
+        if(currentY > 1200) { currentY = 100; currentX += 450; }
+    });
+
+    // 5. Creación de cables con conversión de longitud
+    datos.forEach(row => {
+        let orig = String(row['ORIGEN'] || row['DESTINO 1'] || row['FROM'] || '').trim(); 
+        let dest = String(row['DESTINO'] || row['DESTINO 2'] || row['TO'] || '').trim();
+        let pinOrig = row['PIN_ORIGEN'] || row['PIN 1'] || 1; 
+        let pinDest = row['PIN_DESTINO'] || row['PIN 2'] || 1;
+
+        if(orig && dest && celdasCreadas[orig] && celdasCreadas[dest]) {
+            let sourceObj = { id: celdasCreadas[orig].id };
+            if (conectoresMap[orig].type === 'Connector') sourceObj.port = `via-${pinOrig}`;
+
+            let targetObj = { id: celdasCreadas[dest].id };
+            if (conectoresMap[dest].type === 'Connector') targetObj.port = `via-${pinDest}`;
+
+            // --- PROCESAMIENTO DE LONGITUD ---
+            let longitudRaw = parseFloat(row['LONGITUD'] || row['LONGITUD (MM)'] || 0);
+            // Convertimos a milímetros para almacenamiento interno
+            let longitudMm = longitudRaw * factorConversion;
+
+            const cal = String(row['CALIBRE'] || row['AWG'] || '18').trim();
+            const tipo = row['TIPO'] || row['TIPO DE CABLE'] || 'TXL';
+            const color = row['COLOR'] || 'BK';
+            const circ = row['CIRCUITO'] || row['ESTAMPADO'] || 'S/N';
+            const hexColor = getWireColorHex(color);
+
+            const link = new joint.shapes.standard.Link({ 
+                source: sourceObj, 
+                target: targetObj, 
+                attrs: { 
+                    line: { 
+                        stroke: hexColor, 
+                        strokeWidth: 3, 
+                        strokeLinejoin: 'round', 
+                        strokeLinecap: 'round' 
+                    } 
+                },
+                router: { name: 'manhattan', args: { step: 10, padding: 20 } },
+                connector: { name: 'rounded', args: { radius: 10 } }
+            });
+
+            // Guardar datos en mm (Base estándar del sistema)
+            link.set('bomData', { 
+                type: 'Wire', 
+                circuito: circ, 
+                insulation: tipo, 
+                gage: cal, 
+                color: color, 
+                length: longitudMm, 
+                trenzado: '' 
+            });
+
+            // Generar etiqueta visual basada en la unidad seleccionada actualmente en el switch
+            let valorVisual = convertirDistancia(longitudMm, unidadActual);
+            
+            link.appendLabel({ 
+                attrs: { 
+                    text: { 
+                        text: `[${circ}]\n${valorVisual}${unidadActual}\n${cal} AWG ${tipo} ${color}`, 
+                        fill: '#2c3e50', 
+                        fontSize: 11, 
+                        fontWeight: 'bold' 
+                    }, 
+                    rect: { 
+                        fill: '#ecf0f1', 
+                        stroke: '#bdc3c7', 
+                        strokeWidth: 1, 
+                        rx: 3, 
+                        ry: 3, 
+                        padding: 5, 
+                        cursor: 'move' 
+                    } 
+                }, 
+                position: { distance: 0.5, offset: { x: 0, y: -20 } } 
+            });
+
+            link.addTo(graph);
+        }
+    });
+
+    alert("¡Importación exitosa!\nLos datos se han procesado y convertido a milímetros para el diseño.");
+}
         // ==========================================
         // 6. LÓGICA DE MODALES Y GUARDADO
         // ==========================================
@@ -511,31 +788,32 @@
             let html = ''; 
             for(let i = 1; i <= vias; i++) { 
                 let idVia = `via-${i}`; 
-                
-                // Inicializar datos de manera segura
-                let tData = terminalesTemp[idVia] || { pn: '', sello: '', soldadura: false }; 
-                
-                // Compatibilidad hacia atrás
-                if(typeof tData === 'string') tData = { pn: tData, sello: '', soldadura: false }; 
+                let tData = terminalesTemp[idVia] || { pn: '', sello: '', soldadura: false, manga: false }; 
+                if(typeof tData === 'string') tData = { pn: tData, sello: '', soldadura: false, manga: false }; 
                 if(tData.extra !== undefined) {
                     tData.sello = tData.extra.toLowerCase().includes('soldadura') ? '' : tData.extra;
                     tData.soldadura = tData.extra.toLowerCase().includes('soldadura');
                     delete tData.extra;
                 }
-
-                let checked = tData.soldadura ? 'checked' : '';
+                
+                let checkedSoldadura = tData.soldadura ? 'checked' : '';
+                let checkedManga = tData.manga ? 'checked' : '';
 
                 html += `
                 <div class="cavity-container">
                     <div class="cavity-row">
-                        <label>Vía ${i}:</label>
-                        <input type="text" class="input-terminal" data-via="${idVia}" value="${tData.pn}" placeholder="Part No. de Terminal">
+                        <label style="width: 45px;">Vía ${i}:</label>
+                        <input type="text" class="input-terminal" data-via="${idVia}" value="${tData.pn}" placeholder="Part No. Terminal">
                     </div>
-                    <div class="cavity-row" style="display: flex; gap: 5px; align-items: center;">
-                        <label style="color:#28a745; width: auto; margin:0;">Sello:</label>
-                        <input type="text" class="input-sello" data-via="${idVia}" value="${tData.sello || ''}" placeholder="PN Sello" style="flex:1;">
-                        <label style="color:#dc3545; width: auto; margin:0 0 0 10px;">Soldar:</label>
-                        <input type="checkbox" class="check-soldadura" data-via="${idVia}" ${checked} style="width: auto;">
+                    <div class="cavity-row">
+                        <label style="color:#28a745; width: 35px;">Sello:</label>
+                        <input type="text" class="input-sello" data-via="${idVia}" value="${tData.sello || ''}" placeholder="PN Sello">
+                        
+                        <label style="color:#dc3545; width: auto; margin-left: 5px;">Soldar:</label>
+                        <input type="checkbox" class="check-soldadura" data-via="${idVia}" ${checkedSoldadura} style="width: auto;">
+                        
+                        <label style="color:#8e44ad; width: auto; margin-left: 5px;">Manga (1.5"):</label>
+                        <input type="checkbox" class="check-manga" data-via="${idVia}" ${checkedManga} style="width: auto;">
                     </div>
                 </div>`; 
             } 
@@ -548,14 +826,32 @@
                 let via = $(this).data('via');
                 terminalesTemp[via] = { 
                     pn: $(this).val(), 
-                    sello: $(`.input-sello[data-via="${via}"]`).val(),
-                    soldadura: $(`.check-soldadura[data-via="${via}"]`).is(':checked')
+                    sello: $(`.input-sello[data-via="${via}"]`).val(), 
+                    soldadura: $(`.check-soldadura[data-via="${via}"]`).is(':checked'),
+                    manga: $(`.check-manga[data-via="${via}"]`).is(':checked')
                 };
             }); 
             renderizarInputsTerminales(nuevasVias); 
         });
         
-        function abrirModalCable(link) { enlaceActual = link; const d = link.get('bomData'); if(d) { $('#cable-circuito').val(d.circuito || ''); $('#cable-tipo').val(d.insulation); $('#cable-calibre').val(d.gage); $('#cable-color').val(d.color); $('#cable-longitud').val(d.length); } else { $('#cable-circuito').val(''); $('#cable-longitud').val('150'); } $('#overlay, #modal-cable').show(); }
+        function abrirModalCable(link) { 
+            enlaceActual = link; 
+            const d = link.get('bomData'); 
+            if(d) { 
+                $('#cable-circuito').val(d.circuito || ''); 
+                $('#cable-tipo').val(d.insulation); 
+                $('#cable-calibre').val(d.gage); 
+                $('#cable-color').val(d.color); 
+                $('#cable-longitud').val(d.length); 
+                $('#cable-trenzado').val(d.trenzado || '');
+            } else { 
+                $('#cable-circuito').val(''); 
+                $('#cable-longitud').val('150'); 
+                $('#cable-trenzado').val('');
+            } 
+            $('#overlay, #modal-cable').show(); 
+        }
+
         function abrirModalConector(element) { 
             nodoActual = element; const d = element.get('bomData'); 
             $('#conn-desc').val(d.description); $('#conn-pn').val(d.housingPartNumber); $('#conn-vias').val(d.cavities); $('#conn-orientacion').val(d.orientacion || 'right'); 
@@ -571,6 +867,19 @@
         }
         function abrirModalTie(element) { nodoActual = element; const d = element.get('bomData'); $('#tie-tipo').val(d.recubrimiento || 'cincho'); $('#tie-desc').val(d.description); $('#tie-qty').val(d.qty || 1); $('#tie-orientacion').val(d.orientacion); $('#overlay, #modal-tie').show(); }
         
+        function abrirModalCota(link) { 
+            enlaceActual = link; 
+            const source = link.get('source');
+            const target = link.get('target');
+            if(source.x !== undefined && target.x !== undefined) {
+                const dx = target.x - source.x; 
+                const dy = target.y - source.y;
+                const longitudMm = Math.round(Math.sqrt(dx*dx + dy*dy));
+                $('#cota-longitud').val(longitudMm); 
+            }
+            $('#overlay, #modal-cota').show(); 
+        }
+
         function cerrarModales() { $('#overlay, .modal').hide(); if (enlaceActual && !enlaceActual.get('bomData')) { enlaceActual.remove(); } enlaceActual = null; nodoActual = null; }
 
         $('#btn-delete-cable').click(() => { if(enlaceActual) { enlaceActual.remove(); } cerrarModales(); }); 
@@ -579,32 +888,69 @@
         $('#btn-delete-loom').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
         $('#btn-delete-tie').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
         $('#btn-delete-break').click(() => { if(nodoActual) { nodoActual.remove(); } cerrarModales(); });
+        $('#btn-delete-cota').click(() => { if(enlaceActual) { enlaceActual.remove(); } cerrarModales(); });
 
-        $('#btn-save-cable').click(() => { 
+      $('#btn-save-cable').click(() => {
+                if (enlaceActual) {
+                    let inputLog = $('#cable-longitud').val();
+                    let longitudIngresada = evaluarMatematica(inputLog); // Tu función de cálculo
+                    
+                    // --- CAMBIO AQUÍ: Convertir la entrada a milímetros si está en pulgadas ---
+                    let longitudMm = (unidadActual === 'in') ? (longitudIngresada * 25.4) : longitudIngresada;
+
+                    const data = {
+                        type: 'Wire',
+                        circuito: $('#cable-circuito').val() || 'S/N',
+                        length: longitudMm, // Guardamos siempre en mm
+                        gage: $('#cable-calibre').val(),
+                        color: $('#cable-color').val(),
+                        insulation: $('#cable-tipo').val(),
+                        trenzado: $('#cable-trenzado').val()
+                    };
+                    
+                    enlaceActual.set('bomData', data);
+                    
+                    // Actualizar la etiqueta visual inmediatamente
+                    let lenLabel = convertirDistancia(longitudMm, unidadActual);
+                    enlaceActual.label(0, {
+                        attrs: { text: { text: `[${data.circuito}]\n${lenLabel}${unidadActual}\n${data.gage}AWG ${data.color}` } }
+                    });
+                }
+                cerrarModales();
+            });
+        $('#btn-save-cota').click(() => { 
             if (enlaceActual) { 
-                const circuito = $('#cable-circuito').val() || 'S/N'; const tipo = $('#cable-tipo').val(); const cal = String($('#cable-calibre').val()).trim(); const color = $('#cable-color').val(); const strLongitud = $('#cable-longitud').val(); const longitudCalculada = evaluarMatematica(strLongitud); 
-                const hexColor = getWireColorHex(color); enlaceActual.attr('line/stroke', hexColor);
-                enlaceActual.labels([]); enlaceActual.appendLabel({ attrs: { text: { text: `[${circuito}]\n${longitudCalculada}mm\n${cal} AWG ${tipo} ${color}`, fill: '#2c3e50', fontSize: 11, fontWeight: 'bold' }, rect: { fill: '#ecf0f1', stroke: '#bdc3c7', strokeWidth: 1, rx: 3, ry: 3, padding: 5, cursor: 'move' } }, position: { distance: 0.5, offset: {x: 0, y: -20} } }); 
-                enlaceActual.set('bomData', { type: 'Wire', circuito: circuito, insulation: tipo, gage: cal, color: color, length: longitudCalculada }); 
-            } cerrarModales();
+                const nuevaLongitud = parseFloat($('#cota-longitud').val());
+                if(nuevaLongitud > 0) {
+                    const source = enlaceActual.get('source');
+                    const target = enlaceActual.get('target');
+                    if(source.x !== undefined && target.x !== undefined) {
+                        const dx = target.x - source.x; const dy = target.y - source.y;
+                        const angulo = Math.atan2(dy, dx); 
+                        const newX = source.x + (nuevaLongitud * Math.cos(angulo));
+                        const newY = source.y + (nuevaLongitud * Math.sin(angulo));
+                        enlaceActual.target({x: newX, y: newY});
+                        enlaceActual.label(0, { attrs: { text: { text: `${Math.round(nuevaLongitud)} mm` } } });
+                    }
+                }
+            } cerrarModales(); 
         });
         
         $('#btn-save-conn').click(() => { 
             if (nodoActual) { 
                 const desc = $('#conn-desc').val(), pn = $('#conn-pn').val(), vias = parseInt($('#conn-vias').val()), orientacion = $('#conn-orientacion').val();
                 let terminalesFinales = {}; 
-                
                 $('.input-terminal').each(function() { 
-                    let via = $(this).data('via');
+                    let via = $(this).data('via'); 
                     let pnTerminal = $(this).val(); 
-                    let sello = $(`.input-sello[data-via="${via}"]`).val();
+                    let sello = $(`.input-sello[data-via="${via}"]`).val(); 
                     let isSoldadura = $(`.check-soldadura[data-via="${via}"]`).is(':checked');
+                    let isManga = $(`.check-manga[data-via="${via}"]`).is(':checked');
                     
-                    if(pnTerminal.trim() !== '' || sello.trim() !== '' || isSoldadura) { 
-                        terminalesFinales[via] = { pn: pnTerminal, sello: sello, soldadura: isSoldadura }; 
+                    if(pnTerminal.trim() !== '' || sello.trim() !== '' || isSoldadura || isManga) { 
+                        terminalesFinales[via] = { pn: pnTerminal, sello: sello, soldadura: isSoldadura, manga: isManga }; 
                     } 
                 }); 
-                
                 let d = nodoActual.get('bomData'); d.description = desc; d.housingPartNumber = pn; d.cavities = vias; d.terminals = terminalesFinales; d.orientacion = orientacion; nodoActual.set('bomData', d); 
                 let cnf = getConfigConector(orientacion, vias); nodoActual.attr('label/text', `${desc}\nPN: ${pn}`); nodoActual.attr('label/refY', cnf.labelRefY); nodoActual.resize(cnf.width, cnf.height); 
                 let pines = []; for(let i = 1; i <= vias; i++) { pines.push({ id: `via-${i}`, group: 'cavidades', attrs: { text: { text: `${i}` } } }); } 
@@ -620,8 +966,7 @@
                     let d = JSON.parse(JSON.stringify(nodoActual.get('bomData'))); 
                     d.recubrimiento = tipoRecubrimiento; d.qty = qty; nodoActual.set('bomData', d); 
                     const colores = loomColors[tipoRecubrimiento]; nodoActual.attr('body/fill', colores.fill); nodoActual.attr('body/stroke', colores.stroke);
-                } 
-                cerrarModales(); 
+                } cerrarModales(); 
             });
 
         $('#btn-save-tie').click(() => { 
@@ -633,7 +978,8 @@
             } cerrarModales(); 
         });
 
-        graph.on('add', function(cell) { if (cell.isLink()) { cell.on('change:target', function(link) { if (link.get('target').id && link.get('source').id) { if (!link.get('bomData')) abrirModalCable(link); } }); } });
+        graph.on('add', function(cell) { if (cell.isLink()) { cell.on('change:target', function(link) { if (link.get('target').id && link.get('source').id && !link.get('bomData')) { abrirModalCable(link); } }); } });
+        
         paper.on('element:pointerdblclick', function(cellView) { 
             const tipo = cellView.model.get('bomData').type; 
             if (tipo === 'Connector') abrirModalConector(cellView.model); 
@@ -642,7 +988,21 @@
             if (tipo === 'BreakPoint') abrirModalBreak(cellView.model); 
             if (tipo === 'Tie') abrirModalTie(cellView.model); 
         });
-        paper.on('link:pointerdblclick', function(linkView) { abrirModalCable(linkView.model); });
+
+            // Dentro del evento que abre el modal de cable:
+            paper.on('link:pointerdblclick', function(linkView) {
+                enlaceActual = linkView.model;
+                const d = enlaceActual.get('bomData');
+                if (d && d.type === 'Wire') {
+                    $('#cable-circuito').val(d.circuito);
+                    
+                    // --- CAMBIO AQUÍ: Mostrar en la unidad seleccionada ---
+                    let valorParaMostrar = (unidadActual === 'in') ? (d.length / 25.4).toFixed(3) : d.length;
+                    $('#cable-longitud').val(valorParaMostrar);
+                    
+                    $('#overlay, #modal-cable').show();
+                }
+            });
 
         $('#btn-zoom-in').click(() => { escalaActual += 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); });
         $('#btn-zoom-out').click(() => { if(escalaActual > 0.3) { escalaActual -= 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); } });
@@ -665,10 +1025,7 @@
 
         function obtenerDiametroCable(calibre) {
             const cal = String(calibre).trim().toUpperCase();
-            const tabla = {'24': 1.70, '22': 1.90, '20': 2.15, '18': 2.40, '16': 2.70, '14': 3.20, 
-                            '12': 3.70, '10': 4.40, '8': 5.50, '6': 6.80, '4': 8.50, '2': 10.50, 
-                            '1': 11.50, '1/0': 12.50, '0': 12.50, '2/0': 14.00, '00': 14.00, 
-                            '3/0': 15.50, '000': 15.50, '4/0': 17.50, '0000': 17.50};
+            const tabla = {'24': 1.70, '22': 1.90, '20': 2.15, '18': 2.40, '16': 2.70, '14': 3.20, '12': 3.70, '10': 4.40, '8': 5.50, '6': 6.80, '4': 8.50, '2': 10.50, '1': 11.50, '1/0': 12.50, '0': 12.50, '2/0': 14.00, '00': 14.00, '3/0': 15.50, '000': 15.50, '4/0': 17.50, '0000': 17.50};
             if (tabla[cal]) return tabla[cal];
             let num = parseFloat(cal);
             if (!isNaN(num)) { if (num > 24) return 1.0; if (num >= 10 && num <= 100) return (2 * Math.sqrt(num / Math.PI)) + 2.0; }
@@ -690,6 +1047,7 @@
                 let awgs = []; 
 
                 links.forEach(link => {
+                    if (link.get('bomData') && link.get('bomData').type === 'Cota') return; // Ignorar cotas
                     const view = link.findView(paper); if (!view) return;
                     const path = view.getConnection(); 
                     if (path) {
@@ -702,32 +1060,28 @@
                     }
                 });
                 
-                const numCables = awgs.length; 
-                const d = loom.get('bomData') || {}; 
-                const titulo = (d.description || 'MANGA').toUpperCase().split('(')[0].trim(); 
-
+                const numCables = awgs.length; const d = loom.get('bomData') || {}; const titulo = (d.description || 'MANGA').toUpperCase().split('(')[0].trim(); 
                 let longitudVisualMm = Math.round(d.orientacion === 'horizontal' ? bbox.width : bbox.height);
                 let longitudReal = d.qty || longitudVisualMm;
 
                 if (numCables > 0) { 
-                    const diametroMm = calcularDiametroMazo(awgs); 
-                    const diametroPul = obtenerDiametroPulgadas(diametroMm);
-                    
+                    const diametroMm = calcularDiametroMazo(awgs); const diametroPul = obtenerDiametroPulgadas(diametroMm);
                     loom.attr('label/text', `${titulo}\n(${diametroPul})\n${numCables} Wires | L: ${longitudReal}mm`); 
                     d.len = longitudVisualMm; 
-                    
                     let prefix = d.recubrimiento === 'corrugado' ? 'Corrugado' : (d.recubrimiento === 'manga' ? 'Manga' : 'Tubo PVC');
-                    d.description = `${prefix} (${diametroPul})`; 
-                    loom.set('bomData', d);
+                    d.description = `${prefix} (${diametroPul})`; loom.set('bomData', d);
                 } else { 
                     loom.attr('label/text', `${titulo}\n(Vacío)\nL: ${longitudReal}mm`); 
-                    d.len = longitudVisualMm; 
-                    loom.set('bomData', d);
+                    d.len = longitudVisualMm; loom.set('bomData', d);
                 }
             });
         }
         
-        // Las funciones automáticas de ratón fueron eliminadas de aquí
+        $('#btn-calcular-looms').click(function() {
+            let btn = $(this); let textoOriginal = btn.text();
+            btn.text('Calculando...'); btn.css('background-color', '#d35400');
+            setTimeout(function() { actualizarEscaneoLooms(); btn.text(textoOriginal); btn.css('background-color', '#e67e22'); }, 50);
+        });
 
         // ==========================================
         // 8. RUTEO ORTOGONAL
@@ -735,24 +1089,21 @@
         function forzarAgrupacion(nodoCentral) {
             const bbox = nodoCentral.getBBox(); const centroX = bbox.x + (bbox.width / 2); const centroY = bbox.y + (bbox.height / 2); const puntoCentro = new joint.g.Point(centroX, centroY);
             const cablesAtrapados = [];
-            graph.getLinks().forEach(link => { const view = link.findView(paper); if (view) { const rectLink = new joint.g.Rect(view.getBBox()).inflate(10); if (rectLink.distance(puntoCentro) <= 250) { cablesAtrapados.push(link); } } });
+            graph.getLinks().forEach(link => { const view = link.findView(paper); if (view && (!link.get('bomData') || link.get('bomData').type !== 'Cota')) { const rectLink = new joint.g.Rect(view.getBBox()).inflate(10); if (rectLink.distance(puntoCentro) <= 250) { cablesAtrapados.push(link); } } });
             
             if (cablesAtrapados.length === 0) { alert("No se detectaron cables cerca."); return; }
             const dataNodo = nodoCentral.get('bomData'); const isHorizontal = dataNodo.orientacion === 'horizontal' || dataNodo.type === 'BreakPoint';
 
             cablesAtrapados.forEach(link => {
-                link.set('router', { name: 'normal' }); link.set('connector', { name: 'rounded', args: { radius: 15 } }); 
-                link.set('locked', true); 
+                link.set('router', { name: 'normal' }); link.set('connector', { name: 'rounded', args: { radius: 15 } }); link.set('locked', true); 
                 const sp = link.getSourcePoint() || {x: 0, y:0}; const tp = link.getTargetPoint() || {x: 0, y:0};
                 let v1 = { x: sp.x, y: sp.y }; let v4 = { x: tp.x, y: tp.y };
                 const srcNode = graph.getCell(link.get('source').id); const tgtNode = graph.getCell(link.get('target').id); const stubLen = 40; 
                 if(srcNode && srcNode.get('bomData')) { const ori = srcNode.get('bomData').orientacion; if(ori === 'right') v1.x += stubLen; if(ori === 'left') v1.x -= stubLen; if(ori === 'top') v1.y -= stubLen; if(ori === 'bottom') v1.y += stubLen; }
                 if(tgtNode && tgtNode.get('bomData')) { const ori = tgtNode.get('bomData').orientacion; if(ori === 'right') v4.x += stubLen; if(ori === 'left') v4.x -= stubLen; if(ori === 'top') v4.y -= stubLen; if(ori === 'bottom') v4.y += stubLen; }
-                let v2, v3;
-                if (isHorizontal) { v2 = { x: v1.x, y: centroY }; v3 = { x: v4.x, y: centroY }; } else { v2 = { x: centroX, y: v1.y }; v3 = { x: centroX, y: v4.y }; }
+                let v2, v3; if (isHorizontal) { v2 = { x: v1.x, y: centroY }; v3 = { x: v4.x, y: centroY }; } else { v2 = { x: centroX, y: v1.y }; v3 = { x: centroX, y: v4.y }; }
                 link.vertices([v1, v2, v3, v4]); 
-            });
-            cerrarModales();
+            }); cerrarModales();
         }
 
         function liberarAgrupacion(nodoCentral) {
@@ -768,9 +1119,15 @@
         // 9. REPORTES Y BOM
         // ==========================================
         function generarReporteRutas() {
-            let i=0; const links = graph.getLinks(); let html = `<table style="font-size: 11px; white-space: nowrap;"><tr><th>ESTAMPADO (CIRCUITO)</th><th>CONS. RACK</th><th>TIPO DE CABLE</th><th>CALIBRE (AWG)</th><th>COLOR</th><th>LONGITUD (MM)</th><th>DESTINO 1 STRIP</th><th>DESTINO 1 TERMINAL</th><th>Herramienta 1</th><th>DESTINO 2 STRIP</th><th>DESTINO 2 TERMINAL</th><th>Herramienta 2</th><th>COLOR DE TINTA</th><th>QTY</th><th>DESTINO 1</th><th>DESTINO 2</th></tr>`;
+            let i = 0; const links = graph.getLinks(); 
+            let encabezado = `<table style="font-size: 11px; white-space: nowrap;"><tr><th>ESTAMPADO (CIRCUITO)</th><th>CONS. RACK</th><th>TIPO DE CABLE</th><th>CALIBRE (AWG)</th><th>COLOR</th><th>LONGITUD (MM)</th><th>LONGITUD (IN)</th><th>DESTINO 1 STRIP</th><th>DESTINO 1 TERMINAL</th><th>Herramienta 1</th><th>DESTINO 2 STRIP</th><th>DESTINO 2 TERMINAL</th><th>Herramienta 2</th><th>COLOR DE TINTA</th><th>QTY</th><th>DESTINO 1</th><th>DESTINO 2</th></tr>`;
+            
+            let htmlCablesNormales = '';
+            let gruposTrenzados = {};
+
             links.forEach(link => {
-                i=i+1; const data = link.get('bomData'); if(!data) return;
+                const data = link.get('bomData'); if(!data || data.type === 'Cota') return;
+                i++; 
                 const srcNode = graph.getCell(link.get('source').id); const tgtNode = graph.getCell(link.get('target').id);
                 if(srcNode && tgtNode) {
                     const srcData = srcNode.get('bomData'); const tgtData = tgtNode.get('bomData');
@@ -780,217 +1137,370 @@
                     if (srcData.type === 'Splice') { dest1 = srcData.name; } else { 
                         let numPin = rawSrcPort ? rawSrcPort.replace('via-', '') : ''; dest1 = `${srcData.description} - Pin ${numPin}`; 
                         if (srcData.terminals && srcData.terminals[rawSrcPort]) { 
-                            let t = srcData.terminals[rawSrcPort]; 
-                            if(typeof t === 'string') t = { pn: t, sello: '', soldadura: false };
-                            if(t.extra !== undefined) { t.sello = t.extra.toLowerCase().includes('soldadura') ? '' : t.extra; t.soldadura = t.extra.toLowerCase().includes('soldadura'); }
-
-                            term1 = t.pn || '-';
-                            let extras1 = [];
-                            if (t.sello) extras1.push(`Sello: ${t.sello}`);
-                            if (t.soldadura) extras1.push('Soldadura');
-                            if (extras1.length > 0) term1 += ` (${extras1.join(', ')})`;
+                            let t = srcData.terminals[rawSrcPort]; if(typeof t === 'string') t = { pn: t, sello: '', soldadura: false, manga: false };
+                            term1 = t.pn || '-'; let extras1 = []; if (t.sello) extras1.push(`Sello: ${t.sello}`); if (t.soldadura) extras1.push('Soldadura'); if (t.manga) extras1.push('Manga'); if (extras1.length > 0) term1 += ` (${extras1.join(', ')})`;
                         } 
                     }
-                    
                     if (tgtData.type === 'Splice') { dest2 = tgtData.name; } else { 
                         let numPin = rawTgtPort ? rawTgtPort.replace('via-', '') : ''; dest2 = `${tgtData.description} - Pin ${numPin}`; 
                         if (tgtData.terminals && tgtData.terminals[rawTgtPort]) { 
-                            let t = tgtData.terminals[rawTgtPort]; 
-                            if(typeof t === 'string') t = { pn: t, sello: '', soldadura: false };
-                            if(t.extra !== undefined) { t.sello = t.extra.toLowerCase().includes('soldadura') ? '' : t.extra; t.soldadura = t.extra.toLowerCase().includes('soldadura'); }
-
-                            term2 = t.pn || '-';
-                            let extras2 = [];
-                            if (t.sello) extras2.push(`Sello: ${t.sello}`);
-                            if (t.soldadura) extras2.push('Soldadura');
-                            if (extras2.length > 0) term2 += ` (${extras2.join(', ')})`;
+                            let t = tgtData.terminals[rawTgtPort]; if(typeof t === 'string') t = { pn: t, sello: '', soldadura: false, manga: false };
+                            term2 = t.pn || '-'; let extras2 = []; if (t.sello) extras2.push(`Sello: ${t.sello}`); if (t.soldadura) extras2.push('Soldadura'); if (t.manga) extras2.push('Manga'); if (extras2.length > 0) term2 += ` (${extras2.join(', ')})`;
                         } 
                     }
-                    
-                    html += `<tr><td><b>${data.circuito || 'S/N'}</b></td><td>${i}</td><td>${data.insulation}</td><td>${data.gage}</td><td>${data.color}</td><td>${data.length}</td><td>-</td><td><b>${term1}</b></td><td>-</td><td>-</td><td><b>${term2 || 'EMPALME'}</b></td><td>-</td><td>-</td><td>1</td><td>${dest1}</td><td>${dest2}</td></tr>`;
-                }
-            }); $('#tabla-rutas-container').html(html + '</table>');
-        }
 
-        function generarReporteBOM() {
-            const elements = graph.getElements(); const links = graph.getLinks(); 
-            let componentes = {}; let terminalesTotales = {}; let sellosTotales = {}; let cablesTotales = {};
-            
-            elements.forEach(el => {
-                const data = el.get('bomData'); if(!data) return;
-                
-                if(data.type === 'Connector') { 
-                    if(!componentes[data.housingPartNumber]) componentes[data.housingPartNumber] = { desc: data.description, qty: 0, unit: 'pzas' }; 
-                    componentes[data.housingPartNumber].qty += 1; 
-                    if (data.terminals) { 
-                        for (let via in data.terminals) { 
-                            let t = data.terminals[via]; 
-                            if(typeof t === 'string') t = { pn: t, sello: '', soldadura: false }; 
-                            if(t.extra !== undefined) { t.sello = t.extra.toLowerCase().includes('soldadura') ? '' : t.extra; t.soldadura = t.extra.toLowerCase().includes('soldadura'); }
-                            
-                            if(t.pn) { 
-                                if(!terminalesTotales[t.pn]) terminalesTotales[t.pn] = 0; 
-                                terminalesTotales[t.pn] += 1; 
-                            }
-                            if(t.soldadura) {
-                                if(!componentes['SOLDADURA']) componentes['SOLDADURA'] = { desc: 'Proceso de Soldadura (Vías)', qty: 0, unit: 'vías' };
-                                componentes['SOLDADURA'].qty += 1;
-                            }
-                            if(t.sello) {
-                                if(!sellosTotales[t.sello]) sellosTotales[t.sello] = 0;
-                                sellosTotales[t.sello] += 1;
-                            }
-                        } 
-                    } 
-                } else if(data.type === 'Splice') { 
-                    if(!componentes[data.name]) componentes[data.name] = { desc: 'Splice / Empalme', qty: 0, unit: 'pzas' }; 
-                    componentes[data.name].qty += 1; 
-                    const descTape = 'Manga para Splice (3" por Empalme)';
-                    if(!componentes[descTape]) componentes[descTape] = { desc: descTape, qty: 0, unit: 'inches' }; 
-                    componentes[descTape].qty += 3;
-                } else if(data.type === 'Loom') { 
-                    if(!componentes[data.description]) componentes[data.description] = { desc: `Recubrimiento (${data.recubrimiento})`, qty: 0, unit: 'mm' }; 
-                    componentes[data.description].qty += parseFloat(data.qty || 1); 
-                } else if(data.type === 'Tie') { 
-                    if (data.recubrimiento === 'cinta') {
-                        const descTape = 'Cinta Tape-25 (Puntos de Amarre / Quiebres)';
-                        if(!componentes[descTape]) componentes[descTape] = { desc: descTape, qty: 0, unit: 'inches' }; 
-                        componentes[descTape].qty += (data.qty * 3); 
+                    let esTrenzado = (data.trenzado && data.trenzado.trim() !== '');
+                    let longitudParaReporte = esTrenzado ? Math.round(data.length * 1.08) : data.length;
+                    let longitudInches = esTrenzado ? (data.length * 1.08)/25.4 : (data.length)/25.4;
+                    longitudInches = longitudInches.toFixed(2);
+                    let circuitoTag = esTrenzado ? `${data.circuito} [${data.trenzado}]` : (data.circuito || 'S/N');
+
+                    let filaHtml = `<tr><td><b>${circuitoTag}</b></td><td>${i}</td><td>${data.insulation}</td><td>${data.gage}</td><td>${data.color}</td><td style="${esTrenzado ? 'background-color:#ffeb3b; font-weight:bold;' : ''}">${longitudParaReporte}</td><td>${longitudInches}</td><td><b>${term1}</b></td><td>-</td><td>-</td><td><b>${term2 || 'EMPALME'}</b></td><td>-</td><td>-</td><td>-</td><td>1</td><td>${dest1}</td><td>${dest2}</td></tr>`;
+
+                    if (esTrenzado) {
+                        let nombreGrupo = data.trenzado.trim().toUpperCase();
+                        if (!gruposTrenzados[nombreGrupo]) { gruposTrenzados[nombreGrupo] = []; }
+                        gruposTrenzados[nombreGrupo].push(filaHtml);
                     } else {
-                        if(!componentes[data.description]) componentes[data.description] = { desc: `Amarre (${data.recubrimiento})`, qty: 0, unit: 'pzas' }; 
-                        componentes[data.description].qty += (data.qty || 1); 
+                        htmlCablesNormales += filaHtml;
                     }
-                } else if(data.type === 'BreakPoint') { 
-                    const descTape = 'Cinta Tape-25 (Puntos de Amarre / Quiebres)';
-                    if(!componentes[descTape]) componentes[descTape] = { desc: descTape, qty: 0, unit: 'inches' }; 
-                    componentes[descTape].qty += 6; 
                 }
-            });
-            links.forEach(link => { const data = link.get('bomData'); if(!data) return; const llaveCable = `${data.gage} AWG ${data.insulation} ${data.color}`; if(!cablesTotales[llaveCable]) cablesTotales[llaveCable] = 0; cablesTotales[llaveCable] += data.length; });
+            }); 
             
-            let html = `<h3>Conectores, Splices, Recubrimientos y Soldadura</h3><table><tr><th>Part Number / Identificador</th><th>Descripción / Tipo</th><th>Cantidad Requerida</th></tr>`; 
-            for(let pn in componentes) html += `<tr><td>${pn}</td><td>${componentes[pn].desc}</td><td>${componentes[pn].qty} ${componentes[pn].unit}</td></tr>`; 
+            let htmlFinal = encabezado + htmlCablesNormales;
             
-            html += `</table><br><h3 style="color:#28a745;">Terminales y Sellos</h3><table><tr><th>Part Number</th><th>Tipo</th><th>Cantidad Requerida</th></tr>`; 
-            for(let termPn in terminalesTotales) html += `<tr><td>${termPn}</td><td>Terminal</td><td>${terminalesTotales[termPn]} pzas</td></tr>`; 
-            for(let selloPn in sellosTotales) html += `<tr><td>${selloPn}</td><td>Sello</td><td>${sellosTotales[selloPn]} pzas</td></tr>`; 
+            let nombresGrupos = Object.keys(gruposTrenzados).sort();
+            if (nombresGrupos.length > 0) {
+                htmlFinal += `<tr><td colspan="16" style="background:#e67e22; color:white; text-align:center; font-weight:bold; letter-spacing: 1px;">CABLES TRENZADOS (+8% DISTANCIA APLICADA AL CORTE)</td></tr>`;
+                
+                nombresGrupos.forEach((grupo, index) => {
+                    htmlFinal += `<tr><td colspan="16" style="background:#fdebd0; color:#d35400; font-weight:bold; text-align:center;">GRUPO: ${grupo}</td></tr>`;
+                    htmlFinal += gruposTrenzados[grupo].join('');
+                    
+                    if (index < nombresGrupos.length - 1) {
+                        htmlFinal += `<tr><td colspan="16" style="height: 15px; border:none; background: #fff;"></td></tr>`;
+                    }
+                });
+            }
+            htmlFinal += '</table>';
             
-            html += `</table><br><h3>Longitud Total de Cables</h3><table><tr><th>Especificación de Cable</th><th>Longitud Total (mm)</th><th>Total de cable en FT</th></tr>`; 
-            for(let cable in cablesTotales) html += `<tr><td>${cable}</td><td>${cablesTotales[cable]} mm</td><td>${(cablesTotales[cable] / 304.8).toFixed(2)} ft</td></tr>`;
-            $('#tabla-bom-container').html(html + '</table>');
+            $('#tabla-rutas-container').html(htmlFinal);
         }
+        function generarReporteBOM() {
+                const elements = graph.getElements(); 
+                const links = graph.getLinks(); 
+                let componentes = {}; 
+                let terminalesTotales = {}; 
+                let sellosTotales = {}; 
+                let cablesTotales = {};
+                
+                elements.forEach(el => {
+                    const data = el.get('bomData'); if(!data) return;
+                    if(data.type === 'Connector') { 
+                        if(!componentes[data.housingPartNumber]) componentes[data.housingPartNumber] = { desc: data.description, qty: 0, unit: 'pzas' }; 
+                        componentes[data.housingPartNumber].qty += 1; 
+                        if (data.terminals) { 
+                            for (let via in data.terminals) { 
+                                let t = data.terminals[via]; if(typeof t === 'string') t = { pn: t, sello: '', soldadura: false, manga: false };
+                                if(t.pn) { if(!terminalesTotales[t.pn]) terminalesTotales[t.pn] = 0; terminalesTotales[t.pn] += 1; }
+                                if(t.soldadura) { if(!componentes['SOLDADURA']) componentes['SOLDADURA'] = { desc: 'Proceso de Soldadura (Vías)', qty: 0, unit: 'vías' }; componentes['SOLDADURA'].qty += 1; }
+                                if(t.sello) { if(!sellosTotales[t.sello]) sellosTotales[t.sello] = 0; sellosTotales[t.sello] += 1; }
+                                if(t.manga) {
+                                    const descManga = 'Manga Termocontraíble para Terminales';
+                                    if(!componentes[descManga]) componentes[descManga] = { desc: descManga, qty: 0, unit: 'inches' }; 
+                                    componentes[descManga].qty += 1.5;
+                                }
+                            } 
+                        } 
+                    } else if(data.type === 'Splice') { 
+                        if(!componentes[data.name]) componentes[data.name] = { desc: 'Splice / Empalme', qty: 0, unit: 'pzas' }; 
+                        componentes[data.name].qty += 1; 
+                        const descTape = 'Manga para Splice (3" por Empalme)';
+                        if(!componentes[descTape]) componentes[descTape] = { desc: descTape, qty: 0, unit: 'inches' }; componentes[descTape].qty += 3;
+                    } else if(data.type === 'Loom') { 
+                        // AJUSTE: Si la unidad es mm, se queda igual. Si es in, se convierte.
+                        let unitLabel = (unidadActual === 'mm') ? 'mm' : 'in';
+                        if(!componentes[data.description]) componentes[data.description] = { desc: `Recubrimiento (${data.recubrimiento})`, qty: 0, unit: unitLabel }; 
+                        
+                        let cantidadBase = parseFloat(data.qty || 1);
+                        componentes[data.description].qty += (unidadActual === 'in') ? parseFloat((cantidadBase / 25.4).toFixed(3)) : cantidadBase; 
 
+                    } else if(data.type === 'Tie') { 
+                        if (data.recubrimiento === 'cinta') {
+                            const descTape = 'Cinta Tape-25 (Puntos de Amarre / Quiebres)';
+                            if(!componentes[descTape]) componentes[descTape] = { desc: descTape, qty: 0, unit: 'inches' }; componentes[descTape].qty += (data.qty * 3); 
+                        } else {
+                            if(!componentes[data.description]) componentes[data.description] = { desc: `Amarre (${data.recubrimiento})`, qty: 0, unit: 'pzas' }; componentes[data.description].qty += (data.qty || 1); 
+                        }
+                    } else if(data.type === 'BreakPoint') { 
+                        const descTape = 'Cinta Tape-25 (Puntos de Amarre / Quiebres)';
+                        if(!componentes[descTape]) componentes[descTape] = { desc: descTape, qty: 0, unit: 'inches' }; componentes[descTape].qty += 6; 
+                    }
+                });
+
+                links.forEach(link => { 
+                    const data = link.get('bomData'); if(!data || data.type === 'Cota') return; 
+                    let longitudBOM = data.length;
+                    if(data.trenzado && data.trenzado.trim() !== '') { longitudBOM = Math.round(data.length * 1.08); }
+                    const llaveCable = `${data.gage} AWG ${data.insulation} ${data.color}`; 
+                    if(!cablesTotales[llaveCable]) cablesTotales[llaveCable] = 0; 
+                    cablesTotales[llaveCable] += longitudBOM; 
+                });
+                
+                let html = `<h3>Conectores, Splices, Recubrimientos y Soldadura</h3><table><tr><th>Part Number / Identificador</th><th>Descripción / Tipo</th><th>Cantidad Requerida</th></tr>`; 
+                for(let pn in componentes) html += `<tr><td>${pn}</td><td>${componentes[pn].desc}</td><td>${componentes[pn].qty} ${componentes[pn].unit}</td></tr>`; 
+                html += `</table><br><h3 style="color:#28a745;">Terminales y Sellos</h3><table><tr><th>Part Number</th><th>Tipo</th><th>Cantidad Requerida</th></tr>`; 
+                for(let termPn in terminalesTotales) html += `<tr><td>${termPn}</td><td>Terminal</td><td>${terminalesTotales[termPn]} pzas</td></tr>`; 
+                for(let selloPn in sellosTotales) html += `<tr><td>${selloPn}</td><td>Sello</td><td>${sellosTotales[selloPn]} pzas</td></tr>`; 
+                
+                // TABLA FINAL DE CABLES (Conversión dinámica aplicada aquí)
+                html += `</table><br><h3>Longitud Total de Cables</h3><table><tr><th>Especificación de Cable</th><th>Longitud Total (${unidadActual})</th><th>Total de cable en FT</th></tr>`; 
+                for(let cable in cablesTotales) {
+                    let valorConvertido = (unidadActual === 'in') ? (cablesTotales[cable] / 25.4).toFixed(3) : cablesTotales[cable];
+                    html += `<tr><td>${cable}</td><td><b>${valorConvertido} ${unidadActual}</b></td><td>${(cablesTotales[cable] / 304.8).toFixed(2)} ft</td></tr>`;
+                }
+                $('#tabla-bom-container').html(html + '</table>');
+            }
+        
         // ==========================================
         // 10. EXPORTACIÓN A EXCEL
         // ==========================================
         function descargarExcel() {
-            // Asegurarnos de que los datos estén generados y actualizados antes de descargar
-            generarReporteRutas();
-            generarReporteBOM();
-
+            generarReporteRutas(); generarReporteBOM();
             const wb = XLSX.utils.book_new();
-
-            // --- Construir Pestaña 1: Lista de Materiales (BOM) ---
-            let bomAoA = [];
-            const bomTables = document.querySelectorAll('#tabla-bom-container table');
-            const bomHeaders = document.querySelectorAll('#tabla-bom-container h3');
-            
+            let bomAoA = []; const bomTables = document.querySelectorAll('#tabla-bom-container table'); const bomHeaders = document.querySelectorAll('#tabla-bom-container h3');
             bomTables.forEach((table, index) => {
-                if(bomHeaders[index]) bomAoA.push([bomHeaders[index].innerText]); // Título de la sección
-                
+                if(bomHeaders[index]) bomAoA.push([bomHeaders[index].innerText]); 
                 const rows = table.querySelectorAll('tr');
-                rows.forEach(row => {
-                    let rowData = [];
-                    row.querySelectorAll('th, td').forEach(cell => {
-                        rowData.push(cell.innerText);
-                    });
-                    bomAoA.push(rowData);
-                });
-                bomAoA.push([]); // Espacio en blanco entre tablas
+                rows.forEach(row => { let rowData = []; row.querySelectorAll('th, td').forEach(cell => { rowData.push(cell.innerText); }); bomAoA.push(rowData); });
+                bomAoA.push([]); 
             });
-            
-            const wsBom = bomAoA.length > 0 ? XLSX.utils.aoa_to_sheet(bomAoA) : XLSX.utils.aoa_to_sheet([["No hay datos"]]);
-            XLSX.utils.book_append_sheet(wb, wsBom, "Lista de Materiales");
-
-            // --- Construir Pestaña 2: Lista de Corte (Rutas) ---
-            const tableRutas = document.querySelector('#tabla-rutas-container table');
-            const wsRutas = tableRutas ? XLSX.utils.table_to_sheet(tableRutas) : XLSX.utils.aoa_to_sheet([["No hay datos"]]);
-            XLSX.utils.book_append_sheet(wb, wsRutas, "Lista de Corte");
-
-            // --- Disparar la Descarga ---
+            const wsBom = bomAoA.length > 0 ? XLSX.utils.aoa_to_sheet(bomAoA) : XLSX.utils.aoa_to_sheet([["No hay datos"]]); XLSX.utils.book_append_sheet(wb, wsBom, "Lista de Materiales");
+            const tableRutas = document.querySelector('#tabla-rutas-container table'); const wsRutas = tableRutas ? XLSX.utils.table_to_sheet(tableRutas) : XLSX.utils.aoa_to_sheet([["No hay datos"]]); XLSX.utils.book_append_sheet(wb, wsRutas, "Lista de Corte");
             XLSX.writeFile(wb, "Reportes_MasterCAD.xlsx");
         }
 
         function generarReporteSplices() {
-            let html = ''; const elements = graph.getElements(); let haySplices = false;
-            elements.forEach(el => {
-                const data = el.get('bomData');
-                if(data && data.type === 'Splice') {
-                    haySplices = true; const links = graph.getConnectedLinks(el); let conexiones = [];
-                    links.forEach(link => {
-                        const lData = link.get('bomData'); if(!lData) return;
-                        const isSource = link.get('source').id === el.id; const otherId = isSource ? link.get('target').id : link.get('source').id; const otherPort = isSource ? link.get('target').port : link.get('source').port; const otherEl = graph.getCell(otherId);
-                        if(otherEl) {
-                            const oData = otherEl.get('bomData'); let destName = '';
-                            if (oData.type === 'Splice') { destName = `Hacia ${oData.name}`; } else { let numPin = otherPort ? otherPort.replace('via-','') : ''; destName = `${oData.description} (Pin ${numPin})`; }
-                            conexiones.push({ circuito: lData.circuito || 'S/N', cable: `${lData.gage} AWG ${lData.color}`, longitud: lData.length, destino: destName });
-                        }
-                    });
-                    html += buildSpliceSVG(data.name, conexiones);
+    let html = '';
+    const elements = graph.getElements();
+    let haySplices = false;
+
+    elements.forEach(el => {
+        const data = el.get('bomData');
+        if (data && data.type === 'Splice') {
+            haySplices = true;
+            const links = graph.getConnectedLinks(el);
+            let conexionesIzquierda = []; // Vienen de un conector al Splice (Splice es Target)
+            let conexionesDerecha = [];   // Van del Splice a un conector (Splice es Source)
+
+            links.forEach(link => {
+                const lData = link.get('bomData');
+                if (!lData || lData.type === 'Cota') return;
+
+                const isSpliceSource = (link.get('source').id === el.id);
+                const otherId = isSpliceSource ? link.get('target').id : link.get('source').id;
+                const otherPort = isSpliceSource ? link.get('target').port : link.get('source').port;
+                const otherEl = graph.getCell(otherId);
+
+                if (otherEl) {
+                    const oData = otherEl.get('bomData');
+                    let destName = '';
+                    if (oData.type === 'Splice') {
+                        destName = oData.name;
+                    } else {
+                        let numPin = otherPort ? otherPort.replace('via-', '') : '?';
+                        destName = `${oData.description} (P${numPin})`;
+                    }
+
+                    let infoConexion = {
+                        circuito: lData.circuito || 'S/N',
+                        cable: `${lData.gage} AWG ${lData.color}`,
+                        longitud: lData.length,
+                        destino: destName
+                    };
+
+                    // LÓGICA DE LADOS:
+                    // Si el Splice es el TARGET del link, el cable viene de la izquierda.
+                    // Si el Splice es el SOURCE del link, el cable va hacia la derecha.
+                    if (isSpliceSource) {
+                        conexionesDerecha.push(infoConexion);
+                    } else {
+                        conexionesIzquierda.push(infoConexion);
+                    }
                 }
             });
-            if(!haySplices) { html = '<p style="color: #666;">No hay empalmes (Splices) en tu diseño actual.</p>'; } $('#tabla-splices-container').html(html);
+            html += buildSpliceSVG(data.name, conexionesIzquierda, conexionesDerecha);
         }
+    });
+
+    if (!haySplices) {
+        html = '<p style="color: #666;">No hay empalmes (Splices) en tu diseño actual.</p>';
+    }
+    $('#tabla-splices-container').html(html);
+}
 
         function escapeHTML(str) { if (!str) return ""; return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
-        function buildSpliceSVG(name, conexiones) {
-            const groups = {};
-            conexiones.forEach(con => { const match = con.destino.match(/^(.*?)(?:\s*\()/); const baseDest = match ? match[1].trim() : con.destino.trim(); if (!groups[baseDest]) groups[baseDest] = []; groups[baseDest].push(con); });
-            const leftConns = []; const rightConns = []; const sortedGroups = Object.values(groups).sort((a, b) => b.length - a.length);
-            if (sortedGroups.length === 1 && sortedGroups[0].length > 1) { const allConns = sortedGroups[0]; leftConns.push(allConns[0]); rightConns.push(...allConns.slice(1)); } else { sortedGroups.forEach((group, index) => { if (index === 0) { leftConns.push(...group); } else { rightConns.push(...group); } }); }
+       function buildSpliceSVG(name, connsIzquierda, connsDerecha) {
+    const spacingY = 60;
+    const boxWidth = 120;
+    const boxHeight = 45;
+    const lineLengthX = 180;
+    
+    const maxSideCount = Math.max(connsIzquierda.length, connsDerecha.length, 1);
+    const h = Math.max(200, (maxSideCount * spacingY) + 80);
+    const w = 800;
+    const cx = w / 2;
+    const cy = h / 2;
+    const r = 25;
 
-            const spacingY = 70; const boxWidth = 140; const boxHeight = 55; const lineLengthX = 160; const maxSideCount = Math.max(leftConns.length, rightConns.length); const h = Math.max(300, (maxSideCount * spacingY) + 100); const w = 800; const cx = w / 2; const cy = h / 2; const r = 25;
-            let svgHtml = `<div class="splice-diagram" style="max-width: 100%; overflow-x: auto;"><h3 style="color:#c0392b; margin-top:0; text-align:center;">Empalme: ${escapeHTML(name)}</h3><svg viewBox="0 0 ${w} ${h}" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">`;
+    let svgHtml = `
+    <div class="splice-diagram" style="margin-bottom: 30px;">
+        <h3 style="color:#c0392b; margin-bottom:10px;">Esquema Empalme: ${escapeHTML(name)}</h3>
+        <svg viewBox="0 0 ${w} ${h}" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="background:#f9f9f9; border-radius:8px;">`;
 
-            const drawSide = (conns, isLeft) => {
-                const count = conns.length; const startY = cy - ((count - 1) * spacingY) / 2;
-                conns.forEach((con, index) => {
-                    const currentY = startY + (index * spacingY); const endX = isLeft ? cx - lineLengthX : cx + lineLengthX;
-                    svgHtml += `<line x1="${cx}" y1="${cy}" x2="${endX}" y2="${currentY}" stroke="#34495e" stroke-width="4"/>`;
-                    const rectX = isLeft ? endX - boxWidth - 10 : endX + 10; const rectY = currentY - (boxHeight / 2);
-                    svgHtml += `<rect x="${rectX}" y="${rectY}" width="${boxWidth}" height="${boxHeight}" fill="#ecf0f1" rx="4" ry="4" stroke="#bdc3c7" stroke-width="1"/>`;
-                    const textCenterX = rectX + (boxWidth / 2);
-                    svgHtml += `<text x="${textCenterX}" y="${rectY + 18}" font-family="sans-serif" font-size="10" fill="#2c3e50" font-weight="bold" text-anchor="middle">[${escapeHTML(con.circuito)}] ${escapeHTML(con.cable)}</text><text x="${textCenterX}" y="${rectY + 33}" font-family="sans-serif" font-size="9" fill="#d35400" font-weight="bold" text-anchor="middle">A: ${escapeHTML(con.destino)}</text><text x="${textCenterX}" y="${rectY + 46}" font-family="sans-serif" font-size="9" fill="#7f8c8d" text-anchor="middle">L: ${escapeHTML(con.longitud)} mm</text>`;
-                });
-            };
-            if (conexiones.length > 0) { drawSide(leftConns, true); drawSide(rightConns, false); } else { svgHtml += `<text x="${cx}" y="${cy+60}" font-family="sans-serif" font-size="12" fill="#7f8c8d" text-anchor="middle">(Sin cables conectados)</text>`; }
-            svgHtml += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#e74c3c" stroke="#c0392b" stroke-width="3"/><text x="${cx}" y="${cy+5}" font-family="sans-serif" font-size="14" fill="white" font-weight="bold" text-anchor="middle">SPL</text></svg></div>`;
-            return svgHtml;
-        }
+    const drawSide = (conns, isLeft) => {
+        const count = conns.length;
+        const startY = cy - ((count - 1) * spacingY) / 2;
 
-        // ==========================================
-        // 11. NUEVO EVENTO PARA CÁLCULO MANUAL (BOTÓN)
-        // ==========================================
-        $('#btn-calcular-looms').click(function() {
-            let btn = $(this);
-            let textoOriginal = btn.text();
+        conns.forEach((con, index) => {
+            const currentY = startY + (index * spacingY);
+            const endX = isLeft ? cx - lineLengthX : cx + lineLengthX;
+
+            // Línea de conexión
+            svgHtml += `<line x1="${cx}" y1="${cy}" x2="${endX}" y2="${currentY}" stroke="#34495e" stroke-width="3"/>`;
+
+            // Caja de información
+            const rectX = isLeft ? endX - boxWidth : endX;
+            const rectY = currentY - (boxHeight / 2);
             
-            // Cambiar visualmente el botón para avisar que está trabajando
-            btn.text('Calculando...');
-            btn.css('background-color', '#d35400');
-            
-            // Usamos setTimeout para que el navegador tenga tiempo de actualizar el botón
-            // antes de congelarse un segundo haciendo todas las matemáticas
-            setTimeout(function() {
-                actualizarEscaneoLooms();
-                
-                // Regresar el botón a su estado normal
-                btn.text(textoOriginal);
-                btn.css('background-color', '#e67e22');
-            }, 50);
+            svgHtml += `
+                <rect x="${rectX}" y="${rectY}" width="${boxWidth}" height="${boxHeight}" fill="white" rx="3" stroke="#bdc3c7" stroke-width="1"/>
+                <text x="${rectX + boxWidth/2}" y="${rectY + 18}" font-family="sans-serif" font-size="11" font-weight="bold" fill="#2c3e50" text-anchor="middle">${escapeHTML(con.circuito)}</text>
+                <text x="${rectX + boxWidth/2}" y="${rectY + 35}" font-family="sans-serif" font-size="9" fill="#7f8c8d" text-anchor="middle">${escapeHTML(con.cable)} | ${con.longitud}mm</text>
+                <text x="${isLeft ? rectX : rectX + boxWidth}" y="${rectY - 5}" font-family="sans-serif" font-size="8" font-weight="bold" fill="#e67e22" text-anchor="${isLeft ? 'start' : 'end'}">${escapeHTML(con.destino)}</text>
+            `;
         });
+    };
 
+    drawSide(connsIzquierda, true);
+    drawSide(connsDerecha, false);
+
+    // Círculo central del Splice
+    svgHtml += `
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="#e74c3c" stroke="#c0392b" stroke-width="3"/>
+        <text x="${cx}" y="${cy + 5}" font-family="sans-serif" font-size="12" fill="white" font-weight="bold" text-anchor="middle">SPL</text>
+    </svg></div>`;
+
+    return svgHtml;
+}
+
+        // ==========================================
+        // 11. IMPRESIÓN A ESCALA EXACTA
+        // ==========================================
+        function imprimirAEscala() {
+            const bbox = graph.getBBox();
+            if (!bbox) { alert("El lienzo está vacío. Dibuja algo primero."); return; }
+
+            const svgElement = document.querySelector('#lienzo-arnes svg');
+            const svgClone = svgElement.cloneNode(true);
+
+            // Ajustar el ViewBox para enfocar solo el dibujo con un margen de 20px
+            svgClone.setAttribute('viewBox', `${bbox.x - 20} ${bbox.y - 20} ${bbox.width + 40} ${bbox.height + 40}`);
+
+            const factorStr = prompt(
+                "¿A qué escala deseas imprimir?\n\n" +
+                "1   = Escala 1:1 (Tamaño Real)\n" +
+                "0.5 = Mitad de tamaño (1:2)\n" +
+                "2   = Doble de tamaño (2:1)", 
+                "1"
+            );
+            
+            const factor = parseFloat(factorStr);
+            if (isNaN(factor) || factor <= 0) return; 
+
+            // Asumiendo 1px del lienzo = 1mm real
+            const anchoRealMm = (bbox.width + 40) * factor;
+            const altoRealMm = (bbox.height + 40) * factor;
+
+            svgClone.setAttribute('width', `${anchoRealMm}mm`);
+            svgClone.setAttribute('height', `${altoRealMm}mm`);
+
+            const ventanaPrint = window.open('', '_blank');
+            ventanaPrint.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Impresión de Arnés - Escala ${factor}:1</title>
+                    <style>
+                        @page { margin: 0; }
+                        body { margin: 0; padding: 0; background: white; display: flex; justify-content: center; align-items: center; }
+                        svg { background: white !important; }
+                    </style>
+                </head>
+                <body>
+                    ${svgClone.outerHTML}
+                    <script>
+                        window.onload = function() {
+                            setTimeout(() => { window.print(); }, 500);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            ventanaPrint.document.close();
+        }
+            // ==========================================
+// CONTROL DE VISIBILIDAD DE CAPAS
+// ==========================================
+$(document).on('change', '.toggle-layer', function() {
+    const tipo = $(this).data('type');
+    const visible = $(this).is(':checked');
+
+    // Para Cables (Links)
+    if (tipo === 'Wire') {
+        graph.getLinks().forEach(link => {
+            const data = link.get('bomData');
+            if (data && data.type === 'Wire') {
+                // Usamos opacity para no romper la lógica de conexión
+                link.attr('line/opacity', visible ? 1 : 0);
+                // También ocultamos la etiqueta si el cable se oculta
+                if (!visible) {
+                    link.prop('labels/0/attrs/text/display', 'none');
+                    link.prop('labels/0/attrs/rect/display', 'none');
+                } else if ($('#toggle-labels').is(':checked')) {
+                    link.prop('labels/0/attrs/text/display', 'block');
+                    link.prop('labels/0/attrs/rect/display', 'block');
+                }
+            }
+        });
+    } 
+    // Para Mangas, Cinchos o Breakpoints (Elementos)
+    else {
+        graph.getElements().forEach(el => {
+            const data = el.get('bomData');
+            if (data && (data.type === tipo || (tipo === 'Tie' && data.type === 'BreakPoint'))) {
+                el.attr('./display', visible ? 'block' : 'none');
+            }
+        });
+    }
+});
+
+// Control específico para las Etiquetas de los cables
+$('#toggle-labels').on('change', function() {
+    const visible = $(this).is(':checked');
+    const cablesVisibles = $('.toggle-layer[data-type="Wire"]').is(':checked');
+
+    graph.getLinks().forEach(link => {
+        const data = link.get('bomData');
+        if (data && data.type === 'Wire') {
+            // Solo mostramos etiquetas si el cable también es visible
+            const estado = (visible && cablesVisibles) ? 'block' : 'none';
+            link.prop('labels/0/attrs/text/display', estado);
+            link.prop('labels/0/attrs/rect/display', estado);
+        }
+    });
+});
     </script>
 </body>
 </html>
