@@ -146,22 +146,131 @@
         </div>
         <div class="form-group"><label>Color:</label>
         <select id="cable-color">
-            <option value='YEBN'>YELLOW/BROWN</option><option value='YE'>YELLOW</option>
-            <option value='BNYE'>BROWN/YELLOW</option><option value='BNWH'>BROWN/WHITE</option><option value='BNGN'>BROWN/GREEN</option>
-            <option value='YEBK'>YELLOW/BLACK</option><option value='YERD'>YELLOW/RED</option><option value='VTWH'>VIOLET/WHITE</option>
-            <option value='VTDG'>VIOLET/DARK GREEN</option><option value='VT'>VIOLET</option><option value='RDOG'>RED/ORANGE</option>
-            <option value='RDDB'>RED/DARK BLUE</option><option value='RDBK'>RED/BLACK</option><option value='RD'>RED</option>
-            <option value='GYLB'>GREY/LIGHT BLUE</option><option value='GYDG'>GREY/DARK GREEN</option><option value='GYBN'>GREY/BROWN</option>
-            <option value='DG'>DARK GREEN</option><option value='DB'>DARK BLUE</option><option value='BU'>BLUE</option>
-            <option value="GN">GREEN</option><option value='GNWH'>GREEN/WHITE</option><option value='GNDG'>GREEN/DARK GREEN</option><option value='GNYE'>GREEN/YELLOW</option> 
-            <option value="GR">GRAY</option><option value='GRWH'>GRAY/WHITE</option><option value='GRBN'>GRAY/BROWN</option><option value='GRGN'>GRAY/GREEN</option><option value='GRDB'>GRAY/DARK BLUE</option><option value="GRBK">GRAY/BLACK</option>
-            <option value='BNYE'>BROWN/YELLOW</option><option value='BNWH'>BROWN/WHITE</option><option value='BNGN'>BROWN/GREEN</option>
-            <option value='BNDB'>BROWN/DARK BLUE</option><option value='BN'>BROWN</option><option value='BKWH'>BLACK/WHITE</option>
-            <option value='BKDG'>BLACK/DARK GREEN</option><option value='BKBN'>BLACK/BROWN</option><option value='BK'>BLACK</option>
-            <option value='WHT'>WHITE</option><option value='CLR'>CLEAR</option><option value='ORG'>ORANGE</option><option value='PNK'>PINK</option><option value='TAN'>TAN</option><option value='LGTBLU'>LIGHT BLUE</option>
-        </select>
+    <optgroup label="Sólidos Base">
+        <option value='BK'>BLACK (BK)</option>
+        <option value='WH'>WHITE (WH)</option>
+        <option value='RD'>RED (RD)</option>
+        <option value='BL'>BLUE (BL)</option>
+        <option value='GN'>GREEN (GN)</option>
+        <option value='YE'>YELLOW (YE)</option>
+        <option value='BN'>BROWN (BN)</option>
+        <option value='GR'>GRAY (GR)</option>
+        <option value='OR'>ORANGE (OR)</option>
+        <option value='VT'>VIOLET (VT)</option>
+        <option value='PK'>PINK (PK)</option>
+        <option value='TN'>TAN (TN)</option>
+        <option value='LB'>LIGHT BLUE (LB)</option>
+        <option value='LG'>LIGHT GREEN (LG)</option>
+        <option value='DG'>DARK GREEN (DG)</option>
+        <option value='DB'>DARK BLUE (DB)</option>
+    </optgroup>
+
+    <optgroup label="Base Light Green">
+        <option value='LGBK'>LIGHT GREEN/BLACK (LG/BK)</option>
+        <option value='LGWH'>LIGHT GREEN/WHITE (LG/WH)</option>
+        <option value='LGRD'>LIGHT GREEN/RED (LG/RD)</option>
+        <option value='LGBL'>LIGHT GREEN/BLUE (LG/BL)</option>
+        <option value='LGYE'>LIGHT GREEN/YELLOW (LG/YE)</option>
+        <option value='LGOR'>LIGHT GREEN/ORANGE (LG/OR)</option>
+    </optgroup>
+
+    <optgroup label="Base Violeta">
+        <option value='VTBK'>VIOLET/BLACK (VT/BK)</option>
+        <option value='VTWH'>VIOLET/WHITE (VT/WH)</option>
+        <option value='VTRD'>VIOLET/RED (VT/RD)</option>
+        <option value='VTBL'>VIOLET/BLUE (VT/BL)</option>
+        <option value='VTYE'>VIOLET/YELLOW (VT/YE)</option>
+        <option value='VTOR'>VIOLET/ORANGE (VT/OR)</option>
+        <option value='VTGN'>VIOLET/GREEN (VT/GN)</option>
+        <option value='VTBN'>VIOLET/BROWN (VT/BN)</option>
+    </optgroup>
+
+    <optgroup label="Base Negro">
+        <option value='BKWH'>BLACK/WHITE (BK/WH)</option>
+        <option value='BKRD'>BLACK/RED (BK/RD)</option>
+        <option value='BKBL'>BLACK/BLUE (BK/BL)</option>
+        <option value='BKGN'>BLACK/GREEN (BK/GN)</option>
+        <option value='BKYE'>BLACK/YELLOW (BK/YE)</option>
+        <option value='BKOR'>BLACK/ORANGE (BK/OR)</option>
+        <option value='BKVT'>BLACK/VIOLET (BK/VT)</option>
+        <option value='BKGR'>BLACK/GRAY (BK/GR)</option>
+    </optgroup>
+
+    <optgroup label="Base Blanco">
+        <option value='WHBK'>WHITE/BLACK (WH/BK)</option>
+        <option value='WHRD'>WHITE/RED (WH/RD)</option>
+        <option value='WHBL'>WHITE/BLUE (WH/BL)</option>
+        <option value='WHGN'>WHITE/GREEN (WH/GN)</option>
+        <option value='WHYE'>WHITE/YELLOW (WH/YE)</option>
+        <option value='WHOR'>WHITE/ORANGE (WH/OR)</option>
+        <option value='WHVT'>WHITE/VIOLET (WH/VT)</option>
+        <option value='WHBN'>WHITE/BROWN (WH/BN)</option>
+    </optgroup>
+
+    <optgroup label="Base Azul / Celeste">
+        <option value='BLBK'>BLUE/BLACK (BL/BK)</option>
+        <option value='BLWH'>BLUE/WHITE (BL/WH)</option>
+        <option value='BLRD'>BLUE/RED (BL/RD)</option>
+        <option value='BLYE'>BLUE/YELLOW (BL/YE)</option>
+        <option value='BLGN'>BLUE/GREEN (BL/GN)</option>
+        <option value='BLOR'>BLUE/ORANGE (BL/OR)</option>
+        <option value='LBBK'>LIGHT BLUE/BLACK (LB/BK)</option>
+        <option value='LBWH'>LIGHT BLUE/WHITE (LB/WH)</option>
+        <option value='LBRD'>LIGHT BLUE/RED (LB/RD)</option>
+        <option value='DBWH'>DARK BLUE/WHITE (DB/WH)</option>
+    </optgroup>
+
+    <optgroup label="Base Verde / Verde Oscuro">
+        <option value='GNBK'>GREEN/BLACK (GN/BK)</option>
+        <option value='GNWH'>GREEN/WHITE (GN/WH)</option>
+        <option value='GNRD'>GREEN/RED (GN/RD)</option>
+        <option value='GNYE'>GREEN/YELLOW (GN/YE)</option>
+        <option value='GNOR'>GREEN/ORANGE (GN/OR)</option>
+        <option value='DGBK'>DARK GREEN/BLACK (DG/BK)</option>
+        <option value='DGWH'>DARK GREEN/WHITE (DG/WH)</option>
+        <option value='DGYE'>DARK GREEN/YELLOW (DG/YE)</option>
+    </optgroup>
+
+    <optgroup label="Base Amarillo">
+        <option value='YEBK'>YELLOW/BLACK (YE/BK)</option>
+        <option value='YEWH'>YELLOW/WHITE (YE/WH)</option>
+        <option value='YERD'>YELLOW/RED (YE/RD)</option>
+        <option value='YEBL'>YELLOW/BLUE (YE/BL)</option>
+        <option value='YEGN'>YELLOW/GREEN (YE/GN)</option>
+        <option value='YEOR'>YELLOW/ORANGE (YE/OR)</option>
+        <option value='YEBN'>YELLOW/BROWN (YE/BN)</option>
+    </optgroup>
+    <optgroup label="Base Rojo">
+        <option value='RDBK'>RED/BLACK (RD/BK)</option>
+        <option value='RDWH'>RED/WHITE (RD/WH)</option>
+        <option value='RDRD'>RED/RED (RD/RD)</option>
+        <option value='RDBL'>RED/BLUE (RD/BL)</option>
+        <option value='RDGN'>RED/GREEN (RD/GN)</option>
+        <option value='RDOR'>RED/ORANGE (RD/OR)</option>
+        <option value='RDBN'>RED/BROWN (RD/BN)</option>
+    </optgroup>
+
+    <optgroup label="Base Naranja">
+        <option value='ORBK'>ORANGE/BLACK (OR/BK)</option>
+        <option value='ORWH'>ORANGE/WHITE (OR/WH)</option>
+        <option value='ORRD'>ORANGE/RED (OR/RD)</option>
+        <option value='ORBL'>ORANGE/BLUE (OR/BL)</option>
+        <option value='ORGN'>ORANGE/GREEN (OR/GN)</option>
+    </optgroup>
+
+    <optgroup label="Otros Colores">
+        <option value='BNBK'>BROWN/BLACK (BN/BK)</option>
+        <option value='BNWH'>BROWN/WHITE (BN/WH)</option>
+        <option value='BNYE'>BROWN/YELLOW (BN/YE)</option>
+        <option value='GRBK'>GRAY/BLACK (GR/BK)</option>
+        <option value='GRWH'>GRAY/WHITE (GR/WH)</option>
+        <option value='GRRD'>GRAY/RED (GR/RD)</option>
+        <option value='PKBK'>PINK/BLACK (PK/BK)</option>
+        <option value='PKWH'>PINK/WHITE (PK/WH)</option>
+    </optgroup>
+</select>
         </div>
-        <div class="form-group"><label>Longitud base (MM or IN) Ej. 150+100+50:</label><input type="text" id="cable-longitud" value="0"></div>
+        <div class="form-group"><label>Longitud base (MM or IN) Ej. 150+100:</label><input type="text" id="cable-longitud" value="0"></div>
         <div class="form-group" style="background:#fff3cd; padding:8px; border-left:3px solid #ffc107;">
             <label style="color:#856404; font-weight:bold;">Grupo Trenzado (Ej. T1, TR-1):</label>
             <input type="text" id="cable-trenzado" placeholder="Dejar vacío si no es trenzado">
@@ -310,6 +419,9 @@
             if(c.includes('ORG') || c.includes('ORANGE') || c.includes('OR') || c.includes('OE')) return '#e67e22';
             if(c.includes('PNK') || c.includes('PINK') || c.includes('PK')) return '#ff9ff3';
             if(c.includes('TAN') || c.includes('TN')) return '#EDE8D0';
+            if(c.includes('LB') || c.includes('LTBL') || c.includes('LIGHT BLUE') || c.includes('LIGHT BE') || c.includes('LT BE')) return '#5DADE2';
+            if(c.includes('LG') || c.includes('LTGN') || c.includes('LIGHT GREEN') || c.includes('LT GN')|| c.includes('LT GRN')) return '#58D68D';
+            if(c.includes('DG') || c.includes('DARK GREEN')) return '#27ae60';
             return '#34495e'; 
         }
 
