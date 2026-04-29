@@ -42,12 +42,19 @@ foreach ($datos as $np) {
               //  echo $terminal . " = 1   In $conector en $tiempoPlugIn segundos" . "<br>";
                 $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
                 VALUES ('$np','10951','pend','$leyenda','1','$tiempoPlugIn','300')");
+                 $randomr = rand(0, count($routingBoardTime) - 1);
+                $routingTime = $routingBoardTime[$randomr];
+                $routing = "Routing Wire in $conector";
+              //  echo $terminal . " = 1   In $conector en $tiempoPlugIn segundos" . "<br>";
+                $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
+                VALUES ('$np','10960','pend','$routing','1','$routingTime','300')");
             }
         }
     
     foreach ($terminales as $terminal => $qtyTerminal) {
         $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-            VALUES ('$np','10081','FB-081','$terminal','$qtyTerminal','3.084','300')");
+            VALUES ('$np','10081','FB-081','$terminal','$qtyTerminal','4.084','300')");
+            
     }
 }
 }
