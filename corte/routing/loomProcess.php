@@ -46,7 +46,7 @@ foreach ($datos as $np) {
 
         while ($d = mysqli_fetch_assoc($res)) {
             $qty = $d['qty'];
-            $time = $loomingTime[array_rand($loomingTime)];
+            $time = $loomingTime[array_rand($loomingTime)]*2.5;
 
             if ($d['item'] === 'TAPE-835') {
                 $tapingTotal += ($time * $qty) * 1.25;
