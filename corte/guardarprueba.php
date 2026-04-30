@@ -30,10 +30,11 @@ if (isset($_POST['upload'])) {
 
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                     if (count($data) >= 4) {
-                        $pn   = $data[0];
-                        $rev  = $data[1];
-                        $cons = $data[2];
-                        $tipo = $data[3];
+                        $pn   = trim(str_replace("\xA0", " ", $data[0]));
+                        $rev  = trim(str_replace("\xA0", " ", $data[1]));
+                        $cons = trim(str_replace("\xA0", " ", $data[2]));
+                        $tipo = trim(str_replace("\xA0", " ", $data[3]));
+                        $cons = mb_convert_encoding($cons, 'UTF-8', 'UTF-8');
 
                         mysqli_stmt_execute($stmt);
                         $rowCount++;
