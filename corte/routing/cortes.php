@@ -47,17 +47,17 @@ foreach ($datos as $np) {
             VALUES ('$np','10001','FB036','$dataLabel','1','$tiempo','300')");
         }
         if (mysqli_num_rows($buscar) <= 10) {
-            $testing = 45;
-            $packing = 45;
-        } else if (mysqli_num_rows($buscar) > 10 and mysqli_num_rows($buscar) <= 20) {
-            $testing = 120;
+            $testing = 60;
             $packing = 60;
-        } else if (mysqli_num_rows($buscar) > 20 and mysqli_num_rows($buscar) <= 50) {
+        } else if (mysqli_num_rows($buscar) > 10 and mysqli_num_rows($buscar) <= 20) {
             $testing = 180;
-            $packing = 90;
-        } else if (mysqli_num_rows($buscar) > 50) {
+            $packing = 120;
+        } else if (mysqli_num_rows($buscar) > 20 and mysqli_num_rows($buscar) <= 50) {
             $testing = 240;
             $packing = 180;
+        } else if (mysqli_num_rows($buscar) > 50) {
+            $testing = 720;
+            $packing = 300;
         }
         $label = 'Testing: ' . mysqli_num_rows($buscar) . ' Circuits';
         $testingTimes = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 

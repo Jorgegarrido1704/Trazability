@@ -14,7 +14,7 @@ if (isset($_GET['np'])) {
     header("location:../registro.php");
 }
 foreach ($datos as $np) {
-    $delete=mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and (work_routing='10081' or work_routing='10951')");
+    $delete=mysqli_query($con,"DELETE FROM routing_models WHERE pn_routing='$np' and work_routing IN ('10081', '10951', '10960')");
 
     $buscar = mysqli_query($con, "SELECT DataFrom,terminal1 FROM listascorte WHERE pn='$np' AND terminal1 IS NOT NULL and terminal1 !='' and 
     terminal1 not like 'Empalme%' AND terminal1 not like 'EMPALME%' and terminal1 not like 'SPL%' AND terminal1 not like 'SPLICE%'  
@@ -42,12 +42,19 @@ foreach ($datos as $np) {
               //  echo $terminal . " = 1   In $conector en $tiempoPlugIn segundos" . "<br>";
                 $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
                 VALUES ('$np','10951','pend','$leyenda','1','$tiempoPlugIn','300')");
+                 $randomr = rand(0, count($routingBoardTime) - 1);
+                $routingTime = $routingBoardTime[$randomr];
+                $routing = "Routing Wire in $conector";
+              //  echo $terminal . " = 1   In $conector en $tiempoPlugIn segundos" . "<br>";
+                $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
+                VALUES ('$np','10960','pend','$routing','1','$routingTime','300')");
             }
         }
     
     foreach ($terminales as $terminal => $qtyTerminal) {
         $insertar1 = mysqli_query($con, "INSERT INTO `routing_models`( `pn_routing`, `work_routing`, `posible_stations`, `work_description`, `QtyTimes`, `timePerProcess`, `setUp_routing`) 
-            VALUES ('$np','10081','FB-081','$terminal','$qtyTerminal','3.084','300')");
+            VALUES ('$np','10081','FB-081','$terminal','$qtyTerminal','4.084','300')");
+            
     }
 }
 }

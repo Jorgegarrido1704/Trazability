@@ -46,17 +46,17 @@ foreach ($datos as $np) {
 
         while ($d = mysqli_fetch_assoc($res)) {
             $qty = $d['qty'];
-            $time = $loomingTime[array_rand($loomingTime)];
+            $time = $loomingTime[array_rand($loomingTime)]*1.2;
 
             if ($d['item'] === 'TAPE-835') {
-                $tapingTotal += ($time * $qty) * 1.25;
+                $tapingTotal += ($time * $qty) * 1.15;
                
             } else {
                 $loomingTotal += $time * $qty;
                  $normalTaping += $time * $qty;
             }
         }
-                $tappingandlooming=($loomingTotal+$tapingTotal) * 1.20;
+                $tappingandlooming=($loomingTotal+$tapingTotal) * 1.1;
                 $normalTaping *= 1.55;
             
         insertRouting($con,$np,'11000','looming',$loomingTotal);
