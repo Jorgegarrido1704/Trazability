@@ -97,6 +97,11 @@
             </div>
             <strong>Zoom:</strong> <button id="btn-zoom-out">-</button> <span id="zoom-level">100%</span> <button id="btn-zoom-in">+</button>
         </div>
+    
+<button class="btn-info" id="btn-toggle-agrupar" style="background-color: #2980b9;">Agrupar Vista</button>
+<button class="btn-info" id="btn-ruteo" style="background:#8e44ad; color:white;">
+    📐 Aplicar Ruteo
+</button>
         <div id="lienzo-arnes"></div>
     </div>
 
@@ -389,9 +394,16 @@
         
         const paper = new joint.dia.Paper({
             el: document.getElementById('lienzo-arnes'), model: graph, width: 3000, height: 2000, gridSize: 10, drawGrid: true, background: { color: '#ffffff' },
-            defaultLink: new joint.shapes.standard.Link({ attrs: { line: { stroke: '#34495e', strokeWidth: 3, strokeLinejoin: 'round', strokeLinecap: 'round' } }, router: { name: 'manhattan', args: {step: 10, padding: 20} }, connector: { name: 'rounded', args: { radius: 10 } } }), 
-            interactive: function(cellView) {
-                if (cellView.model.isLink() && cellView.model.get('locked')) return { vertexAdd: false, vertexMove: false, vertexRemove: false, linkMove: false };
+          
+            defaultLink: new joint.shapes.standard.Link({
+                    attrs: {
+                        line: { stroke: '#34495e', strokeWidth: 3, strokeLinejoin: 'round', strokeLinecap: 'round' }
+                    },
+                    router: { name: 'orthogonal', args: { padding: 20 } },
+                    connector: { name: 'rounded', args: { radius: 8 } }
+                }), 
+               interactive: function(cellView) {
+                    if (cellView.model.isLink() && cellView.model.get('locked')) return { vertexAdd: false, vertexMove: false, vertexRemove: false, linkMove: false };
                 return { linkMove: true, vertexAdd: true, vertexMove: true, vertexRemove: true };
             },
             linkPinning: false, snapLinks: { radius: 30 },
@@ -529,7 +541,11 @@
         $('#btn-add-loom').click(() => { drawingState = { active: true, type: 'Loom', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
         $('#btn-add-tie').click(() => { drawingState = { active: true, type: 'Tie', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
         $('#btn-add-cota').click(() => { drawingState = { active: true, type: 'Cota', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
-
+            // En tu <script>:
+$('#btn-ruteo').click(() => {
+    aplicarRuteoATodos();
+    mostrarToast('📐 Ruteo en escuadra aplicado');
+});
         $('#btn-add-break').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearBreakPoint(300, 200); });
         $('#btn-add-connector').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearConector(50, 50, 'Conector A', '12064754', 4, 'right'); });
         $('#btn-add-splice').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearSplice(300, 150, `SP-${contSplices}`); contSplices++; });
@@ -1501,6 +1517,225 @@ $('#toggle-labels').on('change', function() {
         }
     });
 });
+// ==========================================
+// LÓGICA DE AGRUPACIÓN DE VISTA (TOGGLE)
+// ==========================================
+let vistaAgrupadaActiva = false;
+let linksAgrupadosTemporales = [];
+
+$('#btn-toggle-agrupar').click(function() {
+    vistaAgrupadaActiva = !vistaAgrupadaActiva;
+    const btn = $(this);
+
+    if (vistaAgrupadaActiva) {
+        // ACTIVAR MODO AGRUPADO
+        btn.text('📂 Desagrupar Vista').css('background-color', '#e74c3c');
+        
+        const looms = graph.getElements().filter(el => el.get('bomData')?.type === 'Loom');
+        const allLinks = graph.getLinks();
+
+        looms.forEach(loom => {
+            const bbox = loom.getBBox();
+            const rectLoom = new joint.g.Rect(bbox).inflate(10);
+            let cablesEnEsteLoom = [];
+
+            // Detectar qué cables pasan por este Loom
+            allLinks.forEach(link => {
+                const data = link.get('bomData');
+                if (data?.type === 'Wire') {
+                    const view = link.findView(paper);
+                    if (view) {
+                        const path = view.getConnection();
+                        if (path) {
+                            for (let i = 0; i <= path.length(); i += 10) {
+                                if (rectLoom.containsPoint(path.pointAtLength(i))) {
+                                    cablesEnEsteLoom.push(link);
+                                    link.attr('line/opacity', 0); // Ocultar cable individual
+                                    link.prop('labels/0/attrs/text/display', 'none');
+                                    link.prop('labels/0/attrs/rect/display', 'none');
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Si hay cables, crear la "Línea Gruesa de Grupo"
+            if (cablesEnEsteLoom.length > 0) {
+                const isHorizontal = bbox.width >= bbox.height;
+                let start, end;
+
+                if (isHorizontal) {
+                    start = { x: bbox.x, y: bbox.y + bbox.height / 2 };
+                    end = { x: bbox.x + bbox.width, y: bbox.y + bbox.height / 2 };
+                } else {
+                    start = { x: bbox.x + bbox.width / 2, y: bbox.y };
+                    end = { x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height };
+                }
+
+                const groupLine = new joint.shapes.standard.Link({
+                    source: start,
+                    target: end,
+                    attrs: {
+                        line: {
+                            stroke: '#2c3e50',
+                            strokeWidth: 8, // Línea gruesa
+                            targetMarker: 'none',
+                            sourceMarker: 'none'
+                        }
+                    }
+                });
+
+                groupLine.appendLabel({
+                    attrs: {
+                        text: {
+                            text: `${cablesEnEsteLoom.length} cables`,
+                            fill: '#ffffff',
+                            fontSize: 12,
+                            fontWeight: 'bold'
+                        },
+                        rect: {
+                            fill: '#2c3e50',
+                            rx: 5, ry: 5,
+                            padding: 5
+                        }
+                    }
+                });
+
+                groupLine.set('isGroupRepresentation', true);
+                groupLine.addTo(graph);
+                linksAgrupadosTemporales.push(groupLine);
+            }
+        });
+    } else {
+        // DESACTIVAR MODO AGRUPADO (Volver a la normalidad)
+        btn.text('📦 Agrupar Vista').css('background-color', '#2980b9');
+        
+        // Eliminar líneas gruesas temporales
+        linksAgrupadosTemporales.forEach(l => l.remove());
+        linksAgrupadosTemporales = [];
+
+        // Volver a mostrar cables individuales
+        graph.getLinks().forEach(link => {
+            const data = link.get('bomData');
+            if (data?.type === 'Wire') {
+                link.attr('line/opacity', 1);
+                if ($('#toggle-labels').is(':checked')) {
+                    link.prop('labels/0/attrs/text/display', 'block');
+                    link.prop('labels/0/attrs/rect/display', 'block');
+                }
+            }
+        });
+    }
+});
+// ── RUTEO INTELIGENTE POR ORIENTACIÓN ─────────────────────────────────────
+// Calcula el stub de salida según la orientación del conector
+function getStubPoint(element, link, isSource) {
+    const stubLen = 50;
+    const bbox = element.getBBox();
+    const cx = bbox.x + bbox.width / 2;
+    const cy = bbox.y + bbox.height / 2;
+    const d = element.get('bomData');
+    if (!d) return null;
+
+    const ori = d.orientacion || 'right';
+    const offset = {
+        right:  { x: bbox.x + bbox.width + stubLen, y: cy },
+        left:   { x: bbox.x - stubLen,              y: cy },
+        top:    { x: cx, y: bbox.y - stubLen               },
+        bottom: { x: cx, y: bbox.y + bbox.height + stubLen }
+    };
+    return offset[ori] || offset['right'];
+}
+
+// Aplica ruteo en L/Z a un link basado en orientación de sus nodos
+function aplicarRuteoEscuadra(link) {
+    if (link.get('locked')) return;
+    if (link.get('isBundleLine')) return;
+    const d = link.get('bomData');
+    if (!d || d.type !== 'Wire') return;
+
+    const srcId = link.get('source').id;
+    const tgtId = link.get('target').id;
+    if (!srcId || !tgtId) return;
+
+    const srcEl = graph.getCell(srcId);
+    const tgtEl = graph.getCell(tgtId);
+    if (!srcEl || !tgtEl) return;
+
+    const srcData = srcEl.get('bomData');
+    const tgtData = tgtEl.get('bomData');
+    if (!srcData || !tgtData) return;
+
+    const p1 = getStubPoint(srcEl, link, true);
+    const p2 = getStubPoint(tgtEl, link, false);
+    if (!p1 || !p2) return;
+
+    const srcOri = srcData.orientacion || 'right';
+    const tgtOri = tgtData.orientacion || 'left';
+
+    let vertices = [];
+
+    // Ruteo horizontal → horizontal (L simple o Z)
+    if ((srcOri === 'right' || srcOri === 'left') &&
+        (tgtOri === 'right' || tgtOri === 'left')) {
+        const midX = (p1.x + p2.x) / 2;
+        vertices = [
+            { x: midX, y: p1.y },
+            { x: midX, y: p2.y }
+        ];
+    }
+    // Ruteo vertical → vertical
+    else if ((srcOri === 'top' || srcOri === 'bottom') &&
+             (tgtOri === 'top' || tgtOri === 'bottom')) {
+        const midY = (p1.y + p2.y) / 2;
+        vertices = [
+            { x: p1.x, y: midY },
+            { x: p2.x, y: midY }
+        ];
+    }
+    // Ruteo mixto (horizontal → vertical o viceversa) → L pura
+    else if (srcOri === 'right' || srcOri === 'left') {
+        vertices = [{ x: p2.x, y: p1.y }];
+    }
+    else {
+        vertices = [{ x: p1.x, y: p2.y }];
+    }
+
+    link.set('router', { name: 'normal' });
+    link.set('connector', { name: 'rounded', args: { radius: 12 } });
+    link.vertices(vertices);
+}
+
+// Aplica el ruteo a todos los cables existentes
+function aplicarRuteoATodos() {
+    graph.getLinks().forEach(link => aplicarRuteoEscuadra(link));
+}
+
+// ── ESCUCHA EVENTOS PARA RUTEO AUTOMÁTICO ─────────────────────────────────
+
+// Cuando se mueve un conector, recalcula sus cables
+graph.on('change:position', function(cell) {
+    if (!cell.isElement()) return;
+    const links = graph.getConnectedLinks(cell);
+    links.forEach(link => aplicarRuteoEscuadra(link));
+});
+
+// Cuando se conecta un nuevo cable completamente
+graph.on('change:target', function(link) {
+    if (!link.isLink()) return;
+    if (link.get('target').id && link.get('source').id) {
+        setTimeout(() => aplicarRuteoEscuadra(link), 50);
+    }
+});
+
+// Botón manual para re-aplicar a todo el diseño
+$('#btn-calcular-looms').on('click', function() {
+    setTimeout(aplicarRuteoATodos, 100);
+});
+
+// ── FIN RUTEO INTELIGENTE ─────────────────────────────────────────────────
     </script>
 </body>
 </html>
