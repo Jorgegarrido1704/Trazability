@@ -421,7 +421,7 @@
             const c = colorCode.toUpperCase();
             if(c.includes('BK') || c.includes('BLK') || c.includes('BLACK')) return '#212121';
             if(c.includes('RD') || c.includes('RED')) return '#e74c3c';
-            if(c.includes('BU') || c.includes('BLU') || c.includes('BE') || c.includes('BLUE')) return '#3498db';
+            if(c.includes('BU') || c.includes('BL') || c.includes('BLU') || c.includes('BE') || c.includes('BLUE')) return '#3498db';
             if(c.includes('YE') || c.includes('YEL') || c.includes('YELLOW') || c.includes('YL')) return '#f1c40f';
             if(c.includes('GN') || c.includes('GRN') || c.includes('GREEN')) return '#2ecc71';
             if(c.includes('VT') || c.includes('VIO') || c.includes('PUR') || c.includes('PR')) return '#9b59b6';
@@ -541,11 +541,8 @@
         $('#btn-add-loom').click(() => { drawingState = { active: true, type: 'Loom', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
         $('#btn-add-tie').click(() => { drawingState = { active: true, type: 'Tie', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
         $('#btn-add-cota').click(() => { drawingState = { active: true, type: 'Cota', startX: 0, startY: 0, shape: null }; $('#lienzo-arnes').css('cursor', 'crosshair'); });
-            // En tu <script>:
-$('#btn-ruteo').click(() => {
-    aplicarRuteoATodos();
-    mostrarToast('📐 Ruteo en escuadra aplicado');
-});
+            
+
         $('#btn-add-break').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearBreakPoint(300, 200); });
         $('#btn-add-connector').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearConector(50, 50, 'Conector A', '12064754', 4, 'right'); });
         $('#btn-add-splice').click(() => { drawingState.active = false; $('#lienzo-arnes').css('cursor', 'default'); crearSplice(300, 150, `SP-${contSplices}`); contSplices++; });
@@ -1166,9 +1163,14 @@ $('#btn-ruteo').click(() => {
                     }
 
                     let esTrenzado = (data.trenzado && data.trenzado.trim() !== '');
-                    let longitudParaReporte = esTrenzado ? Math.round(data.length * 1.08) : data.length;
-                    let longitudInches = esTrenzado ? (data.length * 1.08)/25.4 : (data.length)/25.4;
-                    longitudInches = longitudInches.toFixed(2);
+                    // ── +12mm por cada extremo que conecta a un Splice ────────────────
+const srcEsSplice = srcNode && srcNode.get('bomData') && srcNode.get('bomData').type === 'Splice';
+const tgtEsSplice = tgtNode && tgtNode.get('bomData') && tgtNode.get('bomData').type === 'Splice';
+const extraSplice = (srcEsSplice ? 12 : 0) + (tgtEsSplice ? 12 : 0);
+
+let longitudParaReporte = (esTrenzado ? Math.round(data.length * 1.08) : data.length) + extraSplice;
+                    let longitudInches = (longitudParaReporte / 25.4).toFixed(2);
+                    
                     let circuitoTag = esTrenzado ? `${data.circuito} [${data.trenzado}]` : (data.circuito || 'S/N');
 
                     let filaHtml = `<tr><td><b>${circuitoTag}</b></td><td>${i}</td><td>${data.insulation}</td><td>${data.gage}</td><td>${data.color}</td><td style="${esTrenzado ? 'background-color:#ffeb3b; font-weight:bold;' : ''}">${longitudParaReporte}</td><td>${longitudInches}</td><td><b>${term1}</b></td><td>-</td><td>-</td><td><b>${term2 || 'EMPALME'}</b></td><td>-</td><td>-</td><td>-</td><td>1</td><td>${dest1}</td><td>${dest2}</td></tr>`;
@@ -1256,8 +1258,16 @@ $('#btn-ruteo').click(() => {
 
                 links.forEach(link => { 
                     const data = link.get('bomData'); if(!data || data.type === 'Cota') return; 
-                    let longitudBOM = data.length;
-                    if(data.trenzado && data.trenzado.trim() !== '') { longitudBOM = Math.round(data.length * 1.08); }
+                    // ── +12mm por cada extremo que conecta a un Splice ────────────────
+                    const srcElBom = graph.getCell(link.get('source').id);
+                    const tgtElBom = graph.getCell(link.get('target').id);
+                    const srcEsSpliceBom = srcElBom && srcElBom.get('bomData') && srcElBom.get('bomData').type === 'Splice';
+                    const tgtEsSpliceBom = tgtElBom && tgtElBom.get('bomData') && tgtElBom.get('bomData').type === 'Splice';
+                    const extraSpliceBom = ((srcEsSpliceBom ? 12 : 0) + (tgtEsSpliceBom ? 12 : 0));
+
+                    let longitudBOM = data.length + extraSpliceBom;
+                    if(data.trenzado && data.trenzado.trim() !== '') { longitudBOM = Math.round(longitudBOM * 1.08); }
+                    // ───
                     const llaveCable = `${data.gage} AWG ${data.insulation} ${data.color}`; 
                     if(!cablesTotales[llaveCable]) cablesTotales[llaveCable] = 0; 
                     cablesTotales[llaveCable] += longitudBOM; 
@@ -1712,10 +1722,7 @@ const grosorActual = link.attr('line/strokeWidth') || 3;
     link.attr('line/strokeLinecap',  'round');
     // ───────────────────────────────────────────────────────────────────
 }
-setTimeout(() => {
-    link.attr('line/stroke', colorActual);
-    link.attr('line/strokeWidth', grosorActual);
-}, 0);
+
 // ── FIN ───────────────────────────────────────────────────────────────────
 
 // Aplica el ruteo a todos los cables existentes
@@ -1746,6 +1753,10 @@ $('#btn-calcular-looms').on('click', function() {
 });
 
 // ── FIN RUTEO INTELIGENTE ─────────────────────────────────────────────────
+$('#btn-ruteo').click(() => {
+    aplicarRuteoATodos();
+   
+});
     </script>
 </body>
 </html>
