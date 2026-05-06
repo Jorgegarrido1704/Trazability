@@ -1672,30 +1672,28 @@ function aplicarRuteoEscuadra(link) {
     const p2 = getStubPoint(tgtEl, link, false);
     if (!p1 || !p2) return;
 
+    // ── GUARDAR COLOR ANTES DE CAMBIAR ROUTER ──────────────────────────
+    const colorActual = (d.color) 
+    ? getWireColorHex(d.color) 
+    : (link.attr('line/stroke') || '#34495e');
+const grosorActual = link.attr('line/strokeWidth') || 3;
+    // ───────────────────────────────────────────────────────────────────
+
     const srcOri = srcData.orientacion || 'right';
     const tgtOri = tgtData.orientacion || 'left';
 
     let vertices = [];
 
-    // Ruteo horizontal → horizontal (L simple o Z)
     if ((srcOri === 'right' || srcOri === 'left') &&
         (tgtOri === 'right' || tgtOri === 'left')) {
         const midX = (p1.x + p2.x) / 2;
-        vertices = [
-            { x: midX, y: p1.y },
-            { x: midX, y: p2.y }
-        ];
+        vertices = [{ x: midX, y: p1.y }, { x: midX, y: p2.y }];
     }
-    // Ruteo vertical → vertical
     else if ((srcOri === 'top' || srcOri === 'bottom') &&
              (tgtOri === 'top' || tgtOri === 'bottom')) {
         const midY = (p1.y + p2.y) / 2;
-        vertices = [
-            { x: p1.x, y: midY },
-            { x: p2.x, y: midY }
-        ];
+        vertices = [{ x: p1.x, y: midY }, { x: p2.x, y: midY }];
     }
-    // Ruteo mixto (horizontal → vertical o viceversa) → L pura
     else if (srcOri === 'right' || srcOri === 'left') {
         vertices = [{ x: p2.x, y: p1.y }];
     }
@@ -1703,10 +1701,22 @@ function aplicarRuteoEscuadra(link) {
         vertices = [{ x: p1.x, y: p2.y }];
     }
 
-    link.set('router', { name: 'normal' });
+    link.set('router',    { name: 'normal' });
     link.set('connector', { name: 'rounded', args: { radius: 12 } });
     link.vertices(vertices);
+
+    // ── RESTAURAR COLOR DESPUÉS DEL CAMBIO DE ROUTER ───────────────────
+    link.attr('line/stroke',       colorActual);
+    link.attr('line/strokeWidth',  grosorActual);
+    link.attr('line/strokeLinejoin', 'round');
+    link.attr('line/strokeLinecap',  'round');
+    // ───────────────────────────────────────────────────────────────────
 }
+setTimeout(() => {
+    link.attr('line/stroke', colorActual);
+    link.attr('line/strokeWidth', grosorActual);
+}, 0);
+// ── FIN ───────────────────────────────────────────────────────────────────
 
 // Aplica el ruteo a todos los cables existentes
 function aplicarRuteoATodos() {
