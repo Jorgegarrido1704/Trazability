@@ -1,0 +1,9 @@
+{
+  "12040953": {
+    "profundidad_mm": 18.0,
+    "terminales": {
+      "1234567": { "strip_mm": 8, "consumo_mm": 3.5 },
+      "7654321": { "strip_mm": 6, "consumo_mm": 2.5 }
+    }
+  }
+}
