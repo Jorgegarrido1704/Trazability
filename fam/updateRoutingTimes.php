@@ -32,7 +32,7 @@ $assetsProcess = ['Cutting' => 0, 'Terminals' => 0, 'Assembly' => 0, 'Looming' =
        $valor = $procesos[$key]>0?round($procesos[$key]/60,3):0;
        $setupt = $assetsProcess[$key]>0?round($assetsProcess[$key]*1.05/60,3):0;
 
-        $valor = round($valor*1.35,2);
+        $valor = round($valor*1.05,2);
         $totalsPerProcess+=$valor; 
         //$rowText = $valor;
       //  echo "<td style='font-weight:bold;'>{$rowText}</td>";
