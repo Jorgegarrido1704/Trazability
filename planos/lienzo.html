@@ -50,6 +50,7 @@
         <button class="tab-btn" onclick="abrirTab('rutas', this)">Lista de Corte</button>
         <button class="tab-btn" onclick="abrirTab('bom', this)">Lista de Materiales (BOM)</button>
         <button class="tab-btn" onclick="abrirTab('splices', this)">Esquemas Splice</button>
+        <button class="tab-btn" onclick="abrirTab('medidas', this)">⚙️ Medidas</button>
     </div>
 
     <div id="tab-editor" class="tab-content active">
@@ -131,6 +132,109 @@
         </div>
         <div id="tabla-splices-container"></div>
     </div>
+    <div id="tab-medidas" class="tab-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h2 style="margin:0;">⚙️ Configuración de Medidas</h2>
+        <button class="btn-primary" onclick="aplicarMedidasABOM()">🔄 Aplicar a BOM y Lista de Corte</button>
+    </div>
+
+    <!-- CONFIGURACIÓN GLOBAL -->
+    <div style="background:white; border:1px solid #dee2e6; border-radius:8px; padding:20px; margin-bottom:20px;">
+        <h3 style="margin:0 0 15px 0; color:#2c3e50;">📏 Posición de Medida (Global para todo el arnés)</h3>
+        <div style="display:flex; gap:30px; align-items:center; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:14px; font-weight:bold;">
+                <input type="radio" name="posicion-medida" value="antes" id="pos-antes" checked
+                    style="width:18px; height:18px; cursor:pointer;">
+                <span>
+                    ANTES del conector
+                    <small style="display:block; font-weight:normal; color:#666;">
+                        Suma el strip de la terminal al cable
+                    </small>
+                </span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-size:14px; font-weight:bold;">
+                <input type="radio" name="posicion-medida" value="despues" id="pos-despues"
+                    style="width:18px; height:18px; cursor:pointer;">
+                <span>
+                    DESPUÉS del conector
+                    <small style="display:block; font-weight:normal; color:#666;">
+                        Resta profundidad del conector + suma consumo de terminal
+                    </small>
+                </span>
+            </label>
+        </div>
+    </div>
+
+    <!-- CARGA DE BIBLIOTECA JSON -->
+    <div style="background:white; border:1px solid #dee2e6; border-radius:8px; padding:20px; margin-bottom:20px;">
+        <h3 style="margin:0 0 10px 0; color:#2c3e50;">📂 Biblioteca de Conectores y Terminales</h3>
+        <p style="font-size:12px; color:#666; margin:0 0 15px 0;">
+            Carga un JSON con los datos de tus conectores y terminales. 
+            El sistema usará automáticamente el PN del conector y terminal de cada vía.
+        </p>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input type="file" id="input-biblioteca-json" accept=".json" style="display:none;">
+            <button class="btn-info" onclick="document.getElementById('input-biblioteca-json').click()"
+                style="background:#17a2b8;">
+                📂 Cargar Biblioteca JSON
+            </button>
+            <span id="biblioteca-status" style="font-size:12px; color:#666;">
+                Sin biblioteca cargada
+            </span>
+        </div>
+
+        <!-- Estructura esperada del JSON -->
+        <details style="margin-top:15px;">
+            <summary style="cursor:pointer; font-size:12px; color:#007bff; font-weight:bold;">
+                Ver estructura esperada del JSON
+            </summary>
+            <pre style="background:#2c3e50; color:#ecf0f1; padding:15px; border-radius:6px; font-size:11px; margin-top:10px; overflow-x:auto;">{
+  "12040953": {
+    "descripcion": "Conector Macho 6 Vías",
+    "profundidad_mm": 18.0,
+    "terminales": {
+      "1234567": { "desc": "Terminal Macho 18AWG", "strip_mm": 8, "consumo_mm": 3.5 },
+      "7654321": { "desc": "Terminal Hembra 20AWG", "strip_mm": 6, "consumo_mm": 2.5 }
+    }
+  },
+  "98765432": {
+    "descripcion": "Conector Hembra 4 Vías",
+    "profundidad_mm": 15.0,
+    "terminales": {
+      "1234567": { "desc": "Terminal Macho 18AWG", "strip_mm": 8, "consumo_mm": 3.5 }
+    }
+  }
+}</pre>
+        </details>
+    </div>
+
+    <!-- PREVIEW DE BIBLIOTECA CARGADA -->
+    <div id="biblioteca-preview" style="display:none; background:white; border:1px solid #dee2e6; border-radius:8px; padding:20px;">
+        <h3 style="margin:0 0 15px 0; color:#2c3e50;">📋 Biblioteca Cargada</h3>
+        <div id="biblioteca-tabla-container"></div>
+    </div>
+</div>
+    <div style="background:#fff3cd; border:1px solid #ffc107; border-radius:6px; padding:12px; margin-bottom:15px; font-size:12px;">
+        <strong>📏 Instrucciones:</strong><br>
+        • <b>Strip:</b> longitud de pelado en mm que se agrega siempre al cable.<br>
+        • <b>Consumo Terminal:</b> mm que consume el crimpe dentro del conector.<br>
+        • <b>Posición:</b> ANTES = se suma al cable. DESPUÉS = se resta la profundidad del conector y se suma el consumo de terminal.
+    </div>
+    <table id="tabla-medidas" style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+            <tr style="background:#e9ecef;">
+                <th style="padding:10px; border:1px solid #dee2e6;">Part No. Terminal</th>
+                <th style="padding:10px; border:1px solid #dee2e6;">Descripción</th>
+                <th style="padding:10px; border:1px solid #dee2e6;">Strip (mm)</th>
+                <th style="padding:10px; border:1px solid #dee2e6;">Consumo Terminal (mm)</th>
+                <th style="padding:10px; border:1px solid #dee2e6;">Profundidad Conector (mm)</th>
+                <th style="padding:10px; border:1px solid #dee2e6;">Posición Medida</th>
+                <th style="padding:10px; border:1px solid #dee2e6;">Acción</th>
+            </tr>
+        </thead>
+        <tbody id="tbody-medidas"></tbody>
+    </table>
+</div>
 
     <div id="overlay"></div>
 
@@ -391,6 +495,141 @@
         function evaluarMatematica(expresion) { try { let expLimpia = String(expresion).replace(/[^0-9\+\-\.\s]/g, ''); if(expLimpia.trim() === '') return 0; return Function('"use strict";return (' + expLimpia + ')')(); } catch (e) { return 0; } }
 
         let escalaActual = 1; let contSplices = 1; const graph = new joint.dia.Graph(); let elementoRedimensionando = null; 
+        // ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// CONFIGURACIÓN DE MEDIDAS — GLOBAL + BIBLIOTECA JSON
+// ══════════════════════════════════════════════════════════════
+
+let bibliotecaConectores = {}; // JSON cargado con datos de conectores/terminales
+// ── CARGA AUTOMÁTICA DE BIBLIOTECA AL INICIAR ─────────────────
+fetch('acceso/datosConectores.json')
+    .then(res => {
+        if (!res.ok) throw new Error('No encontrado');
+        return res.json();
+    })
+    .then(data => {
+        bibliotecaConectores = data;
+        const total = Object.keys(bibliotecaConectores).length;
+        document.getElementById('biblioteca-status').innerHTML =
+            `<span style="color:#28a745; font-weight:bold;">✅ ${total} conectores cargados (automático)</span>`;
+        renderizarBibliotecaPreview();
+    })
+    .catch(() => {
+        document.getElementById('biblioteca-status').innerHTML =
+            `<span style="color:#e67e22;">⚠️ No se encontró datosConectores.json — carga manual disponible</span>`;
+    });
+// ─────────────────────────────────────────────────────────────
+let configMedidas = { posicion: 'antes' }; // configuración global
+
+// ── CARGAR BIBLIOTECA JSON ─────────────────────────────────────
+document.getElementById('input-biblioteca-json').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        try {
+            bibliotecaConectores = JSON.parse(evt.target.result);
+            const total = Object.keys(bibliotecaConectores).length;
+            document.getElementById('biblioteca-status').innerHTML =
+                `<span style="color:#28a745; font-weight:bold;">✅ ${total} conector${total !== 1 ? 'es' : ''} cargado${total !== 1 ? 's' : ''}</span>`;
+            renderizarBibliotecaPreview();
+        } catch(err) {
+            alert('Error al leer el JSON de biblioteca. Verifica el formato.');
+        }
+    };
+    reader.readAsText(file);
+    this.value = '';
+});
+
+// ── PREVIEW DE LA BIBLIOTECA ───────────────────────────────────
+function renderizarBibliotecaPreview() {
+    const container = document.getElementById('biblioteca-tabla-container');
+    const preview   = document.getElementById('biblioteca-preview');
+    if (Object.keys(bibliotecaConectores).length === 0) {
+        preview.style.display = 'none';
+        return;
+    }
+    preview.style.display = 'block';
+    let html = `<table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <tr style="background:#e9ecef;">
+            <th style="padding:8px; border:1px solid #dee2e6;">PN Conector</th>
+            <th style="padding:8px; border:1px solid #dee2e6;">Descripción</th>
+            <th style="padding:8px; border:1px solid #dee2e6;">Profundidad (mm)</th>
+            <th style="padding:8px; border:1px solid #dee2e6;">Terminales compatibles</th>
+        </tr>`;
+    for (let pn in bibliotecaConectores) {
+        const c = bibliotecaConectores[pn];
+        const terms = Object.keys(c.terminales || {}).map(tpn => {
+            const t = c.terminales[tpn];
+            return `<span style="background:#e8f4fd; padding:2px 6px; border-radius:3px; margin:2px; display:inline-block;">
+                ${tpn} (strip:${t.strip_mm}mm / consumo:${t.consumo_mm}mm)
+            </span>`;
+        }).join('');
+        html += `<tr>
+            <td style="padding:8px; border:1px solid #dee2e6; font-weight:bold;">${pn}</td>
+            <td style="padding:8px; border:1px solid #dee2e6;">${c.descripcion || '-'}</td>
+            <td style="padding:8px; border:1px solid #dee2e6; text-align:center;">${c.profundidad_mm || 0}</td>
+            <td style="padding:8px; border:1px solid #dee2e6;">${terms || '-'}</td>
+        </tr>`;
+    }
+    html += '</table>';
+    container.innerHTML = html;
+}
+
+// ── CÁLCULO DEL AJUSTE POR MEDIDA ─────────────────────────────
+// Dado el PN del conector y el PN de la terminal, devuelve mm a ajustar
+function calcularAjusteMedida(connectorPn, terminalPn) {
+    if (!connectorPn || !terminalPn || terminalPn === '-') return 0;
+
+    const conector = bibliotecaConectores[String(connectorPn).trim()];
+    if (!conector) return 0;
+
+    const terminal = (conector.terminales || {})[String(terminalPn).trim()];
+    if (!terminal) return 0;
+
+    const posicion = document.querySelector('input[name="posicion-medida"]:checked').value;
+
+    if (posicion === 'antes') {
+        // Sumar solo el strip de la terminal
+        return terminal.strip_mm || 0;
+    } else {
+        // Restar profundidad del conector y sumar consumo de terminal
+        return (terminal.consumo_mm || 0) - (conector.profundidad_mm || 0);
+    }
+}
+
+// Feedback visual al aplicar
+function aplicarMedidasABOM() {
+    generarReporteRutas();
+    generarReporteBOM();
+    mostrarToast('📏 Medidas aplicadas al BOM y Lista de Corte');
+}
+
+// ── GUARDAR / CARGAR CON EL PROYECTO ──────────────────────────
+function getConfigMedidasParaGuardar() {
+    return {
+        posicion: document.querySelector('input[name="posicion-medida"]:checked').value,
+        biblioteca: bibliotecaConectores
+    };
+}
+
+function cargarConfigMedidas(data) {
+    if (!data) return;
+    if (data.posicion) {
+        document.querySelector(`input[name="posicion-medida"][value="${data.posicion}"]`).checked = true;
+    }
+    if (data.biblioteca) {
+        bibliotecaConectores = data.biblioteca;
+        const total = Object.keys(bibliotecaConectores).length;
+        document.getElementById('biblioteca-status').innerHTML =
+            `<span style="color:#28a745; font-weight:bold;">✅ ${total} conectores cargados (desde proyecto)</span>`;
+        renderizarBibliotecaPreview();
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// FIN CONFIGURACIÓN DE MEDIDAS
+// ══════════════════════════════════════════════════════════════
         
         const paper = new joint.dia.Paper({
             el: document.getElementById('lienzo-arnes'), model: graph, width: 3000, height: 2000, gridSize: 10, drawGrid: true, background: { color: '#ffffff' },
@@ -1020,10 +1259,61 @@
         $('#btn-zoom-in').click(() => { escalaActual += 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); });
         $('#btn-zoom-out').click(() => { if(escalaActual > 0.3) { escalaActual -= 0.1; paper.scale(escalaActual, escalaActual); $('#zoom-level').text(Math.round(escalaActual * 100) + '%'); } });
         $('#btn-clear-canvas').click(() => { if(confirm("¿Estás seguro?")) { graph.clear(); contSplices = 1; } });
-        
-        $('#btn-save-json').click(() => { const jsonStr = JSON.stringify(graph.toJSON(), null, 2); const blob = new Blob([jsonStr], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = "arnes_proyecto.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); });
-        $('#input-load-json').on('change', function(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(event) { try { const jsonData = JSON.parse(event.target.result); graph.clear(); graph.fromJSON(jsonData); let maxSplice = 0; graph.getElements().forEach(el => { const d = el.get('bomData'); if(d && d.type === 'Splice' && d.name) { const match = d.name.match(/SP-(\d+)/); if(match && parseInt(match[1]) > maxSplice) { maxSplice = parseInt(match[1]); } } }); contSplices = maxSplice + 1; alert("Cargado."); } catch (error) { alert("Error."); } }; reader.readAsText(file); $(this).val(''); });
+       $('#btn-save-json').click(() => {
+    const proyecto = {
+        graph:   graph.toJSON(),
+        medidas: getConfigMedidasParaGuardar()
+    };
+    const blob = new Blob([JSON.stringify(proyecto, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = "arnes_proyecto.json";
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+});
+        $('#input-load-json').on('change', function(e) {
+    const file = e.target.files[0]; 
+    if (!file) return; 
+    const reader = new FileReader(); 
+    reader.onload = function(event) { 
+        try { 
+            const jsonData = JSON.parse(event.target.result); 
+            graph.clear();
 
+            // ── Detectar si es proyecto nuevo (con medidas) o viejo ────────
+            if (jsonData.graph) {
+                // Proyecto nuevo — tiene graph y medidas separados
+                graph.fromJSON(jsonData.graph);
+                cargarConfigMedidas(jsonData.medidas); // ← CAMBIO
+            } else {
+                // Proyecto viejo — el JSON es directamente el graph
+                graph.fromJSON(jsonData);
+                cargarConfigMedidas(null); // ← CAMBIO
+            }
+            // ──────────────────────────────────────────────────────────────
+
+            commandManager.reset();
+            actualizarBotonesHistorial();
+
+            let maxSplice = 0; 
+            graph.getElements().forEach(el => { 
+                const d = el.get('bomData'); 
+                if(d && d.type === 'Splice' && d.name) { 
+                    const match = d.name.match(/SP-(\d+)/); 
+                    if(match && parseInt(match[1]) > maxSplice) { 
+                        maxSplice = parseInt(match[1]); 
+                    } 
+                } 
+            }); 
+            contSplices = maxSplice + 1; 
+            alert("Cargado."); 
+        } catch (error) { 
+            alert("Error al cargar el proyecto."); 
+        } 
+    }; 
+    reader.readAsText(file); 
+    $(this).val(''); 
+});
         // ==========================================
         // 7. CÁLCULO MATEMÁTICO DEL LOOM
         // ==========================================
@@ -1164,12 +1454,24 @@
 
                     let esTrenzado = (data.trenzado && data.trenzado.trim() !== '');
                     // ── +12mm por cada extremo que conecta a un Splice ────────────────
-const srcEsSplice = srcNode && srcNode.get('bomData') && srcNode.get('bomData').type === 'Splice';
-const tgtEsSplice = tgtNode && tgtNode.get('bomData') && tgtNode.get('bomData').type === 'Splice';
-const extraSplice = (srcEsSplice ? 12 : 0) + (tgtEsSplice ? 12 : 0);
+                    const srcEsSplice = srcNode && srcNode.get('bomData') && srcNode.get('bomData').type === 'Splice';
+                    const tgtEsSplice = tgtNode && tgtNode.get('bomData') && tgtNode.get('bomData').type === 'Splice';
+                    const extraSplice = (srcEsSplice ? 12 : 0) + (tgtEsSplice ? 12 : 0);
 
-let longitudParaReporte = (esTrenzado ? Math.round(data.length * 1.08) : data.length) + extraSplice;
-                    let longitudInches = (longitudParaReporte / 25.4).toFixed(2);
+                    // ── Ajuste por medidas de terminal (biblioteca global) ─────────
+                    const connPn1  = srcData.housingPartNumber || '';
+                    const connPn2  = tgtData.housingPartNumber || '';
+                    const termPn1  = (srcData.terminals && srcData.terminals[rawSrcPort])
+                        ? (srcData.terminals[rawSrcPort].pn || '') : '';
+                    const termPn2  = (tgtData.terminals && tgtData.terminals[rawTgtPort])
+                        ? (tgtData.terminals[rawTgtPort].pn || '') : '';
+
+                    const ajuste1 = srcData.type === 'Splice' ? 0 : calcularAjusteMedida(connPn1, termPn1);
+                    const ajuste2 = tgtData.type === 'Splice' ? 0 : calcularAjusteMedida(connPn2, termPn2);
+
+                    let longitudParaReporte = (esTrenzado ? Math.round(data.length * 1.08) : data.length)
+                        + extraSplice + ajuste1 + ajuste2;
+                    // ──────────────────────────────────────────────────────────────
                     
                     let circuitoTag = esTrenzado ? `${data.circuito} [${data.trenzado}]` : (data.circuito || 'S/N');
 
@@ -1265,8 +1567,25 @@ let longitudParaReporte = (esTrenzado ? Math.round(data.length * 1.08) : data.le
                     const tgtEsSpliceBom = tgtElBom && tgtElBom.get('bomData') && tgtElBom.get('bomData').type === 'Splice';
                     const extraSpliceBom = ((srcEsSpliceBom ? 12 : 0) + (tgtEsSpliceBom ? 12 : 0));
 
-                    let longitudBOM = data.length + extraSpliceBom;
+                    // ── Ajuste por medidas de terminal (biblioteca global) ─────────
+                    const srcDataBom     = srcElBom ? srcElBom.get('bomData') : null;
+                    const tgtDataBom     = tgtElBom ? tgtElBom.get('bomData') : null;
+                    const rawSrcPortBom  = link.get('source').port;
+                    const rawTgtPortBom  = link.get('target').port;
+
+                    const connPnBom1 = srcDataBom ? (srcDataBom.housingPartNumber || '') : '';
+                    const connPnBom2 = tgtDataBom ? (tgtDataBom.housingPartNumber || '') : '';
+                    const termPnBom1 = (srcDataBom && srcDataBom.terminals && srcDataBom.terminals[rawSrcPortBom])
+                        ? (srcDataBom.terminals[rawSrcPortBom].pn || '') : '';
+                    const termPnBom2 = (tgtDataBom && tgtDataBom.terminals && tgtDataBom.terminals[rawTgtPortBom])
+                        ? (tgtDataBom.terminals[rawTgtPortBom].pn || '') : '';
+
+                    const ajusteBom1 = srcDataBom && srcDataBom.type === 'Splice' ? 0 : calcularAjusteMedida(connPnBom1, termPnBom1);
+                    const ajusteBom2 = tgtDataBom && tgtDataBom.type === 'Splice' ? 0 : calcularAjusteMedida(connPnBom2, termPnBom2);
+
+                    let longitudBOM = data.length + extraSpliceBom + ajusteBom1 + ajusteBom2;
                     if(data.trenzado && data.trenzado.trim() !== '') { longitudBOM = Math.round(longitudBOM * 1.08); }
+                    // ──────────────────────────────────────────────────────────────
                     // ───
                     const llaveCable = `${data.gage} AWG ${data.insulation} ${data.color}`; 
                     if(!cablesTotales[llaveCable]) cablesTotales[llaveCable] = 0; 
