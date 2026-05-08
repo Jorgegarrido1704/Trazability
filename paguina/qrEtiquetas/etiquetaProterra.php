@@ -72,8 +72,7 @@ try{
 
 <style>
     .sheet{
-        width:38mm; height:162mm;
-        display:flex;
+        width:38.5mm; height:104.5mm;
     
         padding-top:23mm;
         padding-left:5mm;
