@@ -28,7 +28,7 @@ while($row = mysqli_fetch_array($validarFaltante)){
     $rowPrecio = mysqli_fetch_array($buscarPrecio);
     if (mysqli_num_rows($buscarPrecio) == 0) {
       mysqli_query($con, "INSERT INTO `precios`( `client`, `pn`, `desc`, `rev`, `price`, `send`) VALUES ( '$cliente', '$pn', '$desc', '$rev', '$price', '$send')");
-    echo $pn . " " . $rev . "Insertado<br>";
+    echo $pn . " " . $rev . " Insertado<br>";
 
     }else{
     $revPrecio = "";
