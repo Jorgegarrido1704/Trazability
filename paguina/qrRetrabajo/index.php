@@ -7,13 +7,19 @@ try{
 $pn=isset($_GET['pn'])?$_GET['pn']:"";
 $cons=isset($_GET['cons'])?$_GET['cons']:"";
 $today = date('mdY');
+if($cons<10){
+    $cons="00".$cons;
+}elseif($cons<100){
+    $cons="0".$cons;
+}
+
 $datos = null;
 $desc = null;
 $codigo = null;
     if($pn!="" and $cons !=""){
       //  echo "Part Number: $pn <br>";
         //echo "Consignment: $cons <br>";
-    $buscar = mysqli_query($con, "SELECT `CodigoIdentificaicon` FROM `registroqrs` where `CodigoIdentificaicon` Like '%$pn%$cons' order by id_qr desc limit 1");
+    $buscar = mysqli_query($con, "SELECT `CodigoIdentificaicon` FROM `registroqrs` where `CodigoIdentificaicon` Like '5703|$pn|%|%|$cons' order by id_qr desc limit 1");
     if (mysqli_num_rows($buscar) > 0) {
         $rows = mysqli_fetch_array($buscar);
         $codigo = $rows['CodigoIdentificaicon'];
