@@ -97,6 +97,13 @@
                 <label><input type="radio" name="unit-toggle" value="in"> in</label>
             </div>
             <strong>Zoom:</strong> <button id="btn-zoom-out">-</button> <span id="zoom-level">100%</span> <button id="btn-zoom-in">+</button>
+            <span style="border-left: 2px solid #ccc; margin: 0 2px; height: 30px;"></span>
+            <button id="btn-undo" onclick="undo()" 
+                    style="background:#6c757d; color:white; padding:8px 15px; border:none; border-radius:4px; cursor:pointer; font-weight:bold;" 
+                    disabled>↩ Deshacer</button>
+            <button id="btn-redo" onclick="redo()" 
+                    style="background:#6c757d; color:white; padding:8px 15px; border:none; border-radius:4px; cursor:pointer; font-weight:bold;" 
+                    disabled>↪ Rehacer</button>
         </div>
     
 <button class="btn-info" id="btn-toggle-agrupar" style="background-color: #2980b9;">Agrupar Vista</button>
@@ -414,8 +421,16 @@
     <div id="modal-loom" class="modal">
         <h3>Propiedades de Protección / Cubierta</h3>
         <div class="form-group"><label>Tipo de Recubrimiento:</label><select id="loom-tipo"><option value="corrugado">Tubo Corrugado (Loom)</option><option value="manga">Manga Expandible (Sleeve)</option><option value="pvc">Tubo PVC (Genérico)</option></select></div>
-        <div class="form-group"><label>Cantidad Requerida (mm, pzas):</label><input type="number" id="loom-qty" value="1"></div>
-        <p style="font-size: 11px; color: #666; margin-bottom: 10px;">* El tamaño y diámetro se calculan automáticamente en el lienzo.</p>
+        <div class="form-group"><label>Cantidad Requerida (pzas):</label><input type="number" id="loom-qty" value="1"></div>
+        <div class="form-group"><label>Longitud (mm):</label><input type="number" id="loom-length" value="200" min="1"></div>
+        <div class="form-group"><label>Ancho / Diámetro (mm):</label><input type="number" id="loom-width" value="40" min="1"></div>
+        <div class="form-group"><label>Orientación:</label>
+            <select id="loom-orientacion">
+                <option value="horizontal">Horizontal</option>
+                <option value="vertical">Vertical</option>
+            </select>
+        </div>
+        <p style="font-size: 11px; color: #666; margin-bottom: 10px;">* El diámetro real se recalcula al presionar "⚡ Calcular Looms".</p>
         <button id="btn-agrupar-loom" class="btn-info" style="width: 100%; margin-bottom: 5px;">Alinear y Bloquear Cables</button>
         <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
         <div class="modal-actions"><button class="btn-danger" id="btn-delete-loom">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-loom">Guardar</button></div></div>
@@ -426,8 +441,13 @@
         <div class="form-group"><label>Tipo de Amarre:</label><select id="tie-tipo"><option value="cincho">Cincho Plástico (Zip Tie)</option><option value="cinta">Cinta (Tape Spot)</option></select></div>
         <div class="form-group"><label>Descripción / Part Number:</label><input type="text" id="tie-desc" value="Cincho 4 pulgadas"></div>
         <div class="form-group"><label>Cantidad (Ej. 2 amarres):</label><input type="number" id="tie-qty" value="1"></div>
-        <p style="font-size: 11px; color: #666; margin-bottom: 10px;">* Si seleccionas "Cinta", cada amarre sumará 3 inches de Tape-25 al BOM.</p>
-        <button id="btn-agrupar-tie" class="btn-info" style="width: 100%; margin-bottom: 5px;">Alinear y Bloquear Cables</button>
+        <div class="form-group"><label>Orientación:</label>
+            <select id="tie-orientacion">
+                <option value="horizontal">Horizontal</option>
+                <option value="vertical">Vertical</option>
+            </select>
+        </div>
+        <p style="font-size: 11px; color: #666; margin-bottom: 10px;">* Si seleccionas "Cinta", cada amarre sumará 3 inches de Tape-25 al BOM.</p><button id="btn-agrupar-tie" class="btn-info" style="width: 100%; margin-bottom: 5px;">Alinear y Bloquear Cables</button>
         <button class="btn-warning btn-desbloquear" style="width: 100%; margin-bottom: 15px; color:#000;">Desbloquear Cables</button>
         <div class="modal-actions"><button class="btn-danger" id="btn-delete-tie">Eliminar</button><div><button class="btn-cancel" onclick="cerrarModales()">Cerrar</button><button class="btn-success" id="btn-save-tie">Guardar</button></div></div>
     </div>
@@ -494,7 +514,59 @@
         
         function evaluarMatematica(expresion) { try { let expLimpia = String(expresion).replace(/[^0-9\+\-\.\s]/g, ''); if(expLimpia.trim() === '') return 0; return Function('"use strict";return (' + expLimpia + ')')(); } catch (e) { return 0; } }
 
-        let escalaActual = 1; let contSplices = 1; const graph = new joint.dia.Graph(); let elementoRedimensionando = null; 
+        let escalaActual = 1;
+        let contSplices = 1;
+        const graph = new joint.dia.Graph();
+        let elementoRedimensionando = null;
+
+        // ── Undo / Redo (snapshot stack) ─────────────────────────────
+        const historial = { 
+            pasado: [], 
+            futuro: [], 
+            grabando: false 
+        };
+
+        function guardarSnapshot() {
+            if (historial.grabando) return;
+            historial.pasado.push(JSON.stringify(graph.toJSON()));
+            historial.futuro = [];           // nueva acción borra el futuro
+            if (historial.pasado.length > 50) historial.pasado.shift(); // límite de memoria
+            actualizarBotonesHistorial();
+        }
+
+        function actualizarBotonesHistorial() {
+            const btnUndo = document.getElementById('btn-undo');
+            const btnRedo = document.getElementById('btn-redo');
+            if (btnUndo) btnUndo.disabled = historial.pasado.length === 0;
+            if (btnRedo) btnRedo.disabled = historial.futuro.length === 0;
+        }
+
+        function undo() {
+            if (historial.pasado.length === 0) return;
+            historial.grabando = true;
+            historial.futuro.push(JSON.stringify(graph.toJSON()));
+            const estadoAnterior = historial.pasado.pop();
+            graph.fromJSON(JSON.parse(estadoAnterior));
+            historial.grabando = false;
+            actualizarBotonesHistorial();
+        }
+
+        function redo() {
+            if (historial.futuro.length === 0) return;
+            historial.grabando = true;
+            historial.pasado.push(JSON.stringify(graph.toJSON()));
+            const estadoSiguiente = historial.futuro.pop();
+            graph.fromJSON(JSON.parse(estadoSiguiente));
+            historial.grabando = false;
+            actualizarBotonesHistorial();
+        }
+
+        // Captura automática al modificar el canvas
+        graph.on('add remove change:position change:size change:attrs change:bomData change:vertices', 
+            _.debounce(guardarSnapshot, 300)
+        );
+// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
         // ══════════════════════════════════════════════════════════════
 // ══════════════════════════════════════════════════════════════
 // CONFIGURACIÓN DE MEDIDAS — GLOBAL + BIBLIOTECA JSON
@@ -602,7 +674,7 @@ function calcularAjusteMedida(connectorPn, terminalPn) {
 function aplicarMedidasABOM() {
     generarReporteRutas();
     generarReporteBOM();
-    mostrarToast('📏 Medidas aplicadas al BOM y Lista de Corte');
+   // mostrarToast('📏 Medidas aplicadas al BOM y Lista de Corte');
 }
 
 // ── GUARDAR / CARGAR CON EL PROYECTO ──────────────────────────
@@ -1212,23 +1284,59 @@ function cargarConfigMedidas(data) {
 
         $('#btn-save-splice').click(() => { if (nodoActual) { const nuevoNombre = $('#splice-name').val(); let d = nodoActual.get('bomData'); d.name = nuevoNombre; nodoActual.set('bomData', d); nodoActual.attr('label/text', nuevoNombre); } cerrarModales(); });
         
-        $('#btn-save-loom').click(() => { 
-                if (nodoActual) { 
-                    const tipoRecubrimiento = $('#loom-tipo').val(); const qty = parseFloat($('#loom-qty').val()) || 1; 
-                    let d = JSON.parse(JSON.stringify(nodoActual.get('bomData'))); 
-                    d.recubrimiento = tipoRecubrimiento; d.qty = qty; nodoActual.set('bomData', d); 
-                    const colores = loomColors[tipoRecubrimiento]; nodoActual.attr('body/fill', colores.fill); nodoActual.attr('body/stroke', colores.stroke);
-                } cerrarModales(); 
-            });
+        $('#btn-save-loom').click(() => {
+            if (nodoActual) {
+                const tipoRecubrimiento = $('#loom-tipo').val();
+                const qty        = parseFloat($('#loom-qty').val())    || 1;
+                const longitud   = parseFloat($('#loom-length').val()) || 200;
+                const ancho      = parseFloat($('#loom-width').val())  || 40;
+                const orientacion = $('#loom-orientacion').val();
 
-        $('#btn-save-tie').click(() => { 
-            if (nodoActual) { 
-                const tipoTie = $('#tie-tipo').val(); const desc = $('#tie-desc').val(); const qty = parseFloat($('#tie-qty').val()) || 1; const orientacion = $('#tie-orientacion').val(); 
-                let d = nodoActual.get('bomData'); d.recubrimiento = tipoTie; d.description = desc; d.qty = qty; d.orientacion = orientacion; nodoActual.set('bomData', d); 
-                const colores = tieColors[tipoTie]; nodoActual.attr('body/fill', colores.fill); nodoActual.attr('body/stroke', colores.stroke);
-                if(orientacion === 'vertical') { nodoActual.attr('label/transform', 'rotate(-90)'); } else { nodoActual.attr('label/transform', 'rotate(0)');} 
-            } cerrarModales(); 
+                let d = JSON.parse(JSON.stringify(nodoActual.get('bomData')));
+                d.recubrimiento = tipoRecubrimiento;
+                d.qty           = qty;
+                d.len           = longitud;
+                d.wid           = ancho;
+                d.orientacion   = orientacion;
+                nodoActual.set('bomData', d);
+
+                // Resize the shape to match the new dimensions
+                if (orientacion === 'horizontal') {
+                    nodoActual.resize(longitud, ancho);
+                } else {
+                    nodoActual.resize(ancho, longitud);
+                }
+
+                const colores = loomColors[tipoRecubrimiento];
+                nodoActual.attr('body/fill',   colores.fill);
+                nodoActual.attr('body/stroke', colores.stroke);
+            }
+            cerrarModales();
         });
+
+        $('#btn-save-tie').click(() => {
+                if (nodoActual) {
+                    const tipoTie    = $('#tie-tipo').val();
+                    const desc       = $('#tie-desc').val();
+                    const qty        = parseFloat($('#tie-qty').val()) || 1;
+                    const orientacion = $('#tie-orientacion').val() || 'horizontal'; // safe fallback
+
+                    let d = nodoActual.get('bomData');
+                    d.recubrimiento = tipoTie;
+                    d.description   = desc;
+                    d.qty           = qty;
+                    d.orientacion   = orientacion;
+                    nodoActual.set('bomData', d);
+
+                    const colores = tieColors[tipoTie];
+                    nodoActual.attr('body/fill',   colores.fill);
+                    nodoActual.attr('body/stroke', colores.stroke);
+                    nodoActual.attr('label/transform',
+                        orientacion === 'vertical' ? 'rotate(-90)' : 'rotate(0)'
+                    );
+                }
+                cerrarModales();
+            });
 
         graph.on('add', function(cell) { if (cell.isLink()) { cell.on('change:target', function(link) { if (link.get('target').id && link.get('source').id && !link.get('bomData')) { abrirModalCable(link); } }); } });
         
@@ -1292,7 +1400,8 @@ function cargarConfigMedidas(data) {
             }
             // ──────────────────────────────────────────────────────────────
 
-            commandManager.reset();
+            historial.pasado = [];
+            historial.futuro = [];
             actualizarBotonesHistorial();
 
             let maxSplice = 0; 
@@ -1423,7 +1532,7 @@ function cargarConfigMedidas(data) {
         // ==========================================
         function generarReporteRutas() {
             let i = 0; const links = graph.getLinks(); 
-            let encabezado = `<table style="font-size: 11px; white-space: nowrap;"><tr><th>ESTAMPADO (CIRCUITO)</th><th>CONS. RACK</th><th>TIPO DE CABLE</th><th>CALIBRE (AWG)</th><th>COLOR</th><th>LONGITUD (MM)</th><th>LONGITUD (IN)</th><th>DESTINO 1 STRIP</th><th>DESTINO 1 TERMINAL</th><th>Herramienta 1</th><th>DESTINO 2 STRIP</th><th>DESTINO 2 TERMINAL</th><th>Herramienta 2</th><th>COLOR DE TINTA</th><th>QTY</th><th>DESTINO 1</th><th>DESTINO 2</th></tr>`;
+            let encabezado = `<table style="font-size: 11px; white-space: nowrap;"><tr><th>ESTAMPADO (CIRCUITO)</th><th>CONS. RACK</th><th>TIPO DE CABLE</th><th>CALIBRE (AWG)</th><th>COLOR</th><th>LONGITUD (MM)</th><th>DESTINO 1 STRIP</th><th>DESTINO 1 TERMINAL</th><th>Herramienta 1</th><th>DESTINO 2 STRIP</th><th>DESTINO 2 TERMINAL</th><th>Herramienta 2</th><th>COLOR DE TINTA</th><th>QTY</th><th>DESTINO 1</th><th>DESTINO 2</th></tr>`;
             
             let htmlCablesNormales = '';
             let gruposTrenzados = {};
@@ -1475,7 +1584,7 @@ function cargarConfigMedidas(data) {
                     
                     let circuitoTag = esTrenzado ? `${data.circuito} [${data.trenzado}]` : (data.circuito || 'S/N');
 
-                    let filaHtml = `<tr><td><b>${circuitoTag}</b></td><td>${i}</td><td>${data.insulation}</td><td>${data.gage}</td><td>${data.color}</td><td style="${esTrenzado ? 'background-color:#ffeb3b; font-weight:bold;' : ''}">${longitudParaReporte}</td><td>${longitudInches}</td><td><b>${term1}</b></td><td>-</td><td>-</td><td><b>${term2 || 'EMPALME'}</b></td><td>-</td><td>-</td><td>-</td><td>1</td><td>${dest1}</td><td>${dest2}</td></tr>`;
+                    let filaHtml = `<tr><td><b>${circuitoTag}</b></td><td>${i}</td><td>${data.insulation}</td><td>${data.gage}</td><td>${data.color}</td><td style="${esTrenzado ? 'background-color:#ffeb3b; font-weight:bold;' : ''}">${longitudParaReporte}</td><td><b>${term1}</b></td><td>-</td><td>-</td><td><b>${term2 || 'EMPALME'}</b></td><td>-</td><td>-</td><td>-</td><td>1</td><td>${dest1}</td><td>${dest2}</td></tr>`;
 
                     if (esTrenzado) {
                         let nombreGrupo = data.trenzado.trim().toUpperCase();
