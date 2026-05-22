@@ -97,7 +97,7 @@ try{
 
         <div class="col-4 " id="etiqueta1">
             <div class ="label">
-                <div class="smallbox">KB030-POS</div>
+                <div class="smallbox"><strong>KB030-POS</strong></div>
                 <div class="qr">
                 <?php
                 $data = 'KB030-POS';
@@ -109,7 +109,7 @@ try{
         </div>
         <div class="col-4 " id="etiqueta2">
             <div class ="label">
-                <div class="smallbox">KB030-POS</div>
+                <div class="smallbox"><strong>KB030-POS</strong></div>
                 <div class="qr">
                 <?php
                 $data = 'KB030-POS';
@@ -121,7 +121,7 @@ try{
         </div>
         <div class="col-4 " id="etiqueta3">
             <div class ="label">
-                <div class="smallbox">KB030-POS</div>
+                <div class="smallbox"><strong>KB030-POS</strong></div>
                 <div class="qr">
                 <?php
                 $data = 'KB030-POS';
@@ -147,7 +147,7 @@ try{
 
         <div class="col-4 " id="etiqueta1">
             <div class ="label">
-                <div class="smallbox">KB031-NEG</div>
+                <div class="smallbox"><strong>KB031-NEG</strong></div>
                 <div class="qr">
                 <?php
                 $data = 'KB031-NEG';
@@ -159,7 +159,7 @@ try{
         </div>
         <div class="col-4 " id="etiqueta2">
             <div class ="label">
-                <div class="smallbox">KB031-NEG</div>
+                <div class="smallbox"><strong>KB031-NEG</strong></div>
                 <div class="qr">
                 <?php
                 $data = 'KB031-NEG';
@@ -171,7 +171,7 @@ try{
         </div>
         <div class="col-4 " id="etiqueta3">
             <div class ="label">
-                <div class="smallbox">KB031-NEG</div>
+                <div class="smallbox"><strong>KB031-NEG</strong></div>
                 <div class="qr">
                 <?php
                 $data = 'KB031-NEG';
