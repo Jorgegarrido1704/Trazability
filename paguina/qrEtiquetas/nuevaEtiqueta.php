@@ -45,8 +45,8 @@ try{
    
 
     .qr img{
-        width:7mm;
-        height:7mm;
+        width:12mm;
+        height:12mm;
         align:center;
         text-align:center;
         padding-left:16px;
