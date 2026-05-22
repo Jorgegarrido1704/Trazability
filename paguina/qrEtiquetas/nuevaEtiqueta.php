@@ -17,7 +17,7 @@ try{
 
 <style>
     .sheet{
-        width:85mm; height:104.5mm;
+        width:85mm; height:97mm;
     
         padding-top:1mm;
         padding-left:2mm;
@@ -27,8 +27,8 @@ try{
     .label{
         width:24.5mm;
         height:24.5mm;
-        border:1px solid black;
-        border-radius:1mm;
+        
+       
         display:inline-block;
         padding-left:10px;
         padding-right:15px;
@@ -45,17 +45,17 @@ try{
    
 
     .qr img{
-        width:12mm;
-        height:12mm;
+        width:10.5mm;
+        height:10.5mm;
         align:center;
         text-align:center;
-        padding-left:16px;
+        padding-left:10px;
     }
 
     .smallbox{
         
         text-align:center;
-        font-size:7px;
+        font-size:10px;
         margin-bottom:1px;
         padding-top:5px;
     }
@@ -67,9 +67,15 @@ try{
         margin-bottom:1px;
     }
 
-    #etiqueta{
+    #etiqueta1{
+        padding-left:7px;
+        padding-right:10px;
+    }#etiqueta2{
         padding-left:10px;
-        padding-right:8px;
+        padding-right:10px;
+    }#etiqueta3{
+        padding-left:10px;
+        padding-right:10px;
     }
     #logo{
         padding-left:2px;
@@ -89,7 +95,7 @@ try{
 
     <div class="row">
 
-        <div class="col-4 " id="etiqueta">
+        <div class="col-4 " id="etiqueta1">
             <div class ="label">
                 <div class="smallbox">KB030-POS</div>
                 <div class="qr">
@@ -101,7 +107,7 @@ try{
             </div>
             </div>            
         </div>
-        <div class="col-4 " id="etiqueta">
+        <div class="col-4 " id="etiqueta2">
             <div class ="label">
                 <div class="smallbox">KB030-POS</div>
                 <div class="qr">
@@ -113,12 +119,62 @@ try{
             </div>
             </div>            
         </div>
-        <div class="col-4 " id="etiqueta">
+        <div class="col-4 " id="etiqueta3">
             <div class ="label">
                 <div class="smallbox">KB030-POS</div>
                 <div class="qr">
                 <?php
                 $data = 'KB030-POS';
+                $qrcode = (new QRCode)->render($data);
+                ?>
+                <img src="<?php echo $qrcode; ?>">
+            </div>
+            </div>            
+        </div>
+       
+       
+
+    
+
+    </div>
+
+</div>
+<div class="sheet">
+
+
+
+    <div class="row">
+
+        <div class="col-4 " id="etiqueta1">
+            <div class ="label">
+                <div class="smallbox">KB031-NEG</div>
+                <div class="qr">
+                <?php
+                $data = 'KB031-NEG';
+                $qrcode = (new QRCode)->render($data);
+                ?>
+                <img src="<?php echo $qrcode; ?>">
+            </div>
+            </div>            
+        </div>
+        <div class="col-4 " id="etiqueta2">
+            <div class ="label">
+                <div class="smallbox">KB031-NEG</div>
+                <div class="qr">
+                <?php
+                $data = 'KB031-NEG';
+                $qrcode = (new QRCode)->render($data);
+                ?>
+                <img src="<?php echo $qrcode; ?>">
+            </div>
+            </div>            
+        </div>
+        <div class="col-4 " id="etiqueta3">
+            <div class ="label">
+                <div class="smallbox">KB031-NEG</div>
+                <div class="qr">
+                <?php
+                $data = 'KB031-NEG';
                 $qrcode = (new QRCode)->render($data);
                 ?>
                 <img src="<?php echo $qrcode; ?>">
