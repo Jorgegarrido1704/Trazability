@@ -1,6 +1,8 @@
 <?php
 
 require "../app/conection.php";
+try {
+    
 
 $select = mysqli_query($con, "SELECT wo,info,Qty FROM registro ");
 
@@ -30,4 +32,7 @@ while ($row = mysqli_fetch_array($select)) {
 
         
     }
+}
+} catch (\Throwable $th) {
+    echo "Error: " . $th->getMessage();
 }
