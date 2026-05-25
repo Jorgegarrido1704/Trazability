@@ -50,13 +50,16 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
                 <input type="submit" name="upload" value="Cargar CSV">
             </form>
         </div>
-        <div class="col-lg-2 mb-4 border">
-            <h1>Update Boms</h1>
-            <form action="guardarprueba.php" method="POST" enctype="multipart/form-data">
-                <input type="file" name="excel_file" id="excel_file" accept=".csv">
-                <input type="submit" name="upload" value="Subir">
-            </form>
+       <div class="col-lg-3 mb-4 border p-3">
+    <h1>Update Boms</h1>
+    <form action="guardarprueba.php" method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="excel_file" class="form-label">Selecciona el archivo Excel (.xlsx)</label>
+            <input type="file" name="excel_file" id="excel_file" accept=".xlsx" class="form-control" required>
         </div>
+        <input type="submit" name="upload" value="Subir" class="btn btn-primary">
+    </form>
+</div>
         <div class="col-lg-2 mb-4 border">
             <h1>Lista actividades</h1>
             <form action="../ing/upActividades.php" method="POST" enctype="multipart/form-data">
