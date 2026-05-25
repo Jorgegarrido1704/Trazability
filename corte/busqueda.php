@@ -50,7 +50,7 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
                 <input type="submit" name="upload" value="Cargar CSV">
             </form>
         </div>
-       <div class="col-lg-3 mb-4 border p-3">
+       <div class="col-lg-2 mb-4 border p-3">
     <h1>Update Boms</h1>
     <form action="guardarprueba.php" method="POST" enctype="multipart/form-data">
         <div class="mb-3">
