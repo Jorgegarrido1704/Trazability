@@ -78,6 +78,9 @@ try {
             margin-left: 3.5mm;
             margin-right: 3.5mm;
         }
+        #etiqueta3{
+            margin-right: 2mm;
+        }
 </style>
 </head>
 <body>
@@ -92,8 +95,8 @@ function generarDataMatrixHTML($texto) {
         $bobj = $barcode->getBarcodeObj(
             'DATAMATRIX', // Tipo de código
             $texto,       // Texto a codificar
-            28,           // Ancho (escala relativa)
-            28,           // Alto (escala relativa)
+            27,           // Ancho (escala relativa)
+            27,           // Alto (escala relativa)
             'black',      // Color de los módulos
             array(-1, -1, -1, -1) // Márgenes limpios
         );
