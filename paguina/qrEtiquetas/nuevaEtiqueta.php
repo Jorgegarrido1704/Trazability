@@ -64,7 +64,7 @@ try {
             width: 7mm !important;
             height: 7mm !important;
             display: block;
-            margin-left : 7px;
+            margin-left : 16px;
            
         }
         
@@ -87,8 +87,8 @@ function generarDataMatrixHTML($texto) {
         $bobj = $barcode->getBarcodeObj(
             'DATAMATRIX', // Tipo de código
             $texto,       // Texto a codificar
-            -3,           // Ancho (escala relativa)
-            -3,           // Alto (escala relativa)
+            20,           // Ancho (escala relativa)
+            20,           // Alto (escala relativa)
             'black',      // Color de los módulos
             array(-1, -1, -1, -1) // Márgenes limpios
         );
