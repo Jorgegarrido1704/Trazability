@@ -70,7 +70,7 @@ try {
         
     .smallbox{
         text-align:center;
-        font-size:6px;
+        font-size:9px;
         margin-bottom:1px;
         }
 </style>
