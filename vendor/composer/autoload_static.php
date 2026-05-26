@@ -41,6 +41,13 @@ class ComposerStaticInit2185d2f99bcd56787481d9357a5972d3
         array (
             'Composer\\Pcre\\' => 14,
             'Complex\\' => 8,
+            'Com\\Tecnick\\Color\\' => 18,
+            'Com\\Tecnick\\Barcode\\' => 20,
+        ),
+        'B' => 
+        array (
+            'BarcodeBakery\\Common\\' => 21,
+            'BarcodeBakery\\Barcode\\' => 22,
         ),
     );
 
@@ -104,6 +111,22 @@ class ComposerStaticInit2185d2f99bcd56787481d9357a5972d3
         'Complex\\' => 
         array (
             0 => __DIR__ . '/..' . '/markbaker/complex/classes/src',
+        ),
+        'Com\\Tecnick\\Color\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/tecnickcom/tc-lib-color/src',
+        ),
+        'Com\\Tecnick\\Barcode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/tecnickcom/tc-lib-barcode/src',
+        ),
+        'BarcodeBakery\\Common\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/barcode-bakery/barcode-common/src',
+        ),
+        'BarcodeBakery\\Barcode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/barcode-bakery/barcode-1d/src',
         ),
     );
 

@@ -21,4 +21,8 @@ return array(
     'Matrix\\' => array($vendorDir . '/markbaker/matrix/classes/src'),
     'Composer\\Pcre\\' => array($vendorDir . '/composer/pcre/src'),
     'Complex\\' => array($vendorDir . '/markbaker/complex/classes/src'),
+    'Com\\Tecnick\\Color\\' => array($vendorDir . '/tecnickcom/tc-lib-color/src'),
+    'Com\\Tecnick\\Barcode\\' => array($vendorDir . '/tecnickcom/tc-lib-barcode/src'),
+    'BarcodeBakery\\Common\\' => array($vendorDir . '/barcode-bakery/barcode-common/src'),
+    'BarcodeBakery\\Barcode\\' => array($vendorDir . '/barcode-bakery/barcode-1d/src'),
 );
