@@ -16,7 +16,6 @@ try {
 <style>
     .sheet{
         width:85mm; height:97mm;
-        padding-top:1mm;
         padding-left:2mm;
     }
 
@@ -62,8 +61,8 @@ try {
         }
 
         .qr  {
-            width: 10.5mm !important;
-            height: 10.5mm !important;
+            width: 7mm !important;
+            height: 7mm !important;
             display: block;
             margin-left : 7px;
            
@@ -71,10 +70,9 @@ try {
         
     .smallbox{
         text-align:center;
-        font-size:10px;
+        font-size:6px;
         margin-bottom:1px;
-        padding-top:5px;
-    }
+        }
 </style>
 </head>
 <body>
