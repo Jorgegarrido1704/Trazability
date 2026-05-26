@@ -91,14 +91,14 @@ function generarDataMatrixHTML($texto) {
     try {
         $barcode = new \Com\Tecnick\Barcode\Barcode();
         
-        // El método correcto es getBarcodeObj
+        
         $bobj = $barcode->getBarcodeObj(
-            'DATAMATRIX', // Tipo de código
-            $texto,       // Texto a codificar
-            27,           // Ancho (escala relativa)
-            27,           // Alto (escala relativa)
-            'black',      // Color de los módulos
-            array(-1, -1, -1, -1) // Márgenes limpios
+            'DATAMATRIX', 
+            $texto,       
+            27,           
+            27,           
+            'black',    
+            array(-1, -1, -1, -1) 
         );
 
         // Retorna el div con el código en formato SVG vectorial integrado
