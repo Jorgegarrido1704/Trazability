@@ -79,7 +79,7 @@ try {
             margin-right: 3.5mm;
         }
         #etiqueta3{
-            margin-right: 2mm;
+            padding-right: 5mm;
         }
 </style>
 </head>
