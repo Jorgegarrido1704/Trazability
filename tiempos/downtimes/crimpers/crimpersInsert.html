@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crimpers Insert</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1>Crimpers Insert</h1>
+      <form method="POST" onsubmit="event.preventDefault(); sendinformation();">
+        <div class="row">
+                <div class="col-md-2 mb-3">
+                <label for="dateRegistered" class="form-label">Date</label>
+                <input type="date" class="form-control" id="dateRegistered" name="dateRegistered"  required>
+                </div>
+                <div class="col-md-2 mb-3">
+                <label for="toolingCrimperName" class="form-label">Crimper ID</label>
+                <select class="form-select" id="toolingCrimperName" name="toolingCrimperName" required>
+                    <option value="" disabled selected>Select Crimper ID</option>
+                    <optgroup label="L1">
+                        <option value="L1-1">L1-1</option>
+                        <option value="L1-2">L1-2</option>
+                        <option value="L1-3">L1-3</option>
+                        <option value="L1-4">L1-4</option>
+                        <option value="L1-5">L1-5</option>
+                        </optgroup>
+                    <optgroup label="L2">
+                        <option value="L2-1">L2-1</option>
+                        <option value="L2-2">L2-2</option>
+                        </optgroup> 
+                    <optgroup label="L3">
+                        <option value="L3-1">L3-1</option>
+                        <option value="L3-2">L3-2</option>
+                        <option value="L3-3">L3-3</option>
+                        </optgroup>
+                    <optgroup label="L4">
+                        <option value="L4-1">L4-1</option>
+                        <option value="L4-2">L4-2</option>
+                        </optgroup>
+
+                        </select>   
+                </div>
+                <div class="col-md-2 mb-3">
+                <label for="Hour time" class="form-label">Hour time</label>
+                   <select class="form-select" id="hourTime" name="hourTime" required onchange="CheckDuplicate();">
+                    <option value="" disabled selected>Select Hour Time</option>
+                    <option value="07:30:00-08:30:00">07:30:00-08:30:00</option>
+                    <option value="08:30:00-09:30:00">08:30:00-09:30:00</option>
+                    <option value="09:30:00-10:30:00">09:30:00-10:30:00</option>
+                    <option value="10:30:00-11:30:00">10:30:00-11:30:00</option>
+                    <option value="11:30:00-12:30:00">11:30:00-12:30:00</option>
+                    <option value="12:30:00-13:30:00">12:30:00-13:30:00</option>
+                    <option value="13:30:00-14:30:00">13:30:00-14:30:00</option>
+                    <option value="14:30:00-15:30:00">14:30:00-15:30:00</option>
+                    </select>   
+                </div>
+                <div class="col-md-1 mb-3">
+                    <label for="Qty" class="form-label">Qty </label>
+                    <input type="number" class="form-control" id="Qty" name="Qty" min="0" step="1" required>
+                </div>
+                <div class="col-md-1 mb-3">
+                    <label for="downtime" class="form-label">Downtime</label>
+                    <input type="number" class="form-control" id="downtime" name="downtime" min="0" step="1" required>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="reason" class="form-label">Reason</label>
+                    <input type="text" class="form-control" id="reason" name="reason" maxlength="4" required>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="observation" class="form-label">Observation</label>
+                    <input type="text" class="form-control" id="observation" name="observation" required>
+                    </div>  
+                    <input type="hidden" name="startHour" id="startHour">
+                    <input type="hidden" name="endHour" id="endHour">
+
+                    <button type="submit" class="btn btn-primary">Insert Crimper</button>
+                
+            </div>      
+            </form>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  </body>
+</html>
+<script>
+    window.onload = function() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById("dateRegistered").value=today;
+        document.getElementById("dateRegistered").setAttribute('max', today);
+    };
+
+    async function CheckDuplicate(){
+        var dateRegistered = document.getElementById("dateRegistered").value;
+        var toolingCrimperName = document.getElementById("toolingCrimperName").value;
+        var hourTime = document.getElementById("hourTime").value;
+
+        let data = {
+            dateRegistered: dateRegistered,
+            toolingCrimperName: toolingCrimperName,
+            hourTime: hourTime
+        };
+
+        let response = await fetch('check_duplicate.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({data: data})
+        });
+        let result = await response.json();
+        if(result.status === 'duplicate'){
+            alert(result.message);
+            window.location.href = 'crimpersInsert.html';
+        }
+        
+    }
+     async function sendinformation(){
+        var dateRegistered = document.getElementById("dateRegistered").value;
+        var toolingCrimperName = document.getElementById("toolingCrimperName").value;
+        var hourTime = document.getElementById("hourTime").value;
+        var Qty = document.getElementById("Qty").value;
+        var downtime = document.getElementById("downtime").value;
+        var reason = document.getElementById("reason").value;
+        var observation = document.getElementById("observation").value;
+        reason = reason.toUpperCase();
+        let data = {
+            dateRegistered: dateRegistered,
+            toolingCrimperName: toolingCrimperName,
+            hourTime: hourTime,
+            Qty: Qty,
+            downtime: downtime,
+            reason: reason,
+            observation: observation,
+            startHour: startime,
+            endHour: endtime
+        };
+
+        let response = await fetch('crimpers.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({data: data})
+        });
+        let result = await response.json();
+        console.log(result);
+        alert(result.message);
+
+
+        
+    }
+</script>
