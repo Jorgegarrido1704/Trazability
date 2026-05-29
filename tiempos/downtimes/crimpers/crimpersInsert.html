@@ -135,12 +135,17 @@
             observation: observation,
         };
 
-        let response = await fetch('crimpers.php', {
-            method: 'POST',
+        let response = await fetch('crimpers.php?' + new URLSearchParams(data), {
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({data: data})
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Credentials': 'true'
+                
+
+            }
         });
         let result = await response.json();
         console.log(result);

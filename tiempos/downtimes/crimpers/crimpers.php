@@ -1,23 +1,28 @@
 <?php
 
 include('./app.php');
-$hora = $_POST['hourTime'];
+$hora = $_GET['hourTime'];
 $startHour = explode('-', $hora)[0];
 $endHour = explode('-', $hora)[1];
-
+$dateRegistered = $_GET['dateRegistered'];
+$toolingCrimperName = $_GET['toolingCrimperName'];
+$terminalsUsed = $_GET['Qty'];
+$downtime = $_GET['downtime'];
+$reason = $_GET['reason'];
+$observation = $_GET['observation'];
 
 $datos = array(
-    'dateRegistered' => $_POST['dateRegistered'],
+    'dateRegistered' => $dateRegistered,
     'startHour' => $startHour,
     'endHour' => $endHour,
-    'toolingCrimperName' => $_POST['toolingCrimperName'],
-    'TerminalsUsed' => $_POST['Qty'],
-    'minutesStop' => $_POST['downtime'],
-    'reasonStop' => $_POST['reason'],
-    'observations' => $_POST['observation']
+    'toolingCrimperName' => $toolingCrimperName,
+    'TerminalsUsed' => $terminalsUsed,
+    'minutesStop' => $downtime,
+    'reasonStop' => $reason,
+    'observations' => $observation
 );
 
-$qry= "INSERT INTO crimpers_tools (`dateRegistered`, `startHour`, `endHour`, `toolingCrimperName`, `TerminalsUsed`, `minutesStop`, `reasonStop`, `observations`) VALUES ('" . $datos['dateRegistered'] . "', '" . $datos['startHour'] . "', '" . $datos['endHour'] . "', '" . $datos['toolingCrimperName'] . "', '" . $datos['TerminalsUsed'] . "', '" . $datos['minutesStop'] . "', '" . $datos['reasonStop'] . "', '" . $datos['observations'] . "')";
+$qry= "INSERT INTO crimpers_tools (`dateRegistered`, `startHour`, `endHour`, `toolingCrimperName`, `TerminalsUsed`, `minutesStop`, `reasonStop`, `observations`) VALUES ('$dateRegistered', '$startHour', '$endHour', '$toolingCrimperName', '$terminalsUsed', '$downtime', '$reason', '$observation')";
 
 $send = $conn->query($qry);
 $conn->close();
