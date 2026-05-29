@@ -85,8 +85,10 @@
 <script>
     window.onload = function() {
         var today = new Date().toISOString().split('T')[0];
-        document.getElementById("dateRegistered").value=today;
+        var yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        document.getElementById("dateRegistered").value=yesterday;
         document.getElementById("dateRegistered").setAttribute('max', today);
+        document.getElementById("dateRegistered").setAttribute('min', yesterday);
     };
 
     async function CheckDuplicate(){
