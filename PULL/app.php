@@ -20,9 +20,11 @@ $quien     = isset($_GET['quien1'])     ? $_GET['quien1']     : "";
 $trabajo   = isset($_GET['trabajo1'])   ? $_GET['trabajo1']   : "";
 $qry       = ""; // Valor por defecto para evitar que la variable no exista
 
-// 3. Lógica de búsqueda (Corregida con AND)
+
+
 if ($aplicador != "No esta(preguntar y agregar)" && $aplicador != "") {
     // Usar Sentencias Preparadas también aquí es más seguro
+
     $stmt_search = $con->prepare("SELECT herramental FROM mant_golpes_diarios WHERE terminal = ?");
     $stmt_search->bind_param("s", $aplicador);
     $stmt_search->execute();
@@ -34,10 +36,20 @@ if ($aplicador != "No esta(preguntar y agregar)" && $aplicador != "") {
     $stmt_search->close();
 }
 
-// 4. Formato de fecha correcto para MySQL
-$fecha = date("Y-m-d H:i:s");
 
 try {
+    $fecha = date("Y-m-d H:i:s");
+    $hoy = date("Y-m-d");
+ // Concatenar nombre de equipo
+    $nombreEquipo = $qry . ' / ' . $aplicador;
+    // buscar duplicados
+    $buscardduplicados = mysqli_query($con, "SELECT * FROM registro_paro WHERE fecha LIKE '$hoy%' AND  nombreEquipo = '$nombreEquipo' AND dano = '$trabajo' AND quien = '$quien' AND area = '$maquina'");
+    if (mysqli_num_rows($buscardduplicados) > 0) {
+        echo "Error: Ya existe un registro similar para hoy.";
+         header("Location: solicitar.php");
+        exit;
+    }
+    
     // Preparar consulta de inserción
     $stmt = $con->prepare("
         INSERT INTO registro_paro 
@@ -49,8 +61,7 @@ try {
         throw new Exception("Error al preparar: " . $con->error);
     }
 
-    // Concatenar nombre de equipo
-    $nombreEquipo = $qry . ' / ' . $aplicador;
+
 
     // Vincular parámetros
     $stmt->bind_param("sssss", $fecha, $nombreEquipo, $trabajo, $quien, $maquina);

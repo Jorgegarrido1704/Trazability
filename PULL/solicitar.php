@@ -49,7 +49,17 @@
       <div class="mb-3">
         <div class="input-group">
           <span class="input-group-text" id="basic-addon3">Operador que solicita</span>
-          <input type="text" class="form-control" id="quien" aria-describedby="basic-addon3 basic-addon4" required>
+          <select type="text" class="form-control" id="quien" aria-describedby="basic-addon3 basic-addon4" required>
+            <option value="" disabled selected> </option>
+           <?php 
+           $emplados = mysqli_query($con, "SELECT   employeeName,employeeArea FROM personalberg WHERE`status` !='Baja' AND `typeWorker` = 'Directo' ORDER BY employeeArea DESC, employeeName ASC");
+           while ($row = mysqli_fetch_array($emplados)) {
+           $nombrecompleto = $row['employeeName'];
+           $nombre=explode(" ", $nombrecompleto)[2]." ".explode(" ", $nombrecompleto)[0]; 
+          ?>
+            <option value="<?php echo $nombre; ?>"><?php echo $nombre; ?></option>
+          <?php } ?>
+          </select>
         </div>
         <div class="form-text" id="basic-addon4">Ejemplo: Juan Ornelas</div>
       </div>
