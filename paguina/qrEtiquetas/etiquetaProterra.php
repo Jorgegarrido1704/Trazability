@@ -195,8 +195,8 @@ try{
                         $bobj = $barcode->getBarcodeObj(
                             'DATAMATRIX', 
                             $texto,       
-                            50,           
-                            50,           
+                            35,           
+                            35,           
                             'black',    
                             array(-1, -1, -1, -1) 
                         );
