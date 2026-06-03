@@ -191,15 +191,15 @@ try{
                     try {
                         $barcode = new \Com\Tecnick\Barcode\Barcode();
                         
-                        
+        
                         $bobj = $barcode->getBarcodeObj(
                             'DATAMATRIX', 
                             $texto,       
-                            38,           
-                            38,           
+                            -7,           
+                            -1,           
                             'black',    
-                            array(-1, -1, -1, -1) 
-                        );
+                            array(0, 0, 0, 0) 
+                        )->setBackgroundColor('white');
 
                         // Retorna el div con el código en formato SVG vectorial integrado
                         return $bobj->getHtmlDiv(); 
