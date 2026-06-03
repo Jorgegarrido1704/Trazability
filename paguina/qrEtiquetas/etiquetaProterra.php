@@ -1,6 +1,6 @@
 <?php
 require '../conector.php';
-require '../vendor/autoload.php';
+require '../../vendor/autoload.php';
 session_start();
 date_default_timezone_set("America/Mexico_City");
 
