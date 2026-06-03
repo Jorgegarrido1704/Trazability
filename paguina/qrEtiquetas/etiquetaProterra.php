@@ -11,8 +11,8 @@ function generarDataMatrixHTML($texto) {
         $bobj = $barcode->getBarcodeObj(
             'DATAMATRIX', 
             $texto,       
-            34,           
-            34,           
+            35,           
+            35,           
             'black',    
             array(0, 0, 0, 0) 
         )->setBackgroundColor('white');
@@ -157,10 +157,18 @@ try {
         visibility: visible !important;
     }
 
-    .smallbox, .smallbox1 {
+    .smallbox {
         border: 1px solid black;
         text-align: center;
         font-size: 7px;
+        margin-bottom: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .smallbox1 {
+        border: 1px solid black;
+        text-align: center;
+        font-size: 6px;
         margin-bottom: 1px;
         white-space: nowrap;
         overflow: hidden;
