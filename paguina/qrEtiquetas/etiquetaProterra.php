@@ -179,9 +179,9 @@ try{
     }
 }
             $qrcode = generarDataMatrixHTML($data);
+            echo $qrcode;
             ?>
-            <img src="<?php echo $qrcode; ?>">
-            <img src="logo.jpg" alt="logo" id="logo">
+           
             </div>
 
             
