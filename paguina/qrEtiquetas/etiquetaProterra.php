@@ -158,7 +158,27 @@ try{
             <div class="qr">
             <?php
             $data = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivoSerial;
-            $qrcode = (new QRCode)->render($data);
+           function generarDataMatrixHTML($texto) {
+    try {
+        $barcode = new \Com\Tecnick\Barcode\Barcode();
+        
+        
+        $bobj = $barcode->getBarcodeObj(
+            'DATAMATRIX', 
+            $texto,       
+            27,           
+            27,           
+            'black',    
+            array(-1, -1, -1, -1) 
+        );
+
+        // Retorna el div con el código en formato SVG vectorial integrado
+        return $bobj->getHtmlDiv(); 
+    } catch (\Exception $e) {
+        return '<span style="color:red;">Error al generar: ' . $e->getMessage() . '</span>';
+    }
+}
+            $qrcode = generarDataMatrixHTML($data);
             ?>
             <img src="<?php echo $qrcode; ?>">
             <img src="logo.jpg" alt="logo" id="logo">
