@@ -196,7 +196,7 @@ try{
                             'DATAMATRIX', 
                             $texto,       
                             -7,           
-                            -1,           
+                            -7,           
                             'black',    
                             array(0, 0, 0, 0) 
                         )->setBackgroundColor('white');
