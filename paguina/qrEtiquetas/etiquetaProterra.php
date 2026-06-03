@@ -134,10 +134,11 @@ try{
         }
 
         .qr  {
-            width: 7mm !important;
-            height: 7mm !important;
+            width: 11.5mm !important;
+            height: 11.5mm !important;
             display: block;
-            margin-left : 16px;
+            padding-top : 5px;
+            margin-left : 5px;
            
         }
 
@@ -194,8 +195,8 @@ try{
                         $bobj = $barcode->getBarcodeObj(
                             'DATAMATRIX', 
                             $texto,       
-                            27,           
-                            27,           
+                            50,           
+                            50,           
                             'black',    
                             array(-1, -1, -1, -1) 
                         );
