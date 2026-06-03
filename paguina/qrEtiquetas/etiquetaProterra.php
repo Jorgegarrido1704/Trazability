@@ -108,13 +108,10 @@ try{
         padding-top:6px;
     }
 
-    .qr {
-        width:11.5mm;
-        height:11.5mm;
-          display: block !important;
+    .qr, .qr div, .qr svg {
+        display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
-
     }
 
     .smallbox{
