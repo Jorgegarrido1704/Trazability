@@ -195,8 +195,8 @@ try{
                         $bobj = $barcode->getBarcodeObj(
                             'DATAMATRIX', 
                             $texto,       
-                            -1,           
-                            -1,           
+                            -3,           
+                            -3,           
                             'black',    
                             array(0, 0, 0, 0) 
                         )->setBackgroundColor('white');
