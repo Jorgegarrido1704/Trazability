@@ -1,10 +1,10 @@
 <?php
 require '../conector.php';
 require '../../vendor/autoload.php';
-session_start();
+
 date_default_timezone_set("America/Mexico_City");
 
-use chillerlan\QRCode\{QRCode, QROptions};
+//use chillerlan\QRCode\{QRCode, QROptions};
 
 try{
     $wo = isset($_GET['wo']) ? $_GET['wo'] : "";
@@ -159,29 +159,29 @@ try{
             <?php
             $data = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivoSerial;
            function generarDataMatrixHTML($texto) {
-    try {
-        $barcode = new \Com\Tecnick\Barcode\Barcode();
-        
-        
-        $bobj = $barcode->getBarcodeObj(
-            'DATAMATRIX', 
-            $texto,       
-            27,           
-            27,           
-            'black',    
-            array(-1, -1, -1, -1) 
-        );
+                    try {
+                        $barcode = new \Com\Tecnick\Barcode\Barcode();
+                        
+                        
+                        $bobj = $barcode->getBarcodeObj(
+                            'DATAMATRIX', 
+                            $texto,       
+                            27,           
+                            27,           
+                            'black',    
+                            array(-1, -1, -1, -1) 
+                        );
 
-        // Retorna el div con el código en formato SVG vectorial integrado
-        return $bobj->getHtmlDiv(); 
-    } catch (\Exception $e) {
-        return '<span style="color:red;">Error al generar: ' . $e->getMessage() . '</span>';
-    }
-}
-            $qrcode = generarDataMatrixHTML($data);
-            echo $qrcode;
+                        // Retorna el div con el código en formato SVG vectorial integrado
+                        return $bobj->getHtmlDiv(); 
+                    } catch (\Exception $e) {
+                        return '<span style="color:red;">Error al generar: ' . $e->getMessage() . '</span>';
+                    }
+                }
+                            $qrcode = generarDataMatrixHTML($data);
+                            
             ?>
-           
+            <?php echo $qrcode; ?>
             </div>
 
             
