@@ -108,11 +108,38 @@ try{
         padding-top:6px;
     }
 
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important; /* Chrome, Edge, Safari */
+        print-color-adjust: exact !important;         /* Firefox */
+    }
+    
     .qr, .qr div, .qr svg {
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
     }
+}
+
+/* 2. Asegurar que los pequeños bloques (rectángulos) del SVG no se oculten */
+.qr div, .qr div * {
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+   /* Forzamos a que el contenedor y el SVG sean visibles y midan lo correcto */
+        .qr div, .qr div * {
+            visibility: visible !important;
+        }
+
+        .qr  {
+            width: 7mm !important;
+            height: 7mm !important;
+            display: block;
+            margin-left : 16px;
+           
+        }
 
     .smallbox{
         border:1px solid black;
