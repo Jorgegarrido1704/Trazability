@@ -11,8 +11,8 @@ function generarDataMatrixHTML($texto) {
         $bobj = $barcode->getBarcodeObj(
             'DATAMATRIX', 
             $texto,       
-            -1.5,           
-            -1.5,           
+            37,           
+            37,           
             'black',    
             array(0, 0, 0, 0) 
         )->setBackgroundColor('white');
