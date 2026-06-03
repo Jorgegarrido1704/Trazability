@@ -4,17 +4,35 @@ require '../../vendor/autoload.php';
 
 date_default_timezone_set("America/Mexico_City");
 
-//use chillerlan\QRCode\{QRCode, QROptions};
+// Mover la función aquí arriba evita el Fatal Error por duplicación en el bucle
+function generarDataMatrixHTML($texto) {
+    try {
+        $barcode = new \Com\Tecnick\Barcode\Barcode();
+        $bobj = $barcode->getBarcodeObj(
+            'DATAMATRIX', 
+            $texto,       
+            -2,           
+            -2,           
+            'black',    
+            array(0, 0, 0, 0) 
+        )->setBackgroundColor('white');
 
-try{
+        return $bobj->getHtmlDiv(); 
+    } catch (\Exception $e) {
+        return '<span style="color:red;">Error: ' . $e->getMessage() . '</span>';
+    }
+}
+
+try {
     $wo = isset($_GET['wo']) ? $_GET['wo'] : "";
-    $cons = isset($_GET['cons']) ? $_GET['cons'] : "";
+    $cons = isset($_GET['cons']) ? intval($_GET['cons']) : 0;
     
     $today_db = date('mdY'); 
     $today_qr = date('Ymd'); 
     $todayDate = date('Y-m-d'); 
 
     $buscar = mysqli_query($con, "SELECT * FROM `registro` where `wo` = '$wo' limit 1");
+    
     if (mysqli_num_rows($buscar) > 0) {
         $rows = mysqli_fetch_array($buscar);
         $np = $rows['NumPart'];
@@ -36,16 +54,11 @@ try{
             $inicio = 1;
             $cuentas = $cons;
         }
-        $i=$j=$inicio;
-        
 
-        for($i; $i <= $cuentas; $i++){
-            $consecutivo = $i;
-            if($consecutivo < 10){
-                $consecutivo = "00".$consecutivo;
-            } else if($consecutivo > 9 and $consecutivo < 100){
-                $consecutivo = "0".$consecutivo;
-            }
+        // PROCESAMIENTO E INSERCIÓN EN BD
+        for($i = $inicio; $i <= $cuentas; $i++){
+            // str_pad añade los ceros a la izquierda automáticamente (ej: 001, 015, 100)
+            $consecutivo = str_pad($i, 3, "0", STR_PAD_LEFT);
             $dataDB = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivo;
             mysqli_query($con, "INSERT INTO `registroqrs`( `infoQr`, `CodigoIdentificaicon`, `fecha`) VALUES ('$info','$dataDB','$todayDate')");
         }
@@ -62,194 +75,149 @@ try{
             mysqli_query($con, "UPDATE `consterm` SET `cuenta` = '$cuentas' WHERE `dias` = '$today_db' ");
         }
 
-    } 
+    } else {
+        throw new Exception("No se encontró el registro con la WO proporcionada.");
+    }
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
+<title>Impresión de Etiquetas</title>
 
 <style>
-    .sheet{
-        width:38.5mm; height:104.5mm;
-    
-        padding-top:23mm;
-        padding-left:5mm;
-
+    /* Configuración de la página para la impresora de etiquetas */
+    @page {
+        size: 38.5mm 104.5mm;
+        margin: 0;
     }
 
-    .label{
-        width:31.4mm;
-        height:15.3mm;
-        border:1px solid black;
-        border-radius:2mm;
-        display:inline-block;
-        padding:0.3mm;
-        font-family:Arial;
-        font-size:5px;
-        box-sizing:border-box;
-        margin:0.3mm;
+    .sheet {
+        width: 38.5mm; 
+        height: 104.5mm;
+        padding-top: 23mm;
+        padding-left: 5mm;
+        box-sizing: border-box;
+        page-break-after: always; /* Crucial: Obliga a la impresora a saltar de etiqueta */
     }
 
-    .row{
-        display:flex;
+    .label {
+        width: 31.4mm;
+        height: 15.3mm;
+        border: 1px solid black;
+        border-radius: 2mm;
+        display: inline-block;
+        padding: 0.3mm;
+        font-family: Arial, sans-serif;
+        font-size: 5px;
+        box-sizing: border-box;
+        margin: 0.3mm;
     }
 
-    .bloque1{
-        padding-left:3px;
-        width:14mm;
-        height:15mm;
+    .row {
+        display: flex;
     }
 
-    .bloque2{
-        width:16mm;
-        height:14.9mm;
-        padding-top:6px;
+    .bloque1 {
+        padding-left: 3px;
+        width: 14mm;
+        height: 15mm;
     }
 
-@media print {
-    * {
-        -webkit-print-color-adjust: exact !important; /* Chrome, Edge, Safari */
-        print-color-adjust: exact !important;         /* Firefox */
+    .bloque2 {
+        width: 16mm;
+        height: 14.9mm;
+        padding-top: 6px;
     }
-    
-    .qr, .qr div, .qr svg {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-}
 
-/* 2. Asegurar que los pequeños bloques (rectángulos) del SVG no se oculten */
-.qr div, .qr div * {
-    visibility: visible !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-}
-
-   /* Forzamos a que el contenedor y el SVG sean visibles y midan lo correcto */
-        .qr div, .qr div * {
+    @media print {
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        
+        .qr, .qr div, .qr svg {
+            display: block !important;
             visibility: visible !important;
+            opacity: 1 !important;
         }
-
-        .qr  {
-            width: 11.0mm !important;
-            height: 11.0mm !important;
-            display: block;
-            padding-top : 5px;
-            margin-left : 5px;
-           
-        }
-
-    .smallbox{
-        border:1px solid black;
-        text-align:center;
-        font-size:7px;
-        margin-bottom:1px;
     }
 
-    .smallbox1{
-        border:1px solid black;
-        text-align:center;
-        font-size:7px;
-        margin-bottom:1px;
+    .qr {
+        width: 11.0mm !important;
+        height: 11.0mm !important;
+        display: block;
+        padding-top: 5px;
+        margin-left: 5px;
     }
 
+    /* Asegurar visibilidad de los vectores del Data Matrix */
+    .qr div, .qr div * {
+        visibility: visible !important;
+    }
 
-    #logo{
-        padding-left:2px;
+    .smallbox, .smallbox1 {
+        border: 1px solid black;
+        text-align: center;
+        font-size: 7px;
+        margin-bottom: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    #logo {
+        padding-left: 2px;
         width: 11mm;
         height: 2.5mm;
     }
-
 </style>
-
 </head>
 
 <body>
-<?php for($j; $j <= $cuentas; $j++){ 
-    $consecutivoSerial = $j;
-    if($consecutivoSerial < 10){
-        $consecutivoSerial = "00".$consecutivoSerial;
-    }elseif($consecutivoSerial < 100){
-        $consecutivoSerial = "0".$consecutivoSerial;
-    }
-    ?>
-<div class="sheet">
 
-<div class="label">
-
-    <div class="row">
-
-        <div class="bloque1">
-
-            <div class="qr">
-            <?php
-            $data = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivoSerial;
-           function generarDataMatrixHTML($texto) {
-                    try {
-                        $barcode = new \Com\Tecnick\Barcode\Barcode();
-                        
-        
-                        $bobj = $barcode->getBarcodeObj(
-                            'DATAMATRIX', 
-                            $texto,       
-                            -2,           
-                            -2,           
-                            'black',    
-                            array(0, 0, 0, 0) 
-                        )->setBackgroundColor('white');
-
-                        // Retorna el div con el código en formato SVG vectorial integrado
-                        return $bobj->getHtmlDiv(); 
-                    } catch (\Exception $e) {
-                        return '<span style="color:red;">Error al generar: ' . $e->getMessage() . '</span>';
-                    }
-                }
-                            $qrcode = generarDataMatrixHTML($data);
-                            
-            ?>
-            <?php echo $qrcode; ?>
+<?php 
+// Bucle exclusivo para renderizar el HTML de las etiquetas
+for($j = $inicio; $j <= $cuentas; $j++){ 
+    $consecutivoSerial = str_pad($j, 3, "0", STR_PAD_LEFT);
+    $data = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivoSerial;
+    $qrcode = generarDataMatrixHTML($data);
+?>
+    <div class="sheet">
+        <div class="label">
+            <div class="row">
+                <div class="bloque1">
+                    <div class="qr">
+                        <?php echo $qrcode; ?>
+                    </div>
+                </div>
+                <div class="bloque2">
+                    <div class="smallbox">5703</div>
+                    <div class="smallbox1"><?php echo htmlspecialchars($np."|".$rev);?></div>
+                    <div class="smallbox"><?php echo htmlspecialchars($today_qr."|".$consecutivoSerial); ?></div>
+                </div>
             </div>
-
-            
         </div>
-
-        <div class="bloque2">
-
-            <div class="smallbox">5703</div>
-
-            <div class="smallbox1"><?php echo $np."|".$rev;?></div>
-
-            <div class="smallbox"><?php echo $today_qr."|".$consecutivoSerial; ?></div>
-
-        </div>
-
     </div>
-
-</div>
-
-</div>
 <?php } ?>
-    <script>
-    window.onload = function() {
-        print();
-    }
 
-    function returnqr() {
-        setTimeout(function() {
-            window.location.href = "../qrs.php";
-        }, 10000);
-    }
-
+<script>
+window.onload = function() {
+    window.print();
     returnqr();
-    </script>
+}
+
+function returnqr() {
+    setTimeout(function() {
+        window.location.href = "../qrs.php";
+    }, 10000);
+}
+</script>
 </body>
 </html>
 
 <?php
-}catch(Exception $e){
-    echo "Error: " . $e->getMessage();
+} catch(Exception $e) {
+    echo "Error: " . htmlspecialchars($e->getMessage());
 }
 ?>
