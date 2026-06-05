@@ -11,8 +11,8 @@ function generarDataMatrixHTML($texto) {
         $bobj = $barcode->getBarcodeObj(
             'DATAMATRIX', 
             $texto,       
-            39,           
-            39,           
+            40,           
+            40,           
             'black', // Color negro para asegurar contraste máximo    
             array(-1, -1, -1, -1) // Espacio blanco alrededor
         )->setBackgroundColor('white');
@@ -44,6 +44,7 @@ try {
         if (substr($rev, 0, 4) == "PPAP" or substr($rev, 0, 4) == "PRIM") {
             $rev = substr($rev, 5);
         }
+        $rev= strtoupper($rev);
 
         $regstroCuenta = mysqli_query($con, "SELECT cuenta FROM `consterm` where `dias` = '$today_db' order by id desc limit 1");
         if(mysqli_num_rows($regstroCuenta) > 0){
@@ -145,8 +146,8 @@ try {
     }
 
     .qr {
-        width: 11mm !important;
-        height: 11mm !important;
+        width: 11.5mm !important;
+        height: 11.5mm !important;
         display: block;
         padding-top: 5px;
         margin-left: 3px;
