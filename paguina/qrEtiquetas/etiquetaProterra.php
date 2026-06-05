@@ -96,7 +96,7 @@ try {
     .sheet {
         width: 38.5mm; 
         height: 104.5mm;
-        padding-top: 23mm;
+        padding-top: 21mm;
         padding-left: 5mm;
         box-sizing: border-box;
         page-break-after: always; /* Crucial: Obliga a la impresora a saltar de etiqueta */
@@ -145,8 +145,8 @@ try {
     }
 
     .qr {
-        width: 11.5mm !important;
-        height: 11.5mm !important;
+        width: 11mm !important;
+        height: 11mm !important;
         display: block;
         padding-top: 5px;
         margin-left: 3px;
