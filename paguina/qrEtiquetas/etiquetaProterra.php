@@ -13,8 +13,8 @@ function generarDataMatrixHTML($texto) {
             $texto,       
             38,           
             38,           
-            'black',    
-            array(0, 0, 0, 0) 
+            'black', // Color negro para asegurar contraste máximo    
+            array(0, 0, 0, 0) // Espacio blanco alrededor
         )->setBackgroundColor('white');
 
         return $bobj->getHtmlDiv(); 
@@ -140,7 +140,7 @@ try {
         .qr, .qr div, .qr svg {
             display: block !important;
             visibility: visible !important;
-            opacity: 1 !important;
+            opacity: 0.9 !important;
         }
     }
 
@@ -148,8 +148,8 @@ try {
         width: 11.5mm !important;
         height: 11.5mm !important;
         display: block;
-        padding-top: 8px;
-        margin-left: 5px;
+        padding-top: 5px;
+        margin-left: 3px;
     }
 
     /* Asegurar visibilidad de los vectores del Data Matrix */
