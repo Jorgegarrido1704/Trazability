@@ -45,15 +45,15 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-3" id ="colorSelect">
+                            <div class="col-md-3" id ="colorSelect" style="display: none;">
                                 <label for="wireColor" class="form-label fw-semibold">Color del Cable</label>
                                 <select class="form-select" id="wireColor" onchange="fetchWireTypes()">
                                     <option value="">Todos los colores...</option>
                                 </select>
                             </div>
-                            <div class="col-md-3 " id="wireTypeSelect">
+                            <div class="col-md-3 " id="wireTypeSelect" style="display: none;">
                                 <label for="wireType" class="form-label fw-semibold">Tipo de Cable</label>
-                                <select class="form-select" id="wireType" onchange="fetchCuttingLists()">
+                                <select class="form-select" id="wireType" onchange="fetchLists()">
                                     <option value="">Todos los tipo de cable...</option>
                                 </select>
 
@@ -168,7 +168,8 @@
 
     <script>
         onload = function() {
-             fetchLists() 
+             fetchLists()
+             fechtInitialData()
             
         }
         function dashboard(section) {
@@ -255,8 +256,54 @@
                 })
                 .catch(err => console.error("Fetch error:", err));
         }
+        function fetchWireTypes(){
+           
+            document.getElementById('wireTypeSelect').style.display = 'block';
+            let gauge = document.getElementById('wireGauge').value
+            let color = document.getElementById('wireColor').value
+            let url = `app/tipe.php?awg=${gauge}&color=${color}`
+            fetch(url)
+                  .then(response => response.json())
+                .then(data => {
+                    let selectHTML = '<option value="">Todos los tipos...</option>';
+                 //   console.log(data);
+                    data.forEach(color => {
+                        selectHTML += `<option value="${color}">${color}</option>`;
+                    });
+                    document.getElementById('wireType').innerHTML = selectHTML;
+                });
+            }
         
-       
+        function fechtInitialData() {
+            fetch('app/gauge.php')
+                .then(response => response.json())
+                .then(data => {
+                    let selectHTML = '<option value="">Todos los calibres...</option>';
+                 //   console.log(data);
+                    data.forEach(gauge => {
+                        selectHTML += `<option value="${gauge}">${gauge}</option>`;
+                    });
+                    document.getElementById('wireGauge').innerHTML = selectHTML;
+                });
+            }
+        function fetchcolors(){
+            document.getElementById('colorSelect').style.display = 'block';
+            let gauge = document.getElementById('wireGauge').value
+            let url = `app/colors.php?awg=${gauge}`
+            fetch(url)
+                  .then(response => response.json())
+                .then(data => {
+                    let selectHTML = '<option value="">Todos los calibres...</option>';
+                 //   console.log(data);
+                    data.forEach(color => {
+                        selectHTML += `<option value="${color}">${color}</option>`;
+                    });
+                    document.getElementById('wireColor').innerHTML = selectHTML;
+                });
+            }
+            function clearFilters(){
+                window.location.href = 'index.html';
+            }
     </script>
 </body>
 </html>
