@@ -10,6 +10,7 @@ try {
     $tintaBlanca = 0;
     $tintaNegraOpt = 0;
     $tintaBlancaOpt = 0;
+    $sellos=0;
     while($rowEstructura = mysqli_fetch_array($estructuras)){
         $pn = $rowEstructura['np'];
         $qty = $rowEstructura['qty'];
@@ -38,15 +39,25 @@ try {
             
 
         }
-
+        $totalsellosIzquierda = mysqli_query($con, "SELECT * FROM listascorte WHERE pn = '$pn' AND terminal1 LIKE  '%Sello%'");
+        $totalsellosDerecha = mysqli_query($con, "SELECT * FROM listascorte WHERE pn = '$pn' AND terminal2 LIKE  '%Sello%'");
+        if(mysqli_num_rows($totalsellosIzquierda) > 0){
+            
+            $sellos += mysqli_num_rows($totalsellosIzquierda)*$qty;
+        }
+        if(mysqli_num_rows($totalsellosDerecha) > 0){
+            
+            $sellos += mysqli_num_rows($totalsellosDerecha) *$qty;
     
         }
+    }
 
     echo json_encode([
         'calibres' => $calibres,
         'totalCables' => $totalCables,
         'tintaNegra' => $tintaNegra,
         'tintaBlanca' => $tintaBlanca,
+        'sellos' => $sellos
     ]);
 
 } catch (Exception $e) {
