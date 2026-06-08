@@ -4,7 +4,8 @@ require '../../app/conection.php';
 try {
     $color=isset($_GET['color']) ? $_GET['color'] : '';
     $awg=isset($_GET['awg']) ? $_GET['awg'] : '';
-    $qry = "SELECT  pn,color,aws,cons FROM listascorte WHERE 1=1";
+    $tipo =isset($_GET['type']) ? $_GET['type'] : '';
+    $qry = "SELECT  pn,color,aws,cons,tipo,tamano FROM listascorte WHERE 1=1";
     if (!empty($color) and empty($awg)) {
         $qry .= " AND color = '$color'";
     }
@@ -15,6 +16,10 @@ try {
         $qry .= " AND color = '$color'";
         $qry .= " AND aws = '$awg'";
     }
+    if (!empty($tipo)) {
+        $qry .= " AND tipo = '$tipo'";
+    }
+    
     $stmt = mysqli_query($con, $qry);
     $gauges = mysqli_fetch_all($stmt, MYSQLI_ASSOC);
     echo json_encode($gauges);

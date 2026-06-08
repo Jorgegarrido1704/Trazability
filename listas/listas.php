@@ -27,21 +27,28 @@
                     <div class="card-body">
                         <form id="filterForm" class="row g-3">
                             
-                            <div class="col-md-5">
+                            <div class="col-md-3">
                                 <label for="wireGauge" class="form-label fw-semibold">Calibre de Cable (Gauge / AWS)</label>
                                 <select class="form-select" id="wireGauge" onchange="fetchcolors()">
                                     <option value="">Todos los calibres...</option>
                                 </select>
                             </div>
 
-                            <div class="col-md-5" id ="colorSelect">
+                            <div class="col-md-3" id ="colorSelect">
                                 <label for="wireColor" class="form-label fw-semibold">Color del Cable</label>
-                                <select class="form-select" id="wireColor" onchange="fetchCuttingLists()">
+                                <select class="form-select" id="wireColor" onchange="fetchWireTypes()">
                                     <option value="">Todos los colores...</option>
                                 </select>
                             </div>
+                            <div class="col-md-3 " id="wireTypeSelect">
+                                <label for="wireType" class="form-label fw-semibold">Tipo de Cable</label>
+                                <select class="form-select" id="wireType" onchange="fetchCuttingLists()">
+                                    <option value="">Todos los tipo de cable...</option>
+                                </select>
 
-                            <div class="col-md-2 d-flex align-items-end">
+                               </div>
+
+                            <div class="col-md-3 d-flex align-items-end">
                                 <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
                                     <i class="bi bi-eraser me-2"></i>Limpiar
                                 </button>
@@ -67,6 +74,8 @@
                                         <th>Consecutivo</th>
                                         <th>Calibre (AWS)</th>
                                         <th>Color</th>
+                                        <th>Tipo de Cable</th>
+                                        <th>Tamaño(MM)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="resultsTableBody">
@@ -91,8 +100,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('colorSelect').style.display = 'none'; // Hide color filter until gauge is selected
+            document.getElementById('wireTypeSelect').style.display = 'none'; // Hide wire type filter until color is selected
             fecthgetgauges();
         });
+
+        
 
         function fecthgetgauges() {
             fetch('api/get-gauges.php')
@@ -128,6 +140,31 @@
                     })   
                     .catch(err => console.error("Fetch error:", err)); // Catch network/JSON parsing errors
             }
+            function fetchWireTypes() {
+                const gauge = document.getElementById('wireGauge').value;
+                const color = document.getElementById('wireColor').value;
+                fetch(`api/get-wire-types.php?awg=${gauge}&color=${encodeURIComponent(color)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error || !Array.isArray(data)) {
+                            console.error("Backend Error:", data.error || "Data is not an array");
+                            alert("Error loading wire types: " + (data.error || "Unknown error"));
+                            return;
+                        }
+
+                        let selectHTML = '<option value="">Todos los tipo de cable...</option>';
+                        data.forEach(type => {
+                            selectHTML += `<option value="${type}">${type}</option>`;
+                        });
+                        
+                        document.getElementById('wireType').innerHTML = selectHTML;
+                        document.getElementById('wireTypeSelect').style.display = 'block';
+                    })
+                    .catch(err => console.error("Fetch error:", err));
+            }
+
+
+
          function clearFilters() {
            window.location.href = 'listas.php'; // Simple page reload to reset all filters and results
 
@@ -135,9 +172,11 @@
         function fetchCuttingLists() {
             const gauge = document.getElementById('wireGauge').value;
             const color = document.getElementById('wireColor').value;
+            const type = document.getElementById('wireType').value;
             let query = '?';
             if (gauge) query += `awg=${encodeURIComponent(gauge)}&`;
-            if (color) query += `color=${encodeURIComponent(color)}`;
+            if (color) query += `color=${encodeURIComponent(color)}&`;
+            if (type) query += `type=${encodeURIComponent(type)}`;
             
             fetch(`api/get-cutting-lists.php${query}`)
                 .then(response => response.json())
@@ -153,6 +192,8 @@
                             <td>${item.cons}</td>
                             <td>${item.aws}</td>
                             <td>${item.color}</td>
+                            <td>${item.tipo}</td>
+                            <td>${item.tamano}</td>
                         `;
                         tbody.appendChild(row);
                         totalRecords++;
