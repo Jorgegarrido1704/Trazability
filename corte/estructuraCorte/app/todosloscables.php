@@ -22,9 +22,9 @@ try {
         $qty = $rowEstructura['qty'];
         
         if($color != '' && $awg != '' && $tipo != ''){
-            $listasdecorte= mysqli_query($con,"SELECT pn,color,aws,cons,tipo,tamano FROM listascorte WHERE pn ='$pn' AND aws = '$awg' AND color = '$color' AND tipo = '$tipo'");
+            $listasdecorte= mysqli_query($con,"SELECT pn,color,aws,cons,tipo,tamano,terminal1,terminal2 FROM listascorte WHERE pn ='$pn' AND aws = '$awg' AND color = '$color' AND tipo = '$tipo' ORDER BY terminal1, terminal2 DESC");
         }else {
-        $listasdecorte= mysqli_query($con,"SELECT pn,color,aws,cons,tipo,tamano FROM listascorte WHERE pn ='$pn'");
+        $listasdecorte= mysqli_query($con,"SELECT pn,color,aws,cons,tipo,tamano,terminal1,terminal2 FROM listascorte WHERE pn ='$pn' ORDER BY terminal1, terminal2 DESC");
         }
         while($rowlistas = mysqli_fetch_array($listasdecorte)){
           //  echo $rowlistas['pn']."<br>";
@@ -34,6 +34,8 @@ try {
             $tipo = $rowlistas['tipo'];
             $color = $rowlistas['color'];
             $tamano = round($rowlistas['tamano'],2);
+            $terminal1 = $rowlistas['terminal1'];
+            $terminal2 = $rowlistas['terminal2'];
            
             $buscarColor= mysqli_query($con, "SELECT tintaOrg,tintaOpt FROM coloresencables WHERE `eng_short_color` = '$color' or `eng_color` = '$color' or `spn_color` = '$color' limit 1");
             if (mysqli_num_rows($buscarColor) > 0) {
@@ -53,7 +55,9 @@ try {
             'tipo' => $tipo,
             'color' => $color,
             'tamano' => $tamano,
-            'tinta' => $tinta
+            'tinta' => $tinta,
+            'terminal1' => $terminal1,
+            'terminal2' => $terminal2
         ];
                    
        $i++;
