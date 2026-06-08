@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listas de Corte</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-dark bg-dark mb-4 ">
+        <div class="row"></div>
+            <div class="col-6 d-flex justify-content-start align-items-center">
+                <div class="container-fluid">
+                    <span class="navbar-brand mb-0 h1"><i class="bi bi-scissors me-2"></i><button
+                        class="btn btn-primary" onclick="dashboard('listas')">Control de Listas de Corte</button></span>
+                </div>
+            </div>
+            <div class="col-6 d-flex justify-content-start align-items-center">
+                <div class="container-fluid">
+                    <span class="navbar-brand mb-0 h1"><button
+                        class="btn btn-primary" onclick="dashboard('dashboard')">Dashboard</button></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4" id="listas">
+        <div class="row g-4">
+            
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0 text-primary"><i class="bi bi-funnel me-2"></i>Filtros de Búsqueda</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="filterForm" class="row g-3">
+                            
+                            <div class="col-md-3">
+                                <label for="wireGauge" class="form-label fw-semibold">Calibre de Cable (Gauge / AWS)</label>
+                                <select class="form-select" id="wireGauge" onchange="fetchcolors()">
+                                    <option value="">Todos los calibres...</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-3" id ="colorSelect">
+                                <label for="wireColor" class="form-label fw-semibold">Color del Cable</label>
+                                <select class="form-select" id="wireColor" onchange="fetchWireTypes()">
+                                    <option value="">Todos los colores...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 " id="wireTypeSelect">
+                                <label for="wireType" class="form-label fw-semibold">Tipo de Cable</label>
+                                <select class="form-select" id="wireType" onchange="fetchCuttingLists()">
+                                    <option value="">Todos los tipo de cable...</option>
+                                </select>
+
+                               </div>
+
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                    <i class="bi bi-eraser me-2"></i>Limpiar
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Lista de cables</h5>
+                        <span class="badge bg-primary rounded-pill" id="totalRecords">0 registros</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0 align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Nº Parte</th>
+                                        <th>Consecutivo</th>
+                                        <th>Calibre (AWS)</th>
+                                        <th>Color</th>
+                                        <th>Tipo de Cable</th>
+                                        <th>Tinta</th>
+                                        <th>Tamaño(MM)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultsTableBody">
+                                    <tr id="loadingRow">
+                                        <td colspan="4" class="text-center text-muted py-4" >
+                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                            Cargando datos...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="container-fluid px-4" id="dashboards" style="display:none;">
+        <div class="row g-4">
+            
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title mb-0 text-primary">Dashboards</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+               <div class="d-sm-flex align-items-center justify-content-between mb-4"></div>
+
+            <div class="row text-center mb-4">
+                <div class="col-xl-2 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-primary text-white font-weight-bold py-2">
+                            Total de cortes
+                        </div>
+                        <div class="card-body d-flex align-items-center justify-content-center py-4">
+                            <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="totalCuts">0</span></h5>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-xl-2 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-primary text-white font-weight-bold py-2">
+                           Tinta Negra
+                        </div>
+                        <div class="card-body d-flex align-items-center justify-content-center py-4">
+                            <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="tintaNegra">0</span></h5>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-xl-2 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-primary text-white font-weight-bold py-2">
+                            Tinta Blanca
+                        </div>
+                        <div class="card-body d-flex align-items-center justify-content-center py-4">
+                            <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="tintaBlanca">0</span></h5>
+                        </div>
+                    </div>
+                </div>
+                <div id="calibres" class="row text-center mb-4">
+                    <!-- Aquí se agregarán dinámicamente las tarjetas por calibre -->
+                </div>
+
+
+
+            </div>
+
+        </div>
+    </div>
+    </div>  
+   
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        onload = function() {
+             fetchLists() 
+            
+        }
+        function dashboard(section) {
+            document.getElementById('listas').style.display = 'none';
+            document.getElementById('dashboards').style.display = 'none';
+            if (section === 'listas') {
+                document.getElementById('listas').style.display = 'block';
+                fetchLists();
+            } else if (section === 'dashboard') {
+                document.getElementById('dashboards').style.display = 'block';
+                fetchCuttingLists(); // Cargar datos al mostrar el dashboard
+            }
+        }
+        function fetchCuttingLists() {
+            fetch('app/listasdecorte.php')  
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('totalCuts').innerHTML = data.totalCables;
+                    let rangoNegra = (data.tintaNegra / data.totalCables) * 100;
+                    let rangoBlanca = (data.tintaBlanca / data.totalCables) * 100;
+                    document.getElementById('tintaNegra').innerHTML = data.tintaNegra + ' (' + rangoNegra.toFixed(2) + '%)';
+                    document.getElementById('tintaBlanca').innerHTML = data.tintaBlanca + ' (' + rangoBlanca.toFixed(2) + '%)';
+                    
+                
+                   let por_calibres = '';
+
+                    // Al estar simplificado, 'calibre' es la clave ("18") y 'total' es el valor (150)
+                    Object.entries(data.calibres).forEach(([calibre, total]) => {
+                        por_calibres += `
+                            <div class="col-xl-2 col-md-6 mb-4">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-header bg-info text-white font-weight-bold py-2">
+                                        Calibre ${calibre}
+                                    </div>
+                                    <div class="card-body d-flex align-items-center justify-content-center py-4">
+                                        <h2 class="display-4 font-weight-bold text-info mb-0">
+                                            <span>${total}</span>
+                                        </h2>
+                                    </div>
+                                </div>
+                            </div>`;
+                    });
+
+                    document.getElementById('calibres').innerHTML = por_calibres;
+                })
+                .catch(error => {
+                    console.error('Error al cargar el dashboard:', error);
+                    document.getElementById('dashboards').innerHTML = '<div class="alert alert-danger">Error al cargar el dashboard. Intente nuevamente más tarde.</div>';
+                });
+            
+           }
+           
+            function fetchLists() {
+            const gauge = document.getElementById('wireGauge').value;
+            const color = document.getElementById('wireColor').value;
+            const type = document.getElementById('wireType').value;
+            let query = '?';
+            if (gauge) query += `awg=${encodeURIComponent(gauge)}&`;
+            if (color) query += `color=${encodeURIComponent(color)}&`;
+            if (type) query += `type=${encodeURIComponent(type)}`;
+            
+            fetch(`app/todosloscables.php${query}`)
+                .then(response => response.json())
+                .then(data => {
+                   //table in  resultsTableBody
+                     const tbody = document.getElementById('resultsTableBody');
+                    tbody.innerHTML = ''; // Clear previous results
+                    let totalRecords = 0;
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.pn}</td>
+                            <td>${item.consumo}</td>
+                            <td>${item.calibre}</td>
+                            <td>${item.color}</td>
+                            <td>${item.tipo}</td>
+                            <td>${item.tinta}</td>
+                            <td>${item.tamano}</td>
+                        `;
+                        tbody.appendChild(row);
+                        totalRecords++;
+                    });
+                    document.getElementById('totalRecords').textContent = totalRecords + ' registros';
+                })
+                .catch(err => console.error("Fetch error:", err));
+        }
+        
+       
+    </script>
+</body>
+</html>
