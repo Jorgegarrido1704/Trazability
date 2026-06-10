@@ -1,0 +1,89 @@
+<?php
+
+require '../conection.php';
+
+try {
+    $color = isset($_GET['color']) ? $_GET['color'] : '';
+    $awg = isset($_GET['awg']) ? $_GET['awg'] : '';
+    $tipo = isset($_GET['type']) ? $_GET['type'] : '';
+    $maquina = isset($_GET['maquina']) ? $_GET['maquina'] : '';
+    $calibres = [];
+    $totalCables = 0;
+    $tintaNegra = 0;
+    $tintaBlanca = 0;
+    $tintaNegraOpt = 0;
+    $tintaBlancaOpt = 0;
+    $tinta = '';
+    $tiempo = '';
+    $maxtime =135000;
+    
+    // CORRECCIÓN: Inicializar la variable del acumulador de tiempo
+    $tiempoTotal = 0; 
+    $i = 0;
+    
+    // CORRECCIÓN: Se agregó 'time_ruteo' a la primera consulta SQL también
+    if ($maquina == "MCUT-1") {
+       $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
+                                             FROM corte 
+                                             WHERE cutStatus != 'Cortado' AND aws IN ('10','12','14',) AND tintaColor='BLANCA'
+                                             ORDER BY aws, color, tipo, term1, term2 DESC";
+                                             $maxtime=27000;
+    }if ($maquina == "MCUT-6") {
+       $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
+                                             FROM corte 
+                                             WHERE cutStatus != 'Cortado' AND aws IN ('16','18','20','22','24') AND tintaColor='BLANCA'
+                                             AND  term1 NOT LIKE '%Sello' AND term2 NOT LIKE '%Sello'
+                                             ORDER BY aws, color, tipo, term1, term2 DESC";
+                                             $maxtime=27000;
+    } else if ($maquina == 'todas') {
+       $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
+                                             FROM corte 
+                                             WHERE cutStatus != 'Cortado' AND aws IN ('10','12','16','14','18','20','22','24') 
+                                             ORDER BY aws, color, tipo, term1, term2 DESC";
+    }
+    $listasdecorte= mysqli_query($con,$qry);
+    while ($rowlistas = mysqli_fetch_array($listasdecorte)) {
+        $pn = $rowlistas['np'];
+        $calibre = $rowlistas['aws'];
+        $consumo = $rowlistas['cons'];
+        $tipo = $rowlistas['tipo'];
+        $color = $rowlistas['color'];
+        $tamano = round($rowlistas['tamano'], 2);
+        $terminal1 = $rowlistas['term1'];
+        $terminal2 = $rowlistas['term2'];
+        $tinta = $rowlistas['tintaColor'];
+        $qty = $rowlistas['qty'];
+        $time_ruteo = $rowlistas['time_ruteo'];
+        
+        // Sumamos el tiempo de la fila actual al acumulador
+        $tiempoTotal += $time_ruteo;
+        
+        // Si el tiempo acumulado NO supera los 27000, lo agregamos al array
+        if ($tiempoTotal <= $maxtime) {
+            $calibres[] = [ // Nota: puedes usar [] vacío, PHP auto-incrementa el índice solo
+                'pn' => $pn,
+                'calibre' => $calibre,
+                'consumo' => $consumo,
+                'tipo' => $tipo,
+                'color' => $color,
+                'tamano' => $tamano,
+                'Qty' => $qty,
+                'tinta' => $tinta,
+                'terminal1' => $terminal1,
+                'terminal2' => $terminal2
+            ];                  
+        } else {
+            // Si la suma de esta fila ya hace que supere los 27000, salimos del while por completo
+            break;
+        }
+    }
+
+    // Devolvemos el JSON con los registros que alcanzaron a entrar en las 27000 unidades de tiempo
+    echo json_encode($calibres);
+
+} catch (Exception $e) {
+    error_log("Error cargando calibres: " . $e->getMessage());
+    echo json_encode([]); // Es buena idea retornar un JSON vacío en lugar de nada si hay error
+}
+
+?>

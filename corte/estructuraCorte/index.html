@@ -14,7 +14,7 @@
         <div class="row"></div>
             <div class="col-2 d-flex justify-content-start align-items-center">
                 <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><i class="bi bi-scissors me-2"></i><button
+                    <span class="navbar-brand mb-0 h1"><button
                         class="btn btn-primary" onclick="dashboard('listas')">Control de Listas de Corte</button></span>
                 </div>
             </div>
@@ -28,6 +28,12 @@
                 <div class="container-fluid">
                     <span class="navbar-brand mb-0 h1"><button
                         class="btn btn-warning" onclick="dashboard('maquinas')">Carga Total</button></span>
+                </div>
+            </div>
+             <div class="col-2 d-flex justify-content-start align-items-center">
+                <div class="container-fluid">
+                    <span class="navbar-brand mb-0 h1"><button
+                        class="btn btn-success" onclick="dashboard('porMaquinas')">Carga por maquinas</button></span>
                 </div>
             </div>
        <!--     <div class="col-4 d-flex justify-content-start align-items-center">
@@ -108,12 +114,11 @@
                                         <th>Color</th>
                                         <th>Tipo de Cable</th>
                                         <th>Tinta</th>
-                                        <th>Tamaño(MM)</th>
                                         <th>Terminal 1</th>
                                         <th>Terminal 2</th>
                                     </tr>
                                 </thead>
-                                <tbody id="resultsTableBody">
+                                <tbody id="resultadosTodos">
                                     <tr id="loadingRow">
                                         <td colspan="4" class="text-center text-muted py-4" >
                                             <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
@@ -310,7 +315,71 @@
                 </div>
             </div>
     </div>  
-   
+   <div class="container-fluid px-4" id="porMaquinas" style="display:none;">   
+    <nav class="navbar navbar-dark bg-dark mb-4 ">
+        <div class="row"></div>
+        <input type="hidden" id="maquina seleccionada" value="todas">
+            <div class="col-2 d-flex justify-content-start align-items-center">
+                <div class="container-fluid">
+                    <span class="navbar-brand mb-0 h1"><button
+                        class="btn btn-primary" id="totalMaquinas" onclick="maquinaSelecionada('todas')">Todas las maquinas</button></span>
+                        
+                </div>
+            </div>
+            <div class="col-2 d-flex justify-content-start align-items-center">
+                <div class="container-fluid">
+                    <span class="navbar-brand mb-0 h1"><button
+                        class="btn btn-primary" id="totalMaquinas" onclick="maquinaSelecionada('MCUT-1')">MCUT1</button></span>
+                        
+                </div>
+            </div>
+             <div class="col-2 d-flex justify-content-start align-items-center">
+                <div class="container-fluid">
+                    <span class="navbar-brand mb-0 h1"><button
+                        class="btn btn-primary" id="totalMaquinas" onclick="maquinaSelecionada('MCUT-6')">MCUT6</button></span>
+                        
+                </div>
+            </div>
+    </nav>
+        <div class="row g-4">
+              <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Lista de cables</h5>
+                        <span class="badge bg-primary rounded-pill" id="totalRecords2">0 registros</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0 align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Nº Parte</th>
+                                        <th>Consecutivo</th>
+                                        <th>Calibre (AWS)</th>
+                                        <th>Color</th>
+                                        <th>Tipo de Cable</th>
+                                        <th>Tinta</th>
+                                        <th>Tamaño(MM)</th>
+                                        <th>Qty</th>
+                                        <th>Terminal 1</th>
+                                        <th>Terminal 2</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultTotal">
+                                    <tr id="loadingRow">
+                                        <td colspan="4" class="text-center text-muted py-4" >
+                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                            Cargando datos...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>  
+    </div>  
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -320,13 +389,17 @@
              fechtInitialData()
             
         }
+        function maquinaSelecionada(maquina){
+           document.getElementById('maquina seleccionada').value = maquina;
+           pormaquina();
+        }
         function dashboard(section) {
             document.getElementById('listas').style.display = 'none';
             document.getElementById('dashboards').style.display = 'none';
             document.getElementById('maquinas').style.display = 'none';
+            document.getElementById('porMaquinas').style.display = 'none'
             if (section === 'listas') {
                 document.getElementById('listas').style.display = 'block';
-                
                 fetchLists();
             } else if (section === 'dashboard') {
                 document.getElementById('dashboards').style.display = 'block';
@@ -334,6 +407,9 @@
             }else if (section === 'maquinas') {
                 document.getElementById('maquinas').style.display = 'block';
                 maquinasCorte();
+            }else if (section === 'porMaquinas'){
+                document.getElementById('porMaquinas').style.display = 'block';
+                pormaquina();
             }
         }
         function fetchCuttingLists() {
@@ -375,7 +451,7 @@
             
            }
            
-            function fetchLists() {
+        function fetchLists() {
             const gauge = document.getElementById('wireGauge').value;
             const color = document.getElementById('wireColor').value;
             const type = document.getElementById('wireType').value;
@@ -388,7 +464,7 @@
                 .then(response => response.json())
                 .then(data => {
                    //table in  resultsTableBody
-                     const tbody = document.getElementById('resultsTableBody');
+                     const tbody = document.getElementById('resultadosTodos');
                     tbody.innerHTML = ''; // Clear previous results
                     let totalRecords = 0;
                     data.forEach(item => {
@@ -400,7 +476,6 @@
                             <td>${item.color}</td>
                             <td>${item.tipo}</td>
                             <td>${item.tinta}</td>
-                            <td>${item.tamano}</td>
                             <td>${item.terminal1}</td>
                             <td>${item.terminal2}</td>
                         `;
@@ -458,25 +533,25 @@
             }
 
       function maquinasCorte() {
-    // Si necesitas enviarle el PN, puedes pasarlo por la URL así: 'app/maquinas.php?pn=tu_part_number'
-    fetch('app/maquinas.php')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Error en el servidor");
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log(data);
-            
-            // Función interna para asignar de manera segura y evitar repetir código
-            const asignarValor = (id) => {
-                const elemento = document.getElementById(id);
-                if (elemento) {
-                    // Si data[id] existe y es un número, usa toFixed. Si no, pon 0.00
-                    elemento.innerHTML = (data && data[id] !== undefined) ? Number(data[id]).toFixed(2) : '0.00';
+        // Si necesitas enviarle el PN, puedes pasarlo por la URL así: 'app/maquinas.php?pn=tu_part_number'
+        fetch('app/maquinas.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Error en el servidor");
                 }
-            };
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                
+                // Función interna para asignar de manera segura y evitar repetir código
+                const asignarValor = (id) => {
+                    const elemento = document.getElementById(id);
+                    if (elemento) {
+                        // Si data[id] existe y es un número, usa toFixed. Si no, pon 0.00
+                        elemento.innerHTML = (data && data[id] !== undefined) ? Number(data[id]).toFixed(2) : '0.00';
+                    }
+                };
 
             // Ejecutar para cada ID de máquina
             asignarValor('MCUT-10');
@@ -496,6 +571,48 @@
             function clearFilters(){
                 window.location.href = 'index.html';
             }
+
+
+             function pormaquina() {
+                        const gauge = document.getElementById('wireGauge').value;
+                        const color = document.getElementById('wireColor').value;
+                        const type = document.getElementById('wireType').value;
+                        const maquina = document.getElementById('maquina seleccionada').value;
+                        let query = '?';
+                        if (gauge) query += `awg=${encodeURIComponent(gauge)}&`;
+                        if (color) query += `color=${encodeURIComponent(color)}&`;
+                        if (type) query += `type=${encodeURIComponent(type)}&`;
+                        if (maquina) query += `maquina=${encodeURIComponent(maquina)}&`;
+                        
+                        fetch(`app/pormaquina/todas.php${query}`)
+                            .then(response => response.json())
+                            .then(data => {
+                            //table in  resultsTableBody
+                                const tbody = document.getElementById('resultTotal');
+                                tbody.innerHTML = ''; // Clear previous results
+                                let totalRecords = 0;
+                                data.forEach(item => {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                        <td>${item.pn}</td>
+                                        <td>${item.consumo}</td>
+                                        <td>${item.calibre}</td>
+                                        <td>${item.color}</td>
+                                        <td>${item.tipo}</td>
+                                        <td>${item.tinta}</td>
+                                        <td>${item.tamano}</td>
+                                        <td>${item.Qty}</td>
+                                        <td>${item.terminal1}</td>
+                                        <td>${item.terminal2}</td>
+                                    `;
+                                    tbody.appendChild(row);
+                                    totalRecords++;
+                                });
+                                document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
+                            })
+                            .catch(err => console.error("Fetch error:", err));
+                    }
+
     </script>
 </body>
 </html>
