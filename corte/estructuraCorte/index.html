@@ -437,13 +437,13 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log(data);
-                        document.getElementById('MCUT-10').innerHTML=data['MCUT-10'].toFixed(2);
-                        document.getElementById('MCUT-7').innerHTML=data['MCUT-7'].toFixed(2);
-                        document.getElementById('MCUT-6').innerHTML=data['MCUT-6'].toFixed(2);
-                        document.getElementById('MCUT-5').innerHTML=data['MCUT-5'].toFixed(2);
-                        document.getElementById('MCUT-4').innerHTML=data['MCUT-4'].toFixed(2);
-                        document.getElementById('MCUT-1').innerHTML=data['MCUT-1'].toFixed(2);
-                        document.getElementById('>10').innerHTML=data['>10'].toFixed(2);
+                        document.getElementById('MCUT-10').innerHTML=data['MCUT-10'];
+                        document.getElementById('MCUT-7').innerHTML=data['MCUT-7'];
+                        document.getElementById('MCUT-6').innerHTML=data['MCUT-6'];
+                        document.getElementById('MCUT-5').innerHTML=data['MCUT-5'];
+                        document.getElementById('MCUT-4').innerHTML=data['MCUT-4'];
+                        document.getElementById('MCUT-1').innerHTML=data['MCUT-1'];
+                        document.getElementById('>10').innerHTML=data['>10'];
                                     });
             }
 
