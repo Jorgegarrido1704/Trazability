@@ -433,19 +433,30 @@
             }
 
        function maquinasCorte() {
-                fetch('app/maquinas.php')
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                        document.getElementById('MCUT-10').innerHTML=data['MCUT-10'];
-                        document.getElementById('MCUT-7').innerHTML=data['MCUT-7'];
-                        document.getElementById('MCUT-6').innerHTML=data['MCUT-6'];
-                        document.getElementById('MCUT-5').innerHTML=data['MCUT-5'];
-                        document.getElementById('MCUT-4').innerHTML=data['MCUT-4'];
-                        document.getElementById('MCUT-1').innerHTML=data['MCUT-1'];
-                        document.getElementById('>10').innerHTML=data['>10'];
-                                    });
+    fetch('app/maquinas.php')
+        .then(response => {
+            // Check if the server responded with a 200 OK
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+            // Safety check: ensure the IDs exist in your HTML before assigning
+            const keys = ['MCUT-10', 'MCUT-7', 'MCUT-6', 'MCUT-5', 'MCUT-4', 'MCUT-1', '>10'];
+            keys.forEach(key => {
+                const element = document.getElementById(key);
+                if (element && data[key] !== undefined) {
+                    element.innerHTML = data[key];
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching machine data:', error);
+            // Optional: Show a message to the user in the UI
+        });
+}
 
             function clearFilters(){
                 window.location.href = 'index.html';
