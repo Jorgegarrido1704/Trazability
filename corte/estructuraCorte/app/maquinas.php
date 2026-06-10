@@ -52,7 +52,7 @@ try {
             $tiempo   = round($rowlistas['time_ruteo']/60,2);
 
            
-            $setUp_routing = 0;
+            $setUp_routing = 10;
 
 
                 if (isset($maquinaMapping[$tinta])) {
