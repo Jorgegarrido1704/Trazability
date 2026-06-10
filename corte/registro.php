@@ -11,7 +11,7 @@ try {
     
 
    // echo "<h1>Se Eliminaron Correctamente</h1>";
-$buscar=mysqli_query($con,"SELECT * FROM registro WHERE count<4");
+$buscar=mysqli_query($con,"SELECT * FROM registro WHERE count<4 ORDER BY count ASC");
 while($row=mysqli_fetch_array($buscar)){
     $pn=$row['NumPart'];
     $client=$row['cliente'];
