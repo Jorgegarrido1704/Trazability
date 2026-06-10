@@ -3,7 +3,7 @@
 require 'conection.php';
 
 try {
-    $estructuras = mysqli_query($con, "SELECT np,qty FROM estructuracortetiempos");
+    
     $calibres =[];
     $totalCables = 0;
     $tintaNegra = 0;
@@ -11,15 +11,17 @@ try {
     $tintaNegraOpt = 0;
     $tintaBlancaOpt = 0;
     $sellos=0;
-    while($rowEstructura = mysqli_fetch_array($estructuras)){
-        $pn = $rowEstructura['np'];
-        $qty = $rowEstructura['qty'];
-        $listasdecorte= mysqli_query($con, "SELECT color,aws,cons,tipo FROM listascorte WHERE pn = '$pn'");
+   
+        $listasdecorte= mysqli_query($con, "SELECT color,aws,cons,tipo,term1,term2,tintaColor,qty FROM corte WHERE cutStatus != 'Cortado'");
         while($rowlistas = mysqli_fetch_array($listasdecorte)){
             $calibre = $rowlistas['aws'];
             $consumo = $rowlistas['cons'];
             $tipo = $rowlistas['tipo'];
             $color = $rowlistas['color'];
+            $qty = $rowlistas['qty'];
+            $term1   = $rowlistas['term1'];
+            $term2   = $rowlistas['term2'];       
+            $tinta   = trim(strtoupper($rowlistas['tintaColor']));
             if (!isset($calibres[$calibre])){ 
                 $calibres[$calibre] = $qty;
             }
@@ -27,29 +29,21 @@ try {
                 $calibres[$calibre] += $qty;
             }
             $totalCables +=  $qty;
-            $buscarColor= mysqli_query($con, "SELECT tintaOrg,tintaOpt FROM coloresencables WHERE `eng_short_color` = '$color' or `eng_color` = '$color' or `spn_color` = '$color' limit 1");
-            if (mysqli_num_rows($buscarColor) > 0) {
-                $rowColor = mysqli_fetch_array($buscarColor);
-               if($rowColor['tintaOrg'] == 'NEGRA'){
+           
+               if($tinta == 'NEGRA'){
                    $tintaNegra += $qty;
-               }else if ($rowColor['tintaOrg'] == 'BLANCA'){
+               }else if ($tinta== 'BLANCA'){
                    $tintaBlanca += $qty;
                }
-            }
             
+            if (stripos($term1, "Sello") !== false || stripos($term2, "Sello") !== false) {
+                 $sellos += $qty;
 
         }
-        $totalsellosIzquierda = mysqli_query($con, "SELECT * FROM listascorte WHERE pn = '$pn' AND terminal1 LIKE  '%Sello%'");
-        $totalsellosDerecha = mysqli_query($con, "SELECT * FROM listascorte WHERE pn = '$pn' AND terminal2 LIKE  '%Sello%'");
-        if(mysqli_num_rows($totalsellosIzquierda) > 0){
+        
             
-            $sellos += mysqli_num_rows($totalsellosIzquierda)*$qty;
-        }
-        if(mysqli_num_rows($totalsellosDerecha) > 0){
-            
-            $sellos += mysqli_num_rows($totalsellosDerecha) *$qty;
-    
-        }
+          
+       
     }
 
     echo json_encode([

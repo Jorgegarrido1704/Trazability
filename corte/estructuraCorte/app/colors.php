@@ -8,11 +8,8 @@ try {
     //$tipo =isset($_GET['type']) ? $_GET['type'] : '';
     
    $color=[];
-    $estructuras = mysqli_query($con, "SELECT np FROM estructuracortetiempos");
     
-    while($rowEstructura = mysqli_fetch_array($estructuras)){
-        $pn = $rowEstructura['np'];  
-        $listasdecorte= mysqli_query($con,"SELECT DISTINCT color FROM listascorte WHERE pn ='$pn'  AND aws = '$awg'");
+        $listasdecorte= mysqli_query($con,"SELECT DISTINCT color FROM corte WHERE  cutStatus != 'Cortado' && aws = '$awg'");
         while($rowlistas = mysqli_fetch_array($listasdecorte)){
          
             $awg = $rowlistas['color'];
@@ -22,7 +19,7 @@ try {
            
           
         }
-        }
+        
     echo json_encode($color);
 
 } catch (Exception $e) {

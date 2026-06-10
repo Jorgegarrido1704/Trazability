@@ -27,10 +27,10 @@
              <div class="col-2 d-flex justify-content-start align-items-center">
                 <div class="container-fluid">
                     <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-warning" onclick="dashboard('maquinas')">Maquinas de Corte</button></span>
+                        class="btn btn-warning" onclick="dashboard('maquinas')">Carga Total</button></span>
                 </div>
             </div>
-            <div class="col-4 d-flex justify-content-start align-items-center">
+       <!--     <div class="col-4 d-flex justify-content-start align-items-center">
                 <div class="container-fluid">
                     <span class="navbar-brand mb-0 h1"><form action="app/updatePn.php" method="POST" enctype="multipart/form-data" id="updatePn" >
                         <div class="row">
@@ -44,8 +44,8 @@
                         </div>
                     </form></span>
                 </div>
-            </div>
-        </div>
+            </div>-->
+        
     </nav>
 
     <div class="container-fluid px-4" id="listas">
@@ -198,18 +198,7 @@
     <div class="container-fluid px-4" id="maquinas" style="display:none;">
        
             <div class="row g-4">
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-warning text-white font-weight-bold py-2">
-                                                MCUT-7 (AWG 18,20,22,24 tinta blanca)
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                <h2 class="display-4 font-weight-bold text-warning mb-0">
-                                    <span id= "MCUT-7">0 </span>min
-                                </h2>
-                        </div>
-                    </div>
-                </div>
+                
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm border-0">
                         <div class="card-header bg-warning text-white font-weight-bold py-2">
@@ -230,6 +219,18 @@
                         <div class="card-body d-flex align-items-center justify-content-center py-4">
                                 <h2 class="display-4 font-weight-bold text-warning mb-0">
                                     <span id= "MCUT-1">0 </span>min
+                                </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-success text-white font-weight-bold py-2">
+                                                MCUT-10 con Sello (AWG 18,16,14 tinta blanca)
+                        </div>
+                        <div class="card-body d-flex align-items-center justify-content-center py-4">
+                                <h2 class="display-4 font-weight-bold text-success mb-0">
+                                    <span id= "MCUT-10SB">0 </span>min
                                 </h2>
                         </div>
                     </div>
@@ -270,7 +271,31 @@
                                 </h2>
                         </div>
                     </div>
-                </div>          
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-success text-white font-weight-bold py-2">
+                                                MCUT-10 con Sello (AWG 18,16,14 tinta negra)
+                        </div>
+                        <div class="card-body d-flex align-items-center justify-content-center py-4">
+                                <h2 class="display-4 font-weight-bold text-success mb-0">
+                                    <span id= "MCUT-10SN">0 </span>min
+                                </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-success text-white font-weight-bold py-2">
+                                                MCUT-10 Total de Carga
+                        </div>
+                        <div class="card-body d-flex align-items-center justify-content-center py-4">
+                                <h2 class="display-4 font-weight-bold text-success mb-0">
+                                    <span id= "MCUT-10TT">0 </span>min
+                                </h2>
+                        </div>
+                    </div>
+                </div>                
                 <div class="col-xl-4 col-md-6 mb-4">
                     <div class="card h-100 shadow-sm border-0">
                         <div class="card-header bg-info text-white font-weight-bold py-2">
@@ -455,12 +480,14 @@
 
             // Ejecutar para cada ID de máquina
             asignarValor('MCUT-10');
-            asignarValor('MCUT-7');
             asignarValor('MCUT-6');
             asignarValor('MCUT-5');
             asignarValor('MCUT-4');
             asignarValor('MCUT-1');
             asignarValor('>10');
+            asignarValor('MCUT-10SN');
+            asignarValor('MCUT-10SB');
+            asignarValor('MCUT-10TT');
         })
         .catch(error => {
             console.error("Error en la petición maquinasCorte:", error);
