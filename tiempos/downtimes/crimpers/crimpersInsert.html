@@ -29,6 +29,7 @@
                     <optgroup label="L2">
                         <option value="L2-1">2-1</option>
                         <option value="L2-2">2-2</option>
+                         <option value="L2-3">2-3</option>
                         </optgroup> 
                     <optgroup label="L3">
                         <option value="L3-1">3-1</option>
@@ -85,7 +86,7 @@
 <script>
     window.onload = function() {
         var today = new Date().toISOString().split('T')[0];
-        var yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+        var yesterday = new Date(Date.now()).toISOString().split('T')[0];
         document.getElementById("dateRegistered").value=yesterday;
         document.getElementById("dateRegistered").setAttribute('max', today);
         document.getElementById("dateRegistered").setAttribute('min', yesterday);
