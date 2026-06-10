@@ -51,8 +51,22 @@ try {
         if ($calibre == 10 || $calibre == 12) {
             $rango = '10_12';
         } elseif ($calibre == 14 || $calibre == 16) {
+            if(strpos($term1,"Sello")){
+                $rango = '10_12';
+                $tinta='NEGRA';
+            }else if(strpos($term2,"Sello")){
+                $rango = '10_12';
+                $tinta='NEGRA';
+            }
             $rango = '14_16';
         } elseif ($calibre >= 18 && $calibre <= 24 && $calibre % 2 == 0) {
+             if($calibre == 18 && strpos($term1,"Sello")){
+                $rango = '10_12';
+                $tinta='NEGRA';
+            }else if($calibre == 18 && strpos($term2,"Sello")){
+                $rango = '10_12';
+                $tinta='NEGRA';
+            }
             $rango = '18_24';
         }
 
