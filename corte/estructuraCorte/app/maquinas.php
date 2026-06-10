@@ -19,12 +19,12 @@ try {
         'BLANCA' => [
             '10_12' => 'MCUT-1',
             '14_16' => 'MCUT-6',
-            '18_24' => 'MCUT-7'
+            '18_24' => 'MCUT-6'
         ]
     ];
 
     // SOLUCIÓN: Agregada la columna 'qty' al SELECT para que no rompa el while
-    $stmtListas = mysqli_prepare($con, "SELECT np, aws, cons, color, term1, term2, tintaColor, time_ruteo, cutStatus, qty FROM corte WHERE cutStatus != 'Cortado' ORDER BY aws DESC");
+    $stmtListas = mysqli_prepare($con, "SELECT  aws, color, term1, term2, tintaColor, time_ruteo, cutStatus FROM corte WHERE cutStatus != 'Cortado' ORDER BY aws,color,term1,term2 DESC");
     
     if (!$stmtListas) {
         throw new Exception("Error al preparar la consulta: " . mysqli_error($con));
@@ -34,15 +34,14 @@ try {
     $resListas = mysqli_stmt_get_result($stmtListas);
 
     while ($rowlistas = mysqli_fetch_assoc($resListas)) {
-        $pn       = $rowlistas['np'];
+      
         $calibre  = (int)$rowlistas['aws'];
-        $consumo  = $rowlistas['cons'];
         $color    = $rowlistas['color'];
         $term1    = $rowlistas['term1'];
         $term2    = $rowlistas['term2'];
         // Pasamos a mayúsculas y limpiamos espacios por si acaso
         $tinta    = trim(strtoupper($rowlistas['tintaColor'])); 
-        $qty      = $rowlistas['qty']; // Ahora ya existe en el SELECT
+       
         $tiempo   = round($rowlistas['time_ruteo'] / 60, 2);
 
         $setUp_routing = 10;
