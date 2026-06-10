@@ -26,27 +26,52 @@ try {
        $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
                                              FROM corte 
                                              WHERE cutStatus != 'Cortado' AND aws IN ('10','12','14') AND tintaColor='BLANCA'
-                                            AND  term1 NOT LIKE '%Sello' AND term2 NOT LIKE '%Sello'
-                                              AND tipo IN ('GXL','TXL','SGX','UL1569') 
+                                            AND  (term1 NOT LIKE '%Sello%' OR term2 NOT LIKE '%Sello%')
+                                              AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
                                              ORDER BY aws, color, tipo, term1, term2 DESC";
                                              $maxtime=27000;
-    }if ($maquina == "MCUT-6") {
+    }elseif ($maquina == "MCUT-6") {
        $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
                                              FROM corte 
                                              WHERE cutStatus != 'Cortado' AND aws IN ('16','18','20','22','24') AND tintaColor='BLANCA'
-                                             AND  term1 NOT LIKE '%Sello' AND term2 NOT LIKE '%Sello'
-                                              AND tipo IN ('GXL','TXL','SGX','UL1569') 
+                                             AND  (term1 NOT LIKE '%Sello%' OR term2 NOT LIKE '%Sello%')
+                                              AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
+                                             ORDER BY aws, color, tipo, term1, term2 DESC";
+                                             $maxtime=27000;
+    }elseif ($maquina == "MCUT-10") {
+       $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
+                                             FROM corte 
+                                             WHERE cutStatus != 'Cortado' AND qty>20 AND ((aws IN ('10','12') AND tintaColor='NEGRA'
+                                             ) or (aws IN ('18','16','14')   AND (term1 LIKE '%Sello%' OR term2 LIKE '%Sello%')
+                                             ))  AND tipo IN ('GXL','TXL','SGX','UL1569')
+                                             ORDER BY aws, color, tipo, term1, term2 DESC";
+                                             $maxtime=27000;
+    }elseif ($maquina == "MCUT-5") {
+       $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
+                                             FROM corte 
+                                             WHERE cutStatus != 'Cortado' AND aws IN ('14','16') AND tintaColor='NEGRA'
+                                             AND ( term1 NOT LIKE '%Sello%' or term2 NOT LIKE '%Sello%')
+                                              AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
+                                             ORDER BY aws, color, tipo, term1, term2 DESC";
+                                             $maxtime=27000;
+    }elseif ($maquina == "MCUT-4") {
+       $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
+                                             FROM corte 
+                                             WHERE cutStatus != 'Cortado' AND aws IN ('18','20','22','24') AND tintaColor='NEGRA'
+                                             AND  (term1 NOT LIKE '%Sello%' OR term2 NOT LIKE '%Sello%')
+                                              AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
                                              ORDER BY aws, color, tipo, term1, term2 DESC";
                                              $maxtime=27000;
     } else if ($maquina == 'todas') {
        $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
                                              FROM corte 
                                              WHERE cutStatus != 'Cortado' 
-                                              AND tipo IN ('GXL','TXL','SGX','UL1569') 
+                                              AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
                                              ORDER BY aws, color, tipo, term1, term2 DESC";
     }
     $listasdecorte= mysqli_query($con,$qry);
     while ($rowlistas = mysqli_fetch_array($listasdecorte)) {
+        $minutos=0;
         $pn = $rowlistas['np'];
         $calibre = $rowlistas['aws'];
         $consumo = $rowlistas['cons'];
@@ -58,6 +83,7 @@ try {
         $tinta = $rowlistas['tintaColor'];
         $qty = $rowlistas['qty'];
         $time_ruteo = $rowlistas['time_ruteo']+300;
+        $minutos=round(($time_ruteo/60),2);
         
         // Sumamos el tiempo de la fila actual al acumulador
         $tiempoTotal += $time_ruteo;
@@ -72,6 +98,7 @@ try {
                 'color' => $color,
                 'tamano' => $tamano,
                 'Qty' => $qty,
+                'min' => $minutos,
                 'tinta' => $tinta,
                 'terminal1' => $terminal1,
                 'terminal2' => $terminal2
