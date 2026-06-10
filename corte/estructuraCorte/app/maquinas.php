@@ -25,16 +25,15 @@ try {
     ];
 
     // 2. Preparar las consultas fijas ANTES de los bucles para mejorar rendimiento y seguridad
-    $stmtListas = mysqli_prepare($con, "SELECT pn, aws, cons, color FROM listascorte WHERE pn = ? ORDER BY aws DESC");
-    $stmtTiempo = mysqli_prepare($con, "SELECT timePerProcess FROM routing_models WHERE pn_routing = ? AND work_routing = '10001' AND work_description LIKE ?");
-    $stmtColor  = mysqli_prepare($con, "SELECT tintaOrg FROM coloresencables WHERE eng_short_color = ? OR eng_color = ? OR spn_color = ? LIMIT 1");
+    $stmtListas = mysqli_prepare($con, "SELECT np, aws, cons, color,term1,term2,tintaColor,time_ruteo,cutStatus FROM corte WHERE pn = ? AND cutStatus != 'Cortado' ORDER BY aws DESC");
+   
 
     // Consulta inicial externa
     $estructuras = mysqli_query($con, "SELECT np, qty FROM estructuracortetiempos");
 
     while ($rowEstructura = mysqli_fetch_assoc($estructuras)) {
         $pn_estructura = $rowEstructura['np'];  
-        $qty = (int)$rowEstructura['qty'];
+       
 
         // Ejecutar consulta de listas de corte de forma segura
         mysqli_stmt_bind_param($stmtListas, "s", $pn_estructura);
@@ -42,33 +41,19 @@ try {
         $resListas = mysqli_stmt_get_result($stmtListas);
 
         while ($rowlistas = mysqli_fetch_assoc($resListas)) {
-            $pn       = $rowlistas['pn'];
+            $pn       = $rowlistas['np'];
             $calibre  = (int)$rowlistas['aws'];
             $consumo  = $rowlistas['cons'];
             $color    = $rowlistas['color'];
+            $term1    = $rowlistas['term1'];
+            $term2    = $rowlistas['term2'];
+            $tinta    = $rowlistas['tintaColor'];
+            $qty      = $rowlistas['qty'];
+            $tiempo   = round($rowlistas['time_ruteo']/60,2);
 
-            // Valores por defecto para cada iteración
-            $tiempo = 0;
+           
             $setUp_routing = 0;
 
-            // Buscar tiempos con Prepared Statement
-            $likeConsumo = "Cutting cons {$consumo} //%";
-            mysqli_stmt_bind_param($stmtTiempo, "ss", $pn, $likeConsumo);
-            mysqli_stmt_execute($stmtTiempo);
-            $resTiempo = mysqli_stmt_get_result($stmtTiempo);
-
-            if ($rowTiempo = mysqli_fetch_assoc($resTiempo)) {
-                $tiempo = round(($rowTiempo['timePerProcess'] * $qty/60),2);
-                $setUp_routing = 10;
-            }
-
-            // Buscar Color con Prepared Statement
-            mysqli_stmt_bind_param($stmtColor, "sss", $color, $color, $color);
-            mysqli_stmt_execute($stmtColor);
-            $resColor = mysqli_stmt_get_result($stmtColor);
-
-            if ($rowColor = mysqli_fetch_assoc($resColor)) {
-                $tinta = $rowColor['tintaOrg'];
 
                 if (isset($maquinaMapping[$tinta])) {
                     // Determinar el rango del calibre
@@ -88,12 +73,10 @@ try {
                 }
             }
         }
-    }
+    
 
     // Cerrar statements
     mysqli_stmt_close($stmtListas);
-    mysqli_stmt_close($stmtTiempo);
-    mysqli_stmt_close($stmtColor);
 
     // Devolver JSON limpio
     header('Content-Type: application/json');
