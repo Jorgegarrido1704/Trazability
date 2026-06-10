@@ -25,7 +25,9 @@ try {
     if ($maquina == "MCUT-1") {
        $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
                                              FROM corte 
-                                             WHERE cutStatus != 'Cortado' AND aws IN ('10','12','14',) AND tintaColor='BLANCA'
+                                             WHERE cutStatus != 'Cortado' AND aws IN ('10','12','14') AND tintaColor='BLANCA'
+                                            AND  term1 NOT LIKE '%Sello' AND term2 NOT LIKE '%Sello'
+                                              AND tipo IN ('GXL','TXL','SGX','UL1569') 
                                              ORDER BY aws, color, tipo, term1, term2 DESC";
                                              $maxtime=27000;
     }if ($maquina == "MCUT-6") {
@@ -33,12 +35,14 @@ try {
                                              FROM corte 
                                              WHERE cutStatus != 'Cortado' AND aws IN ('16','18','20','22','24') AND tintaColor='BLANCA'
                                              AND  term1 NOT LIKE '%Sello' AND term2 NOT LIKE '%Sello'
+                                              AND tipo IN ('GXL','TXL','SGX','UL1569') 
                                              ORDER BY aws, color, tipo, term1, term2 DESC";
                                              $maxtime=27000;
     } else if ($maquina == 'todas') {
        $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
                                              FROM corte 
-                                             WHERE cutStatus != 'Cortado' AND aws IN ('10','12','16','14','18','20','22','24') 
+                                             WHERE cutStatus != 'Cortado' 
+                                              AND tipo IN ('GXL','TXL','SGX','UL1569') 
                                              ORDER BY aws, color, tipo, term1, term2 DESC";
     }
     $listasdecorte= mysqli_query($con,$qry);
