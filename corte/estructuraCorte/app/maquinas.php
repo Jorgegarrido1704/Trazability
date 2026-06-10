@@ -43,7 +43,7 @@ try {
         $tinta    = trim(strtoupper($rowlistas['tintaColor'])); 
        
         $tiempo   = round($rowlistas['time_ruteo'] / 60, 2);
-        $setUp_routing = 10;
+        $setUp_routing = 5;
 
         // --- NUEVA LÓGICA DE ASIGNACIÓN DE RANGO ---
         
