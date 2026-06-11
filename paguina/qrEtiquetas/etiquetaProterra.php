@@ -188,11 +188,11 @@ try {
 <?php 
 // Bucle exclusivo para renderizar el HTML de las etiquetas
 for($j = $inicio; $j <= $cuentas; $j++){ 
-    if($j < 100){
-        $consecutivoSerial = "0".$j;
-    }
-    elseif($j < 10) {
+    if($j < 10){
         $consecutivoSerial = "00".$j;
+    }
+    elseif($j < 100) {
+        $consecutivoSerial = "0".$j;
     } else {
         $consecutivoSerial = $j;
     }
