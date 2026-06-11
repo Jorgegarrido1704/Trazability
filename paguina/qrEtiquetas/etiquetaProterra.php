@@ -188,7 +188,14 @@ try {
 <?php 
 // Bucle exclusivo para renderizar el HTML de las etiquetas
 for($j = $inicio; $j <= $cuentas; $j++){ 
-    $consecutivoSerial = str_pad($j, 3, "0", STR_PAD_LEFT);
+    if($j < 100){
+        $consecutivoSerial = "0".$j;
+    }
+    elseif($j < 10) {
+        $consecutivoSerial = "00".$j;
+    } else {
+        $consecutivoSerial = $j;
+    }
     $data = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivoSerial;
     $qrcode = generarDataMatrixHTML($data);
 ?>
