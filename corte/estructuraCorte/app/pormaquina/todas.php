@@ -120,7 +120,8 @@ try {
         $terminal2 = $rowlistas['term2'];
         $tinta = $rowlistas['tintaColor'];
         $qty = $rowlistas['qty'];
-        $time_ruteo = $rowlistas['time_ruteo']+300;
+        //$time_ruteo = $rowlistas['time_ruteo']+300;
+        $time_ruteo = round((2.92*$qty)+180,2);
         $minutos=round(($time_ruteo/60),2);
         
         // Sumamos el tiempo de la fila actual al acumulador
