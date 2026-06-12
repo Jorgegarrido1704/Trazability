@@ -6,7 +6,7 @@ try {
     $color = isset($_GET['color']) ? $_GET['color'] : '';
     $awg = isset($_GET['awg']) ? $_GET['awg'] : '';
     $tipo = isset($_GET['type']) ? $_GET['type'] : '';
-    $maquina = isset($_GET['maquina']) ? $_GET['maquina'] : '';
+    $maquina = isset($_GET['maquina']) ? $_GET['maquina'] : 'todas';
     $calibres = [];
     $totalCables = 0;
     $tintaNegra = 0;
@@ -16,11 +16,12 @@ try {
     $tinta = '';
     $tiempo = '';
     $maxtime =135000;
+    $cables = $terminales = $herramental = [];
     
     // CORRECCIÓN: Inicializar la variable del acumulador de tiempo
     $tiempoTotal = 0; 
     $i = 0;
-    
+       
     // CORRECCIÓN: Se agregó 'time_ruteo' a la primera consulta SQL también
     if ($maquina == "MCUT-1") {
        $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
@@ -40,7 +41,7 @@ try {
        $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
                                              FROM corte 
                                              WHERE cutStatus != 'Cortado' AND aws IN ('16','18','20','22','24') AND tintaColor='BLANCA'
-                                             AND  (term1 NOT LIKE '%Sello%' OR term2 NOT LIKE '%Sello%')
+                                             AND  (term1 NOT LIKE '%Sello%' AND term2 NOT LIKE '%Sello%')
                                               AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
                                              ORDER BY  aws ASC, 
                                              term1 ASC,
@@ -129,27 +130,31 @@ try {
         
         // Si el tiempo acumulado NO supera los 27000, lo agregamos al array
         if ($tiempoTotal <= $maxtime) {
-            $calibres[] = [ // Nota: puedes usar [] vacío, PHP auto-incrementa el índice solo
-                'pn' => $pn,
-                'calibre' => $calibre,
-                'consumo' => $consumo,
-                'tipo' => $tipo,
-                'color' => $color,
-                'tamano' => $tamano,
-                'Qty' => $qty,
-                'min' => $minutos,
-                'tinta' => $tinta,
-                'terminal1' => $terminal1,
-                'terminal2' => $terminal2
-            ];                  
+            // if exist the key in the array no add key else add key
+            if (array_key_exists($calibre."-".$tipo."-".$color, $cables)) {
+                $cables[$calibre."-".$tipo."-".$color]+=$minutos;
+            }else{
+                $cables[$calibre."-".$tipo."-".$color]=$minutos;
+            }
+            if(!array_key_exists($terminal1, $terminales) && stripos($terminal1, 'Empalme') === false){
+                $terminales[$terminal1]=1;
+            }
+            if(!array_key_exists($terminal2, $terminales) && stripos($terminal2, 'Empalme') === false ){
+                $terminales[$terminal2]=1;
+            }
+           
+                     
         } else {
-            // Si la suma de esta fila ya hace que supere los 27000, salimos del while por completo
+           
             break;
         }
     }
-
+    $datos=array();
+    $datos['cables']=$cables;
+    $datos['terminales']=$terminales; 
+   
     // Devolvemos el JSON con los registros que alcanzaron a entrar en las 27000 unidades de tiempo
-    echo json_encode($calibres);
+    echo json_encode($datos);
 
 } catch (Exception $e) {
     error_log("Error cargando calibres: " . $e->getMessage());
