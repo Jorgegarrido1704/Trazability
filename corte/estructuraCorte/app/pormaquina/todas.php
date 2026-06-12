@@ -28,7 +28,8 @@ try {
                                              WHERE cutStatus != 'Cortado' AND aws IN ('10','12','14') AND tintaColor='BLANCA'
                                             AND  (term1 NOT LIKE '%Sello%' AND term2 NOT LIKE '%Sello%')
                                               AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
-                                             ORDER BY  aws ASC, 
+                                             ORDER BY urgencia DESC,
+                                              aws ASC, 
                                              term1 ASC,
                                              CASE 
                                                 WHEN term2 LIKE CONCAT('%',term1,'%') THEN 0 
@@ -42,7 +43,8 @@ try {
                                              WHERE cutStatus != 'Cortado' AND aws IN ('16','18','20','22','24') AND tintaColor='BLANCA'
                                              AND  (term1 NOT LIKE '%Sello%' OR term2 NOT LIKE '%Sello%')
                                               AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
-                                             ORDER BY  aws ASC, 
+                                             ORDER BY urgencia DESC,
+                                             aws ASC, 
                                              term1 ASC,
                                              CASE 
                                                 WHEN term2 LIKE CONCAT('%',term1,'%') THEN 0 
@@ -56,7 +58,8 @@ try {
                                              WHERE cutStatus != 'Cortado' AND qty>20 AND ((aws IN ('10','12') AND tintaColor='NEGRA'
                                              ) or (aws IN ('18','16','14')   AND (term1 LIKE '%Sello%' OR term2 LIKE '%Sello%')
                                              ))  AND tipo IN ('GXL','TXL','SGX','UL1569')
-                                             ORDER BY  aws ASC, 
+                                             ORDER BY urgencia DESC,
+                                              aws ASC, 
                                              term1 ASC,
                                              CASE 
                                                 WHEN term2 LIKE CONCAT('%',term1,'%') THEN 0 
@@ -70,7 +73,8 @@ try {
                                              WHERE cutStatus != 'Cortado' AND aws IN ('14','16') AND tintaColor='NEGRA'
                                              AND ( term1 NOT LIKE '%Sello%' AND term2 NOT LIKE '%Sello%')
                                               AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
-                                             ORDER BY  aws ASC, 
+                                             ORDER BY urgencia DESC,
+                                             aws ASC, 
                                              term1 ASC,
                                              CASE 
                                                 WHEN term2 LIKE CONCAT('%',term1,'%') THEN 0 
@@ -84,7 +88,8 @@ try {
                                              WHERE cutStatus != 'Cortado' AND aws IN ('18','20','22','24') AND tintaColor='NEGRA'
                                              AND  (term1 NOT LIKE '%Sello%' AND term2 NOT LIKE '%Sello%')
                                               AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
-                                             ORDER BY  aws ASC, 
+                                             ORDER BY urgencia DESC,
+                                              aws ASC, 
                                              term1 ASC,
                                              CASE 
                                                 WHEN term2 LIKE CONCAT('%',term1,'%') THEN 0 
@@ -98,6 +103,7 @@ try {
                                              WHERE cutStatus != 'Cortado' 
                                               AND tipo IN ('GXL','TXL','SGX','UL1569') AND qty>20
                                              ORDER BY 
+                                             urgencia DESC,
                                              aws ASC, 
                                              term1 ASC,
                                              CASE 
