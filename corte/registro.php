@@ -34,7 +34,7 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
         $dataTo=$rowList['dataTo'];
        $likeConsu = "Cutting cons {$cons} //%";
         $conector=$rowList['conector'];
-        $tinrtaOrg=$rowList['colorTinta'];
+        $tinta=$rowList['colorTinta'];
     $tiempo = round(($rowList['defaultTime'] * $cuantos),2);
     $codigo=substr($wo,2).$cons;
 
