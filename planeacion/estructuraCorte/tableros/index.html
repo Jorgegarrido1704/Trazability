@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hora por hora </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#1e1e1e] text-[#e0e0e0] font-sans p-6">
+
+    <div class="max-w-[1400px] mx-auto bg-[#262626] rounded-xl p-6 shadow-2xl border border-[#333]">
+        
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-white tracking-wide">Tablero Día × Hora</h1>
+                <p class="text-sm text-gray-400 mt-1">Fecha</p>
+            </div>
+           <!-- <div class="flex gap-3">
+                <button class="bg-[#333] hover:bg-[#444] text-gray-200 text-sm py-2 px-4 rounded-lg border border-[#444] transition-all">Exportar CSV</button>
+                <button class="bg-[#333] hover:bg-[#444] text-gray-200 text-sm py-2 px-4 rounded-lg border border-[#444] transition-all">Reiniciar turno</button>
+            </div>-->
+        </div>
+
+        <div class="flex gap-2 border-b border-[#3a3a3a] mb-6 pb-px">
+            <button data-tab="produccion" class="tab-btn bg-[#333] text-white text-sm font-medium py-2 px-4 rounded-t-lg border-t border-x border-[#444]">
+                Producción
+            </button>
+            <button data-tab="paros" class="tab-btn text-gray-400 hover:text-white text-sm font-medium py-2 px-4 transition-all">
+                Registro de paros
+            </button>
+            <button data-tab="pareto" class="tab-btn text-gray-400 hover:text-white text-sm font-medium py-2 px-4 transition-all">
+                Pareto de paros
+            </button>
+        </div>
+
+        <div id="pantalla-produccion" class="tab-content space-y-6">
+            <div class="grid grid-cols-5 gap-4">
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Meta Diaria (Pzas)</p>
+                    <p class="text-2xl font-bold text-white mt-1">57</p>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Horas Productivas</p>
+                    <p class="text-2xl font-bold text-white mt-1">9</p>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e] flex justify-between items-center">
+                    <div>
+                        <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Hora de Inicio</p>
+                        <p class="text-2xl font-bold text-white mt-1">07:00 <span class="text-sm font-normal text-gray-400">AM</span></p>
+                    </div>
+                    <span class="text-gray-500">🕒</span>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Referencia</p>
+                    <p class="text-xl font-bold text-white mt-1 truncate">2664-GG5A-010</p>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Línea / Turno</p>
+                    <p class="text-lg font-bold text-white mt-1 truncate">Línea 1 — Matutino</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-5 gap-4">
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Meta Horaria</p>
+                    <p class="text-2xl font-bold text-white mt-1">6</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">pzas / hora</p>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Producido Hoy</p>
+                    <p class="text-2xl font-bold text-white mt-1">0</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">de 57 pzas</p>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Brecha Acumulada</p>
+                    <p class="text-2xl font-bold text-emerald-400 mt-1">+0</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">pzas de ventaja</p>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">% Avance</p>
+                    <p class="text-2xl font-bold text-white mt-1">0%</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">0 horas registradas</p>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Tiempo Perdido Hoy</p>
+                    <p class="text-2xl font-bold text-white mt-1">0 min</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">0 paros</p>
+                </div>
+            </div>
+
+            <div class="bg-[#1e1e1e] p-5 rounded-xl border border-[#2e2e2e]">
+                <h2 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-4">Registro Hora × Hora</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b border-[#333] text-[11px] text-gray-400 tracking-wider uppercase">
+                                <th class="pb-3 font-semibold">Intervalo</th>
+                                <th class="pb-3 text-center font-semibold">Meta Hora</th>
+                                <th class="pb-3 text-center font-semibold">Meta Acum.</th>
+                                <th class="pb-3 text-center font-semibold w-24">Real</th>
+                                <th class="pb-3 text-center font-semibold">Real Acum.</th>
+                                <th class="pb-3 text-center font-semibold">Brecha Hora</th>
+                                <th class="pb-3 text-center font-semibold">Brecha Acum.</th>
+                                <th class="pb-3 text-center font-semibold">Estado</th>
+                                <th class="pb-3 pl-4 font-semibold">Nota</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#2a2a2a] text-gray-300">
+                            <tr class="hover:bg-[#252525] transition-all">
+                                <td class="py-2.5 font-medium text-gray-400">07:00–08:00</td>
+                                <td class="py-2.5 text-center font-bold">6</td>
+                                <td class="py-2.5 text-center text-gray-400">6</td>
+                                <td class="py-2.5 text-center">
+                                    <input type="number" placeholder="—" class="w-16 bg-[#2a2a2a] border border-[#3a3a3a] rounded text-center py-1 text-white focus:outline-none focus:border-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                </td>
+                                <td class="py-2.5 text-center text-gray-500">—</td>
+                                <td class="py-2.5 text-center text-gray-500">—</td>
+                                <td class="py-2.5 text-center text-gray-500">—</td>
+                                <td class="py-2.5 text-center text-gray-500">—</td>
+                                <td class="py-2.5 pl-4">
+                                    <input type="text" placeholder="nota rápida" class="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded px-3 py-1 text-xs text-gray-300 focus:outline-none focus:border-blue-500">
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-[#252525] transition-all">
+                                <td class="py-2.5 font-medium text-gray-400">08:00–09:00</td>
+                                <td class="py-2.5 text-center font-bold">6</td>
+                                <td class="py-2.5 text-center text-gray-400">12</td>
+                                <td class="py-2.5 text-center">
+                                    <input type="number" placeholder="—" class="w-16 bg-[#2a2a2a] border border-[#3a3a3a] rounded text-center py-1 text-white focus:outline-none focus:border-blue-500">
+                                </td>
+                                <td class="py-2.5 text-center text-gray-500">—</td>
+                                <td class="py-2.5 text-center text-gray-500">—</td>
+                                <td class="py-2.5 text-center text-gray-500">—</td>
+                                <td class="py-2.5 text-center text-gray-500">—</td>
+                                <td class="py-2.5 pl-4">
+                                    <input type="text" placeholder="nota rápida" class="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded px-3 py-1 text-xs text-gray-300 focus:outline-none focus:border-blue-500">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-[#1e1e1e] p-5 rounded-xl border border-[#2e2e2e]">
+                <h2 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-4">Producción vs Meta — Barras Por Hora</h2>
+                <div class="h-28 flex items-end justify-between px-4 border-b border-[#333] pb-2 text-xs text-gray-500">
+                    <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2 text-[11px]">07:00</span></div>
+                    <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2 text-[11px]">08:00</span></div>
+                    <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2 text-[11px]">09:00</span></div>
+                    <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2 text-[11px]">10:00</span></div>
+                    <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2 text-[11px]">11:00</span></div>
+                    <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2 text-[11px]">12:00</span></div>
+                    <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2 text-[11px]">13:00</span></div>
+                    <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2 text-[11px]">14:00</span></div>
+                    <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2 text-[11px]">15:00</span></div>
+                </div>
+                <div class="flex gap-4 mt-3 text-xs text-gray-400">
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#10b981] rounded-sm"></span> En meta</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#f59e0b] rounded-sm"></span> Rezago leve</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#ef4444] rounded-sm"></span> Rezago crítico</div>
+                    <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#4b5563] rounded-sm"></span> Sin captura</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pantalla-paros" class="tab-content space-y-6 hidden">
+            <div class="grid grid-cols-4 gap-4">
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Total Paros</p>
+                    <p class="text-2xl font-bold text-white mt-1">0</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">eventos hoy</p>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Tiempo Perdido</p>
+                    <p class="text-2xl font-bold text-white mt-1">0 min</p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">0.0 horas</p>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Máquina más afectada</p>
+                    <p class="text-2xl font-bold text-gray-500 mt-1">—</p>
+                </div>
+                <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]">
+                    <p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Tipo más frecuente</p>
+                    <p class="text-2xl font-bold text-gray-500 mt-1">—</p>
+                </div>
+            </div>
+
+            <div class="bg-[#1e1e1e] p-5 rounded-xl border border-[#2e2e2e]">
+                <h2 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-4">Bitácora de paros del turno</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse mb-6">
+                        <thead>
+                            <tr class="border-b border-[#333] text-[11px] text-gray-400 tracking-wider uppercase">
+                                <th class="pb-3 font-semibold">Hora Inicio</th>
+                                <th class="pb-3 font-semibold">Hora Fin</th>
+                                <th class="pb-3 font-semibold">Duración</th>
+                                <th class="pb-3 font-semibold">Máquina</th>
+                                <th class="pb-3 font-semibold">Tipo de Falla</th>
+                                <th class="pb-3 font-semibold">Descripción</th>
+                                <th class="pb-3 font-semibold">Acción Realizada</th>
+                                <th class="pb-3 font-semibold">Técnico</th>
+                                <th class="pb-3 font-semibold text-center">¿Resuelto?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="9" class="text-center py-12 text-sm text-gray-500 italic">
+                                    Sin paros registrados en este turno
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="bg-[#2a2a2a] hover:bg-[#333] text-gray-300 text-xs font-medium py-2 px-4 rounded-lg border border-[#3a3a3a] transition-all flex items-center gap-1.5">
+                    <span>+</span> Agregar paro
+                </button>
+            </div>
+        </div>
+
+        <div id="pantalla-pareto" class="tab-content space-y-6 hidden">
+            <div class="bg-[#1e1e1e] p-5 rounded-xl border border-[#2e2e2e]">
+                <h2 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-4">
+                    Pareto de tiempo perdido por tipo de falla — Turno actual
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b border-[#333] text-[11px] text-gray-400 tracking-wider uppercase">
+                                <th class="pb-3 font-semibold w-1/4">Tipo de Falla</th>
+                                <th class="pb-3 font-semibold text-center">Eventos</th>
+                                <th class="pb-3 font-semibold text-center">Min Perdidos</th>
+                                <th class="pb-3 font-semibold text-center">% Del Total</th>
+                                <th class="pb-3 font-semibold w-1/3 pl-4">Barra</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="text-center py-10 text-sm text-gray-500 italic">
+                                    Sin datos registrados
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-[#1e1e1e] p-5 rounded-xl border border-[#2e2e2e]">
+                <h2 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-4">
+                    Pareto de tiempo perdido por máquina — Turno actual
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b border-[#333] text-[11px] text-gray-400 tracking-wider uppercase">
+                                <th class="pb-3 font-semibold w-1/4">Máquina</th>
+                                <th class="pb-3 font-semibold text-center">Eventos</th>
+                                <th class="pb-3 font-semibold text-center">Min Perdidos</th>
+                                <th class="pb-3 font-semibold text-center">% Del Total</th>
+                                <th class="pb-3 font-semibold w-1/3 pl-4">Barra</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="text-center py-10 text-sm text-gray-500 italic">
+                                    Sin datos registrados
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const botones = document.querySelectorAll('.tab-btn');
+            const pantallas = document.querySelectorAll('.tab-content');
+
+            botones.forEach(boton => {
+                boton.addEventListener('click', () => {
+                    const targetTab = boton.getAttribute('data-tab');
+
+                    // 1. Alternar estados visuales de los botones (Pestañas)
+                    botones.forEach(btn => {
+                        if (btn === boton) {
+                            // Pestaña Activa
+                            btn.className = "tab-btn bg-[#333] text-white text-sm font-medium py-2 px-4 rounded-t-lg border-t border-x border-[#444]";
+                        } else {
+                            // Pestaña Inactiva
+                            btn.className = "tab-btn text-gray-400 hover:text-white text-sm font-medium py-2 px-4 transition-all";
+                        }
+                    });
+
+                    // 2. Mostrar la pantalla correspondiente y ocultar las demás
+                    pantallas.forEach(pantalla => {
+                        if (pantalla.id === `pantalla-${targetTab}`) {
+                            pantalla.classList.remove('hidden');
+                        } else {
+                            pantalla.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
