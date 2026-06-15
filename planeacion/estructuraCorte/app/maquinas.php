@@ -6,7 +6,7 @@ try {
     $maquinas = [
         "MCUT-10" => 0, "MCUT-1" => 0, "MCUT-5" => 0, 
         "MCUT-6"  => 0, "MCUT-4" => 0, 
-        ">10"     => 0, "MCUT-10SN" => 0, "MCUT-10SB" => 0,
+        ">10"     => 0, "MCUT-10SN" => 0, "MCUT-10SB" => 0,"TOTAL" => 0
     ];
 
     // Estructura: [tinta][rango_de_calibres] => modelo_maquina
@@ -78,8 +78,10 @@ try {
         // Evitar errores si la máquina asignada no está declarada en el array principal
         if (isset($maquinas[$maquinaAsignada])) {
             $maquinas[$maquinaAsignada] += ($tiempo + $setUp_routing);
+            $maquinas['TOTAL'] += ($tiempo + $setUp_routing);
         } else {
             $maquinas['>10'] += ($tiempo + $setUp_routing);
+            $maquinas['TOTAL'] += ($tiempo + $setUp_routing);
         }
     }
     $maquinas["MCUT-10TT"] = $maquinas["MCUT-10"] + $maquinas["MCUT-10SN"] + $maquinas["MCUT-10SB"];
