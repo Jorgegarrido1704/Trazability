@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Paros Maquinas de corte</title>
+    <title>Defectos de calidad en maquinas de corte</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   </head>
   <body>
     <div class="container mt-5">
-      <h1>Agregar paro de maquina de corte</h1>
+      <h1>Agregar defecto en maquina de corte</h1>
       <form method="POST" onsubmit="event.preventDefault(); sendinformation();">
         <div class="row">
                 <div class="col-md-2 mb-3">
@@ -43,12 +43,15 @@
                     </select>   
                 </div>
                 <div class="col-md-2 mb-3">
-                    <label for="downtime" class="form-label">Tiempo Muerto</label>
+                    <label for="downtime" class="form-label">Cantidad de defectos</label>
                     <input type="number" class="form-control" id="downtime" name="downtime" min="0" step="1" required>
                 </div>
                 <div class="col-md-3 mb-3">
                     <label for="reason" class="form-label">Razon</label>
-                    <input type="text" class="form-control" id="reason" name="reason" maxlength="10" placeholder="Ej. K,J,G Separados por comas"  required>
+                    <select class="form-select" id="reason" name="reason" required>
+                    <option value="" disabled selected>Selecciona una razon</option>
+                    
+                    </select>
                 </div> 
                     <button type="submit" class="btn btn-primary">Agregar Tiempo Muerto</button>
                 
@@ -64,7 +67,22 @@
         document.getElementById("dateRegistered").value=yesterday;
         document.getElementById("dateRegistered").setAttribute('max', today);
         document.getElementById("dateRegistered").setAttribute('min', yesterday);
+        function getReasons(){
+            fetch('reasons.php').then(response => response.json()).then(data => {
+                var select = document.getElementById('reason');
+                data.forEach(reason => {
+                    var option = document.createElement('option');
+                    option.value = reason.clave;
+                    option.text = reason.defecto;
+                    select.add(option);
+                });
+            })
+        }
+            
+        
+        getReasons();
     };
+
 
     async function CheckDuplicate(){
         var dateRegistered = document.getElementById("dateRegistered").value;

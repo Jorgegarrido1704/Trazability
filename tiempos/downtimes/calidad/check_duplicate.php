@@ -12,7 +12,7 @@ $hourTime = $datos['hourTime'];
 $toolingCrimperName = $datos['toolingCrimperName'];
 
 
-$busqueda = "SELECT `fecha`,`hora`,`maquina` FROM `cutting_machine_stops` WHERE fecha = '$dateRegistered' AND hora = '$hourTime' AND maquina = '$toolingCrimperName' ";
+$busqueda = "SELECT `fecha`,`hora`,`maquina` FROM `calidad_corte_oee` WHERE fecha = '$dateRegistered' AND hora = '$hourTime' AND maquina = '$toolingCrimperName' ";
 $result = $conn->query($busqueda);
 
 if ($result->num_rows > 0) {
