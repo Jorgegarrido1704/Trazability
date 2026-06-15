@@ -464,6 +464,7 @@
             fetch('app/maquinas.php')
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);
                     const asignarValor = (id) => {
                         const elemento = document.getElementById(id);
                         if (elemento) {

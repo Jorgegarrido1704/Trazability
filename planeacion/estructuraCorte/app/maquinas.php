@@ -40,13 +40,13 @@ try {
 
     while ($rowlistas = mysqli_fetch_assoc($resListas)) {
       
-        $calibre  = (int)$rowlistas['aws'];
-        $color    = $rowlistas['color'];
-        $term1    = $rowlistas['term1'];
-        $term2    = $rowlistas['term2'];
-        $tinta    = trim(strtoupper($rowlistas['tintaColor'])); 
+        $calibre  = (int)$rowlistas['c.aws'];
+        $color    = $rowlistas['c.color'];
+        $term1    = $rowlistas['c.term1'];
+        $term2    = $rowlistas['c.term2'];
+        $tinta    = trim(strtoupper($rowlistas['c.tintaColor'])); 
        
-        $tiempo   = round($rowlistas['time_ruteo'] / 60, 2);
+        $tiempo   = round($rowlistas['c.time_ruteo'] / 60, 2);
         $setUp_routing = 5;
 
         // --- NUEVA LÓGICA DE ASIGNACIÓN DE RANGO ---
