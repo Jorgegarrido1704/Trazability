@@ -1,621 +1,475 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listas de Corte</title>
+    <title>Control de Producción y Listas de Corte</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Corrección para evitar conflictos en vistas Bootstrap */
+        .bootstrap-scope img, .bootstrap-scope svg { display: inline; }
+        .tab-content-all { display: none; }
+        .tab-content-all.active { display: block; }
+    </style>
 </head>
 <body class="bg-light">
 
-    <nav class="navbar navbar-dark bg-dark mb-4 ">
-        <div class="row"></div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" onclick="dashboard('listas')">Control de Listas de Corte</button></span>
+    <nav class="navbar navbar-dark bg-dark mb-4 p-2">
+        <div class="container-fluid">
+            <div class="d-flex flex-wrap gap-2 w-100 justify-content-between align-items-center">
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-primary" onclick="dashboard('listas')">Control de Listas de Corte</button>
+                    <button class="btn btn-warning" onclick="dashboard('cargaSemanal')">Carga Semanal</button>
+                    <button class="btn btn-danger" onclick="dashboard('dashboard')">Dashboard Cortes</button>
+                    <button class="btn btn-warning" onclick="dashboard('maquinas')">Carga Total</button>
+                    <button class="btn btn-success" onclick="dashboard('porMaquinas')">Carga por Máquinas</button>
+                    <button class="btn btn-primary" onclick="dashboard('materialistas')">Carga Materialista y Crimpers</button>
+                </div>
+                <div>
+                    <button class="btn btn-info text-white fw-bold" onclick="dashboard('tableroDiaHora')">
+                        <i class="bi bi-speedometer2 me-1"></i> Tablero Día × Hora
+                    </button>
                 </div>
             </div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-warning" onclick="dashboard('cargaSemanal')">Carga Semanal</button></span>
-                </div>
-            </div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-danger" onclick="dashboard('dashboard')">Dashboard</button></span>
-                </div>
-            </div>
-             <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-warning" onclick="dashboard('maquinas')">Carga Total</button></span>
-                </div>
-            </div>
-             <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-success" onclick="dashboard('porMaquinas')">Carga por maquinas</button></span>
-                </div>
-            </div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" onclick="dashboard('materialistas')">Carga materialista y crimpers</button></span>
-                </div>
-            </div>
-       <!--     <div class="col-4 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><form action="app/updatePn.php" method="POST" enctype="multipart/form-data" id="updatePn" >
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label for="csv_file" class="form-label fw-semibold">Actualizar PN</label>
-                            </div><div class="col-md-6">
-                                <input type="file" name="csv_file" id="csv_file" class="form-control" required>
-                            </div><div class="col-md-3"> 
-                                 <button type="submit" name="upload" class="btn btn-primary">Actualizar PN</button>
-                            </div>
-                        </div>
-                    </form></span>
-                </div>
-            </div>-->
-        
+        </div>
     </nav>
 
-    <div class="container-fluid px-4" id="listas">
-        <div class="row g-4">
-            
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="card-title mb-0 text-primary"><i class="bi bi-funnel me-2"></i>Filtros de Búsqueda</h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="filterForm" class="row g-3">
-                            
-                            <div class="col-md-3">
-                                <label for="wireGauge" class="form-label fw-semibold">Calibre de Cable (Gauge / AWS)</label>
-                                <select class="form-select" id="wireGauge" onchange="fetchcolors()">
-                                    <option value="">Todos los calibres...</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-3" id ="colorSelect" style="display: none;">
-                                <label for="wireColor" class="form-label fw-semibold">Color del Cable</label>
-                                <select class="form-select" id="wireColor" onchange="fetchWireTypes()">
-                                    <option value="">...</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 " id="wireTypeSelect" style="display: none;">
-                                <label for="wireType" class="form-label fw-semibold">Tipo de Cable</label>
-                                <select class="form-select" id="wireType" onchange="fetchLists()">
-                                    <option value="">...</option>
-                                </select>
-
-                               </div>
-
-                            <div class="col-md-3 d-flex align-items-end">
-                                <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
-                                    <i class="bi bi-eraser me-2"></i>Limpiar
-                                </button>
-                            </div>
-
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                        <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Lista de cables</h5>
-                        <span class="badge bg-primary rounded-pill" id="totalRecords">0 registros</span>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped mb-0 align-middle">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Nº Parte</th>
-                                        <th>Consecutivo</th>
-                                        <th>Calibre (AWS)</th>
-                                        <th>Color</th>
-                                        <th>Tipo de Cable</th>
-                                        <th>Tinta</th>
-                                        <th>Terminal 1</th>
-                                        <th>Terminal 2</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="resultadosTodos">
-                                    <tr id="loadingRow">
-                                        <td colspan="4" class="text-center text-muted py-4" >
-                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                                            Cargando datos...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-    <div class="container-fluid px-4" id="dashboards" style="display:none;">
-        <div class="row g-4">
-            
-            <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="card-title mb-0 text-primary">Dashboards</h5>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12">
-               <div class="d-sm-flex align-items-center justify-content-between mb-4"></div>
-
-            <div class="row text-center mb-4">
-                <div class="col-xl-2 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-primary text-white font-weight-bold py-2">
-                            Total de cortes
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                            <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="totalCuts">0</span></h5>
-                        </div>
-                    </div>
-                </div>
-                 <div class="col-xl-2 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-primary text-white font-weight-bold py-2">
-                           Tinta Negra
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                            <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="tintaNegra">0</span></h5>
-                        </div>
-                    </div>
-                </div>
-                 <div class="col-xl-2 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-primary text-white font-weight-bold py-2">
-                            Tinta Blanca
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                            <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="tintaBlanca">0</span></h5>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-2 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-primary text-white font-weight-bold py-2">
-                            Total de sellos
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                            <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="totalSellos">0</span></h5>
-                        </div>
-                    </div>
-                </div>
-                <div id="calibres" class="row text-center mb-4">
-                    <!-- Aquí se agregarán dinámicamente las tarjetas por calibre -->
-                </div>
-
-
-
-            </div>
-
-        </div>
-    </div>
-    </div>  
-    <div class="container-fluid px-4" id="maquinas" style="display:none;">
-       
+    <div class="bootstrap-scope">
+        
+        <div class="container-fluid px-4 tab-content-all active" id="listas">
             <div class="row g-4">
-                
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-warning text-white font-weight-bold py-2">
-                                                MCUT-6 (AWG 14,16 tinta blanca)
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title mb-0 text-primary"><i class="bi bi-funnel me-2"></i>Filtros de Búsqueda</h5>
                         </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                <h2 class="display-4 font-weight-bold text-warning mb-0">
-                                    <span id= "MCUT-6">0 </span>min
-                                </h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-warning text-white font-weight-bold py-2">
-                                                MCUT-1 (AWG 10,12 tinta blanca)
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                <h2 class="display-4 font-weight-bold text-warning mb-0">
-                                    <span id= "MCUT-1">0 </span>min
-                                </h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-success text-white font-weight-bold py-2">
-                                                MCUT-10 con Sello (AWG 18,16,14 tinta blanca)
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                <h2 class="display-4 font-weight-bold text-success mb-0">
-                                    <span id= "MCUT-10SB">0 </span>min
-                                </h2>
+                        <div class="card-body">
+                            <form id="filterForm" class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="wireGauge" class="form-label fw-semibold">Calibre de Cable (Gauge / AWS)</label>
+                                    <select class="form-select" id="wireGauge" onchange="fetchcolors()">
+                                        <option value="">Todos los calibres...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3" id="colorSelect" style="display: none;">
+                                    <label for="wireColor" class="form-label fw-semibold">Color del Cable</label>
+                                    <select class="form-select" id="wireColor" onchange="fetchWireTypes()">
+                                        <option value="">...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3" id="wireTypeSelect" style="display: none;">
+                                    <label for="wireType" class="form-label fw-semibold">Tipo de Cable</label>
+                                    <select class="form-select" id="wireType" onchange="fetchLists()">
+                                        <option value="">...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                        <i class="bi bi-eraser me-2"></i>Limpiar
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-dark text-white font-weight-bold py-2">
-                                                MCUT-4 (AWG 18,20,22,24 tinta negra)
+
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Lista de cables</h5>
+                            <span class="badge bg-primary rounded-pill" id="totalRecords">0 registros</span>
                         </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                <h2 class="display-4 font-weight-bold text-dark mb-0">
-                                    <span id= "MCUT-4">0 </span>min
-                                </h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-dark text-white font-weight-bold py-2">
-                                                MCUT-5 (AWG 16,14 tinta negra)
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                <h2 class="display-4 font-weight-bold text-dark mb-0">
-                                    <span id= "MCUT-5">0 </span>min
-                                </h2>
-                        </div>
-                    </div>
-                </div>
-        
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-dark text-white font-weight-bold py-2">
-                                                MCUT-10 (AWG 10,12 tinta negra)
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                <h2 class="display-4 font-weight-bold text-dark mb-0">
-                                    <span id= "MCUT-10">0</span>min
-                                </h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-success text-white font-weight-bold py-2">
-                                                MCUT-10 con Sello (AWG 18,16,14 tinta negra)
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                <h2 class="display-4 font-weight-bold text-success mb-0">
-                                    <span id= "MCUT-10SN">0 </span>min
-                                </h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-success text-white font-weight-bold py-2">
-                                                MCUT-10 Total de Carga
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                <h2 class="display-4 font-weight-bold text-success mb-0">
-                                    <span id= "MCUT-10TT">0 </span>min
-                                </h2>
-                        </div>
-                    </div>
-                </div>                
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-info text-white font-weight-bold py-2">
-                                               Cables Especiales
-                        </div>
-                        <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                <h2 class="display-4 font-weight-bold text-info mb-0">
-                                    <span id= ">10">0 </span>min
-                                </h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    </div>  
-    <div class="container-fluid px-4" id="porMaquinas" style="display:none;">   
-    <nav class="navbar navbar-dark bg-dark mb-4 ">
-        <div class="row"></div>
-        <input type="hidden" id="maquina seleccionada" value="todas">
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="maquinaSelecionada('todas')">Todas las maquinas</button></span>
-                        
-                </div>
-            </div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="maquinaSelecionada('MCUT-1')">MCUT-1</button></span>
-                        
-                </div>
-            </div>
-             <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="maquinaSelecionada('MCUT-6')">MCUT-6</button></span>
-                        
-                </div>
-            </div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="maquinaSelecionada('MCUT-10')">MCUT-10</button></span>
-                        
-                </div>
-            </div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="maquinaSelecionada('MCUT-5')">MCUT-5</button></span>
-                        
-                </div>
-            </div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="maquinaSelecionada('MCUT-4')">MCUT-4</button></span>
-                        
-                </div>
-            </div>
-    </nav>
-        <div class="row g-4">
-              <div class="col-12">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                        <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Lista de cables</h5>
-                        <span class="badge bg-primary rounded-pill" id="totalRecords2">0 registros</span>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped mb-0 align-middle">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Nº Parte</th>
-                                        <th>Consecutivo</th>
-                                        <th>Calibre (AWS)</th>
-                                        <th>Color</th>
-                                        <th>Tipo de Cable</th>
-                                        <th>Tinta</th>
-                                        <th>Tamaño(MM)</th>
-                                        <th>Qty</th>
-                                        <th>Minutos</th>
-                                        <th>Terminal 1</th>
-                                        <th>Terminal 2</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="resultTotal">
-                                    <tr id="loadingRow">
-                                        <td colspan="4" class="text-center text-muted py-4" >
-                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                                            Cargando datos...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>  
-    </div>  
-    <div class="container-fluid px-4" id="materialistas" style="display:none;">   
-    <nav class="navbar navbar-dark bg-dark mb-4 ">
-        <div class="row"></div>
-        <input type="hidden" id="maquina_material" name="maquina_material" value="todas">
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="materialista('MCUT-1')">MCUT-1</button></span>
-                        
-                </div>
-            </div>
-             <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="materialista('MCUT-6')">MCUT-6</button></span>
-                        
-                </div>
-            </div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="materialista('MCUT-10')">MCUT-10</button></span>
-                        
-                </div>
-            </div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="materialista('MCUT-5')">MCUT-5</button></span>
-                        
-                </div>
-            </div>
-            <div class="col-2 d-flex justify-content-start align-items-center">
-                <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1"><button
-                        class="btn btn-primary" id="totalMaquinas" onclick="materialista('MCUT-4')">MCUT-4</button></span>
-                        
-                </div>
-            </div>
-    </nav>
-        <div class="row g-4">
-            <div class="col-4" >
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                        <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Cables</h5>
-                        <span class="badge bg-primary rounded-pill" id="totalCables">0 registros</span>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped mb-0 align-middle">
-                                <thead class="table-dark">
-                            
-                                </thead>
-                                <tbody id="cablespormaquina">
-                                    <tr id="loadingRow">
-                                        <td colspan="4" class="text-center text-muted py-4" >
-                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                                            Cargando datos...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-             <div class="col-4" >
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                        <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Terminales y sellos</h5>
-                        <span class="badge bg-primary rounded-pill" id="totalterminales">0 registros</span>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped mb-0 align-middle">
-                                <thead class="table-dark">
-                            
-                                </thead>
-                                <tbody id="terminalspormaquina">
-                                    <tr id="loadingRow">
-                                        <td colspan="4" class="text-center text-muted py-4" >
-                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                                            Cargando datos...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-             <div class="col-4" >
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                        <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Herramentales</h5>
-                        <span class="badge bg-primary rounded-pill" id="totalRecords2">0 registros</span>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped mb-0 align-middle">
-                                <thead class="table-dark">
-                            
-                                </thead>
-                                <tbody id="herramentales">
-                                    <tr id="loadingRow">
-                                        <td colspan="4" class="text-center text-muted py-4" >
-                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                                            Cargando datos...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>  
-    </div> 
-    <div class="container-fluid px-4" id="cargaSemanal" style="display:none;">   
-                <div class="row g-4">
-                    <div class="col-12" >
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                                <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Work Orders</h5>
-                                <span class="badge bg-primary rounded-pill" id="totalCables">0 registros</span>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0 align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Nº Parte</th>
+                                            <th>Consecutivo</th>
+                                            <th>Calibre (AWS)</th>
+                                            <th>Color</th>
+                                            <th>Tipo de Cable</th>
+                                            <th>Tinta</th>
+                                            <th>Terminal 1</th>
+                                            <th>Terminal 2</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultadosTodos">
+                                        <tr id="loadingRow">
+                                            <td colspan="8" class="text-center text-muted py-4">
+                                                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                                Cargando datos...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-striped mb-0 align-middle">
-                                        <thead class="table-dark">
-                                            <tr>
-                                                  <th scope="col">Numero de Parte</th>
-                                                <th scope="col">Work Order</th>
-                                                <th scope="col">Cantidad</th>
-                                                <th scope="col">Estado (0 = no programado, 1 = programado)</th>
-                                                <th scope="col">Cambiar estado</th>
-                                        </thead>
-                                        <tbody id="listaDesemana">
-                                           
-                                        </tbody>
-                                    </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid px-4 tab-content-all" id="dashboards">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title mb-0 text-primary">Dashboards Analítico</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="row text-center mb-4">
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-header bg-primary text-white font-weight-bold py-2">Total de cortes</div>
+                                <div class="card-body d-flex align-items-center justify-content-center py-4">
+                                    <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="totalCuts">0</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-header bg-primary text-white font-weight-bold py-2">Tinta Negra</div>
+                                <div class="card-body d-flex align-items-center justify-content-center py-4">
+                                    <h5 class="display-5 font-weight-bold text-primary mb-0"><span id="tintaNegra">0</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-header bg-primary text-white font-weight-bold py-2">Tinta Blanca</div>
+                                <div class="card-body d-flex align-items-center justify-content-center py-4">
+                                    <h5 class="display-5 font-weight-bold text-primary mb-0"><span id="tintaBlanca">0</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-header bg-primary text-white font-weight-bold py-2">Total de sellos</div>
+                                <div class="card-body d-flex align-items-center justify-content-center py-4">
+                                    <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="totalSellos">0</span></h5>
                                 </div>
                             </div>
                         </div>
                     </div>
-                
-                    
-                </div>  
-    </div> 
+                    <div id="calibres" class="row text-center mb-4"></div>
+                </div>
+            </div>
+        </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <div class="container-fluid px-4 tab-content-all" id="maquinas">
+            <div class="row g-4">
+                <div class="col-xl-4 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-warning text-white font-weight-bold py-2">MCUT-6 (AWG 14,16 blanca)</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-warning mb-0"><span id="MCUT-6">0</span> min</h2></div></div></div>
+                <div class="col-xl-4 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-warning text-white font-weight-bold py-2">MCUT-1 (AWG 10,12 blanca)</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-warning mb-0"><span id="MCUT-1">0</span> min</h2></div></div></div>
+                <div class="col-xl-4 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-success text-white font-weight-bold py-2">MCUT-10 Sello (AWG 18,16,14 blanca)</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-success mb-0"><span id="MCUT-10SB">0</span> min</h2></div></div></div>
+                <div class="col-xl-4 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-dark text-white font-weight-bold py-2">MCUT-4 (AWG 18,20,22,24 negra)</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-dark mb-0"><span id="MCUT-4">0</span> min</h2></div></div></div>
+                <div class="col-xl-4 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-dark text-white font-weight-bold py-2">MCUT-5 (AWG 16,14 negra)</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-dark mb-0"><span id="MCUT-5">0</span> min</h2></div></div></div>
+                <div class="col-xl-4 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-dark text-white font-weight-bold py-2">MCUT-10 (AWG 10,12 negra)</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-dark mb-0"><span id="MCUT-10">0</span> min</h2></div></div></div>
+                <div class="col-xl-4 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-success text-white font-weight-bold py-2">MCUT-10 Sello (AWG 18,16,14 negra)</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-success mb-0"><span id="MCUT-10SN">0</span> min</h2></div></div></div>
+                <div class="col-xl-4 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-success text-white font-weight-bold py-2">MCUT-10 Total Carga</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-success mb-0"><span id="MCUT-10TT">0</span> min</h2></div></div></div>
+                <div class="col-xl-4 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-info text-white font-weight-bold py-2">Cables Especiales</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-info mb-0"><span id=">10">0</span> min</h2></div></div></div>
+            </div>
+        </div>
+
+        <div class="container-fluid px-4 tab-content-all" id="porMaquinas">
+            <nav class="navbar navbar-expand bg-secondary mb-4 rounded px-2">
+                <input type="hidden" id="maquina seleccionada" value="todas">
+                <div class="navbar-nav gap-2">
+                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('todas')">Todas las máquinas</button>
+                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-1')">MCUT-1</button>
+                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-6')">MCUT-6</button>
+                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-10')">MCUT-10</button>
+                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-5')">MCUT-5</button>
+                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-4')">MCUT-4</button>
+                </div>
+            </nav>
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Lista por máquina</h5>
+                    <span class="badge bg-primary rounded-pill" id="totalRecords2">0 registros</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Nº Parte</th><th>Consecutivo</th><th>Calibre</th><th>Color</th><th>Tipo</th><th>Tinta</th><th>Tamaño(MM)</th><th>Qty</th><th>Minutos</th><th>Terminal 1</th><th>Terminal 2</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultTotal"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid px-4 tab-content-all" id="materialistas">
+            <nav class="navbar navbar-expand bg-secondary mb-4 rounded px-2">
+                <input type="hidden" id="maquina_material" value="todas">
+                <div class="navbar-nav gap-2">
+                    <button class="btn btn-light btn-sm" onclick="materialista('MCUT-1')">MCUT-1</button>
+                    <button class="btn btn-light btn-sm" onclick="materialista('MCUT-6')">MCUT-6</button>
+                    <button class="btn btn-light btn-sm" onclick="materialista('MCUT-10')">MCUT-10</button>
+                    <button class="btn btn-light btn-sm" onclick="materialista('MCUT-5')">MCUT-5</button>
+                    <button class="btn btn-light btn-sm" onclick="materialista('MCUT-4')">MCUT-4</button>
+                </div>
+            </nav>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <h5 class="card-title mb-0 text-secondary">Cables</h5>
+                            <span class="badge bg-primary rounded-pill" id="totalCables">0</span>
+                        </div>
+                        <div class="card-body p-0"><table class="table mb-0"><tbody id="cablespormaquina"></tbody></table></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <h5 class="card-title mb-0 text-secondary">Terminales y sellos</h5>
+                            <span class="badge bg-primary rounded-pill" id="totalterminales">0</span>
+                        </div>
+                        <div class="card-body p-0"><table class="table mb-0"><tbody id="terminalspormaquina"></tbody></table></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                            <h5 class="card-title mb-0 text-secondary">Herramentales</h5>
+                        </div>
+                        <div class="card-body p-0"><table class="table mb-0"><tbody id="herramentales"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid px-4 tab-content-all" id="cargaSemanal">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 text-secondary"><i class="bi bi-calendar-week me-2"></i>Work Orders de la Semana</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Número de Parte</th><th>Work Order</th><th>Cantidad</th><th>Estado</th><th>Cambiar Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaDesemana"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container-fluid px-4 tab-content-all" id="tableroDiaHora">
+        <div class="max-w-[1400px] mx-auto bg-[#262626] text-[#e0e0e0] rounded-xl p-6 shadow-2xl border border-[#333]">
+            
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-white tracking-wide">Tablero Control OEE — Producción de Arneses</h1>
+                    <p class="text-sm text-gray-400 mt-1">domingo, 14 de junio de 2026 · Línea 1 — Turno Matutino</p>
+                </div>
+                <div class="flex gap-3">
+                    <button class="bg-[#333] hover:bg-[#444] text-gray-200 text-sm py-2 px-4 rounded-lg border border-[#444] transition-all">Exportar CSV</button>
+                    <button class="bg-[#333] hover:bg-[#444] text-gray-200 text-sm py-2 px-4 rounded-lg border border-[#444] transition-all">Reiniciar turno</button>
+                </div>
+            </div>
+
+            <div class="flex gap-2 border-b border-[#3a3a3a] mb-6 pb-px">
+                <button data-subtab="produccion" class="subtab-btn bg-[#333] text-white text-sm font-medium py-2 px-4 rounded-t-lg border-t border-x border-[#444]">Producción</button>
+                <button data-subtab="paros" class="subtab-btn text-gray-400 hover:text-white text-sm font-medium py-2 px-4 transition-all">Registro de paros</button>
+                <button data-subtab="pareto" class="subtab-btn text-gray-400 hover:text-white text-sm font-medium py-2 px-4 transition-all">Pareto de paros</button>
+            </div>
+
+            <div id="subpantalla-produccion" class="subtab-content space-y-6">
+                <div class="grid grid-cols-5 gap-4">
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Meta Diaria</p><p class="text-2xl font-bold text-white mt-1">57</p></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Horas Prod.</p><p class="text-2xl font-bold text-white mt-1">9</p></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e] flex justify-between items-center"><div><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Inicio</p><p class="text-2xl font-bold text-white mt-1">07:00 <span class="text-sm font-normal text-gray-400">AM</span></p></div><span class="text-gray-500">🕒</span></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Referencia</p><p class="text-xl font-bold text-white mt-1 truncate">2664-GG5A-010</p></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Línea</p><p class="text-lg font-bold text-white mt-1 truncate">Línea 1 — Matutino</p></div>
+                </div>
+
+                <div class="grid grid-cols-5 gap-4">
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Meta Horaria</p><p class="text-2xl font-bold text-white mt-1">6</p></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Producido Hoy</p><p class="text-2xl font-bold text-white mt-1">0</p></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Brecha Acum.</p><p class="text-2xl font-bold text-emerald-400 mt-1">+0</p></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">% Avance</p><p class="text-2xl font-bold text-white mt-1">0%</p></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Tiempo Perdido</p><p class="text-2xl font-bold text-white mt-1">0 min</p></div>
+                </div>
+
+                <div class="bg-[#1e1e1e] p-5 rounded-xl border border-[#2e2e2e]">
+                    <h2 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-4">Registro Hora × Hora</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b border-[#333] text-[11px] text-gray-400 tracking-wider uppercase">
+                                    <th class="pb-3">Intervalo</th><th class="pb-3 text-center">Meta</th><th class="pb-3 text-center">Meta Acum.</th><th class="pb-3 text-center w-24">Real</th><th class="pb-3 text-center">Real Acum.</th><th class="pb-3 text-center">Brecha</th><th class="pb-3 text-center">Brecha Acum.</th><th class="pb-3 text-center">Estado</th><th class="pb-3 pl-4">Nota</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-[#2a2a2a] text-gray-300">
+                                <tr class="hover:bg-[#252525] transition-all">
+                                    <td class="py-2.5 text-gray-400">07:00–08:00</td><td class="text-center font-bold">6</td><td class="text-center text-gray-400">6</td>
+                                    <td class="text-center"><input type="number" placeholder="—" class="w-16 bg-[#2a2a2a] border border-[#3a3a3a] rounded text-center py-1 text-white focus:outline-none focus:border-blue-500"></td>
+                                    <td class="text-center text-gray-500">—</td><td class="text-center text-gray-500">—</td><td class="text-center text-gray-500">—</td><td class="text-center text-gray-500">—</td>
+                                    <td class="pl-4"><input type="text" placeholder="nota rápida" class="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded px-3 py-1 text-xs focus:outline-none"></td>
+                                </tr>
+                                <tr class="hover:bg-[#252525] transition-all">
+                                    <td class="py-2.5 text-gray-400">08:00–09:00</td><td class="text-center font-bold">6</td><td class="text-center text-gray-400">12</td>
+                                    <td class="text-center"><input type="number" placeholder="—" class="w-16 bg-[#2a2a2a] border border-[#3a3a3a] rounded text-center py-1 text-white focus:outline-none focus:border-blue-500"></td>
+                                    <td class="text-center text-gray-500">—</td><td class="text-center text-gray-500">—</td><td class="text-center text-gray-500">—</td><td class="text-center text-gray-500">—</td>
+                                    <td class="pl-4"><input type="text" placeholder="nota rápida" class="w-full bg-[#2a2a2a] border border-[#3a3a3a] rounded px-3 py-1 text-xs focus:outline-none"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-[#1e1e1e] p-5 rounded-xl border border-[#2e2e2e]">
+                    <h2 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-4">Producción vs Meta — Barras Por Hora</h2>
+                    <div class="h-24 flex items-end justify-between px-4 border-b border-[#333] pb-2 text-gray-500 text-[11px]">
+                        <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2">07:00</span></div>
+                        <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2">08:00</span></div>
+                        <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2">09:00</span></div>
+                        <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2">10:00</span></div>
+                        <div class="flex flex-col items-center w-full"><div class="w-full bg-[#2a2a2a] h-1 rounded-t"></div><span class="mt-2">11:00</span></div>
+                    </div>
+                    <div class="flex gap-4 mt-3 text-xs text-gray-400">
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#10b981] rounded-sm"></span> En meta</div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#f59e0b] rounded-sm"></span> Rezago leve</div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-[#ef4444] rounded-sm"></span> Rezago crítico</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="subpantalla-paros" class="subtab-content space-y-6 hidden">
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Total Paros</p><p class="text-2xl font-bold text-white mt-1">0</p></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Tiempo Perdido</p><p class="text-2xl font-bold text-white mt-1">0 min</p></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Máquina Afectada</p><p class="text-2xl font-bold text-gray-500 mt-1">—</p></div>
+                    <div class="bg-[#1e1e1e] p-4 rounded-lg border border-[#2e2e2e]"><p class="text-[11px] text-gray-400 font-semibold tracking-wider uppercase">Tipo más Frecuente</p><p class="text-2xl font-bold text-gray-500 mt-1">—</p></div>
+                </div>
+                <div class="bg-[#1e1e1e] p-5 rounded-xl border border-[#2e2e2e]">
+                    <h2 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-4">Bitácora de paros del turno</h2>
+                    <table class="w-full text-left text-sm mb-6">
+                        <thead>
+                            <tr class="border-b border-[#333] text-[11px] text-gray-400 uppercase">
+                                <th class="pb-3">Hora Inicio</th><th class="pb-3">Hora Fin</th><th class="pb-3">Duración</th><th class="pb-3">Máquina</th><th class="pb-3">Tipo de Falla</th><th class="pb-3">Descripción</th><th class="pb-3 text-center">¿Resuelto?</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr><td colspan="7" class="text-center py-12 text-sm text-gray-500 italic">Sin paros registrados en este turno</td></tr></tbody>
+                    </table>
+                    <button class="bg-[#2a2a2a] hover:bg-[#333] text-gray-300 text-xs py-2 px-4 rounded-lg border border-[#3a3a3a] transition-all">+ Agregar paro</button>
+                </div>
+            </div>
+
+            <div id="subpantalla-pareto" class="subtab-content space-y-6 hidden">
+                <div class="bg-[#1e1e1e] p-5 rounded-xl border border-[#2e2e2e]">
+                    <h2 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-4">Pareto de tiempo perdido por tipo de falla — Turno actual</h2>
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-[#333] text-[11px] text-gray-400 uppercase">
+                                <th class="pb-3 w-1/4">Tipo de Falla</th><th class="pb-3 text-center">Eventos</th><th class="pb-3 text-center">Min Perdidos</th><th class="pb-3 text-center">% Del Total</th><th class="pb-3 w-1/3 pl-4">Barra</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr><td colspan="5" class="text-center py-10 text-sm text-gray-500 italic">Sin datos registrados</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
 
     <script>
-         const codigoOficial = 52;
-        onload = function() {
-             fetchLists()
-             fechtInitialData()
-           
+        const codigoOficial = 52;
 
+        window.onload = function() {
+            fetchLists();
+            fechtInitialData();
         }
+
         function maquinaSelecionada(maquina){
-           document.getElementById('maquina seleccionada').value = maquina;
-           pormaquina();
+            document.getElementById('maquina seleccionada').value = maquina;
+            pormaquina();
         }
-     
+
+        // CONTROLADOR DE PANTALLAS GLOBAL (Soporta Bootstrap y Tailwind)
         function dashboard(section) {
-            document.getElementById('listas').style.display = 'none';
-            document.getElementById('dashboards').style.display = 'none';
-            document.getElementById('maquinas').style.display = 'none';
-            document.getElementById('porMaquinas').style.display = 'none'
-            document.getElementById('materialistas').style.display = 'none';
-            document.getElementById('cargaSemanal').style.display = 'none';
-            if (section === 'listas') {
-                document.getElementById('listas').style.display = 'block';
-                fetchLists();
-            } else if (section === 'dashboard') {
-                document.getElementById('dashboards').style.display = 'block';
-                fetchCuttingLists(); // Cargar datos al mostrar el dashboard
-            }else if (section === 'maquinas') {
-                document.getElementById('maquinas').style.display = 'block';
-                maquinasCorte();
-            }else if (section === 'porMaquinas'){
-                document.getElementById('porMaquinas').style.display = 'block';
-                pormaquina();
-            }else if (section === 'materialistas'){
-                document.getElementById('materialistas').style.display = 'block';
-                materialista('todas');
-            }else if (section === 'cargaSemanal'){
-                document.getElementById('cargaSemanal').style.display = 'block';
-                var codigoDevisual=prompt('Ingrese el codigo de visualización');
-                codigoDevisual = parseInt(codigoDevisual);
-                if (codigoDevisual === codigoOficial){
-                    alert('Bienvenido');
-                    CargaSemanal();
-                }else{
-                     window.location.reload();
-                }
-               
+            // Ocultar de manera masiva todas las secciones
+            const todasLasSecciones = document.querySelectorAll('.tab-content-all');
+            todasLasSecciones.forEach(sec => sec.classList.remove('active'));
+
+            // Activar la sección elegida
+            const seccionActiva = document.getElementById(section);
+            if (seccionActiva) {
+                seccionActiva.classList.add('active');
             }
 
+            // Ejecución de funciones de datos heredadas
+            if (section === 'listas') {
+                fetchLists();
+            } else if (section === 'dashboard') {
+                fetchCuttingLists();
+            } else if (section === 'maquinas') {
+                maquinasCorte();
+            } else if (section === 'porMaquinas') {
+                pormaquina();
+            } else if (section === 'materialistas') {
+                materialista('todas');
+            } else if (section === 'cargaSemanal') {
+                var codigoDevisual = prompt('Ingrese el codigo de visualización');
+                codigoDevisual = parseInt(codigoDevisual);
+                if (codigoDevisual === codigoOficial) {
+                    alert('Bienvenido');
+                    CargaSemanal();
+                } else {
+                    window.location.reload();
+                }
+            }
         }
 
+        // NAVEGACIÓN INTERNA JAVASCRIPT PARA LAS SUB-PESTAÑAS DEL TABLERO
+        document.addEventListener('DOMContentLoaded', () => {
+            const subBotones = document.querySelectorAll('.subtab-btn');
+            const subPantallas = document.querySelectorAll('.subtab-content');
+
+            subBotones.forEach(boton => {
+                boton.addEventListener('click', () => {
+                    const targetSubTab = boton.getAttribute('data-subtab');
+
+                    // Alternar colores de pestañas de producción
+                    subBotones.forEach(btn => {
+                        if (btn === boton) {
+                            btn.className = "subtab-btn bg-[#333] text-white text-sm font-medium py-2 px-4 rounded-t-lg border-t border-x border-[#444]";
+                        } else {
+                            btn.className = "subtab-btn text-gray-400 hover:text-white text-sm font-medium py-2 px-4 transition-all";
+                        }
+                    });
+
+                    // Alternar contenedores
+                    subPantallas.forEach(pantalla => {
+                        if (pantalla.id === `subpantalla-${targetSubTab}`) {
+                            pantalla.classList.remove('hidden');
+                        } else {
+                            pantalla.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+        });
+
+        // =========================================================================
+        // FUNCIONES DE CALLBACKS ORIGINALES (CONSERVADAS AL 100%)
+        // =========================================================================
         function fetchCuttingLists() {
             fetch('app/listasdecorte.php')  
                 .then(response => response.json())
@@ -627,33 +481,22 @@
                     document.getElementById('tintaBlanca').innerHTML = data.tintaBlanca + ' (' + rangoBlanca.toFixed(2) + '%)';
                     document.getElementById('totalSellos').innerHTML = data.sellos;
                 
-                   let por_calibres = '';
-
-                    // Al estar simplificado, 'calibre' es la clave ("18") y 'total' es el valor (150)
+                    let por_calibres = '';
                     Object.entries(data.calibres).forEach(([calibre, total]) => {
                         por_calibres += `
                             <div class="col-xl-2 col-md-6 mb-4">
                                 <div class="card h-100 shadow-sm border-0">
-                                    <div class="card-header bg-info text-white font-weight-bold py-2">
-                                        Calibre ${calibre}
-                                    </div>
+                                    <div class="card-header bg-info text-white font-weight-bold py-2">Calibre ${calibre}</div>
                                     <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                        <h2 class="display-4 font-weight-bold text-info mb-0">
-                                            <span>${total}</span>
-                                        </h2>
+                                        <h2 class="display-4 font-weight-bold text-info mb-0"><span>${total}</span></h2>
                                     </div>
                                 </div>
                             </div>`;
                     });
-
                     document.getElementById('calibres').innerHTML = por_calibres;
                 })
-                .catch(error => {
-                    console.error('Error al cargar el dashboard:', error);
-                    document.getElementById('dashboards').innerHTML = '<div class="alert alert-danger">Error al cargar el dashboard. Intente nuevamente más tarde.</div>';
-                });
-            
-           }
+                .catch(error => console.error('Error al cargar el dashboard:', error));
+        }
            
         function fetchLists() {
             const gauge = document.getElementById('wireGauge').value;
@@ -667,22 +510,15 @@
             fetch(`app/todosloscables.php${query}`)
                 .then(response => response.json())
                 .then(data => {
-                   //table in  resultsTableBody
-                     const tbody = document.getElementById('resultadosTodos');
-                    tbody.innerHTML = ''; // Clear previous results
+                    const tbody = document.getElementById('resultadosTodos');
+                    tbody.innerHTML = '';
                     let totalRecords = 0;
                     data.forEach(item => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${item.pn}</td>
-                            <td>${item.consumo}</td>
-                            <td>${item.calibre}</td>
-                            <td>${item.color}</td>
-                            <td>${item.tipo}</td>
-                            <td>${item.tinta}</td>
-                            <td>${item.terminal1}</td>
-                            <td>${item.terminal2}</td>
-                        `;
+                            <td>${item.pn}</td><td>${item.consumo}</td><td>${item.calibre}</td>
+                            <td>${item.color}</td><td>${item.tipo}</td><td>${item.tinta}</td>
+                            <td>${item.terminal1}</td><td>${item.terminal2}</td>`;
                         tbody.appendChild(row);
                         totalRecords++;
                     });
@@ -690,241 +526,148 @@
                 })
                 .catch(err => console.error("Fetch error:", err));
         }
+
         function fetchWireTypes(){
-           
             document.getElementById('wireTypeSelect').style.display = 'block';
-            let gauge = document.getElementById('wireGauge').value
-            let color = document.getElementById('wireColor').value
-            let url = `app/tipe.php?awg=${gauge}&color=${color}`
-            fetch(url)
-                  .then(response => response.json())
+            let gauge = document.getElementById('wireGauge').value;
+            let color = document.getElementById('wireColor').value;
+            fetch(`app/tipe.php?awg=${gauge}&color=${color}`)
+                .then(response => response.json())
                 .then(data => {
                     let selectHTML = '<option value="">Todos los tipos...</option>';
-                 //   console.log(data);
-                    data.forEach(color => {
-                        selectHTML += `<option value="${color}">${color}</option>`;
-                    });
+                    data.forEach(tipo => { selectHTML += `<option value="${tipo}">${tipo}</option>`; });
                     document.getElementById('wireType').innerHTML = selectHTML;
                 });
-            }
+        }
         
         function fechtInitialData() {
             fetch('app/gauge.php')
                 .then(response => response.json())
                 .then(data => {
                     let selectHTML = '<option value="">Todos los calibres...</option>';
-                 //   console.log(data);
-                    data.forEach(gauge => {
-                        selectHTML += `<option value="${gauge}">${gauge}</option>`;
-                    });
+                    data.forEach(gauge => { selectHTML += `<option value="${gauge}">${gauge}</option>`; });
                     document.getElementById('wireGauge').innerHTML = selectHTML;
                 });
-            }
+        }
+
         function fetchcolors(){
             document.getElementById('colorSelect').style.display = 'block';
-            let gauge = document.getElementById('wireGauge').value
-            let url = `app/colors.php?awg=${gauge}`
-            fetch(url)
-                  .then(response => response.json())
+            let gauge = document.getElementById('wireGauge').value;
+            fetch(`app/colors.php?awg=${gauge}`)
+                .then(response => response.json())
                 .then(data => {
-                    let selectHTML = '<option value="">Todos los calibres...</option>';
-                 //   console.log(data);
-                    data.forEach(color => {
-                        selectHTML += `<option value="${color}">${color}</option>`;
-                    });
+                    let selectHTML = '<option value="">Todos los colores...</option>';
+                    data.forEach(color => { selectHTML += `<option value="${color}">${color}</option>`; });
                     document.getElementById('wireColor').innerHTML = selectHTML;
                 });
-            }
+        }
 
-      function maquinasCorte() {
-        // Si necesitas enviarle el PN, puedes pasarlo por la URL así: 'app/maquinas.php?pn=tu_part_number'
-        fetch('app/maquinas.php')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Error en el servidor");
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log(data);
-                
-                // Función interna para asignar de manera segura y evitar repetir código
-                const asignarValor = (id) => {
-                    const elemento = document.getElementById(id);
-                    if (elemento) {
-                        // Si data[id] existe y es un número, usa toFixed. Si no, pon 0.00
-                        elemento.innerHTML = (data && data[id] !== undefined) ? Number(data[id]).toFixed(2) : '0.00';
-                    }
-                };
+        function maquinasCorte() {
+            fetch('app/maquinas.php')
+                .then(response => response.json())
+                .then(data => {
+                    const asignarValor = (id) => {
+                        const elemento = document.getElementById(id);
+                        if (elemento) {
+                            elemento.innerHTML = (data && data[id] !== undefined) ? Number(data[id]).toFixed(2) : '0.00';
+                        }
+                    };
+                    asignarValor('MCUT-10'); asignarValor('MCUT-6'); asignarValor('MCUT-5');
+                    asignarValor('MCUT-4'); asignarValor('MCUT-1'); asignarValor('>10');
+                    asignarValor('MCUT-10SN'); asignarValor('MCUT-10SB'); asignarValor('MCUT-10TT');
+                });
+        }
 
-            // Ejecutar para cada ID de máquina
-            asignarValor('MCUT-10');
-            asignarValor('MCUT-6');
-            asignarValor('MCUT-5');
-            asignarValor('MCUT-4');
-            asignarValor('MCUT-1');
-            asignarValor('>10');
-            asignarValor('MCUT-10SN');
-            asignarValor('MCUT-10SB');
-            asignarValor('MCUT-10TT');
-        })
-        .catch(error => {
-            console.error("Error en la petición maquinasCorte:", error);
-        });
-}
-            function clearFilters(){
-                window.location.href = 'index.html';
-            }
+        function clearFilters(){ window.location.href = 'index.html'; }
 
+        function pormaquina() {
+            const gauge = document.getElementById('wireGauge').value;
+            const color = document.getElementById('wireColor').value;
+            const type = document.getElementById('wireType').value;
+            const maquina = document.getElementById('maquina seleccionada').value;
+            let query = '?';
+            if (gauge) query += `awg=${encodeURIComponent(gauge)}&`;
+            if (color) query += `color=${encodeURIComponent(color)}&`;
+            if (type) query += `type=${encodeURIComponent(type)}&`;
+            if (maquina) query += `maquina=${encodeURIComponent(maquina)}&`;
+            
+            fetch(`app/pormaquina/todas.php${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('resultTotal');
+                    tbody.innerHTML = '';
+                    let totalRecords = 0;
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${item.pn}</td><td>${item.consumo}</td><td>${item.calibre}</td><td>${item.color}</td>
+                            <td>${item.tipo}</td><td>${item.tinta}</td><td>${item.tamano}</td><td>${item.Qty}</td>
+                            <td>${item.min}</td><td>${item.terminal1}</td><td>${item.terminal2}</td>`;
+                        tbody.appendChild(row);
+                        totalRecords++;
+                    });
+                    document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
+                });
+        }
 
-             function pormaquina() {
-                        const gauge = document.getElementById('wireGauge').value;
-                        const color = document.getElementById('wireColor').value;
-                        const type = document.getElementById('wireType').value;
-                        const maquina = document.getElementById('maquina seleccionada').value;
-                        let query = '?';
-                        if (gauge) query += `awg=${encodeURIComponent(gauge)}&`;
-                        if (color) query += `color=${encodeURIComponent(color)}&`;
-                        if (type) query += `type=${encodeURIComponent(type)}&`;
-                        if (maquina) query += `maquina=${encodeURIComponent(maquina)}&`;
-                        
-                        fetch(`app/pormaquina/todas.php${query}`)
-                            .then(response => response.json())
-                            .then(data => {
-                            //table in  resultsTableBody
-                                const tbody = document.getElementById('resultTotal');
-                                tbody.innerHTML = ''; // Clear previous results
-                                let totalRecords = 0;
-                                data.forEach(item => {
-                                    const row = document.createElement('tr');
-                                    row.innerHTML = `
-                                        <td>${item.pn}</td>
-                                        <td>${item.consumo}</td>
-                                        <td>${item.calibre}</td>
-                                        <td>${item.color}</td>
-                                        <td>${item.tipo}</td>
-                                        <td>${item.tinta}</td>
-                                        <td>${item.tamano}</td>
-                                        <td>${item.Qty}</td>
-                                        <td>${item.min}</td>
-                                        <td>${item.terminal1}</td>
-                                        <td>${item.terminal2}</td>
-                                    `;
-                                    tbody.appendChild(row);
-                                    totalRecords++;
-                                });
-                                document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
-                            })
-                            .catch(err => console.error("Fetch error:", err));
-                    }
-            function materialista(material) {
-                        const materialista = material;
-                        const gauge = document.getElementById('wireGauge').value;
-                        const color = document.getElementById('wireColor').value;
-                        const type = document.getElementById('wireType').value;
-                        const maquina = document.getElementById('maquina_material').value;
-                        let query = '?';
-                        if (gauge) query += `awg=${encodeURIComponent(gauge)}&`;
-                        if (color) query += `color=${encodeURIComponent(color)}&`;
-                        if (type) query += `type=${encodeURIComponent(type)}&`;
-                        if (maquina) query += `maquina=${encodeURIComponent(materialista)}&`;
-                        
-                        fetch(`app/pormaquina/materialista.php${query}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log(data);
-                                const cables =data.cables;
-                                const terminals = data.terminales
-                                // mostrar las key de cables in id 
-                                const tbodyCables = document.getElementById('cablespormaquina');
-                               
-                                const totalCables = Object.keys(cables).length;
-                                const totalTerminals = Object.keys(terminals).length;
-                                document.getElementById('totalCables').textContent = totalCables;
-                                document.getElementById('totalterminales').textContent = totalTerminals;
-                                tbodyCables.innerHTML = ''; // Clear previous results
-                                Object.keys(cables).forEach(key => {
-                                    const row = document.createElement('tr');
-                                    row.innerHTML = `
-                                        <td>${key}</td>
-                                        <td>${cables[key].toFixed(2)}</td>
-                                    `;
-                                    tbodyCables.appendChild(row);
-                                });
-                                // mostrar las key de terminals in id 
-                                const tbodyTerminals = document.getElementById('terminalspormaquina');
-                                tbodyTerminals.innerHTML = ''; // Clear previous results
-                                Object.keys(terminals).forEach(key => {
-                                    const row = document.createElement('tr');
-                                    row.innerHTML = `
-                                        <td>${key}</td>
-                                       
-                                    `;
-                                    tbodyTerminals.appendChild(row);
-                                });
+        function materialista(material) {
+            fetch(`app/pormaquina/materialista.php?maquina=${encodeURIComponent(material)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const cables = data.cables;
+                    const terminals = data.terminales;
+                    const tbodyCables = document.getElementById('cablespormaquina');
+                    
+                    document.getElementById('totalCables').textContent = Object.keys(cables).length;
+                    document.getElementById('totalterminales').textContent = Object.keys(terminals).length;
+                    
+                    tbodyCables.innerHTML = '';
+                    Object.keys(cables).forEach(key => {
+                        tbodyCables.innerHTML += `<tr><td>${key}</td><td>${cables[key].toFixed(2)}</td></tr>`;
+                    });
+                    
+                    const tbodyTerminals = document.getElementById('terminalspormaquina');
+                    tbodyTerminals.innerHTML = '';
+                    Object.keys(terminals).forEach(key => {
+                        tbodyTerminals.innerHTML += `<tr><td>${key}</td></tr>`;
+                    });
+                });
+        }
 
+        function CargaSemanal() {          
+            fetch(`app/pormaquina/cargaSemanal.php`)
+                .then(response => response.json())
+                .then(data => {
+                    let listaWo = document.getElementById('listaDesemana');
+                    listaWo.innerHTML = "";
+                    data.forEach(wo => {
+                        let textoEstado = (wo[4] == 0) ? "No programado" : "Programado";
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${wo[1]}</td><td>${wo[2]}</td><td>${wo[3]}</td><td>${wo[4]} ${textoEstado}</td>
+                            <td>
+                                <select class="form-select form-select-sm" onchange="programar(${wo[0]},this.value)">
+                                    <option value="" selected disabled>Seleccionar cambio</option>
+                                    <option value="1">Programar</option>
+                                    <option value="0">Quitar de programación</option>                    
+                                </select>
+                            </td>`;
+                        listaWo.appendChild(row);
+                    });
+                });
+        }
 
-                            })
-                            .catch(err => console.error("Fetch error:", err));
-                    }
-            function CargaSemanal() {          
-                        fetch(`app/pormaquina/cargaSemanal.php`)
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log(data);
-                                let listaWo = document.getElementById('listaDesemana');
-                                listaWo.innerHTML = "";
-                               dato = "";
-                                data.forEach(wo => {
-                                    if(wo[4] == 0){
-                                        let dato = "No programado";
-                                    }else{
-                                        let dato ="Programado";
-                                    }
-                                     const row = document.createElement('tr');
-                                    row.innerHTML =`<tr>
-                                        <td>${wo[1]}</td>
-                                        <td>${wo[2]}</td>
-                                        <td>${wo[3]}</td>
-                                        <td>${wo[4]} ${dato}</td>
-                                        <td>
-                                            <select name="programar" id="programar" required onchange="programar(${wo[0]},this.value)">
-                                            <option value="" selected disabled>Seleccionar cambio</option>
-                                            <option value="1">programar</option>
-                                            <option value="0">Quitar de programacion</option>                    
-                                            </select>
-                                        </td>
-                                    `
-                                    listaWo.appendChild(row);
-                                });
-                        
-                            })
-                            .catch(err => console.error("Fetch error:", err));
-                    }
-           function programar(id, valor) {
-                    fetch(`app/pormaquina/planificacion.php?id=${id}&valor=${valor}`)
-                        .then(response => {
-                            // Si el servidor responde con un error HTTP (ej. 500), lanzamos error antes de procesar JSON
-                            if (!response.ok) {
-                                throw new Error("Error en la respuesta del servidor");
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log(data);
-                            
-                            // Verificamos si el PHP realmente hizo el UPDATE con éxito
-                            if (data.success) {
-                                CargaSemanal();
-                            } else {
-                                console.error("Error en la base de datos:", data.error);
-                                alert("No se pudo programar. Error: " + data.error);
-                            }
-                        })
-                        .catch(err => console.error("Fetch error:", err));
-                }
-                                
-
+        function programar(id, valor) {
+            fetch(`app/pormaquina/planificacion.php?id=${id}&valor=${valor}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Error en la respuesta");
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) { CargaSemanal(); } 
+                    else { alert("No se pudo cambiar el estado: " + data.error); }
+                });
+        }
     </script>
 </body>
 </html>

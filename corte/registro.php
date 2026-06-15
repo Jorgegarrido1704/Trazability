@@ -11,7 +11,7 @@ try {
     
 
    // echo "<h1>Se Eliminaron Correctamente</h1>";
-$buscar=mysqli_query($con,"SELECT * FROM registro WHERE count<4 ORDER BY count ASC");
+$buscar=mysqli_query($con,"SELECT * FROM registro WHERE count IN ('2','3')  ORDER BY count ASC");
 while($row=mysqli_fetch_array($buscar)){
     $pn=$row['NumPart'];
     $client=$row['cliente'];
@@ -34,12 +34,8 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
         $dataTo=$rowList['dataTo'];
        $likeConsu = "Cutting cons {$cons} //%";
         $conector=$rowList['conector'];
-    $stmtTiempo = mysqli_query($con, "SELECT timePerProcess FROM routing_models WHERE pn_routing = '$pn' AND work_routing = '10001' AND work_description LIKE '$likeConsu' LIMIT 1");
-    $stmtColor  = mysqli_query($con, "SELECT tintaOrg FROM coloresencables WHERE eng_short_color = '$color' OR eng_color = '$color' OR spn_color = '$color' LIMIT 1");
-    $rowTiempo = mysqli_fetch_array($stmtTiempo);
-    $rowColor  = mysqli_fetch_array($stmtColor);
-    $tinta= $rowColor['tintaOrg'];
-    $tiempo = round(($rowTiempo['timePerProcess'] * $cuantos),2);
+        $tinrtaOrg=$rowList['colorTinta'];
+    $tiempo = round(($rowList['defaultTime'] * $cuantos),2);
     $codigo=substr($wo,2).$cons;
 
       
