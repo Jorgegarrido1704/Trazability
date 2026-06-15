@@ -24,7 +24,7 @@ try {
        
     // CORRECCIÓN: Se agregó 'time_ruteo' a la primera consulta SQL también
     if ($maquina == "MCUT-1") {
-       $qry ="SELECT np, color, aws, cons, tipo, tamano, term1, term2, tintaColor, qty, time_ruteo 
+       $qry ="SELECT c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte 
                                              WHERE cutStatus != 'Cortado' AND aws IN ('10','12','14') AND tintaColor='BLANCA'
                                             AND  (term1 NOT LIKE '%Sello%' AND term2 NOT LIKE '%Sello%')
