@@ -12,7 +12,7 @@ try {
     
     if ($color != '' && $awg != '' && $tipo != '') {
         // CORRECCIÓN: Se agregó c.qty (ó qty) para mantener consistencia con el else
-        $listasdecorte = mysqli_query($con, "SELECT c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty 
+        $listasdecorte = mysqli_query($con, "SELECT c.np, c.wo,c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty 
                                              FROM corte c 
                                              JOIN registro r ON c.wo = r.wo 
                                              WHERE c.cutStatus != 'Cortado' 
@@ -24,7 +24,7 @@ try {
                                              ORDER BY c.term1, c.term2 DESC");
     } else {
         // CORRECCIÓN: Se agregó c.tamano a la consulta para que no rompa el ciclo while
-        $listasdecorte = mysqli_query($con, "SELECT c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty 
+        $listasdecorte = mysqli_query($con, "SELECT c.np, c.wo,c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty 
                                              FROM corte c 
                                              JOIN registro r ON c.wo = r.wo 
                                              WHERE c.cutStatus != 'Cortado' 

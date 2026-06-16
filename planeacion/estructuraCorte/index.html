@@ -276,7 +276,7 @@
                         <table class="table table-hover table-striped mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>Número de Parte</th><th>Work Order</th><th>Cantidad</th><th>Estado</th><th>Cambiar Estado</th>
+                                    <th>Número de Parte</th><th>Work Order</th><th>Cantidad</th><th>Estado</th><th>Cambiar Programacion</th><th>Cambiar Urgencia</th>
                                 </tr>
                             </thead>
                             <tbody id="listaDesemana"></tbody>
@@ -550,16 +550,29 @@
                 .then(data => {
                     let listaWo = document.getElementById('listaDesemana');
                     listaWo.innerHTML = "";
+                    let id ="";
+                    let wo ="";
                     data.forEach(wo => {
+                        id = wo[0];
+                        work = wo[2];
                         let textoEstado = (wo[4] == 0) ? "No programado" : "Programado";
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${wo[1]}</td><td>${wo[2]}</td><td>${wo[3]}</td><td>${wo[4]} ${textoEstado}</td>
+                            <td>${wo[1]}</td><td>${wo[2]}</td><td>${wo[3]}</td><td>${wo[4]} ${textoEstado}- ${wo[5]}</td>
                             <td>
-                                <select class="form-select form-select-sm" onchange="programar(${wo[0]},this.value)">
+                                <select class="form-select form-select-sm" onchange="programar(${id},this.value)">
                                     <option value="" selected disabled>Seleccionar cambio</option>
                                     <option value="1">Programar</option>
                                     <option value="0">Quitar de programación</option>                    
+                                </select>
+                            </td>
+                            <td>
+                                <select class="form-select form-select-sm" onchange="urgencia(${id},this.value)">
+                                    <option value="" selected disabled>Seleccionar urgencia</option>
+                                    <option value="1-Baja">Baja</option>
+                                    <option value="2-Media">Media</option>
+                                    <option value="3-Alta">Alta</option>
+                                    <option value="4-Critico">Critico</option>                    
                                 </select>
                             </td>`;
                         listaWo.appendChild(row);
@@ -576,6 +589,18 @@
                 .then(data => {
                     if (data.success) { CargaSemanal(); } 
                     else { alert("No se pudo cambiar el estado: " + data.error); }
+                });
+        }
+        function urgencia(wo, urgencia) {
+            alert(wo, urgencia);
+            fetch(`app/pormaquina/urgencia.php?wo=${wo}&urgencia=${urgencia}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Error en la respuesta");
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) { CargaSemanal(); } 
+                    else { alert("No se pudo cambiar la urgencia: " + data.error); }
                 });
         }
     </script>
