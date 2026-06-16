@@ -24,7 +24,7 @@ try {
             c.wo 
           FROM corte c 
           JOIN registro r ON c.wo = r.wo 
-          WHERE c.cutStatus != 'Cortado' 
+          WHERE c.cutStatus != 'Cortado'  AND c.tamano >0
             AND r.programado = 1");
         while($rowlistas = mysqli_fetch_array($listasdecorte)){
             $calibre = $rowlistas['aws'];

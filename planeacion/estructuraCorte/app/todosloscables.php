@@ -20,6 +20,7 @@ try {
                                                AND c.aws = '$awg' 
                                                AND c.color = '$color' 
                                                AND c.tipo = '$tipo' 
+                                               AND c.tamano >0
                                              ORDER BY c.term1, c.term2 DESC");
     } else {
         // CORRECCIÓN: Se agregó c.tamano a la consulta para que no rompa el ciclo while
@@ -27,7 +28,7 @@ try {
                                              FROM corte c 
                                              JOIN registro r ON c.wo = r.wo 
                                              WHERE c.cutStatus != 'Cortado' 
-                                               AND r.programado = 1 
+                                               AND r.programado = 1  AND c.tamano >0
                                              ORDER BY c.term1, c.term2 DESC");
     }
 
@@ -48,13 +49,15 @@ try {
         $terminal1 = $rowlistas['term1'];
         $terminal2 = $rowlistas['term2'];
         $tinta     = $rowlistas['tintaColor'];
-        $qty       = $rowlistas['qty']; // Por si la necesitas en el JS
+        $qty       = $rowlistas['qty']; 
+        $wo        = $rowlistas['wo'];
 
         $calibres[$i] = [
             'pn'        => $pn,
             'calibre'   => $calibre,
             'consumo'   => $consumo,
             'tipo'      => $tipo,
+            'wo'        => $wo,
             'color'     => $color,
             'tamano'    => $tamano,
             'tinta'     => $tinta,

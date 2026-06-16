@@ -82,8 +82,10 @@
                                 <table class="table table-hover table-striped mb-0 align-middle">
                                     <thead class="table-dark">
                                         <tr>
+                                            <th>ID</th>
                                             <th>Nº Parte</th>
                                             <th>Consecutivo</th>
+                                            <th>WO</th>
                                             <th>Calibre (AWS)</th>
                                             <th>Color</th>
                                             <th>Tipo de Cable</th>
@@ -415,14 +417,16 @@
                     const tbody = document.getElementById('resultadosTodos');
                     tbody.innerHTML = '';
                     let totalRecords = 0;
+                    let id = 1;
                     data.forEach(item => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${item.pn}</td><td>${item.consumo}</td><td>${item.calibre}</td>
+                            <td>${id}</td><td>${item.pn}</td><td>${item.consumo}</td><td>${item.wo}</td><td>${item.calibre}</td>
                             <td>${item.color}</td><td>${item.tipo}</td><td>${item.tinta}</td>
                             <td>${item.terminal1}</td><td>${item.terminal2}</td>`;
                         tbody.appendChild(row);
                         totalRecords++;
+                        id++;
                     });
                     document.getElementById('totalRecords').textContent = totalRecords + ' registros';
                 })

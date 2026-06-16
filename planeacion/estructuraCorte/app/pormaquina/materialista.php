@@ -28,7 +28,7 @@ try {
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
-            AND r.programado = 1 AND (c.aws < '10' or c.cons LIKE 'C%')
+            AND r.programado = 1 AND (c.aws < '10' or c.cons LIKE 'C%') AND c.tamano >0
                                              ORDER BY c.urgencia DESC,
                                               c.aws ASC, 
                                              c.term1 ASC,
@@ -45,7 +45,7 @@ try {
                                               WHERE c.cutStatus != 'Cortado' 
             AND r.programado = 1 AND c.aws IN ('10','12','14') AND c.tintaColor='BLANCA'
                                             AND  (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569') 
+                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
                                              ORDER BY c.urgencia DESC,
                                               c.aws ASC, 
                                              c.term1 ASC,
@@ -62,7 +62,7 @@ try {
                                               WHERE c.cutStatus != 'Cortado' 
             AND r.programado = 1 AND c.aws IN ('16','18','20','22','24') AND c.tintaColor='BLANCA'
                                              AND  (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569') 
+                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
                                              ORDER BY  c.urgencia DESC, c.aws ASC, 
                                              c.term1 ASC,
                                              CASE 
@@ -78,7 +78,7 @@ try {
                                               WHERE c.cutStatus != 'Cortado' 
             AND r.programado = 1 AND ((c.aws IN ('10','12') AND c.tintaColor='NEGRA'
                                              ) or (c.aws IN ('18','16','14')   AND (c.term1 LIKE '%Sello%' OR c.term2 LIKE '%Sello%')
-                                             ))  AND c.tipo IN ('GXL','TXL','SGX','UL1569')
+                                             ))  AND c.tipo IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
                                              ORDER BY c.urgencia DESC,
                                               c.aws ASC, 
                                              c.term1 ASC,
@@ -95,7 +95,7 @@ try {
                                               WHERE c.cutStatus != 'Cortado' 
             AND r.programado = 1 AND c.aws IN ('14','16') AND c.tintaColor='NEGRA'
                                              AND  (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569') 
+                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
                                              ORDER BY  c.urgencia DESC, c.aws ASC, 
                                              c.term1 ASC,
                                              CASE 
@@ -111,7 +111,7 @@ try {
                                               WHERE c.cutStatus != 'Cortado' 
             AND r.programado = 1 AND c.aws IN ('18','20','22','24') AND c.tintaColor='NEGRA'
                                              AND  (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569') 
+                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
                                              ORDER BY  c.urgencia DESC, c.aws ASC, 
                                              c.term1 ASC,
                                              CASE 
@@ -126,7 +126,7 @@ try {
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
             AND r.programado = 1 
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569') 
+                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
                                              ORDER BY
                                              c.urgencia DESC, 
                                              c.aws ASC, 
