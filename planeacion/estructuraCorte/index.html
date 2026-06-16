@@ -592,7 +592,7 @@
                 });
         }
         function urgencia(wo, urgencia) {
-            alert(wo, urgencia);
+            //alert(wo, urgencia);
             fetch(`app/pormaquina/urgencia.php?wo=${wo}&urgencia=${urgencia}`)
                 .then(response => {
                     if (!response.ok) throw new Error("Error en la respuesta");
