@@ -519,6 +519,26 @@
                     document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
                 });
         }
+        // Función para sumar minutos a una hora y devolver HH:mm
+function sumarMinutos(minutosTotales,ultimaHora ) {
+    try {
+        
+        let ultimaHora = parseInt(ultimaHora);
+        ulhh = (ultimaHora/60).toFixed(0);
+        ulmm = (ultimaHora%60).toFixed(0);
+        
+        let horaAcutal = ultimaHora+minutosTotales;
+        hh = (horaAcutal/60).toFixed(0);
+        mm = (horaAcutal%60).toFixed(0);
+
+        return `${ulhh}:${ulmm} - ${hh}:${mm}`;
+    } catch (e) {
+        console.error("Error al sumar minutos:", e);
+        return "07:30";
+    }
+}
+
+
 
         function materialista(material) {
             fetch(`app/pormaquina/materialista.php?maquina=${encodeURIComponent(material)}`)
@@ -527,13 +547,28 @@
                     const cables = data.cables;
                     const terminals = data.terminales;
                     const tbodyCables = document.getElementById('cablespormaquina');
+                    let tiempo_del_trabajo = 450;
                     
                     document.getElementById('totalCables').textContent = Object.keys(cables).length;
                     document.getElementById('totalterminales').textContent = Object.keys(terminals).length;
                     
                     tbodyCables.innerHTML = '';
                     Object.keys(cables).forEach(key => {
-                        tbodyCables.innerHTML += `<tr><td>${key}</td><td>${cables[key].toFixed(2)}</td></tr>`;
+                        const minutos = parseInt(cables[key]);
+                        tiempo_del_trabajo
+                        ulhh = (tiempo_del_trabajo/60).toFixed(3).split('.')[0];
+                        if(ulhh.length == 1) ulhh = '0'+ulhh;
+                        ulmm = (tiempo_del_trabajo%60).toFixed(0);
+                        if(ulmm.length == 1) ulmm = '0'+ulmm;
+                        let horaAcutal = minutos+tiempo_del_trabajo;
+                        hh = (horaAcutal/60).toFixed(3).split('.')[0];
+                        if(hh.length == 1) hh = '0'+hh;
+                        mm = (horaAcutal%60).toFixed(0);
+                        if(mm.length == 1) mm = '0'+mm;
+                        const tiempoCalculado = `${ulhh}:${ulmm} - ${hh}:${mm}`;
+
+                        tbodyCables.innerHTML += `<tr><td>${key}</td><td>${tiempoCalculado}</td></tr>`;
+                        tiempo_del_trabajo += parseInt(cables[key]);
                     });
                     
                     const tbodyTerminals = document.getElementById('terminalspormaquina');
@@ -552,21 +587,38 @@
                     listaWo.innerHTML = "";
                     let id ="";
                     let wo ="";
+                    let urgencias="";
+                    let color ="";
                     data.forEach(wo => {
                         id = wo[0];
                         work = wo[2];
+                        urgencias=wo[5];
+                        if(urgencias == '1-Baja'){
+                            color = 'rgba(255, 251, 235, 0.2)';
+                        }else if(urgencias == '2-Media'){
+                            color = 'rgba(255, 170, 0, 0.341)';
+                        }else if(urgencias == '3-Alta'){
+                            color = 'rgba(255, 75, 0, 0.5)';
+                        }
+                        else if (urgencias == '4-Critico') {
+                            color = 'rgba(255, 0, 0, 0.35)';
+                        }
                         let textoEstado = (wo[4] == 0) ? "No programado" : "Programado";
                         const row = document.createElement('tr');
+                        row.style.backgroundColor = color;
                         row.innerHTML = `
-                            <td>${wo[1]}</td><td>${wo[2]}</td><td>${wo[3]}</td><td>${wo[4]} ${textoEstado}- ${wo[5]}</td>
-                            <td>
+                            <td style="text-align: center; background-color: ${color};">${wo[1]}</td>
+                            <td style="text-align: center; background-color: ${color};">${wo[2]}</td>
+                            <td style="text-align: center; background-color: ${color};">${wo[3]}</td>
+                            <td style="text-align: center; background-color: ${color};">${wo[4]} ${textoEstado}- ${wo[5]}</td>
+                            <td style="text-align: center; background-color: ${color};">
                                 <select class="form-select form-select-sm" onchange="programar(${id},this.value)">
                                     <option value="" selected disabled>Seleccionar cambio</option>
                                     <option value="1">Programar</option>
                                     <option value="0">Quitar de programación</option>                    
                                 </select>
                             </td>
-                            <td>
+                            <td style="text-align: center; background-color: ${color};">
                                 <select class="form-select form-select-sm" onchange="urgencia(${id},this.value)">
                                     <option value="" selected disabled>Seleccionar urgencia</option>
                                     <option value="1-Baja">Baja</option>
