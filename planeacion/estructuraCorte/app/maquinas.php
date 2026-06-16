@@ -56,7 +56,7 @@ try {
         if (stripos($term1, "Sello") !== false || stripos($term2, "Sello") !== false) {
             $rango = 'sello';
         } 
-       elseif(stripos($cons, "Corte") !== false || stripos($term2, "CORTE") !== false){
+       elseif(stripos($cons, "Corte") !== false || stripos($cons, "CORTE") !== false){
             $rango = '>10';
             }else {
             if ($calibre == 10 || $calibre == 12) {
