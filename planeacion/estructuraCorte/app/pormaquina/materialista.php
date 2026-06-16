@@ -28,7 +28,7 @@ try {
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
-            AND r.programado = 1 AND (c.aws < '10' or c.cons LIKE 'C%') AND c.tamano >0
+            AND r.programado = 1 AND (c.aws < 10 or c.cons LIKE 'C%') AND c.tamano >0
                                              ORDER BY c.urgencia DESC,
                                               c.aws ASC, 
                                              c.term1 ASC,
