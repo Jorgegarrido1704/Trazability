@@ -14,7 +14,8 @@ if ($conn->connect_error) {
 date_default_timezone_set("America/Mexico_City"); 
 $codigo=isset($_POST['codigo'])?$_POST['codigo']:"";
 if($codigo!=""){
-    $busqueda = "UPDATE `corte` SET `cutStatus` = 'Cortado' WHERE `codigo` = '$codigo'";
+    $actualdate = date('Y-m-d');
+    $busqueda = "UPDATE `corte` SET `cutStatus` = 'Cortado',`fechaDeregistro` = '$actualdate' WHERE `codigo` = '$codigo'";
     $result = $conn->query($busqueda);
     if ($result) {
         echo "<div class='alert alert-success' role='alert'>Corte removido con exito</div>";
