@@ -7,7 +7,7 @@ require '../conection.php';
 try {
     $id = isset($_GET['wo']) ? $_GET['wo'] : "";
     $valor = isset($_GET['urgencia']) ? $_GET['urgencia'] : "";
-    $woRegistro = mysqli_query($con, "SELECT `wo` FROM `REGISTRO` WHERE `id`='$id'");
+    $woRegistro = mysqli_query($con, "SELECT `wo` FROM `registro` WHERE `id`='$id'");
     $row = mysqli_fetch_array($woRegistro);
     $wo = $row['wo'];
     
