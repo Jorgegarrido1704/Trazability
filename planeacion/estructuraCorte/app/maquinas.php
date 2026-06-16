@@ -44,6 +44,7 @@ try {
         $color    = $rowlistas['color'];
         $term1    = $rowlistas['term1'];
         $term2    = $rowlistas['term2'];
+        $cons     = $rowlistas['cons'];
         $tinta    = trim(strtoupper($rowlistas['tintaColor'])); 
        
         $tiempo   = round($rowlistas['time_ruteo'] / 60, 2);
@@ -55,8 +56,9 @@ try {
         if (stripos($term1, "Sello") !== false || stripos($term2, "Sello") !== false) {
             $rango = 'sello';
         } 
-        // 2. Si no tiene sello, evaluamos calibres normales
-        else {
+       elseif(stripos($cons, "Corte") !== false || stripos($term2, "CORTE") !== false){
+            $rango = '>10';
+            }else {
             if ($calibre == 10 || $calibre == 12) {
                 $rango = '10_12';
             } elseif ($calibre == 14 || $calibre == 16) {
