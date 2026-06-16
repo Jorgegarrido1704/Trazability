@@ -199,6 +199,7 @@
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-10')">MCUT-10</button>
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-5')">MCUT-5</button>
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-4')">MCUT-4</button>
+                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('ESPECIALES')">Cables Especiales</button>
                 </div>
             </nav>
             <div class="card shadow-sm">
@@ -211,7 +212,7 @@
                         <table class="table table-hover table-striped mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>Nº Parte</th><th>Consecutivo</th><th>Calibre</th><th>Color</th><th>Tipo</th><th>Tinta</th><th>Tamaño(MM)</th><th>Qty</th><th>Minutos</th><th>Terminal 1</th><th>Terminal 2</th>
+                                    <th>ID</th><th>Nº Parte</th><th>Consecutivo</th><th>Wo</th><th>Calibre</th><th>Color</th><th>Tipo</th><th>Tinta</th><th>Tamaño(MM)</th><th>Qty</th><th>Minutos</th><th>Terminal 1</th><th>Terminal 2</th>
                                 </tr>
                             </thead>
                             <tbody id="resultTotal"></tbody>
@@ -230,6 +231,7 @@
                     <button class="btn btn-light btn-sm" onclick="materialista('MCUT-10')">MCUT-10</button>
                     <button class="btn btn-light btn-sm" onclick="materialista('MCUT-5')">MCUT-5</button>
                     <button class="btn btn-light btn-sm" onclick="materialista('MCUT-4')">MCUT-4</button>
+                     <button class="btn btn-light btn-sm" onclick="materialista('ESPECIALES')">Cables Especiales</button>
                 </div>
             </nav>
             <div class="row g-4">
@@ -499,14 +501,16 @@
                     const tbody = document.getElementById('resultTotal');
                     tbody.innerHTML = '';
                     let totalRecords = 0;
+                    let id = 1;
                     data.forEach(item => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${item.pn}</td><td>${item.consumo}</td><td>${item.calibre}</td><td>${item.color}</td>
+                            <td>${id}</td><td>${item.pn}</td><td>${item.consumo}</td><td>${item.wo}</td><td>${item.calibre}</td><td>${item.color}</td>
                             <td>${item.tipo}</td><td>${item.tinta}</td><td>${item.tamano}</td><td>${item.Qty}</td>
                             <td>${item.min}</td><td>${item.terminal1}</td><td>${item.terminal2}</td>`;
                         tbody.appendChild(row);
                         totalRecords++;
+                        id++;
                     });
                     document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
                 });

@@ -22,9 +22,24 @@ try {
     $tiempoTotal = 0; 
     $i = 0;
        
-    // CORRECCIÓN: Se agregó 'time_ruteo' a la primera consulta SQL también
-    if ($maquina == "MCUT-1") {
-       $qry ="SELECT c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+    
+    if ($maquina == "ESPECIALES") {
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+                                             FROM corte c 
+          JOIN registro r ON c.wo = r.wo 
+                                              WHERE c.cutStatus != 'Cortado' 
+            AND r.programado = 1 AND (c.aws < '10' or c.cons LIKE 'C%
+                                             ORDER BY c.urgencia DESC,
+                                              c.aws ASC, 
+                                             c.term1 ASC,
+                                             CASE 
+                                                WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
+                                                ELSE 1
+                                            END,
+                                            tipo ASC";
+                                             $maxtime=27000;
+    }elseif ($maquina == "MCUT-1") {
+       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -41,7 +56,7 @@ try {
                                             tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-6") {
-       $qry ="SELECT c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -57,7 +72,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-10") {
-       $qry ="SELECT c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -74,7 +89,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-5") {
-       $qry ="SELECT c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -90,7 +105,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-4") {
-       $qry ="SELECT c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -106,7 +121,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     } else if ($maquina == 'todas') {
-       $qry ="SELECT c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
