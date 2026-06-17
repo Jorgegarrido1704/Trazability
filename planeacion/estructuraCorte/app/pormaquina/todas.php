@@ -146,6 +146,8 @@ try {
         $color = $rowlistas['color'];
         $tamano = round($rowlistas['tamano'], 2);
         $terminal1 = $rowlistas['term1'];
+        $strip1 = $rowlistas['strip1'];
+        $strip2 = $rowlistas['strip2'];
         $terminal2 = $rowlistas['term2'];
         $tinta = $rowlistas['tintaColor'];
         $qty = $rowlistas['qty'];
@@ -173,7 +175,9 @@ try {
                 'terminal1' => $terminal1,
                 'terminal2' => $terminal2,
                 'wo' => $wo,
-                'codigo' => $codigo
+                'codigo' => $codigo,
+                'strip1' => $strip1,
+                'strip2' => $strip2
             ];                  
         } else {
             // Si la suma de esta fila ya hace que supere los 27000, salimos del while por completo
