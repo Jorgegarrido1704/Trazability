@@ -22,7 +22,7 @@ try {
     $i = 0;
     
      if ($maquina == "ESPECIALES") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -37,7 +37,7 @@ try {
                                             tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-1") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -54,7 +54,7 @@ try {
                                             tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-6") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -70,7 +70,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-10") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -87,7 +87,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-5") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -103,7 +103,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-4") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -119,7 +119,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     } else if ($maquina == 'todas') {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
