@@ -43,7 +43,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 0.5mm  dashed #000;
+           
         }
 
         .barcode-vertical {
@@ -663,7 +663,7 @@ function imprimirEtiqueta2() {
                 // 1. Inyectamos la estructura HTML. 
                 // Cambiamos los <svg> de barras por <div> para los códigos QR.
                 label_container.innerHTML = `
-                    <div class="barcode-side" style="margin-bottom: 25px;">
+                    <div class="barcode-side" style="margin-bottom:30px; margin-top:10px margin-left:10px; margin-right:10px">
                         <div id="qrcode-lateral${id}" class="qr-vertical"></div>
                     </div>
 
@@ -682,10 +682,10 @@ function imprimirEtiqueta2() {
                                 <b>T1:</b> ${item.terminal1 || ''} | <b>T2:</b> ${item.terminal2 || ''}<br>
                             </div>
                         </div>
-
-                        <div class="footer-barcode" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        
+                        <div class="footer-barcode" style="margin-top: 10px; margin-left:70px;">
                             <div id="qrcode-inferior${id}"></div>
-                            <div style="font-size: 6pt; margin-top: 2px;"><strong>ESTAMPADO:</strong>${item.conector || ''}</div>
+                            <div style="font-size: 6pt; margin-top: 3px;"><strong>ESTAMPADO:</strong>${item.conector || ''}</div>
                         </div>
                     </div>
                 `;
@@ -701,16 +701,16 @@ function imprimirEtiqueta2() {
                 // 4. Generar QR Lateral
                 new QRCode(document.getElementById(`qrcode-lateral${id}`), {
                     text: codigoQR,
-                    width: 40,  // Ajusta el tamaño según tus necesidades en mm/px
-                    height: 40,
+                    width: 50,  // Ajusta el tamaño según tus necesidades en mm/px
+                    height: 50,
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
                 // 5. Generar QR Inferior
                 new QRCode(document.getElementById(`qrcode-inferior${id}`), {
                     text: contenidoQR,
-                    width: 40,
-                    height: 40,
+                    width: 55,
+                    height: 55,
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
