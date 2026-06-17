@@ -188,7 +188,7 @@ try {
                 'tinta' => $tinta,
                 'terminal1' => $terminal1,
                 'terminal2' => $terminal2,
-                'wo' => $wo,
+                'wo' => $wo, 
                 'codigo' => $codigo,
                 'strip1' => $strip1,
                 'strip2' => $strip2,

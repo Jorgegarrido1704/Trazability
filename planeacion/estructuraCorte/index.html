@@ -6,8 +6,100 @@
     <title>Control de Producción y Listas de Corte</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-  
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <style>
+        /* Configuración de página para etiquetas */
+        @page {
+            size: 104mm 50mm;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            font-size: 9pt;
+            background-color: white;
+        }
+
+        /* Salto de página para cada etiqueta */
+        .label-container {
+            width: 104mm;
+            height: 50mm;
+            box-sizing: border-box;
+            padding: 1mm;
+            padding-top: 20px;
+            display: flex; /* Dividimos en Izquierda (Barcode) y Derecha (Info) */
+            overflow: hidden;
+            page-break-after: always;
+            border: 0.1mm solid #eee; /* Solo para visualización, se puede quitar */
+        }
+
+        /* Contenedor del código de barras vertical */
+        .barcode-side {
+            width: 12mm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #000;
+        }
+
+        .barcode-vertical {
+            transform: rotate(-90deg); /* Rotado para optimizar altura */
+            transform-origin: center;
+            border: 1px solid #000;
+        }
+
+        /* Contenedor de la información */
+        .info-side {
+            flex: 1;
+            padding-left: 2mm;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #000;
+            margin-bottom: 2px;
+            padding-bottom: 2px;
+        }
+
+        .logo {
+            width: 50px;
+            height: auto;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr ;
+            gap: 1px;
+            line-height: 1.1;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .label-bold {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .footer-barcode {
+           
+            text-align: center;
+        }
+
+        #bcode-canvas {
+            max-width: 100%;
+            height: 7mm;
+        }
+   
         /* Corrección para evitar conflictos en vistas Bootstrap */
         .bootstrap-scope img, .bootstrap-scope svg { display: inline; }
         .tab-content-all { display: none; }
@@ -15,7 +107,7 @@
     </style>
 </head>
 <body class="bg-light">
-
+<div id="app">
     <nav class="navbar navbar-dark bg-dark mb-4 p-2">
         <div class="container-fluid">
             <div class="d-flex flex-wrap gap-2 w-100 justify-content-between align-items-center">
@@ -173,7 +265,7 @@
 
         </div>
     </div>
-    </div>  
+       </div>  
 
         <div class="container-fluid px-4 tab-content-all" id="maquinas">
             <div class="row g-4">
@@ -188,7 +280,7 @@
                 <div class="col-xl-4 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-info text-white font-weight-bold py-2">Cables Especiales</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-info mb-0"><span id=">10">0</span> min</h2></div></div></div>
                 <div class="col-xl-12 col-md-6 mb-4"><div class="card h-100 shadow-sm border-0"><div class="card-header bg-info text-white font-weight-bold py-2">Total en maquinas normales</div><div class="card-body text-center py-4"><h2 class="display-4 font-weight-bold text-info mb-0"><span id="TOTAL_MAQUINAS">0</span> min</h2></div></div></div>
             </div>
-            </div>
+           
         </div>
 
         <div class="container-fluid px-4 tab-content-all" id="porMaquinas">
@@ -207,6 +299,7 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                     <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Lista por máquina</h5>
+                    <button class="btn btn-sm btn-primary" onclick="imprimirEtiqueta2()"><i class="bi bi-printer me-2"></i>Imprimir Etiqueta</button>
                     <span class="badge bg-primary rounded-pill" id="totalRecords2">0 registros</span>
                 </div>
                 <div class="card-body p-0">
@@ -290,9 +383,14 @@
 
     
 
- 
+</div>
+<div id="etiquetas" style="display: none;"></div>
 
     <script>
+        
+       
+
+        ///
         const codigoOficial = 52;
 
         window.onload = function() {
@@ -495,6 +593,8 @@
             const color = document.getElementById('wireColor').value;
             const type = document.getElementById('wireType').value;
             const maquina = document.getElementById('maquina seleccionada').value;
+            document.getElementById('maquina seleccionada').value = maquina;
+
             let query = '?';
             if (gauge) query += `awg=${encodeURIComponent(gauge)}&`;
             if (color) query += `color=${encodeURIComponent(color)}&`;
@@ -511,7 +611,7 @@
                     data.forEach(item => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${id}</td><td>${item.pn}</td><td>${item.consumo}</td><td>${item.wo}</td><td>${item.calibre}</td><td>${item.color}</td>
+                            <td>${id}</td><td>${item.pn}</td><td>${item.consumo}</td><td>${item.codigo}</td><td>${item.calibre}</td><td>${item.color}</td>
                             <td>${item.tipo}</td><td>${item.tinta}</td><td>${item.tamano}</td><td>${item.Qty}</td>
                             <td>${item.min}</td><td>${item.terminal1}</td><td>${item.strip1}</td><td>${item.terminal2}</td> <td>${item.strip2}</td><td>${item.conector}</td>`;
                         tbody.appendChild(row);
@@ -540,8 +640,89 @@ function sumarMinutos(minutosTotales,ultimaHora ) {
     }
 }
 
+function imprimirEtiqueta2() {
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('etiquetas').style.display = 'block';
 
+    const maquina = document.getElementById('maquina seleccionada').value;
+    let query = `?maquina=${encodeURIComponent(maquina)}`;
 
+    fetch(`app/pormaquina/todas.php${query}`)
+        .then(response => response.json())
+        .then(data => {
+            const contenedorEtiquetas = document.getElementById('etiquetas');
+            contenedorEtiquetas.innerHTML = ''; // Limpiamos el contenedor
+            
+            let totalRecords = 0;
+            let id = 1; // ID único para los contenedores de QR
+
+            data.forEach(item => {
+                const label_container = document.createElement('div');
+                label_container.classList.add('label-container');
+                
+                // 1. Inyectamos la estructura HTML. 
+                // Cambiamos los <svg> de barras por <div> para los códigos QR.
+                label_container.innerHTML = `
+                    <div class="barcode-side">
+                        <div id="qrcode-lateral${id}" class="qr-vertical"></div>
+                    </div>
+
+                    <div class="info-side">
+                        <div class="content-grid">
+                            <div><span class="label-bold">Qty:</span> ${item.Qty || ''}</div>
+                            <div><span class="label-bold">WO:</span> ${item.wo || ''}</div>
+                            <div><span class="label-bold">AWG:</span> ${item.calibre || ''}</div>
+                            <div><span class="label-bold">Tipo:</span> ${item.tipo || ''}</div>
+                            <div><span class="label-bold">PN:</span> ${item.pn || ''}</div>
+                            <div><span class="label-bold">Rev:</span> ${item.rev || ''}</div>
+                            <div><span class="label-bold">Col:</span> ${item.color || ''}</div>
+                            <div><span class="label-bold"><b>Cons:</b></span> ${item.consumo || ''}</div>
+
+                            <div class="full-width" style="font-size: 8pt; margin-top: 2px;">
+                                <b>T1:</b> ${item.terminal1 || ''} | <b>T2:</b> ${item.terminal2 || ''}
+                            </div>
+                        </div>
+
+                        <div class="footer-barcode" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <div id="qrcode-inferior${id}"></div>
+                            <div style="font-size: 6pt; margin-top: 2px;"><strong>ESTAMPADO:</strong>${item.conector || ''}</div>
+                        </div>
+                    </div>
+                `;
+
+                // 2. Agregamos la etiqueta al DOM antes de generar el QR
+                contenedorEtiquetas.appendChild(label_container);
+
+                // 3. Definimos el contenido que llevará el QR (puedes usar el item.codigo o el ID)
+                // Nota: Si quieres que el QR tenga el ID de la fila usa String(id). Si quieres los datos de tu BD usa item.codigo
+                const contenidoQR = item.conector || String(id); 
+                const codigoQR = item.codigo || String(id);
+
+                // 4. Generar QR Lateral
+                new QRCode(document.getElementById(`qrcode-lateral${id}`), {
+                    text: codigoQR,
+                    width: 27,  // Ajusta el tamaño según tus necesidades en mm/px
+                    height: 27,
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // 5. Generar QR Inferior
+                new QRCode(document.getElementById(`qrcode-inferior${id}`), {
+                    text: contenidoQR,
+                    width: 35,
+                    height: 35,
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                totalRecords++;
+                id++;
+            });
+            
+            document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
+            window.print();
+        })
+        .catch(error => console.error("Error al obtener los datos:", error));
+}
         function materialista(material) {
             fetch(`app/pormaquina/materialista.php?maquina=${encodeURIComponent(material)}`)
                 .then(response => response.json())
