@@ -29,7 +29,9 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
         $tamano=doubleval($rowList['tamano']);//$rowList['tamano'];
         $color=$rowList['color'];
         $term1=$rowList['terminal1'];
+        $strip1=$rowList['strip1'];
         $term2=$rowList['terminal2'];
+        $strip2=$rowList['strip2'];
         $dataForm=$rowList['dataFrom'];
         $dataTo=$rowList['dataTo'];
        $likeConsu = "Cutting cons {$cons} //%";
@@ -45,7 +47,7 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
 
         }else{ $codigo=substr($wo,2).$cons;}
    
-    $insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `rev`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`, `term2`, `dataFrom`, `dataTo`, `qty`, `tamano`, `conector`,`tintaColor`,`time_ruteo` ) VALUES ('$pn','$client','$rev','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$term2','$dataForm','$dataTo','$cuantos','$tamano','$conector','$tinta','$tiempo')");
+    $insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `rev`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`,`strip1`, `term2`,`strip2`, `dataFrom`, `dataTo`, `qty`, `tamano`, `conector`,`tintaColor`,`time_ruteo` ) VALUES ('$pn','$client','$rev','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$strip1','$term2','$strip2','$dataForm','$dataTo','$cuantos','$tamano','$conector','$tinta','$tiempo')");
 }}
 
     //echo "<br><br><h1>Se Agregaron correctamente Correctamente</h1>";
