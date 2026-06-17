@@ -74,10 +74,10 @@ try {
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
-            AND r.programado = 1 AND ((c.aws IN ('10','12') AND c.tintaColor='BLANCA'
-                                             ) or (c.aws IN ('18','16','14')   AND 
-                                             (c.term1 LIKE '%DA2-38%' OR c.term1 LIKE '%DA2-40%' c.term1 LIKE '%DA2-80%'        OR  c.term2 LIKE '%DA2-38%' OR c.term2 LIKE '%DA2-40%' c.term2 LIKE '%DA2-80%')
-                                              ) AND c.tipo IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
+            AND r.programado = 1 AND ((c.aws IN ('10','12') AND c.tintaColor='BLANCA') or (c.aws IN ('18','16','14')   AND 
+                                             (c.term1 LIKE '%DA2-38%' OR c.term1 LIKE '%DA2-40%' OR  c.term1 LIKE '%DA2-80%'      
+                                               OR  c.term2 LIKE '%DA2-38%' OR c.term2 LIKE '%DA2-40%' OR c.term2 LIKE '%DA2-80%') )
+                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
                                              ORDER BY c.urgencia DESC,
                                               c.aws ASC, 
                                              c.term1 ASC,
