@@ -30,7 +30,7 @@
             height: 57.5mm;
             box-sizing: border-box;
             padding: 3mm;
-            padding-top: 25px;
+            padding-top: 35px;
             display: flex; /* Dividimos en Izquierda (Barcode) y Derecha (Info) */
             overflow: hidden;
             page-break-after: always;
@@ -46,13 +46,14 @@
            
         }
 
-        .barcode-vertical {
-            transform: rotate(-90deg); /* Rotado para optimizar altura */
+      /*  .barcode-vertical {
+            transform: rotate(-90deg); 
             transform-origin: center;
-            border: 1px dashed #000;
-        }
+            border: 1px dashed #000;0
+        } 
+        */
 
-        /* Contenedor de la información */
+        
         .info-side {
             flex: 1;
             padding-left: 2mm;
@@ -88,6 +89,8 @@
         .label-bold {
             font-weight: bold;
             text-transform: uppercase;
+            font-size: 8pt;
+
         }
 
         .footer-barcode {
@@ -663,29 +666,29 @@ function imprimirEtiqueta2() {
                 // 1. Inyectamos la estructura HTML. 
                 // Cambiamos los <svg> de barras por <div> para los códigos QR.
                 label_container.innerHTML = `
-                    <div class="barcode-side" style="margin-bottom:30px; margin-top:10px margin-left:10px; margin-right:10px">
-                        <div id="qrcode-lateral${id}" class="qr-vertical"></div>
+                    <div class="barcode-side" style="  margin-left:17px; margin-right:10px;">
+                        <div class="row">
+                            <div style="font-size: 8pt; margin-top: 2px;"><strong>${item.codigo || ''}</strong></div>
+                            <div id="qrcode-lateral${id}" class="qr-vertical"></div>
+                            </div>
                     </div>
 
                     <div class="info-side">
                         <div class="content-grid">
+                            <div><span class="label-bold">AWG:</span> ${item.calibre || ''}-${item.color || ''}-${item.tipo || ''}</div>
                             <div><span class="label-bold">Qty:</span> ${item.Qty || ''}</div>
                             <div><span class="label-bold">WO:</span> ${item.wo || ''}</div>
-                            <div><span class="label-bold">AWG:</span> ${item.calibre || ''}</div>
-                            <div><span class="label-bold">Tipo:</span> ${item.tipo || ''}</div>
                             <div><span class="label-bold">PN:</span> ${item.pn || ''}</div>
-                            <div><span class="label-bold">Rev:</span> ${item.rev || ''}</div>
-                            <div><span class="label-bold">Col:</span> ${item.color || ''}</div>
                             <div><span class="label-bold"><b>Cons:</b></span> ${item.consumo || ''}</div>
 
-                            <div class="full-width" style="font-size: 8pt; margin-top: 1px; margin-bottom: 3px;">
+                            <div class="full-width" style="font-size: 8pt; margin-top: 1px; margin-bottom: 2px;">
                                 <b>T1:</b> ${item.terminal1 || ''} | <b>T2:</b> ${item.terminal2 || ''}<br>
                             </div>
                         </div>
                         
-                        <div class="footer-barcode" style="margin-top: 10px; margin-left:70px;">
+                        <div class="footer-barcode" style="margin-top: 5px; margin-left:45px;">
                             <div id="qrcode-inferior${id}"></div>
-                            <div style="font-size: 6pt; margin-top: 3px;"><strong>ESTAMPADO:</strong>${item.conector || ''}</div>
+                            <div style="font-size: 8pt; margin-top: 2px;"><strong>ESTAMPADO:</strong>${item.conector || ''}</div>
                         </div>
                     </div>
                 `;
