@@ -22,7 +22,7 @@ try {
     $i = 0;
     
      if ($maquina == "ESPECIALES") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -37,7 +37,7 @@ try {
                                             tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-1") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -54,7 +54,7 @@ try {
                                             tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-6") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -70,7 +70,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-10") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -87,7 +87,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-5") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -103,7 +103,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     }elseif ($maquina == "MCUT-4") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -119,7 +119,7 @@ try {
                                             c.tipo ASC";
                                              $maxtime=27000;
     } else if ($maquina == 'todas') {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo 
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
@@ -166,6 +166,7 @@ try {
         $qty = $rowlistas['qty'];
         $wo = $rowlistas['wo'];
         $codigo = $rowlistas['codigo'];
+        $conector = $rowlistas['conector'];
         //$time_ruteo = $rowlistas['time_ruteo']+300;
         $time_ruteo = round((2.92*$qty)+180,2);
         $minutos=round(($time_ruteo/60),2);
@@ -190,7 +191,8 @@ try {
                 'wo' => $wo,
                 'codigo' => $codigo,
                 'strip1' => $strip1,
-                'strip2' => $strip2
+                'strip2' => $strip2,
+                'conector' => $conector
             ];                  
         } else {
             // Si la suma de esta fila ya hace que supere los 27000, salimos del while por completo
