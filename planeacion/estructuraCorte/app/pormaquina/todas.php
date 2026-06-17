@@ -157,7 +157,10 @@ try {
             $strip2 = 0;
         }else if($strip2 < 1.5){
             $strip2=$strip2*25.4;
+
         }
+        $strip1 = round($strip1, 2);
+        $strip2 = round($strip2, 2);
         $terminal2 = $rowlistas['term2'];
         $tinta = $rowlistas['tintaColor'];
         $qty = $rowlistas['qty'];
