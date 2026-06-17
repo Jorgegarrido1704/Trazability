@@ -147,7 +147,17 @@ try {
         $tamano = round($rowlistas['tamano'], 2);
         $terminal1 = $rowlistas['term1'];
         $strip1 = $rowlistas['strip1'];
+        if($strip1 == null){
+            $strip1 = 0;
+        }else if($strip1 < 1.5){
+            $strip1=$strip1*25.4;
+        }
         $strip2 = $rowlistas['strip2'];
+        if($strip2 == null){
+            $strip2 = 0;
+        }else if($strip2 < 1.5){
+            $strip2=$strip2*25.4;
+        }
         $terminal2 = $rowlistas['term2'];
         $tinta = $rowlistas['tintaColor'];
         $qty = $rowlistas['qty'];
