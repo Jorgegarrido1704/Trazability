@@ -12,7 +12,7 @@
     <style>
         /* Configuración de página para etiquetas */
         @page {
-            size: 104mm 50mm;
+            size: 104mm 57.5mm;
             margin: 0;
         }
 
@@ -27,14 +27,14 @@
         /* Salto de página para cada etiqueta */
         .label-container {
             width: 104mm;
-            height: 50mm;
+            height: 57.5mm;
             box-sizing: border-box;
-            padding: 1mm;
-            padding-top: 20px;
+            padding: 3mm;
+            padding-top: 25px;
             display: flex; /* Dividimos en Izquierda (Barcode) y Derecha (Info) */
             overflow: hidden;
             page-break-after: always;
-            border: 0.1mm solid #eee; /* Solo para visualización, se puede quitar */
+            border: 0.5mm dashed #eee; /* Solo para visualización, se puede quitar */
         }
 
         /* Contenedor del código de barras vertical */
@@ -43,13 +43,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid #000;
+            border: 0.5mm  dashed #000;
         }
 
         .barcode-vertical {
             transform: rotate(-90deg); /* Rotado para optimizar altura */
             transform-origin: center;
-            border: 1px solid #000;
+            border: 1px dashed #000;
         }
 
         /* Contenedor de la información */
@@ -97,7 +97,7 @@
 
         #bcode-canvas {
             max-width: 100%;
-            height: 7mm;
+            height: 6mm;
         }
    
         /* Corrección para evitar conflictos en vistas Bootstrap */
@@ -663,7 +663,7 @@ function imprimirEtiqueta2() {
                 // 1. Inyectamos la estructura HTML. 
                 // Cambiamos los <svg> de barras por <div> para los códigos QR.
                 label_container.innerHTML = `
-                    <div class="barcode-side">
+                    <div class="barcode-side" style="margin-bottom: 25px;">
                         <div id="qrcode-lateral${id}" class="qr-vertical"></div>
                     </div>
 
@@ -678,8 +678,8 @@ function imprimirEtiqueta2() {
                             <div><span class="label-bold">Col:</span> ${item.color || ''}</div>
                             <div><span class="label-bold"><b>Cons:</b></span> ${item.consumo || ''}</div>
 
-                            <div class="full-width" style="font-size: 8pt; margin-top: 2px;">
-                                <b>T1:</b> ${item.terminal1 || ''} | <b>T2:</b> ${item.terminal2 || ''}
+                            <div class="full-width" style="font-size: 8pt; margin-top: 1px; margin-bottom: 3px;">
+                                <b>T1:</b> ${item.terminal1 || ''} | <b>T2:</b> ${item.terminal2 || ''}<br>
                             </div>
                         </div>
 
@@ -701,16 +701,16 @@ function imprimirEtiqueta2() {
                 // 4. Generar QR Lateral
                 new QRCode(document.getElementById(`qrcode-lateral${id}`), {
                     text: codigoQR,
-                    width: 27,  // Ajusta el tamaño según tus necesidades en mm/px
-                    height: 27,
+                    width: 40,  // Ajusta el tamaño según tus necesidades en mm/px
+                    height: 40,
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
                 // 5. Generar QR Inferior
                 new QRCode(document.getElementById(`qrcode-inferior${id}`), {
                     text: contenidoQR,
-                    width: 35,
-                    height: 35,
+                    width: 40,
+                    height: 40,
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
