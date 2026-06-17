@@ -723,6 +723,8 @@ function imprimirEtiqueta2() {
             
             document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
             window.print();
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('etiquetas').style.display = 'none';
         })
         .catch(error => console.error("Error al obtener los datos:", error));
 }
