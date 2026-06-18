@@ -593,19 +593,12 @@
         function clearFilters(){ window.location.href = 'index.html'; }
 
         function pormaquina() {
-            const gauge = document.getElementById('wireGauge').value;
-            const color = document.getElementById('wireColor').value;
-            const type = document.getElementById('wireType').value;
             const maquina = document.getElementById('maquina seleccionada').value;
             document.getElementById('maquina seleccionada').value = maquina;
 
-            let query = '?';
-            if (gauge) query += `awg=${encodeURIComponent(gauge)}&`;
-            if (color) query += `color=${encodeURIComponent(color)}&`;
-            if (type) query += `type=${encodeURIComponent(type)}&`;
-            if (maquina) query += `maquina=${encodeURIComponent(maquina)}`;
+           
             
-            fetch(`app/pormaquina/todas.php${query}`)
+            fetch(`app/pormaquina/todas.php?maquina=${encodeURIComponent(maquina)}`)
     .then(response => response.json())
     .then(data => {
         
