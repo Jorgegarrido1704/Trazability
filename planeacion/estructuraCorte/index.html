@@ -608,7 +608,7 @@
             fetch(`app/pormaquina/todas.php${query}`)
     .then(response => response.json())
     .then(data => {
-        // Validar si el backend mandó un error estructurado
+        
         if (data.status === "error") {
             console.error("Error del servidor:", data.message);
             alert("Error en el servidor: " + data.message);
@@ -626,7 +626,7 @@
                 <td>${id}</td><td>${item.pn}</td><td>${item.consumo}</td><td>${item.wo}</td><td>${item.calibre}</td><td>${item.color}</td>
                 <td>${item.tipo}</td><td>${item.tinta}</td><td>${item.tamano}</td><td>${item.Qty}</td>
                 <td>${item.min}</td><td>${item.terminal1}</td><td>${item.strip1}</td><td>${item.terminal2}</td> <td>${item.strip2}</td>
-                <td>${item.conector}</td><td>${item.dist_stamp}`;
+                <td>${item.conector}</td><td>${item.estampado}`;
             tbody.appendChild(row);
             totalRecords++;
             id++;
