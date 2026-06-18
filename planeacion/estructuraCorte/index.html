@@ -313,6 +313,7 @@
                                     <th>ID</th><th>Nº Parte</th><th>Cons</th><th>Work Order</th><th>Calibre</th>
                                     <th>Color</th><th>Tipo</th><th>Tinta</th><th>Tamaño(MM)</th><th>Qty</th><th>Minutos</th>
                                     <th>Terminal 1</th><th>Desforre 1</th><th>Terminal 2</th><th>Desforre 2</th><th>Estampados</th>
+                                    <th>Estampar cada</th>
                                 </tr>
                             </thead>
                             <tbody id="resultTotal"></tbody>
@@ -616,7 +617,8 @@
                         row.innerHTML = `
                             <td>${id}</td><td>${item.pn}</td><td>${item.consumo}</td><td>${item.wo}</td><td>${item.calibre}</td><td>${item.color}</td>
                             <td>${item.tipo}</td><td>${item.tinta}</td><td>${item.tamano}</td><td>${item.Qty}</td>
-                            <td>${item.min}</td><td>${item.terminal1}</td><td>${item.strip1}</td><td>${item.terminal2}</td> <td>${item.strip2}</td><td>${item.conector}</td>`;
+                            <td>${item.min}</td><td>${item.terminal1}</td><td>${item.strip1}</td><td>${item.terminal2}</td> <td>${item.strip2}</td>
+                            <td>${item.conector}</td><td>${item.estampado}</td>`;
                         tbody.appendChild(row);
                         totalRecords++;
                         id++;
