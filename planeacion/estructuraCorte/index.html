@@ -603,7 +603,7 @@
             if (gauge) query += `awg=${encodeURIComponent(gauge)}&`;
             if (color) query += `color=${encodeURIComponent(color)}&`;
             if (type) query += `type=${encodeURIComponent(type)}&`;
-            if (maquina) query += `maquina=${encodeURIComponent(maquina)}&`;
+            if (maquina) query += `maquina=${encodeURIComponent(maquina)}`;
             
             fetch(`app/pormaquina/todas.php${query}`)
                 .then(response => response.json())

@@ -196,7 +196,7 @@ try {
                 'strip1' => $strip1,
                 'strip2' => $strip2,
                 'conector' => $conector,
-                'estampado' => $estampado
+                'estampado' => $estampado,
             ];                  
         } else {
             // Si la suma de esta fila ya hace que supere los 27000, salimos del while por completo
