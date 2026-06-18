@@ -57,7 +57,7 @@ try {
                FROM corte c 
                JOIN registro r ON c.wo = r.wo 
                WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND c.aws IN ('16','18','20','22','24') AND c.tintaColor='NEGRA'
+               AND r.programado = 1 AND c.aws IN ('18','20','22','24') AND c.tintaColor='NEGRA'
                AND (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
                AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
                ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
@@ -68,7 +68,7 @@ try {
                FROM corte c 
                JOIN registro r ON c.wo = r.wo 
                WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND ((c.aws IN ('10','12') AND c.tintaColor='BLANCA') or (c.aws IN ('18','16','14') AND 
+               AND r.programado = 1 AND ((c.aws IN ('16','18','20','22','24') AND c.tintaColor='BLANCA') or (c.aws IN ('18','16','14') AND 
                (c.term1 LIKE '%DA2-38%' OR c.term1 LIKE '%DA2-40%' OR c.term1 LIKE '%DA2-80%' OR c.term2 LIKE '%DA2-38%' OR c.term2 LIKE '%DA2-40%' OR c.term2 LIKE '%DA2-80%') ))
                AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
                ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
