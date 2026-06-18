@@ -142,8 +142,7 @@
                         <table class="table table-hover table-striped mb-0">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>ID</th><th>Nº Parte</th><th>Cantidad</th><th>Work Order</th><th>Cons</th><th>Tipo</th><th>Calibre</th>
-                                    <th>Color</th><th>Quitar</th>
+                                   <th>Nº Parte</th><th>Work Order</th><th>Cons</th><th>Quitar</th>
                                 </tr>
                             </thead>
                             <tbody id="resultTotal"></tbody>
@@ -199,8 +198,7 @@
                 data.forEach(item => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${id}</td><td>${item.pn}</td><td>${item.Qty}</td><td>${item.wo}</td><td>${item.consumo}</td><td>${item.tipo}</td><td>${item.calibre}</td>
-                        <td>${item.color}</td><td><input type="checkbox" id="quitar" name="quitar" onclick="quitar(${item.codigo})"></td>`;
+                        <td>${item.pn}</td><td>${item.wo}</td><td>${item.consumo}</td><td><input type="checkbox" id="quitar" name="quitar" onclick="quitar(${item.codigo})"></td>`;
                     tbody.appendChild(row);
                     totalRecords++;
                     id++;
