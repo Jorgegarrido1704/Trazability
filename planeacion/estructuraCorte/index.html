@@ -650,7 +650,7 @@ function imprimirEtiqueta2() {
     document.getElementById('app').style.display = 'none';
     document.getElementById('etiquetas').style.display = 'block';
 
-    const maquina = document.getElementById('maquina seleccionada').value;
+    const maquina = document.getElementById('maquinaSeleccionada').value;
     let query = `?maquina=${encodeURIComponent(maquina)}`;
 
     fetch(`app/pormaquina/todas.php${query}`)
