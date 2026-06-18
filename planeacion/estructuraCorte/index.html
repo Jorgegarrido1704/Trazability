@@ -288,7 +288,7 @@
 
         <div class="container-fluid px-4 tab-content-all" id="porMaquinas">
             <nav class="navbar navbar-expand bg-secondary mb-4 rounded px-2">
-                <input type="hidden" id="maquina seleccionada" value="todas">
+                <input type="hidden" id="maquinaSeleccionada" value="todas">
                 <div class="navbar-nav gap-2">
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('todas')">Todas las máquinas</button>
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-1')">MCUT-1</button>
@@ -593,7 +593,7 @@
         function clearFilters(){ window.location.href = 'index.html'; }
 
         function pormaquina() {
-            const maquina = document.getElementById('maquina seleccionada').value;
+            const maquina = document.getElementById('maquinaSeleccionada').value;
             document.getElementById('maquina seleccionada').value = maquina;
 
            
@@ -619,7 +619,7 @@
                 <td>${id}</td><td>${item.pn}</td><td>${item.consumo}</td><td>${item.wo}</td><td>${item.calibre}</td><td>${item.color}</td>
                 <td>${item.tipo}</td><td>${item.tinta}</td><td>${item.tamano}</td><td>${item.Qty}</td>
                 <td>${item.min}</td><td>${item.terminal1}</td><td>${item.strip1}</td><td>${item.terminal2}</td> <td>${item.strip2}</td>
-                <td>${item.conector}</td><td>${item.estampado}`;
+                <td>${item.conector}</td><td>${item.estampado}</td>`;
             tbody.appendChild(row);
             totalRecords++;
             id++;

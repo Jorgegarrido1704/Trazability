@@ -19,7 +19,19 @@ try {
     
     $tiempoTotal = 0; 
     $i = 0;
-    
+    // TEMPORAL - para depurar el 500
+    ini_set('display_errors', 0);
+    error_reporting(E_ALL);
+    set_exception_handler(function($e) {
+        header('Content-Type: application/json');
+        echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+        exit;
+    });
+    set_error_handler(function($errno, $errstr) {
+        header('Content-Type: application/json');
+        echo json_encode(["status" => "error", "message" => "$errstr (código $errno)"]);
+        exit;
+    });
     if ($maquina == "ESPECIALES") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
