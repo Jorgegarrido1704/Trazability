@@ -6,10 +6,10 @@ try{
   $codigo=isset($_GET['codigo']) ? $_GET['codigo'] : null;
   
  $data=[];
-  $changeEstatus="UPDATE corte SET cutStatus='Cortado' WHERE codigo='$codigo'  '";
+  $changeEstatus="UPDATE corte SET cutStatus='Cortado' WHERE codigo='$codigo'  ";
   $result=mysqli_query($con,$changeEstatus);
-  $buscarWo=mysqli_query($con,"SELECT wo FROM corte WHERE codigo='$codigo' limit 1");
-  $wo=mysqli_fetch_row($buscarWo)[0];parc
+  $buscarWo=mysqli_query($con,"SELECT wo FROM corte WHERE codigo='$codigo' ");
+  $wo=mysqli_fetch_row($buscarWo)[0];
   $buscar=mysqli_query($con,"SELECT * FROM corte WHERE wo='$wo' AND cutStatus='Activo'");
   if(mysqli_num_rows($buscar==0)){
       $update=mysqli_query($con,"UPDATE registro SET count='4', donde='En espera de liberacion' WHERE wo='$wo' ");
@@ -19,7 +19,7 @@ try{
     echo json_encode($dat);
  
   }catch(Exception $e){
-    $dat['status'] = "error";
+    $dat['status'] = "error ".$codigo." ". $e;
     echo json_encode($dat);
   }
   
