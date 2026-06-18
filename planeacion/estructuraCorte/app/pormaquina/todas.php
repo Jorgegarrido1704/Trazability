@@ -93,12 +93,10 @@ try {
                CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
     }
 
-    // CORRECCIÓN PRINCIPAL: Cambiar $con por la variable correcta de tu conection.php (ej. $conexion)
-    // Además, validamos si la consulta falla para lanzar una excepción controlada.
     $listasdecorte = mysqli_query($con, $qry); 
     
     if (!$listasdecorte) {
-        throw new Exception("Error en la consulta SQL: " . mysqli_error($conexion));
+        throw new Exception("Error en la consulta SQL: " . mysqli_error($con));
     }
 
     while ($rowlistas = mysqli_fetch_array($listasdecorte)) {
