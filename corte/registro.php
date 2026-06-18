@@ -3,7 +3,7 @@ require "../app/conection.php";
 try {
     
 
-$delCore=mysqli_query($con,"DELETE FROM corte ");
+$delCore=mysqli_query($con,"DELETE FROM corte WHERE cutStatus = 'Activo'");
 } catch (\Throwable $th) {
     echo $th;
 }
@@ -47,8 +47,11 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
         $codigo=substr($wo,2).substr($cons,5);
 
         }else{ $codigo=substr($wo,2).$cons;}
-   
-    $insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `rev`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`,`strip1`, `term2`,`strip2`, `dataFrom`, `dataTo`, `qty`, `tamano`, `conector`,`tintaColor`,`time_ruteo`,`dist_stamp` ) VALUES ('$pn','$client','$rev','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$strip1','$term2','$strip2','$dataForm','$dataTo','$cuantos','$tamano','$conector','$tinta','$tiempo','$distEstamp')");
+    $buscarDuplicado=mysqli_query($con,"SELECT * FROM corte WHERE wo='$wo' AND cons='$cons' ");
+    if(mysqli_num_rows($buscarDuplicado)==0){
+        $insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `rev`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`,`strip1`, `term2`,`strip2`, `dataFrom`, `dataTo`, `qty`, `tamano`, `conector`,`tintaColor`,`time_ruteo`,`dist_stamp` ) VALUES ('$pn','$client','$rev','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$strip1','$term2','$strip2','$dataForm','$dataTo','$cuantos','$tamano','$conector','$tinta','$tiempo','$distEstamp')");
+    }
+    //$insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `rev`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`,`strip1`, `term2`,`strip2`, `dataFrom`, `dataTo`, `qty`, `tamano`, `conector`,`tintaColor`,`time_ruteo`,`dist_stamp` ) VALUES ('$pn','$client','$rev','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$strip1','$term2','$strip2','$dataForm','$dataTo','$cuantos','$tamano','$conector','$tinta','$tiempo','$distEstamp')");
 }}
 
     //echo "<br><br><h1>Se Agregaron correctamente Correctamente</h1>";
