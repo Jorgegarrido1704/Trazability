@@ -13,7 +13,7 @@ try {
     $tintaBlancaOpt = 0;
     $tinta = '';
     $tiempo = '';
-    $maxtime = 135000;
+    $maxtime = 135000000;
     
     $tiempoTotal = 0; 
     $i = 0;
@@ -37,9 +37,8 @@ try {
                JOIN registro r ON c.wo = r.wo 
                WHERE c.cutStatus != 'Cortado' 
                AND r.programado = 1 AND (c.aws < '10' or c.cons LIKE 'C%') AND c.tamano >0
-               ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, tipo ASC";
-        $maxtime = 27000;
+               ORDER BY c.wo ASC, c.cons ASC";
+       
     } elseif ($maquina == "MCUT-1") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -48,9 +47,8 @@ try {
                AND r.programado = 1 AND c.aws IN ('10','12','14') AND c.tintaColor='BLANCA'
                AND (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
                AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
-               ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, tipo ASC";
-        $maxtime = 27000;
+               ORDER BY c.wo ASC, c.cons ASC";
+       
     } elseif ($maquina == "MCUT-6") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -59,9 +57,8 @@ try {
                AND r.programado = 1 AND c.aws IN ('16','18','20','22','24') AND c.tintaColor='NEGRA'
                AND (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
                AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
-               ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
-        $maxtime = 27000;
+               ORDER BY c.wo ASC, c.cons ASC";
+       
     } elseif ($maquina == "MCUT-10") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -70,9 +67,8 @@ try {
                AND r.programado = 1 AND ((c.aws IN ('10','12') AND c.tintaColor='BLANCA') or (c.aws IN ('18','16','14') AND 
                (c.term1 LIKE '%DA2-38%' OR c.term1 LIKE '%DA2-40%' OR c.term1 LIKE '%DA2-80%' OR c.term2 LIKE '%DA2-38%' OR c.term2 LIKE '%DA2-40%' OR c.term2 LIKE '%DA2-80%') ))
                AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
-               ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC, c.tintaColor ASC";
-        $maxtime = 27000;
+               ORDER BY c.wo ASC, c.cons ASC";
+       
     } elseif ($maquina == "MCUT-5") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -81,9 +77,8 @@ try {
                AND r.programado = 1 AND c.aws IN ('14','16') AND c.tintaColor='NEGRA'
                AND (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
                AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
-               ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
-        $maxtime = 27000;
+               ORDER BY c.wo ASC, c.cons ASC";
+       
     } elseif ($maquina == "MCUT-4") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -92,16 +87,14 @@ try {
                AND r.programado = 1 AND c.aws IN ('18','20','22','24') AND c.tintaColor='NEGRA'
                AND (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
                AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
-               ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
-        $maxtime = 27000;
+               ORDER BY c.wo ASC, c.cons ASC";
+       
     } else if ($maquina == 'todas') {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
                JOIN registro r ON c.wo = r.wo 
                WHERE c.cutStatus != 'Cortado' AND r.programado = 1 AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
-               ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
+               ORDER BY c.wo ASC, c.cons ASC";
     }
 
     // SI EN TU ARCHIVO CONECTION.PHP LA VARIABLE SE LLAMA $conexion, CAMBIA ESTO A $conexion
