@@ -131,7 +131,7 @@ try {
         $wo = $rowlistas['wo'];
         $codigo = $rowlistas['codigo'];
         $conector = $rowlistas['conector'];
-        $estamp = $rowlistas['estamp'];
+        $estamp = $rowlistas['dist_stamp'];
         
         $time_ruteo = round((2.92 * $qty) + 180, 2);
         $minutos = round(($time_ruteo / 60), 2);
