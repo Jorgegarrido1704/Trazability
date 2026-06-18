@@ -123,7 +123,7 @@ try {
         $consumo = $rowlistas['cons'];
         $tipo = $rowlistas['tipo'];
         $color = $rowlistas['color'];
-        $tamano = round($rowlistas['tamano'], 2);
+        $tamano = round((float)$rowlistas['tamano'], 2);
         $terminal1 = $rowlistas['term1'];
         
         $strip1 = $rowlistas['strip1'];
@@ -140,8 +140,8 @@ try {
             $strip2 = $strip2 * 25.4;
         }
         
-        $strip1 = round($strip1, 2);
-        $strip2 = round($strip2, 2);
+        $strip1 = round((float)$strip1, 2);
+        $strip2 = round((float)$strip2, 2);
         $terminal2 = $rowlistas['term2'];
         $tinta = $rowlistas['tintaColor'];
         $qty = $rowlistas['qty'];
@@ -151,7 +151,7 @@ try {
         $estamp = isset($rowlistas['dist_stamp']) ? $rowlistas['dist_stamp'] : '';
         
         $time_ruteo = round((2.92 * $qty) + 180, 2);
-        $minutos = round(($time_ruteo / 60), 2);
+        $minutos = round(((float)$time_ruteo / 60), 2);
         
         $tiempoTotal += $time_ruteo;
         
