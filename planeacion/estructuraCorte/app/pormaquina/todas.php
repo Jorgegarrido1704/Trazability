@@ -1,6 +1,6 @@
 <?php
 
-require '../conection.php'; // Asegúrate de que se escriba exactamente así (conection o connection)
+require '../conection.php'; 
 
 try {
     $color = isset($_GET['color']) ? $_GET['color'] : '';
@@ -95,7 +95,7 @@ try {
 
     // CORRECCIÓN PRINCIPAL: Cambiar $con por la variable correcta de tu conection.php (ej. $conexion)
     // Además, validamos si la consulta falla para lanzar una excepción controlada.
-    $listasdecorte = mysqli_query($conexion, $qry); 
+    $listasdecorte = mysqli_query($con, $qry); 
     
     if (!$listasdecorte) {
         throw new Exception("Error en la consulta SQL: " . mysqli_error($conexion));
