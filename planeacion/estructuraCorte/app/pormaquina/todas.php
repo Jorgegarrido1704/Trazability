@@ -93,6 +93,11 @@ try {
                CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
     }
 
+    // SI EN TU ARCHIVO CONECTION.PHP LA VARIABLE SE LLAMA $conexion, CAMBIA ESTO A $conexion
+    if (!isset($con) || !$con) {
+        throw new Exception("La variable de conexión no está definida correctamente.");
+    }
+
     $listasdecorte = mysqli_query($con, $qry); 
     
     if (!$listasdecorte) {
@@ -131,7 +136,7 @@ try {
         $wo = $rowlistas['wo'];
         $codigo = $rowlistas['codigo'];
         $conector = $rowlistas['conector'];
-        $estamp = $rowlistas['dist_stamp'];
+        $estamp = isset($rowlistas['dist_stamp']) ? $rowlistas['dist_stamp'] : '';
         
         $time_ruteo = round((2.92 * $qty) + 180, 2);
         $minutos = round(($time_ruteo / 60), 2);
@@ -156,19 +161,17 @@ try {
                 'strip1' => $strip1,
                 'strip2' => $strip2,
                 'conector' => $conector,
-                'estamapo' => $estamp
+                'estampado' => $estamp
             ];                  
         } else {
             break;
         }
     }
 
-    // Cabecera indispensable para asegurar que el navegador entienda que es JSON
     header('Content-Type: application/json');
     echo json_encode($calibres);
 
 } catch (Exception $e) {
-    // Si algo falla, registramos el error y enviamos un JSON válido con el error para debuggear
     error_log("Error cargando calibres: " . $e->getMessage());
     header('Content-Type: application/json');
     echo json_encode([

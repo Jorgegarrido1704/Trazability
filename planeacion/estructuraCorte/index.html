@@ -606,25 +606,34 @@
             if (maquina) query += `maquina=${encodeURIComponent(maquina)}`;
             
             fetch(`app/pormaquina/todas.php${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('resultTotal');
-                    tbody.innerHTML = '';
-                    let totalRecords = 0;
-                    let id = 1;
-                    data.forEach(item => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${id}</td><td>${item.pn}</td><td>${item.consumo}</td><td>${item.wo}</td><td>${item.calibre}</td><td>${item.color}</td>
-                            <td>${item.tipo}</td><td>${item.tinta}</td><td>${item.tamano}</td><td>${item.Qty}</td>
-                            <td>${item.min}</td><td>${item.terminal1}</td><td>${item.strip1}</td><td>${item.terminal2}</td> <td>${item.strip2}</td>
-                            <td>${item.conector}</td>`;
-                        tbody.appendChild(row);
-                        totalRecords++;
-                        id++;
-                    });
-                    document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
-                });
+    .then(response => response.json())
+    .then(data => {
+        // Validar si el backend mandó un error estructurado
+        if (data.status === "error") {
+            console.error("Error del servidor:", data.message);
+            alert("Error en el servidor: " + data.message);
+            return;
+        }
+
+        const tbody = document.getElementById('resultTotal');
+        tbody.innerHTML = '';
+        let totalRecords = 0;
+        let id = 1;
+        
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${id}</td><td>${item.pn}</td><td>${item.consumo}</td><td>${item.wo}</td><td>${item.calibre}</td><td>${item.color}</td>
+                <td>${item.tipo}</td><td>${item.tinta}</td><td>${item.tamano}</td><td>${item.Qty}</td>
+                <td>${item.min}</td><td>${item.terminal1}</td><td>${item.strip1}</td><td>${item.terminal2}</td> <td>${item.strip2}</td>
+                <td>${item.conector}</td><td>${item.dist_stamp}`;
+            tbody.appendChild(row);
+            totalRecords++;
+            id++;
+        });
+        document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
+    })
+    .catch(err => console.error("Error en el procesamiento del Fetch:", err));
         }
         // Función para sumar minutos a una hora y devolver HH:mm
 function sumarMinutos(minutosTotales,ultimaHora ) {
