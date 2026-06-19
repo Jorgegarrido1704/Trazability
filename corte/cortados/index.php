@@ -12,7 +12,7 @@ try {
             ROUND((SUM(CASE WHEN cutStatus = 'Activo' THEN 1 ELSE 0 END) / COUNT(*)) * 100, 2) as porcentaje_activos
         FROM `corte` 
         GROUP BY np, wo
-        ORDER BY np DESC
+        ORDER BY porcentaje_activos asc
     ";
 
     $cortes = mysqli_query($con, $query);
