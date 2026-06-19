@@ -1,5 +1,5 @@
 <?php
-require "../app/conection.php";
+require "../../app/conection.php";
 
 try {
     // Consulta optimizada con suma condicional y GROUP BY
