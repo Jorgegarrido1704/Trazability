@@ -64,7 +64,7 @@ try {
                FROM corte c 
                JOIN registro r ON c.wo = r.wo 
                WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND AND `maq_asignada` = 'MCUT-10' AND c.tamano >0
+               AND r.programado = 1  AND `maq_asignada` = 'MCUT-10' AND c.tamano >0
                ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
                CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC, c.tintaColor ASC";
         $maxtime = 27000;
