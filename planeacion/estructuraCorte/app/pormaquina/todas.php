@@ -55,7 +55,7 @@ try {
                FROM corte c 
                JOIN registro r ON c.wo = r.wo 
                WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND `maq_asignada` = 'MCUT-6' AND c.tamano >0
+               AND r.programado = 1 AND `maq_asignada` = 'MCUT-6' AND c.tamano >0 AND c.tintaColor = 'NEGRO'
                ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
                CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
         $maxtime = 27000;
@@ -73,7 +73,7 @@ try {
                FROM corte c 
                JOIN registro r ON c.wo = r.wo 
                WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND `maq_asignada` = 'MCUT-5' AND c.tamano >0
+               AND r.programado = 1 AND `maq_asignada` = 'MCUT-5' AND c.tamano >0 AND c.tintaColor = 'NEGRA'
                ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
                CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
         $maxtime = 27000;
@@ -82,7 +82,7 @@ try {
                FROM corte c 
                JOIN registro r ON c.wo = r.wo 
                WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND `maq_asignada` = 'MCUT-4' AND c.tamano >0
+               AND r.programado = 1 AND `maq_asignada` = 'MCUT-4' AND c.tamano >0 AND c.tintaColor = 'NEGRA'
                ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
                CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
         $maxtime = 27000;
