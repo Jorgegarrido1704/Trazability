@@ -1,13 +1,13 @@
 <?php
 
-require 'conection.php';
+require 'app/conection.php';
 
 // --- FUNCIONES AUXILIARES ---
 
 /**
- * Cascada de tiempos entre rangos en bloques de 450, respetando conexiones directas.
+ * Cascada de tiempos que balancea minutos Y TAMBIÉN mueve los IDs de los registros correspondientes.
  */
-function aplicarCascada(array &$raw, float $ocupadoSello10_12 = 0, float $bloque = 450, int $maxRondas = 20): void
+function aplicarCascadaConIds(array &$raw, array &$rawIds, float $ocupadoSello10_12 = 0, float $bloque = 450, int $maxRondas = 20): void
 {
     $target = $bloque;
 
@@ -21,6 +21,15 @@ function aplicarCascada(array &$raw, float $ocupadoSello10_12 = 0, float $bloque
             if ($prestamo > 0) {
                 $raw['10_12'] += $prestamo;
                 $raw['14_16'] -= $prestamo;
+                
+                // Mover IDs físicamente en el array proporcionalmente
+                // Para simplificar y asegurar consistencia, pasamos elementos de un rango a otro
+                $elementosAMover = ceil(count($rawIds['14_16']) * ($prestamo / ($raw['14_16'] + $prestamo)));
+                for ($i = 0; $i < $elementosAMover; $i++) {
+                    if (!empty($rawIds['14_16'])) {
+                        $rawIds['10_12'][] = array_pop($rawIds['14_16']);
+                    }
+                }
                 $huboTransferencia = true;
             }
         }
@@ -31,16 +40,30 @@ function aplicarCascada(array &$raw, float $ocupadoSello10_12 = 0, float $bloque
             if ($prestamo > 0) {
                 $raw['14_16'] += $prestamo;
                 $raw['18_24'] -= $prestamo;
+                
+                $elementosAMover = ceil(count($rawIds['18_24']) * ($prestamo / ($raw['18_24'] + $prestamo)));
+                for ($i = 0; $i < $elementosAMover; $i++) {
+                    if (!empty($rawIds['18_24'])) {
+                        $rawIds['14_16'][] = array_pop($rawIds['18_24']);
+                    }
+                }
                 $huboTransferencia = true;
             }
         }
 
-        // 3) 18_24 <- 14_16 (lo que le quede)
+        // 3) 18_24 <- 14_16
         if ($raw['18_24'] < $target && $raw['14_16'] > 0) {
             $prestamo = min($target - $raw['18_24'], $raw['14_16']);
             if ($prestamo > 0) {
                 $raw['18_24'] += $prestamo;
                 $raw['14_16'] -= $prestamo;
+                
+                $elementosAMover = ceil(count($rawIds['14_16']) * ($prestamo / ($raw['14_16'] + $prestamo)));
+                for ($i = 0; $i < $elementosAMover; $i++) {
+                    if (!empty($rawIds['14_16'])) {
+                        $rawIds['18_24'][] = array_pop($rawIds['14_16']);
+                    }
+                }
                 $huboTransferencia = true;
             }
         }
@@ -56,6 +79,25 @@ function aplicarCascada(array &$raw, float $ocupadoSello10_12 = 0, float $bloque
     }
 }
 
+/**
+ * Función para ejecutar el UPDATE masivo en la base de datos por máquina
+ */
+function actualizarMaquinaEnBD($con, array $ids, string $nombreMaquina): void {
+    if (empty($ids)) return;
+    
+    // Sanitizar los IDs para evitar inyecciones si son strings o números
+    $idsFormateados = array_map(function($id) use ($con) {
+        return "'" . mysqli_real_escape_string($con, $id) . "'";
+    }, $ids);
+    
+    $listaIds = implode(',', $idsFormateados);
+    
+    // OJO: Cambia 'id' por tu columna llave primaria si se llama diferente (ej. corteId)
+    $sql = "UPDATE corte SET maq_asignada = '$nombreMaquina' WHERE id IN ($listaIds)";
+    mysqli_query($con, $sql);
+}
+
+
 // --- FLUJO PRINCIPAL ---
 
 try {
@@ -65,19 +107,29 @@ try {
         "TOTAL_MAQUINAS" => 0
     ];
 
-    // Variables de control locales para que la cascada funcione perfectamente
-    $selloNegra = 0;
-    $selloBlanca = 0;
+    // Arrays para guardar los IDs de cada registro según su asignación final
+    $idsPorMaquina = [
+        "MCUT-10" => [], "MCUT-1"  => [], "MCUT-5" => [],
+        "MCUT-6"  => [], "MCUT-4"  => [], ">10"    => []
+    ];
+
+    $selloNegra = 0; $selloBlanca = 0;
 
     $rawTimes = [
         'NEGRA'  => ['10_12' => 0, '14_16' => 0, '18_24' => 0],
         'BLANCA' => ['10_12' => 0, '14_16' => 0, '18_24' => 0],
     ];
 
-    $stmtListas = mysqli_prepare($con, "SELECT c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+    // Estructura espejo para almacenar los IDs temporalmente antes de la cascada
+    $rawIds = [
+        'NEGRA'  => ['10_12' => [], '14_16' => [], '18_24' => []],
+        'BLANCA' => ['10_12' => [], '14_16' => [], '18_24' => []],
+    ];
+
+    // NOTA: Asegúrate de seleccionar la llave primaria de tu tabla corte (ej: c.id)
+    $stmtListas = mysqli_prepare($con, "SELECT c.id, c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                          FROM corte c 
-                                         JOIN registro r ON c.wo = r.wo 
-                                         WHERE c.cutStatus != 'Cortado' AND c.tamano > 0 AND r.programado = 1 
+                                         WHERE c.cutStatus != 'Cortado' AND c.tamano > 0 
                                          ORDER BY c.aws, c.color, c.term1, c.term2 DESC");
 
     if (!$stmtListas) {
@@ -89,6 +141,7 @@ try {
 
     while ($rowlistas = mysqli_fetch_assoc($resListas)) {
 
+        $idCorte  = $rowlistas['id']; // Almacenamos el ID único del registro de corte
         $calibre  = (int)$rowlistas['aws'];
         $term1    = $rowlistas['term1'];
         $term2    = $rowlistas['term2'];
@@ -119,21 +172,25 @@ try {
         // --- ACUMULACIÓN ---
         if ($rango === 'sello') {
             if ($tinta === 'NEGRA' || $tinta === 'BLANCA') {
-                $maquinas['MCUT-10'] += $tiempoTotal; // Va directo a MCUT-10 sin crear llaves extras en el JSON
+                $maquinas['MCUT-10'] += $tiempoTotal;
+                $idsPorMaquina['MCUT-10'][] = $idCorte; // Va directo a MCUT-10
                 
-                // Almacenamos temporalmente en la variable de control para la cascada matemática
                 if ($tinta === 'NEGRA')  $selloNegra += $tiempoTotal;
                 if ($tinta === 'BLANCA') $selloBlanca += $tiempoTotal;
             } else {
                 $maquinas['>10'] += $tiempoTotal;
+                $idsPorMaquina['>10'][] = $idCorte;
             }
         } elseif ($rango === '>10') {
             $maquinas['>10'] += $tiempoTotal;
+            $idsPorMaquina['>10'][] = $idCorte;
         } else {
             if (isset($rawTimes[$tinta][$rango])) {
                 $rawTimes[$tinta][$rango] += $tiempoTotal;
+                $rawIds[$tinta][$rango][] = $idCorte; // Guardamos el ID en el pozo crudo
             } else {
                 $maquinas['>10'] += $tiempoTotal;
+                $idsPorMaquina['>10'][] = $idCorte;
             }
         }
 
@@ -141,22 +198,35 @@ try {
     }
     mysqli_stmt_close($stmtListas);
 
-    // --- CASCADA DE TIEMPOS (Utilizando los acumuladores de control corregidos) ---
-    aplicarCascada($rawTimes['NEGRA'], $selloNegra);
-    aplicarCascada($rawTimes['BLANCA'], $selloBlanca);
+    // --- CASCADA DE TIEMPOS Y DE IDs ---
+    aplicarCascadaConIds($rawTimes['NEGRA'], $rawIds['NEGRA'], $selloNegra);
+    aplicarCascadaConIds($rawTimes['BLANCA'], $rawIds['BLANCA'], $selloBlanca);
 
-    // --- MAPEO FINAL A MÁQUINAS ---
+    // --- MAPEO FINAL DE TIEMPOS Y AGRUPACIÓN DE IDs POST-CASCADA ---
     $maquinas['MCUT-10'] += $rawTimes['NEGRA']['10_12'];
+    $idsPorMaquina['MCUT-10'] = array_merge($idsPorMaquina['MCUT-10'], $rawIds['NEGRA']['10_12']);
+
     $maquinas['MCUT-5']  += $rawTimes['NEGRA']['14_16'];
+    $idsPorMaquina['MCUT-5']  = $rawIds['NEGRA']['14_16'];
+
     $maquinas['MCUT-4']  += $rawTimes['NEGRA']['18_24'];
+    $idsPorMaquina['MCUT-4']  = $rawIds['NEGRA']['18_24'];
 
     $maquinas['MCUT-1']  += $rawTimes['BLANCA']['10_12'];
-    $maquinas['MCUT-6']  += $rawTimes['BLANCA']['14_16'] + $rawTimes['BLANCA']['18_24'];
+    $idsPorMaquina['MCUT-1']  = $rawIds['BLANCA']['10_12'];
 
-    // Calculamos el Total de MCUT-10 de forma directa
+    // MCUT-6 comparte rangos 14_16 y 18_24 de Blanca
+    $maquinas['MCUT-6']  += $rawTimes['BLANCA']['14_16'] + $rawTimes['BLANCA']['18_24'];
+    $idsPorMaquina['MCUT-6']  = array_merge($rawIds['BLANCA']['14_16'], $rawIds['BLANCA']['18_24']);
+
     $maquinas["MCUT-10TT"] = $maquinas["MCUT-10"];
 
-    // Devolver JSON limpio sin rastros de propiedades basura
+    // --- ¡EJECUCIÓN DEL UPDATE MASIVO EN BD! ---
+    foreach ($idsPorMaquina as $nombreMaquina => $arregloIds) {
+        actualizarMaquinaEnBD($con, $arregloIds, $nombreMaquina);
+    }
+
+    // Devolver JSON limpio al front-end
     header('Content-Type: application/json');
     echo json_encode($maquinas);
 
