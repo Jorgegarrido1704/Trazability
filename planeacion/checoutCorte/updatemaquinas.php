@@ -23,7 +23,6 @@ function aplicarCascadaConIds(array &$raw, array &$rawIds, float $ocupadoSello10
                 $raw['14_16'] -= $prestamo;
                 
                 // Mover IDs físicamente en el array proporcionalmente
-                // Para simplificar y asegurar consistencia, pasamos elementos de un rango a otro
                 $elementosAMover = ceil(count($rawIds['14_16']) * ($prestamo / ($raw['14_16'] + $prestamo)));
                 for ($i = 0; $i < $elementosAMover; $i++) {
                     if (!empty($rawIds['14_16'])) {
@@ -92,7 +91,6 @@ function actualizarMaquinaEnBD($con, array $ids, string $nombreMaquina): void {
     
     $listaIds = implode(',', $idsFormateados);
     
-    // OJO: Cambia 'id' por tu columna llave primaria si se llama diferente (ej. corteId)
     $sql = "UPDATE corte SET maq_asignada = '$nombreMaquina' WHERE id IN ($listaIds)";
     mysqli_query($con, $sql);
 }
@@ -126,7 +124,6 @@ try {
         'BLANCA' => ['10_12' => [], '14_16' => [], '18_24' => []],
     ];
 
-    // NOTA: Asegúrate de seleccionar la llave primaria de tu tabla corte (ej: c.id)
     $stmtListas = mysqli_prepare($con, "SELECT c.id, c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                          FROM corte c 
                                          WHERE c.cutStatus != 'Cortado' AND c.tamano > 0 
@@ -141,7 +138,7 @@ try {
 
     while ($rowlistas = mysqli_fetch_assoc($resListas)) {
 
-        $idCorte  = $rowlistas['id']; // Almacenamos el ID único del registro de corte
+        $idCorte  = $rowlistas['id']; 
         $calibre  = (int)$rowlistas['aws'];
         $term1    = $rowlistas['term1'];
         $term2    = $rowlistas['term2'];
@@ -169,14 +166,18 @@ try {
             }
         }
 
-        // --- ACUMULACIÓN ---
+        // --- ACUMULACIÓN EN POZOS TEMPORALES ---
         if ($rango === 'sello') {
-            if ($tinta === 'NEGRA' || $tinta === 'BLANCA') {
+            if ($tinta === 'BLANCA') {
+                // Sello Blanca va directo a MCUT-10 inicialmente
                 $maquinas['MCUT-10'] += $tiempoTotal;
-                $idsPorMaquina['MCUT-10'][] = $idCorte; // Va directo a MCUT-10
-                
-                if ($tinta === 'NEGRA')  $selloNegra += $tiempoTotal;
-                if ($tinta === 'BLANCA') $selloBlanca += $tiempoTotal;
+                $idsPorMaquina['MCUT-10'][] = $idCorte; 
+                $selloBlanca += $tiempoTotal;
+            } elseif ($tinta === 'NEGRA') {
+                // Sello Negra va con su respectiva máquina inicial de Negra (MCUT-6)
+                $maquinas['MCUT-6'] += $tiempoTotal;
+                $idsPorMaquina['MCUT-6'][] = $idCorte;
+                $selloNegra += $tiempoTotal;
             } else {
                 $maquinas['>10'] += $tiempoTotal;
                 $idsPorMaquina['>10'][] = $idCorte;
@@ -187,7 +188,7 @@ try {
         } else {
             if (isset($rawTimes[$tinta][$rango])) {
                 $rawTimes[$tinta][$rango] += $tiempoTotal;
-                $rawIds[$tinta][$rango][] = $idCorte; // Guardamos el ID en el pozo crudo
+                $rawIds[$tinta][$rango][] = $idCorte; 
             } else {
                 $maquinas['>10'] += $tiempoTotal;
                 $idsPorMaquina['>10'][] = $idCorte;
@@ -203,25 +204,38 @@ try {
     aplicarCascadaConIds($rawTimes['BLANCA'], $rawIds['BLANCA'], $selloBlanca);
 
     // --- MAPEO FINAL DE TIEMPOS Y AGRUPACIÓN DE IDs POST-CASCADA ---
-    $maquinas['MCUT-10'] += $rawTimes['NEGRA']['10_12'];
-    $idsPorMaquina['MCUT-10'] = array_merge($idsPorMaquina['MCUT-10'], $rawIds['NEGRA']['10_12']);
+    
+    // ==========================================
+    // SECCIÓN TINTA NEGRA
+    // ==========================================
+    // MCUT-6 (10_12 Negra + lo que tenga de Sello Negra)
+    $maquinas['MCUT-6'] += $rawTimes['NEGRA']['10_12'];
+    $idsPorMaquina['MCUT-6'] = array_merge($idsPorMaquina['MCUT-6'], $rawIds['NEGRA']['10_12']);
 
-    $maquinas['MCUT-5']  += $rawTimes['NEGRA']['14_16'];
-    $idsPorMaquina['MCUT-5']  = $rawIds['NEGRA']['14_16'];
+    // MCUT-5 (14_16 Negra)
+    $maquinas['MCUT-5'] += $rawTimes['NEGRA']['14_16'];
+    $idsPorMaquina['MCUT-5'] = array_merge($idsPorMaquina['MCUT-5'], $rawIds['NEGRA']['14_16']);
 
-    $maquinas['MCUT-4']  += $rawTimes['NEGRA']['18_24'];
-    $idsPorMaquina['MCUT-4']  = $rawIds['NEGRA']['18_24'];
+    // MCUT-4 (18_24 Negra)
+    $maquinas['MCUT-4'] += $rawTimes['NEGRA']['18_24'];
+    $idsPorMaquina['MCUT-4'] = array_merge($idsPorMaquina['MCUT-4'], $rawIds['NEGRA']['18_24']);
 
-    $maquinas['MCUT-1']  += $rawTimes['BLANCA']['10_12'];
-    $idsPorMaquina['MCUT-1']  = $rawIds['BLANCA']['10_12'];
 
-    // MCUT-6 comparte rangos 14_16 y 18_24 de Blanca
-    $maquinas['MCUT-6']  += $rawTimes['BLANCA']['14_16'] + $rawTimes['BLANCA']['18_24'];
-    $idsPorMaquina['MCUT-6']  = array_merge($rawIds['BLANCA']['14_16'], $rawIds['BLANCA']['18_24']);
+    // ==========================================
+    // SECCIÓN TINTA BLANCA
+    // ==========================================
+    // MCUT-1 (10_12 Blanca)
+    $maquinas['MCUT-1'] += $rawTimes['BLANCA']['10_12'];
+    $idsPorMaquina['MCUT-1'] = array_merge($idsPorMaquina['MCUT-1'], $rawIds['BLANCA']['10_12']);
+
+    // MCUT-10 (Comparte / absorbe rangos de Blanca + Sello Blanca)
+    $maquinas['MCUT-10'] += $rawTimes['BLANCA']['14_16'] + $rawTimes['BLANCA']['18_24'];
+    $idsPorMaquina['MCUT-10'] = array_merge($idsPorMaquina['MCUT-10'], $rawIds['BLANCA']['14_16'], $rawIds['BLANCA']['18_24']);
+
 
     $maquinas["MCUT-10TT"] = $maquinas["MCUT-10"];
 
-    // --- ¡EJECUCIÓN DEL UPDATE MASIVO EN BD! ---
+    // --- EJECUCIÓN DEL UPDATE MASIVO EN BD ---
     foreach ($idsPorMaquina as $nombreMaquina => $arregloIds) {
         actualizarMaquinaEnBD($con, $arregloIds, $nombreMaquina);
     }
