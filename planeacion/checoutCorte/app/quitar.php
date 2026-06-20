@@ -1,25 +1,33 @@
 <?php
-
 require 'conection.php'; 
 
-try{
-  $codigo=isset($_GET['codigo']) ? $_GET['codigo'] : null;
+try {
+    $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : null;
+    if(!$codigo) {
+        throw new Exception("Código ausente.");
+    }
   
- $data=[];
-  $changeEstatus="UPDATE corte SET cutStatus='Cortado' WHERE codigo='$codigo'  ";
-  $result=mysqli_query($con,$changeEstatus);
-  $buscarWo=mysqli_query($con,"SELECT wo FROM corte WHERE codigo='$codigo' ");
-  $wo=mysqli_fetch_row($buscarWo)[0];
-  $buscar=mysqli_query($con,"SELECT * FROM corte WHERE wo='$wo' AND cutStatus='Activo'");
-  if(mysqli_num_rows($buscar==0)){
-      $update=mysqli_query($con,"UPDATE registro SET count='4', donde='En espera de liberacion' WHERE wo='$wo' ");
-      $updateRecords= mysqli_query($con,"UPDATE registroparcial SET libePar=libePar+cortPar, cortPar='0' WHERE wo='$wo' ");
-  }
+    $changeEstatus = "UPDATE corte SET cutStatus='Cortado' WHERE codigo='$codigo'";
+    mysqli_query($con, $changeEstatus);
+    
+    $buscarWo = mysqli_query($con, "SELECT wo FROM corte WHERE codigo='$codigo'");
+    $filaWo = mysqli_fetch_row($buscarWo);
+    
+    if ($filaWo) {
+        $wo = $filaWo[0];
+        $buscar = mysqli_query($con, "SELECT * FROM corte WHERE wo='$wo' AND cutStatus='Activo'");
+        
+        if (mysqli_num_rows($buscar) == 0) {
+            mysqli_query($con, "UPDATE registro SET count='4', donde='En espera de liberacion' WHERE wo='$wo'");
+            mysqli_query($con, "UPDATE registroparcial SET libePar=libePar+cortPar, cortPar='0' WHERE wo='$wo'");
+        }
+    }
+    
     $dat['status'] = "success";
     echo json_encode($dat);
  
-  }catch(Exception $e){
-    $dat['status'] = "error ".$codigo." ". $e;
-    echo json_encode($dat);
-  }
-  
+} catch(Exception $e) {
+    header('Content-Type: application/json');
+    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+}
+?>

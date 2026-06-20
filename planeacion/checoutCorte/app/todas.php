@@ -1,36 +1,13 @@
 <?php
-
 require 'conection.php'; 
 
 try {
-  
     $maquina = isset($_GET['maquina']) ? $_GET['maquina'] : 'todas';
     $calibres = [];
     $totalCables = 0;
-    $tintaNegra = 0;
-    $tintaBlanca = 0;
-    $tintaNegraOpt = 0;
-    $tintaBlancaOpt = 0;
-    $tinta = '';
-    $tiempo = '';
     $maxtime = 135000000;
-    
     $tiempoTotal = 0; 
-    $i = 0;
-    // TEMPORAL - para depurar el 500
-    /*ini_set('display_errors', 0);
-    error_reporting(E_ALL);
-    set_exception_handler(function($e) {
-        header('Content-Type: application/json');
-        echo json_encode(["status" => "error", "message" => $e->getMessage()]);
-        exit;
-    });
-    set_error_handler(function($errno, $errstr) {
-        header('Content-Type: application/json');
-        echo json_encode(["status" => "error", "message" => "$errstr (código $errno)"]);
-        exit;
-    });
-    */
+
     if ($maquina == "ESPECIALES") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -38,7 +15,6 @@ try {
                WHERE c.cutStatus != 'Cortado' 
                AND r.programado = 1 AND maq_asignada = '>10' AND c.tamano >0
                ORDER BY c.wo ASC, c.cons ASC";
-       
     } elseif ($maquina == "MCUT-1") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -46,7 +22,6 @@ try {
                WHERE c.cutStatus != 'Cortado' 
                AND r.programado = 1 AND maq_asignada = 'MCUT-1' AND c.tamano >0
                ORDER BY c.wo ASC, c.cons ASC";
-       
     } elseif ($maquina == "MCUT-6") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -54,7 +29,6 @@ try {
                WHERE c.cutStatus != 'Cortado' 
                AND r.programado = 1 AND maq_asignada = 'MCUT-6' AND c.tamano >0
                ORDER BY c.wo ASC, c.cons ASC";
-       
     } elseif ($maquina == "MCUT-10") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -62,7 +36,6 @@ try {
                WHERE c.cutStatus != 'Cortado' 
                AND r.programado = 1 AND maq_asignada = 'MCUT-10' AND c.tamano >0
                ORDER BY c.wo ASC, c.cons ASC";
-       
     } elseif ($maquina == "MCUT-5") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -70,7 +43,6 @@ try {
                WHERE c.cutStatus != 'Cortado' 
                AND r.programado = 1 AND `maq_asignada` = 'MCUT-5' AND c.tamano >0
                ORDER BY c.wo ASC, c.cons ASC";
-       
     } elseif ($maquina == "MCUT-4") {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -78,7 +50,6 @@ try {
                WHERE c.cutStatus != 'Cortado' 
                AND r.programado = 1 AND `maq_asignada` = 'MCUT-4' AND c.tamano > 0
                ORDER BY c.wo ASC, c.cons ASC";
-       
     } else if ($maquina == 'todas') {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
@@ -87,7 +58,6 @@ try {
                ORDER BY c.wo ASC, c.cons ASC";
     }
 
-    // SI EN TU ARCHIVO CONECTION.PHP LA VARIABLE SE LLAMA $conexion, CAMBIA ESTO A $conexion
     if (!isset($con) || !$con) {
         throw new Exception("La variable de conexión no está definida correctamente.");
     }
@@ -99,7 +69,6 @@ try {
     }
 
     while ($rowlistas = mysqli_fetch_array($listasdecorte)) {
-        $minutos = 0;
         $pn = $rowlistas['np'];
         $calibre = $rowlistas['aws'];
         $consumo = $rowlistas['cons'];
@@ -108,19 +77,11 @@ try {
         $tamano = round((float)$rowlistas['tamano'], 2);
         $terminal1 = $rowlistas['term1'];
         
-        $strip1 = $rowlistas['strip1'];
-        if ($strip1 == null) {
-            $strip1 = 0;
-        } else if ($strip1 < 1.5) {
-            $strip1 = $strip1 * 25.4;
-        }
+        $strip1 = $rowlistas['strip1'] ?? 0;
+        if ($strip1 < 1.5 && $strip1 > 0) $strip1 = $strip1 * 25.4;
         
-        $strip2 = $rowlistas['strip2'];
-        if ($strip2 == null) {
-            $strip2 = 0;
-        } else if ($strip2 < 1.5) {
-            $strip2 = $strip2 * 25.4;
-        }
+        $strip2 = $rowlistas['strip2'] ?? 0;
+        if ($strip2 < 1.5 && $strip2 > 0) $strip2 = $strip2 * 25.4;
         
         $strip1 = round((float)$strip1, 2);
         $strip2 = round((float)$strip2, 2);
@@ -130,7 +91,7 @@ try {
         $wo = $rowlistas['wo'];
         $codigo = $rowlistas['codigo'];
         $conector = $rowlistas['conector'];
-        $estamp = isset($rowlistas['dist_stamp']) ? $rowlistas['dist_stamp'] : '';
+        $estamp = $rowlistas['dist_stamp'] ?? '';
         
         $time_ruteo = round((2.92 * $qty) + 180, 2);
         $minutos = round(((float)$time_ruteo / 60), 2);
@@ -139,7 +100,6 @@ try {
         
         if ($tiempoTotal <= $maxtime) {
             $calibres[] = [ 
-                
                 'pn' => $pn,
                 'calibre' => $calibre,
                 'consumo' => $consumo,
@@ -167,11 +127,7 @@ try {
     echo json_encode($calibres);
 
 } catch (Exception $e) {
-    error_log("Error cargando calibres: " . $e->getMessage());
     header('Content-Type: application/json');
-    echo json_encode([
-        "status" => "error",
-        "message" => $e->getMessage()
-    ]);
+    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
 ?>

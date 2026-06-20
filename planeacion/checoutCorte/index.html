@@ -10,7 +10,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
-        /* Configuración de página para etiquetas */
         @page {
             size: 104mm 57.5mm;
             margin: 0;
@@ -24,35 +23,24 @@
             background-color: white;
         }
 
-        /* Salto de página para cada etiqueta */
         .label-container {
             width: 104mm;
             height: 57.5mm;
             box-sizing: border-box;
             padding: 3mm;
             padding-top: 35px;
-            display: flex; /* Dividimos en Izquierda (Barcode) y Derecha (Info) */
+            display: flex;
             overflow: hidden;
             page-break-after: always;
-            border: 0.5mm dashed #eee; /* Solo para visualización, se puede quitar */
+            border: 0.5mm dashed #eee;
         }
 
-        /* Contenedor del código de barras vertical */
         .barcode-side {
             width: 12mm;
             display: flex;
             align-items: center;
             justify-content: center;
-           
         }
-
-      /*  .barcode-vertical {
-            transform: rotate(-90deg); 
-            transform-origin: center;
-            border: 1px dashed #000;0
-        } 
-        */
-
         
         .info-side {
             flex: 1;
@@ -90,12 +78,6 @@
             font-weight: bold;
             text-transform: uppercase;
             font-size: 8pt;
-
-        }
-
-        .footer-barcode {
-           
-            text-align: center;
         }
 
         #bcode-canvas {
@@ -103,66 +85,72 @@
             height: 6mm;
         }
    
-        /* Corrección para evitar conflictos en vistas Bootstrap */
         .bootstrap-scope img, .bootstrap-scope svg { display: inline; }
-      
+
+        /* --- CORRECCIÓN DEL ESTILO PARA TRASPASAR TABLE-STRIPED --- */
+        .table tbody tr.row-selected td {
+            background-color: #d1e7dd !important; /* Color verde claro de Bootstrap */
+            color: #0f5132 !important;            /* Texto verde oscuro para mejor contraste */
+        }
+        
+        .row-selected {
+            transition: background-color 0.15s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-light">
 
-   
+    <div class="container-fluid px-4 tab-content-all" id="porMaquinas">
+        <nav class="navbar navbar-expand bg-secondary mb-4 rounded px-2 mt-3">
+            <input type="hidden" id="maquinaSeleccionada" value="todas">
+            <div class="navbar-nav gap-2">
+                <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('todas')">Todas las máquinas</button>
+                <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-1')">MCUT-1</button>
+                <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-10')">MCUT-2</button>
+                <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-10')">MCUT-3</button>
+                <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-4')">MCUT-4</button>
+                <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-5')">MCUT-5</button>
+                <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-6')">MCUT-6</button>
+                <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('ESPECIALES')">Cables Especiales</button>
+            </div>
+        </nav>
 
-    
-        
-    
-
-        <div class="container-fluid px-4 tab-content-all" id="porMaquinas">
-            <nav class="navbar navbar-expand bg-secondary mb-4 rounded px-2">
-                <input type="hidden" id="maquinaSeleccionada" value="todas">
-                <div class="navbar-nav gap-2">
-                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('todas')">Todas las máquinas</button>
-                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-1')">MCUT-1</button>
-                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-10')">MCUT-2</button><!--falta  ponerla es igual que MCUT7-->
-                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-10')">MCUT-3</button>
-                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-4')">MCUT-4</button>
-                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-5')">MCUT-5</button>
-                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-6')">MCUT-6</button>
-        
-                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('ESPECIALES')">Cables Especiales</button>
-                </div>
-            </nav>
-            <div class="card shadow-sm">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div class="d-flex align-items-center gap-3">
                     <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Lista por máquina</h5>
-                   
-                    <span class="badge bg-primary rounded-pill" id="totalRecords2">0 registros</span>
+                    <button class="btn btn-success btn-sm" id="btnProcesarLote" onclick="procesarSeleccionados()" disabled>
+                        <i class="bi bi-check2-all me-1"></i> Procesar Seleccionados (<span id="countSelected">0</span>)
+                    </button>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped mb-0">
-                            <thead class="table-dark">
-                                <tr>
-                                   <th>Nº Parte</th><th>Work Order</th><th>Cons</th><th>Quitar</th>
-                                </tr>
-                            </thead>
-                            <tbody id="resultTotal"></tbody>
-                        </table>
-                    </div>
+                <span class="badge bg-primary rounded-pill" id="totalRecords2">0 registros</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Nº Parte</th>
+                                <th>Work Order</th>
+                                <th>Cons</th>
+                                <th width="120px">
+                                    <div class="form-check m-0">
+                                        <input class="form-check-input" type="checkbox" id="checkAll" onclick="toggleSelectAll(this)">
+                                        <label class="form-check-label text-white fw-bold small" for="checkAll">Marcar Todo</label>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultTotal"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
-
-   
-
-    
-
-
+    </div>
 
     <script>
-        
         window.onload = function() {
-            document.getElementById('porMaquinas').display = 'block';
-          pormaquina();
+            pormaquina();
         }
 
         function maquinaSelecionada(maquina){
@@ -170,20 +158,14 @@
             pormaquina();
         }
 
-       
-
-        
-
-      
- 
         function pormaquina() {
             const maquina = document.getElementById('maquinaSeleccionada').value;
-            document.getElementById('maquinaSeleccionada').value = maquina;
+            document.getElementById('checkAll').checked = false;
+            actualizarContadorLote();
 
             fetch(`app/todas.php?maquina=${encodeURIComponent(maquina)}`)
             .then(response => response.json())
             .then(data => {
-                
                 if (data.status === "error") {
                     console.error("Error del servidor:", data.message);
                     alert("Error en el servidor: " + data.message);
@@ -193,34 +175,77 @@
                 const tbody = document.getElementById('resultTotal');
                 tbody.innerHTML = '';
                 let totalRecords = 0;
-                let id = 1;
                 
                 data.forEach(item => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${item.pn}</td><td>${item.wo}</td><td>${item.consumo}</td><td><input type="checkbox" id="quitar" name="quitar" onclick="quitar(${item.codigo})"></td>`;
+                        <td>${item.pn}</td>
+                        <td>${item.wo}</td>
+                        <td>${item.consumo}</td>
+                        <td>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input row-checkbox" data-codigo="${item.codigo}" onclick="actualizarContadorLote()">
+                            </div>
+                        </td>`;
                     tbody.appendChild(row);
                     totalRecords++;
-                    id++;
                 });
                 document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
             })
             .catch(err => console.error("Error en el procesamiento del Fetch:", err));
         }
-        // Función para sumar minutos a una hora y devolver HH:mm
-        function quitar(wo) {
+
+        function toggleSelectAll(masterCheckbox) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+            actualizarContadorLote();
+        }
+
+        function actualizarContadorLote() {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            let totalSeleccionados = 0;
+
+            checkboxes.forEach(cb => {
+                const fila = cb.closest('tr');
+                if (fila) {
+                    if (cb.checked) {
+                        fila.classList.add('row-selected');
+                        totalSeleccionados++;
+                    } else {
+                        fila.classList.remove('row-selected');
+                    }
+                }
+            });
             
-           // alert(wo);
-           
-            fetch(`app/quitar.php?codigo=${wo}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-               
-               
+            document.getElementById('countSelected').textContent = totalSeleccionados;
+            document.getElementById('btnProcesarLote').disabled = (totalSeleccionados === 0);
+        }
+
+        function procesarSeleccionados() {
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            const codigos = Array.from(checkboxes).map(cb => cb.getAttribute('data-codigo'));
+
+            if(codigos.length === 0) return;
+
+            if(!confirm(`¿Estás seguro de que deseas marcar como 'Cortado' los ${codigos.length} elementos seleccionados?`)) {
+                return;
+            }
+
+            const promesas = codigos.map(codigo => {
+                return fetch(`app/quitar.php?codigo=${encodeURIComponent(codigo)}`)
+                    .then(response => response.json());
+            });
+
+            Promise.all(promesas)
+            .then(resultados => {
+                console.log("Lote procesado con éxito:", resultados);
+                pormaquina();
             })
-            .catch(err => console.error("Error en el procesamiento del Fetch:", err));
-             pormaquina();
+            .catch(err => {
+                console.error("Error procesando lote:", err);
+                alert("Ocurrió un error en el procesamiento por lote.");
+                pormaquina();
+            });
         }
     </script>
 </body>
