@@ -12,6 +12,7 @@ try {
             SUM(CASE WHEN cutStatus = 'Activo' THEN 1 ELSE 0 END) as activos,
             ROUND((SUM(CASE WHEN cutStatus != 'Activo' THEN 1 ELSE 0 END) / COUNT(*)) * 100, 2) as porcentaje_activos
         FROM `corte` 
+        WHERE porcentaje_activos < 100
         GROUP BY np, wo
         ORDER BY porcentaje_activos DESC
     ";
