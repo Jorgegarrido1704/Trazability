@@ -2,7 +2,7 @@
 require "../../app/conection.php";
 try {
 
-$pn= isset($_POST['pn']) ? $_POST['pn'] : '';
+$pn= isset($_POST['np']) ? $_POST['np'] : '';
 
 $delCore=mysqli_query($con,"DELETE FROM corte WHERE cutStatus = 'Activo' AND np = $pn ");
 } catch (\Throwable $th) {
@@ -56,7 +56,7 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
 }}
 
     //echo "<br><br><h1>Se Agregaron correctamente Correctamente</h1>";
-    header("location:busqueda.php");
+    header("location:../busqueda.php");
 
 
 } catch (\Throwable $th) {
