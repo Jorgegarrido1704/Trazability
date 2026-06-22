@@ -145,6 +145,14 @@ $activaListas = isset($_GET['active']) ? $_GET['active'] : "";
                 <button class="btn btn-primary">Eliminar PO</button>
             </form>
         </div>
+         <div class="col-lg-2 mb-4 border">
+            <h3>Agregar cortes</h3>
+            <form action="../cortados/cargarCortePorNumero,php" method="POST" >
+                <input type="text" name="np" id="np" requires>
+                <br>
+                <input type="submit" name="upload" value="Cargar cortes">
+            </form>
+        </div>
     </div>
     <br>
 
