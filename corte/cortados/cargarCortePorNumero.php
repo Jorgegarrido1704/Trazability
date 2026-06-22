@@ -1,5 +1,5 @@
 <?php
-require "../app/conection.php";
+require "../../app/conection.php";
 try {
 
 $pn= isset($_POST['pn']) ? $_POST['pn'] : '';
