@@ -132,7 +132,7 @@ try {
                         while ($corte = mysqli_fetch_assoc($cortes)): 
                            
                             $porcentaje = $corte['porcentaje_activos'];
-                           if($porcentaje < 100){
+                           if($porcentaje <= 100){
                                
                            
                             if ($porcentaje < 40) {
