@@ -13,13 +13,14 @@
             width: 114mm;
             height: 45mm;
             padding: 5mm;
+
             border: 1px solid #eee;
             background: white;
             margin: 0 auto;
         }
-        #customer { font-size: 24px; font-weight: bold; margin: 0; }
-        #partNumber { font-size: 20px; font-weight: bold; margin: 0; }
-        #partNumberQty { font-size: 18px; margin: 0; }
+        #customer { font-size: 30px; font-weight: bold; margin: 0;padding-top: 20px; }
+        #partNumber { font-size: 23px; font-weight: bold; margin: 0; }
+        #partNumberQty { font-size: 22px; margin: 0; }
         #qr { width: 35mm; height: 35mm; display: flex; justify-content: center; align-items: center; }
         #qr img { max-width: 100%; height: auto; }
 
