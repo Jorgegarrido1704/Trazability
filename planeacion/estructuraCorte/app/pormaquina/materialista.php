@@ -15,7 +15,7 @@ try {
     $tintaBlancaOpt = 0;
     $tinta = '';
     $tiempo = '';
-    $maxtime =135000;
+    $maxtime =135000*3;
     $cables = $terminales = $herramental = [];
     
     // CORRECCIÓN: Inicializar la variable del acumulador de tiempo
@@ -37,7 +37,7 @@ try {
                                                 ELSE 1
                                             END,
                                             tipo ASC";
-                                             $maxtime=27000;
+                                             $maxtime=27000*3;
     }elseif ($maquina == "MCUT-1") {
        $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
@@ -54,7 +54,7 @@ try {
                                                 ELSE 1
                                             END,
                                             tipo ASC";
-                                             $maxtime=27000;
+                                             $maxtime=27000*3;
     }elseif ($maquina == "MCUT-6") {
        $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
@@ -70,7 +70,7 @@ try {
                                                 ELSE 1
                                             END,
                                             c.tipo ASC";
-                                             $maxtime=27000;
+                                             $maxtime=27000*3;
     }elseif ($maquina == "MCUT-10") {
        $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
@@ -87,7 +87,7 @@ try {
                                                 ELSE 1
                                             END,
                                             c.tipo ASC";
-                                             $maxtime=27000;
+                                             $maxtime=27000*3;
     }elseif ($maquina == "MCUT-5") {
        $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
@@ -103,7 +103,7 @@ try {
                                                 ELSE 1
                                             END,
                                             c.tipo ASC";
-                                             $maxtime=27000;
+                                             $maxtime=27000*3;
     }elseif ($maquina == "MCUT-4") {
        $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
@@ -119,7 +119,7 @@ try {
                                                 ELSE 1
                                             END,
                                             c.tipo ASC";
-                                             $maxtime=27000;
+                                             $maxtime=27000*3;
     } else if ($maquina == 'todas') {
        $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
