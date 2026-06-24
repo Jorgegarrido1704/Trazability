@@ -13,10 +13,9 @@
             width: 114mm;
             height: 45mm;
             padding: 5mm;
-
-            border: 1px solid #eee;
             background: white;
             margin: 0 auto;
+            rotate: 180deg;
         }
         #customer { font-size: 30px; font-weight: bold; margin: 0;padding-top: 20px; }
         #partNumber { font-size: 23px; font-weight: bold; margin: 0; }
