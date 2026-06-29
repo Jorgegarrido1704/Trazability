@@ -5,15 +5,15 @@ try {
     // Consulta optimizada con suma condicional y GROUP BY
     $query = "
         SELECT 
-            np,
-            wo,
-            qty,
+            c.np,
+            c.wo,
+            c.qty,
             COUNT(*) as total_cortes,
             SUM(CASE WHEN cutStatus = 'Activo' THEN 1 ELSE 0 END) as activos,
             ROUND((SUM(CASE WHEN cutStatus != 'Activo' THEN 1 ELSE 0 END) / COUNT(*)) * 100, 2) as porcentaje_activos
-        FROM `corte`  JOIN `registro` ON corte.wo = registro.wo
-        WHERE registro.count IN ('2','3','17','1')
-        GROUP BY corte.np, corte.wo
+        FROM `corte` c JOIN `registro` r ON c.wo = r.wo
+        WHERE r.count IN ('2','3','17','1')
+        GROUP BY c.np, c.wo
         ORDER BY porcentaje_activos DESC
     ";
 
@@ -153,7 +153,7 @@ try {
                                 <td>
                                     <a href="detalle_corte.php?wo=<?php echo urlencode($corte['wo']); ?>" class="text-decoration-none">
                                         <span class="badge badge-wo px-3 py-2 rounded-pill" style="cursor: pointer;">
-                                            <i class="fa-solid fa-eye me-1 small"></i> <?php echo htmlspecialchars($corte['corte.wo']); ?>
+                                            <i class="fa-solid fa-eye me-1 small"></i> <?php echo htmlspecialchars($corte['wo']); ?>
                                         </span>
                                     </a>
                                 </td>
