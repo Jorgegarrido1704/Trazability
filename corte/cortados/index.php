@@ -11,7 +11,8 @@ try {
             COUNT(*) as total_cortes,
             SUM(CASE WHEN cutStatus = 'Activo' THEN 1 ELSE 0 END) as activos,
             ROUND((SUM(CASE WHEN cutStatus != 'Activo' THEN 1 ELSE 0 END) / COUNT(*)) * 100, 2) as porcentaje_activos
-        FROM `corte` 
+        FROM `corte`  JOIN `registro` ON corte.wo = registro.wo
+        WHERE registro.count IN ('2','3','17','1')
         GROUP BY np, wo
         ORDER BY porcentaje_activos DESC
     ";
