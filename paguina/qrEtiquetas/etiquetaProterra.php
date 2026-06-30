@@ -4,51 +4,40 @@ require '../../vendor/autoload.php';
 
 date_default_timezone_set("America/Mexico_City");
 
-// Función optimizada para generar imágenes perfectas para impresión térmica milimétrica
+// FUNCIÓN CORREGIDA: Genera una cuadrícula HTML pura píxel por píxel (Cero imágenes, cero negro falso)
 function generarDataMatrixHTML($texto) {
     try {
         $barcode = new \Com\Tecnick\Barcode\Barcode();
         $bobj = $barcode->getBarcodeObj(
             'DATAMATRIX', 
             $texto,       
-            4, // Escalado de módulo (un poco más grande para evitar distorsión)
-            4, 
-            '#000000', // Negro absoluto en Hexadecimal
-            array(0, 0, 0, 0)
-        )->setBackgroundColor('#FFFFFF'); // Blanco absoluto en Hexadecimal
+            1, // Cada módulo medirá exactamente 1 píxel base
+            1, 
+            'black', 
+            array(0, 0, 0, 0) // Sin márgenes internos
+        )->setBackgroundColor('white');
 
-        // 1. Obtenemos los datos en bruto del PNG
-        $rawPng = $bobj->getPngData();
-
-        // 2. Re-procesamos la imagen con la librería GD de PHP (incluida por defecto)
-        // Esto elimina cualquier canal alfa/transparencia oculto y la aplana a Blanco y Negro puro.
-        $im = imagecreatefromstring($rawPng);
-        if ($im !== false) {
-            $width = imagesx($im);
-            $height = imagesy($im);
-            
-            // Crear una nueva imagen con paleta (truecolor falso) para asegurar que no haya transparencias
-            $bg = imagecreatetruecolor($width, $height);
-            $white = imagecolorallocate($bg, 255, 255, 255);
-            imagefill($bg, 0, 0, $white);
-            
-            // Copiar el DataMatrix sobre el fondo blanco puro
-            imagecopy($bg, $im, 0, 0, 0, 0, $width, $height);
-            
-            // Guardar el resultado en un buffer como PNG plano
-            ob_start();
-            imagepng($bg);
-            $pngDataFinal = base64_encode(ob_get_clean());
-            
-            imagedestroy($im);
-            imagedestroy($bg);
-            
-            return '<img src="data:image/png;base64,' . $pngDataFinal . '" style="width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges;" />';
+        // Extraemos la estructura interna (la matriz de unos y ceros: 1 = negro, 0 = blanco)
+        $grid = $bobj->getGridArray();
+        
+        if (!is_array($grid)) {
+            return '<span style="color:red; font-size:4px;">Error en matriz</span>';
         }
 
-        // Si falla el procesamiento GD, usamos el fallback normal en Base64
-        return '<img src="data:image/png;base64,' . base64_encode($rawPng) . '" style="width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges;" />';
-        
+        // Construimos una tabla HTML ultra-compacta
+        $html = '<table style="border-collapse: collapse; border: 0; margin: auto; padding: 0; background-white; line-height: 0; font-size: 0;" cellpading="0" cellspacing="0">';
+        foreach ($grid as $row) {
+            $html .= '<tr style="padding: 0; margin: 0; height: 1px;">'; // Ajusta a 2px si sale demasiado pequeño
+            foreach ($row as $cell) {
+                // Si la celda es 1 pintamos negro, si es 0 blanco absoluto
+                $color = ($cell == 1) ? '#000000' : '#FFFFFF';
+                $html .= '<td style="width: 1px; height: 1px; background-color: ' . $color . '; padding: 0; margin: 0;"></td>';
+            }
+            $html .= '</tr>';
+        }
+        $html .= '</table>';
+
+        return $html;
     } catch (\Exception $e) {
         return '<span style="color:red; font-size:4px;">Error: ' . $e->getMessage() . '</span>';
     }
@@ -121,7 +110,6 @@ try {
 <title>Impresión de Etiquetas</title>
 
 <style>
-    /* Configuración de la página para la impresora de etiquetas */
     @page {
         size: 38.5mm 104.5mm;
         margin: 0;
@@ -133,7 +121,7 @@ try {
         padding-top: 21mm;
         padding-left: 5mm;
         box-sizing: border-box;
-        page-break-after: always; /* Crucial: Obliga a la impresora a saltar de etiqueta */
+        page-break-after: always;
     }
 
     .label {
@@ -147,23 +135,25 @@ try {
         font-size: 5px;
         box-sizing: border-box;
         margin: 0.3mm;
+        background-color: white;
     }
 
     .row {
         display: flex;
     }
 
+    /* Contenedor del QR modificado a tamaño fijo para evitar desbordes */
     .bloque1 {
-        padding-left: 3px;
-        width: 14mm;
-        height: 15mm;
+        width: 13mm;
+        height: 14mm;
         display: flex;
         align-items: center;
         justify-content: center;
+        background-color: white !important;
     }
 
     .bloque2 {
-        width: 16mm;
+        width: 17mm;
         height: 14.9mm;
         padding-top: 6px;
     }
@@ -173,32 +163,17 @@ try {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
-        
-        .qr, .qr img {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+        .label, .bloque1, .qr, table, td {
+            background-color: white !important;
         }
     }
 
-    /* Reducido ligeramente a 9.2mm para forzar "Zona de Silencio" blanca perimetral obligatoria */
+    /* Área del QR aislada */
     .qr {
-        width: 9.2mm !important;
-        height: 9.2mm !important;
-        display: block;
-        background: white;
-        padding: 0.4mm; /* Margen de aislamiento para el lector óptico */
+        display: inline-block;
+        background-color: white !important;
+        padding: 4px; /* Zona de silencio obligatoria */
         box-sizing: border-box;
-    }
-
-    /* Forzar al motor del navegador a renderizar sin suavizado difuminado */
-    .qr img {
-        image-rendering: -moz-crisp-edges;
-        image-rendering: -o-crisp-edges;
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
-        image-rendering: pixelated;
-        -ms-interpolation-mode: nearest-neighbor;
     }
 
     .smallbox {
@@ -217,19 +192,12 @@ try {
         white-space: nowrap;
         overflow: hidden;
     }
-
-    #logo {
-        padding-left: 2px;
-        width: 11mm;
-        height: 2.5mm;
-    }
 </style>
 </head>
 
 <body>
 
 <?php 
-// Bucle exclusivo para renderizar el HTML de las etiquetas
 for($j = $inicio; $j <= $cuentas; $j++){ 
     if($j < 10){
         $consecutivoSerial = "00".$j;
