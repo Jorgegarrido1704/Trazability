@@ -20,7 +20,7 @@ function generarDataMatrixHTML($texto) {
         $grid = $bobj->getGridArray();
         if (!is_array($grid)) return '';
 
-        $pixelSize = 3; // Tamaño de cada módulo en píxeles. 2px o 3px es perfecto para 9mm.
+        $pixelSize = 1; // Tamaño de cada módulo en píxeles. 2px o 3px es perfecto para 9mm.
         $shadows = array();
 
         foreach ($grid as $y => $row) {
