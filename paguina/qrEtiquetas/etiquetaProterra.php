@@ -4,38 +4,45 @@ require '../../vendor/autoload.php';
 
 date_default_timezone_set("America/Mexico_City");
 
-// FUNCIÓN CORREGIDA: Genera una cuadrícula HTML pura píxel por píxel (Cero imágenes, cero negro falso)
+// FUNCIÓN DEFINITIVA: Genera el DataMatrix usando sombras CSS (Garantiza nitidez y visibilidad)
 function generarDataMatrixHTML($texto) {
     try {
         $barcode = new \Com\Tecnick\Barcode\Barcode();
         $bobj = $barcode->getBarcodeObj(
             'DATAMATRIX', 
             $texto,       
-            1, // Cada módulo medirá exactamente 1 píxel base
+            1, 
             1, 
             'black', 
-            array(0, 0, 0, 0) // Sin márgenes internos
+            array(0, 0, 0, 0)
         )->setBackgroundColor('white');
 
-        // Extraemos la estructura interna (la matriz de unos y ceros: 1 = negro, 0 = blanco)
         $grid = $bobj->getGridArray();
-        
-        if (!is_array($grid)) {
-            return '<span style="color:red; font-size:4px;">Error en matriz</span>';
+        if (!is_array($grid)) return '';
+
+        $pixelSize = 2; // Tamaño de cada módulo en píxeles. 2px o 3px es perfecto para 9mm.
+        $shadows = array();
+
+        foreach ($grid as $y => $row) {
+            foreach ($row as $x => $cell) {
+                if ($cell == 1) {
+                    // Calculamos la posición exacta de cada píxel negro
+                    $posX = $x * $pixelSize;
+                    $posY = $y * $pixelSize;
+                    $shadows[] = "{$posX}px {$posY}px 0 #000000";
+                }
+            }
         }
 
-        // Construimos una tabla HTML ultra-compacta
-        $html = '<table style="border-collapse: collapse; border: 0; margin: auto; padding: 0; background-white; line-height: 0; font-size: 0;" cellpading="0" cellspacing="0">';
-        foreach ($grid as $row) {
-            $html .= '<tr style="padding: 0; margin: 0; height: 1px;">'; // Ajusta a 2px si sale demasiado pequeño
-            foreach ($row as $cell) {
-                // Si la celda es 1 pintamos negro, si es 0 blanco absoluto
-                $color = ($cell == 1) ? '#000000' : '#FFFFFF';
-                $html .= '<td style="width: 1px; height: 1px; background-color: ' . $color . '; padding: 0; margin: 0;"></td>';
-            }
-            $html .= '</tr>';
-        }
-        $html .= '</table>';
+        // El ancho y alto total dependen del tamaño de la matriz
+        $totalWidth = count($grid[0]) * $pixelSize;
+        $totalHeight = count($grid) * $pixelSize;
+        $shadowString = implode(', ', $shadows);
+
+        // Creamos un contenedor contenedor con la sombra para dibujar el código
+        $html = '<div style="position: relative; width: ' . $totalWidth . 'px; height: ' . $totalHeight . 'px; background: #FFFFFF; margin: auto;">';
+        $html .= '<div style="position: absolute; left: -' . $pixelSize . 'px; top: -' . $pixelSize . 'px; width: ' . $pixelSize . 'px; height: ' . $pixelSize . 'px; background: transparent; box-shadow: ' . $shadowString . '; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div>';
+        $html .= '</div>';
 
         return $html;
     } catch (\Exception $e) {
@@ -135,25 +142,24 @@ try {
         font-size: 5px;
         box-sizing: border-box;
         margin: 0.3mm;
-        background-color: white;
+        background-color: #FFFFFF !important;
     }
 
     .row {
         display: flex;
     }
 
-    /* Contenedor del QR modificado a tamaño fijo para evitar desbordes */
     .bloque1 {
-        width: 13mm;
+        width: 14mm;
         height: 14mm;
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: white !important;
+        background-color: #FFFFFF !important;
     }
 
     .bloque2 {
-        width: 17mm;
+        width: 16mm;
         height: 14.9mm;
         padding-top: 6px;
     }
@@ -163,17 +169,15 @@ try {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
-        .label, .bloque1, .qr, table, td {
-            background-color: white !important;
+        .label, .bloque1, .qr {
+            background-color: #FFFFFF !important;
         }
     }
 
-    /* Área del QR aislada */
     .qr {
-        display: inline-block;
-        background-color: white !important;
-        padding: 4px; /* Zona de silencio obligatoria */
-        box-sizing: border-box;
+        display: block;
+        background-color: #FFFFFF !important;
+        padding: 4px; /* Margen de silencio esencial */
     }
 
     .smallbox {
@@ -183,6 +187,7 @@ try {
         margin-bottom: 1px;
         white-space: nowrap;
         overflow: hidden;
+        background-color: #FFFFFF;
     }
     .smallbox1 {
         border: 1px solid black;
@@ -191,6 +196,7 @@ try {
         margin-bottom: 1px;
         white-space: nowrap;
         overflow: hidden;
+        background-color: #FFFFFF;
     }
 </style>
 </head>
