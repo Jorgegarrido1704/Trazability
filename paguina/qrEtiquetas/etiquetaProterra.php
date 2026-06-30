@@ -39,7 +39,7 @@ function generarDataMatrixHTML($texto, $sizeMM = 10) {
                     // Calculamos la posición exacta de cada píxel negro
                     $posX = $x * $pixelSize;
                     $posY = $y * $pixelSize;
-                    $shadows[] = "{$posX}px {$posY}px 0 #0000007a";
+                    $shadows[] = "{$posX}px {$posY}px 0 #000000c1";
                 }
             }
         }
