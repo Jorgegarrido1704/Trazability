@@ -25,8 +25,8 @@ function generarDataMatrixHTML($texto, $sizeMM = 10) {
         $numRows = count($grid);
 
         // Conversión mm -> px a 96dpi (estándar de render del navegador)
-        $mmToPx = 3.7795275591;
-
+       // $mmToPx = 3.7795275591;
+        $mmToPx = 3.8;
         // pixelSize EXACTO para que el total dé el tamaño deseado en mm,
         // sin importar cuántos módulos tenga la matriz generada
         $pixelSize = ($sizeMM * $mmToPx) / $numCols;
