@@ -5,7 +5,8 @@ require '../../vendor/autoload.php';
 date_default_timezone_set("America/Mexico_City");
 
 // FUNCIÓN DEFINITIVA: Genera el DataMatrix usando sombras CSS (Garantiza nitidez y visibilidad)
-function generarDataMatrixHTML($texto) {
+// $sizeMM controla el tamaño FÍSICO final del código (ancho = alto), independiente de cuántos módulos tenga la matriz.
+function generarDataMatrixHTML($texto, $sizeMM = 10) {
     try {
         $barcode = new \Com\Tecnick\Barcode\Barcode();
         $bobj = $barcode->getBarcodeObj(
@@ -20,7 +21,16 @@ function generarDataMatrixHTML($texto) {
         $grid = $bobj->getGridArray();
         if (!is_array($grid)) return '';
 
-        $pixelSize = 1; // Tamaño de cada módulo en píxeles. 2px o 3px es perfecto para 9mm.
+        $numCols = count($grid[0]);
+        $numRows = count($grid);
+
+        // Conversión mm -> px a 96dpi (estándar de render del navegador)
+        $mmToPx = 3.7795275591;
+
+        // pixelSize EXACTO para que el total dé el tamaño deseado en mm,
+        // sin importar cuántos módulos tenga la matriz generada
+        $pixelSize = ($sizeMM * $mmToPx) / $numCols;
+
         $shadows = array();
 
         foreach ($grid as $y => $row) {
@@ -29,17 +39,17 @@ function generarDataMatrixHTML($texto) {
                     // Calculamos la posición exacta de cada píxel negro
                     $posX = $x * $pixelSize;
                     $posY = $y * $pixelSize;
-                    $shadows[] = "{$posX}px {$posY}px 0 #000000";
+                    $shadows[] = "{$posX}px {$posY}px 0 #0000007a";
                 }
             }
         }
 
         // El ancho y alto total dependen del tamaño de la matriz
-        $totalWidth = count($grid[0]) * $pixelSize;
-        $totalHeight = count($grid) * $pixelSize;
+        $totalWidth = $numCols * $pixelSize;
+        $totalHeight = $numRows * $pixelSize;
         $shadowString = implode(', ', $shadows);
 
-        // Creamos un contenedor contenedor con la sombra para dibujar el código
+        // Creamos un contenedor con la sombra para dibujar el código
         $html = '<div style="position: relative; width: ' . $totalWidth . 'px; height: ' . $totalHeight . 'px; background: #FFFFFF; margin: auto;">';
         $html .= '<div style="position: absolute; left: -' . $pixelSize . 'px; top: -' . $pixelSize . 'px; width: ' . $pixelSize . 'px; height: ' . $pixelSize . 'px; background: transparent; box-shadow: ' . $shadowString . '; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div>';
         $html .= '</div>';
@@ -214,7 +224,7 @@ for($j = $inicio; $j <= $cuentas; $j++){
         $consecutivoSerial = $j;
     }
     $data = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivoSerial;
-    $qrcode = generarDataMatrixHTML($data);
+    $qrcode = generarDataMatrixHTML($data, 10); // <-- tamaño en mm aquí
 ?>
     <div class="sheet">
         <div class="label">
