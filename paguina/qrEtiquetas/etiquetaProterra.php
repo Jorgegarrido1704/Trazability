@@ -11,17 +11,44 @@ function generarDataMatrixHTML($texto) {
         $bobj = $barcode->getBarcodeObj(
             'DATAMATRIX', 
             $texto,       
-            3, // Tamaño base del módulo (píxeles pequeños para prevenir desbordes)
-            3, 
-            'black', 
-            array(0, 0, 0, 0) // Sin márgenes internos de librería para controlarlo nosotros por CSS
-        )->setBackgroundColor('white');
+            4, // Escalado de módulo (un poco más grande para evitar distorsión)
+            4, 
+            '#000000', // Negro absoluto en Hexadecimal
+            array(0, 0, 0, 0)
+        )->setBackgroundColor('#FFFFFF'); // Blanco absoluto en Hexadecimal
 
-        // Renderizar en PNG Base64 en lugar de bloques HTML estructurados con DIVs
-        $pngData = base64_encode($bobj->getPngData());
+        // 1. Obtenemos los datos en bruto del PNG
+        $rawPng = $bobj->getPngData();
+
+        // 2. Re-procesamos la imagen con la librería GD de PHP (incluida por defecto)
+        // Esto elimina cualquier canal alfa/transparencia oculto y la aplana a Blanco y Negro puro.
+        $im = imagecreatefromstring($rawPng);
+        if ($im !== false) {
+            $width = imagesx($im);
+            $height = imagesy($im);
+            
+            // Crear una nueva imagen con paleta (truecolor falso) para asegurar que no haya transparencias
+            $bg = imagecreatetruecolor($width, $height);
+            $white = imagecolorallocate($bg, 255, 255, 255);
+            imagefill($bg, 0, 0, $white);
+            
+            // Copiar el DataMatrix sobre el fondo blanco puro
+            imagecopy($bg, $im, 0, 0, 0, 0, $width, $height);
+            
+            // Guardar el resultado en un buffer como PNG plano
+            ob_start();
+            imagepng($bg);
+            $pngDataFinal = base64_encode(ob_get_clean());
+            
+            imagedestroy($im);
+            imagedestroy($bg);
+            
+            return '<img src="data:image/png;base64,' . $pngDataFinal . '" style="width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges;" />';
+        }
+
+        // Si falla el procesamiento GD, usamos el fallback normal en Base64
+        return '<img src="data:image/png;base64,' . base64_encode($rawPng) . '" style="width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges;" />';
         
-        // El atributo 'image-rendering: pixelated' obliga al navegador a mantener bordes ultra-nítidos
-        return '<img src="data:image/png;base64,' . $pngData . '" style="width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges;" />';
     } catch (\Exception $e) {
         return '<span style="color:red; font-size:4px;">Error: ' . $e->getMessage() . '</span>';
     }
