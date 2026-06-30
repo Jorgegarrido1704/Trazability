@@ -11,8 +11,8 @@ function generarDataMatrixHTML($texto) {
         $bobj = $barcode->getBarcodeObj(
             'DATAMATRIX', 
             $texto,       
-            1, 
-            1, 
+            40, 
+            40, 
             'black', 
             array(0, 0, 0, 0)
         )->setBackgroundColor('white');
@@ -20,7 +20,7 @@ function generarDataMatrixHTML($texto) {
         $grid = $bobj->getGridArray();
         if (!is_array($grid)) return '';
 
-        $pixelSize = 2; // Tamaño de cada módulo en píxeles. 2px o 3px es perfecto para 9mm.
+        $pixelSize = 3; // Tamaño de cada módulo en píxeles. 2px o 3px es perfecto para 9mm.
         $shadows = array();
 
         foreach ($grid as $y => $row) {
