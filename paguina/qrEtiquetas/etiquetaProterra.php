@@ -4,22 +4,26 @@ require '../../vendor/autoload.php';
 
 date_default_timezone_set("America/Mexico_City");
 
-// Mover la función aquí arriba evita el Fatal Error por duplicación en el bucle
+// Función optimizada para generar imágenes perfectas para impresión térmica milimétrica
 function generarDataMatrixHTML($texto) {
     try {
         $barcode = new \Com\Tecnick\Barcode\Barcode();
         $bobj = $barcode->getBarcodeObj(
             'DATAMATRIX', 
             $texto,       
-            50,           
-            50,           
-            'black', // Color negro para asegurar contraste máximo    
-            array(-1, -1, -1, -1) // Espacio blanco alrededor
+            3, // Tamaño base del módulo (píxeles pequeños para prevenir desbordes)
+            3, 
+            'black', 
+            array(0, 0, 0, 0) // Sin márgenes internos de librería para controlarlo nosotros por CSS
         )->setBackgroundColor('white');
 
-        return $bobj->getHtmlDiv(); 
+        // Renderizar en PNG Base64 en lugar de bloques HTML estructurados con DIVs
+        $pngData = base64_encode($bobj->getPngData());
+        
+        // El atributo 'image-rendering: pixelated' obliga al navegador a mantener bordes ultra-nítidos
+        return '<img src="data:image/png;base64,' . $pngData . '" style="width: 100%; height: 100%; image-rendering: pixelated; image-rendering: crisp-edges;" />';
     } catch (\Exception $e) {
-        return '<span style="color:red;">Error: ' . $e->getMessage() . '</span>';
+        return '<span style="color:red; font-size:4px;">Error: ' . $e->getMessage() . '</span>';
     }
 }
 
@@ -58,7 +62,6 @@ try {
 
         // PROCESAMIENTO E INSERCIÓN EN BD
         for($i = $inicio; $i <= $cuentas; $i++){
-            // str_pad añade los ceros a la izquierda automáticamente (ej: 001, 015, 100)
             $consecutivo = str_pad($i, 3, "0", STR_PAD_LEFT);
             if($np == '300-157000R01-R'){
                 $np = '300-1922-00-R01';
@@ -127,6 +130,9 @@ try {
         padding-left: 3px;
         width: 14mm;
         height: 15mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .bloque2 {
@@ -141,24 +147,31 @@ try {
             print-color-adjust: exact !important;
         }
         
-        .qr, .qr div, .qr svg {
+        .qr, .qr img {
             display: block !important;
             visibility: visible !important;
-            opacity: 0.9 !important;
+            opacity: 1 !important;
         }
     }
 
+    /* Reducido ligeramente a 9.2mm para forzar "Zona de Silencio" blanca perimetral obligatoria */
     .qr {
-        width: 11.5mm !important;
-        height: 11.5mm !important;
+        width: 9.2mm !important;
+        height: 9.2mm !important;
         display: block;
-        padding-top: 5px;
-        margin-left: 3px;
+        background: white;
+        padding: 0.4mm; /* Margen de aislamiento para el lector óptico */
+        box-sizing: border-box;
     }
 
-    /* Asegurar visibilidad de los vectores del Data Matrix */
-    .qr div, .qr div * {
-        visibility: visible !important;
+    /* Forzar al motor del navegador a renderizar sin suavizado difuminado */
+    .qr img {
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -o-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        image-rendering: pixelated;
+        -ms-interpolation-mode: nearest-neighbor;
     }
 
     .smallbox {
