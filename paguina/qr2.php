@@ -19,7 +19,7 @@ $today = date('mdY');
         if (substr($rev, 0, 4) == "PPAP" or substr($rev, 0, 4) == "PRIM") {
             $rev = substr($rev, 5);
         }
-        if($np=='300-1570-00-R01' or $np == '300-1922-00-R01'){
+        if($np=='300-1570-00-R01' or $np == '300-1922-00-R01' or $np=='300-157000R01-R'){
             header("Location:qrEtiquetas/etiquetaProterra.php?wo=$wo&cons=$cons");
             exit;
         }

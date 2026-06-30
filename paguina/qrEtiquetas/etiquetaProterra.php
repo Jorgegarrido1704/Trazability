@@ -60,6 +60,9 @@ try {
         for($i = $inicio; $i <= $cuentas; $i++){
             // str_pad añade los ceros a la izquierda automáticamente (ej: 001, 015, 100)
             $consecutivo = str_pad($i, 3, "0", STR_PAD_LEFT);
+            if($np == '300-157000R01-R'){
+                $np = '300-1922-00-R01';
+            }
             $dataDB = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivo;
             mysqli_query($con, "INSERT INTO `registroqrs`( `infoQr`, `CodigoIdentificaicon`, `fecha`) VALUES ('$info','$dataDB','$todayDate')");
         }
