@@ -29,8 +29,7 @@ try {
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
-            AND r.programado = 1 
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
+            AND r.programado = 1  AND r.count IN ('2','3','17')  AND c.tamano >0
                                              ORDER BY
                                              c.urgencia DESC, 
                                              c.aws ASC, 
@@ -48,8 +47,7 @@ try {
           JOIN registro r ON c.wo = r.wo 
                                               WHERE c.cutStatus != 'Cortado' 
             AND r.programado = 1 AND `maq_asignada` = '$maquina'
-                                             AND  (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
+                                              AND c.tamano >0 AND r.count IN ('2','3','17')
                                              ORDER BY  c.urgencia DESC, c.aws ASC, 
                                              c.term1 ASC,
                                              CASE 

@@ -8,55 +8,20 @@ try {
     $maxtime = 135000*3;
     $tiempoTotal = 0; 
 
-    if ($maquina == "ESPECIALES") {
+    if ($maquina == 'todas') {
+        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
+               FROM corte c 
+               JOIN registro r ON c.wo = r.wo 
+               WHERE c.cutStatus != 'Cortado' AND r.programado = 1  AND c.tamano >0 AND r.count IN ('2','3','17')
+               ORDER BY c.urgencia DESC,c.wo ASC, c.cons ASC";
+    } else {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
                JOIN registro r ON c.wo = r.wo 
                WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND maq_asignada = '>10' AND c.tamano >0
+               AND r.programado = 1 AND maq_asignada = '$maquina' AND c.tamano >0 AND r.count IN ('2','3','17')
                ORDER BY c.urgencia DESC,c.wo ASC, c.cons ASC";
-    } elseif ($maquina == "MCUT-1") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND maq_asignada = 'MCUT-1' AND c.tamano >0
-               ORDER BY c.urgencia DESC,c.wo ASC, c.cons ASC";
-    } elseif ($maquina == "MCUT-6") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND maq_asignada = 'MCUT-6' AND c.tamano >0
-               ORDER BY c.urgencia DESC,c.wo ASC, c.cons ASC";
-    } elseif ($maquina == "MCUT-10") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND maq_asignada = 'MCUT-10' AND c.tamano >0
-               ORDER BY c.urgencia DESC,c.wo ASC, c.cons ASC";
-    } elseif ($maquina == "MCUT-5") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND `maq_asignada` = 'MCUT-5' AND c.tamano >0
-               ORDER BY c.urgencia DESC,c.wo ASC, c.cons ASC";
-    } elseif ($maquina == "MCUT-4") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND `maq_asignada` = 'MCUT-4' AND c.tamano > 0
-               ORDER BY c.urgencia DESC,c.wo ASC, c.cons ASC";
-    } else if ($maquina == 'todas') {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' AND r.programado = 1 AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
-               ORDER BY c.urgencia DESC,c.wo ASC, c.cons ASC";
-    }
+    } 
 
     if (!isset($con) || !$con) {
         throw new Exception("La variable de conexión no está definida correctamente.");
