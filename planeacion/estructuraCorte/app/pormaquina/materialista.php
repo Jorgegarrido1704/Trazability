@@ -23,104 +23,8 @@ try {
     $i = 0;
        
     
-    if ($maquina == "ESPECIALES") {
-       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
-                                             FROM corte c 
-          JOIN registro r ON c.wo = r.wo 
-                                              WHERE c.cutStatus != 'Cortado' 
-            AND r.programado = 1 AND (c.aws < 10 or c.cons LIKE 'C%') AND c.tamano >0
-                                             ORDER BY c.urgencia DESC,
-                                              c.aws ASC, 
-                                             c.term1 ASC,
-                                             CASE 
-                                                WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
-                                                ELSE 1
-                                            END,
-                                            tipo ASC";
-                                             $maxtime=27000*3;
-    }elseif ($maquina == "MCUT-1") {
-       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
-                                             FROM corte c 
-          JOIN registro r ON c.wo = r.wo 
-                                              WHERE c.cutStatus != 'Cortado' 
-            AND r.programado = 1 AND c.aws IN ('10','12','14') AND c.tintaColor='BLANCA'
-                                            AND  (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
-                                             ORDER BY c.urgencia DESC,
-                                              c.aws ASC, 
-                                             c.term1 ASC,
-                                             CASE 
-                                                WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
-                                                ELSE 1
-                                            END,
-                                            tipo ASC";
-                                             $maxtime=27000*3;
-    }elseif ($maquina == "MCUT-6") {
-       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
-                                             FROM corte c 
-          JOIN registro r ON c.wo = r.wo 
-                                              WHERE c.cutStatus != 'Cortado' 
-            AND r.programado = 1 AND c.aws IN ('16','18','20','22','24') AND c.tintaColor='BLANCA'
-                                             AND  (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
-                                             ORDER BY  c.urgencia DESC, c.aws ASC, 
-                                             c.term1 ASC,
-                                             CASE 
-                                                WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
-                                                ELSE 1
-                                            END,
-                                            c.tipo ASC";
-                                             $maxtime=27000*3;
-    }elseif ($maquina == "MCUT-10") {
-       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
-                                             FROM corte c 
-          JOIN registro r ON c.wo = r.wo 
-                                              WHERE c.cutStatus != 'Cortado' 
-            AND r.programado = 1 AND ((c.aws IN ('10','12') AND c.tintaColor='NEGRA'
-                                             ) or (c.aws IN ('18','16','14')   AND (c.term1 LIKE '%Sello%' OR c.term2 LIKE '%Sello%')
-                                             ))  AND c.tipo IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
-                                             ORDER BY c.urgencia DESC,
-                                              c.aws ASC, 
-                                             c.term1 ASC,
-                                             CASE 
-                                                WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
-                                                ELSE 1
-                                            END,
-                                            c.tipo ASC";
-                                             $maxtime=27000*3;
-    }elseif ($maquina == "MCUT-5") {
-       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
-                                             FROM corte c 
-          JOIN registro r ON c.wo = r.wo 
-                                              WHERE c.cutStatus != 'Cortado' 
-            AND r.programado = 1 AND c.aws IN ('14','16') AND c.tintaColor='NEGRA'
-                                             AND  (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
-                                             ORDER BY  c.urgencia DESC, c.aws ASC, 
-                                             c.term1 ASC,
-                                             CASE 
-                                                WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
-                                                ELSE 1
-                                            END,
-                                            c.tipo ASC";
-                                             $maxtime=27000*3;
-    }elseif ($maquina == "MCUT-4") {
-       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
-                                             FROM corte c 
-          JOIN registro r ON c.wo = r.wo 
-                                              WHERE c.cutStatus != 'Cortado' 
-            AND r.programado = 1 AND c.aws IN ('18','20','22','24') AND c.tintaColor='NEGRA'
-                                             AND  (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
-                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
-                                             ORDER BY  c.urgencia DESC, c.aws ASC, 
-                                             c.term1 ASC,
-                                             CASE 
-                                                WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
-                                                ELSE 1
-                                            END,
-                                            c.tipo ASC";
-                                             $maxtime=27000*3;
-    } else if ($maquina == 'todas') {
+    
+     if ($maquina == 'todas') {
        $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
                                              FROM corte c 
           JOIN registro r ON c.wo = r.wo 
@@ -137,6 +41,23 @@ try {
                                             END,
                                             c.tipo ASC
                                             ";
+    }else {
+     
+       $qry ="SELECT c.np, c.color,c.wo,c.codigo, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+                                             FROM corte c 
+          JOIN registro r ON c.wo = r.wo 
+                                              WHERE c.cutStatus != 'Cortado' 
+            AND r.programado = 1 AND `maq_asignada` = '$maquina'
+                                             AND  (c.term1 NOT LIKE '%Sello%' AND c.term2 NOT LIKE '%Sello%')
+                                              AND c.tipo IN ('GXL','TXL','SGX','UL1569')  AND c.tamano >0
+                                             ORDER BY  c.urgencia DESC, c.aws ASC, 
+                                             c.term1 ASC,
+                                             CASE 
+                                                WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
+                                                ELSE 1
+                                            END,
+                                            c.tipo ASC";
+                                             $maxtime=27000*3;
     }
     $listasdecorte= mysqli_query($con,$qry);
     while ($rowlistas = mysqli_fetch_array($listasdecorte)) {

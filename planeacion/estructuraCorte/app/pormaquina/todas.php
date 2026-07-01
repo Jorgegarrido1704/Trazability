@@ -32,67 +32,29 @@ try {
         echo json_encode(["status" => "error", "message" => "$errstr (código $errno)"]);
         exit;
     });
-    if ($maquina == "ESPECIALES") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND `maq_asignada` = '>10'  AND c.tamano >0
-               ORDER BY  c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, tipo ASC";
-        $maxtime = 27000*3;
-    } elseif ($maquina == "MCUT-1") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND `maq_asignada` = 'MCUT-1' AND c.tamano >0
-               ORDER BY  c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, tipo ASC";
-        $maxtime = 27000*3;
-    } elseif ($maquina == "MCUT-6") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND `maq_asignada` = 'MCUT-6' AND c.tamano >0 AND c.tintaColor = 'NEGRA'
-               ORDER BY  c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
-        $maxtime = 27000*3;
-    } elseif ($maquina == "MCUT-10") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1  AND `maq_asignada` = 'MCUT-10' AND c.tamano >0
-               ORDER BY  c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC, c.tintaColor ASC";
-        $maxtime = 27000*3;
-    } elseif ($maquina == "MCUT-5") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND `maq_asignada` = 'MCUT-5' AND c.tamano >0 AND c.tintaColor = 'NEGRA'
-               ORDER BY  c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
-        $maxtime = 27000*3;
-    } elseif ($maquina == "MCUT-4") {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND `maq_asignada` = 'MCUT-4' AND c.tamano >0 AND c.tintaColor = 'NEGRA'
-               ORDER BY  c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
-        $maxtime = 27000*3;
-    } else if ($maquina == 'todas') {
+     if ($maquina == 'todas') {
         $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
                FROM corte c 
                JOIN registro r ON c.wo = r.wo 
                WHERE c.cutStatus != 'Cortado' AND r.programado = 1 AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0
                ORDER BY  c.aws ASC, c.term1 ASC,
                CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
+    }else {
+     
+       $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
+                                             FROM corte c 
+          JOIN registro r ON c.wo = r.wo 
+                                              WHERE c.cutStatus != 'Cortado' 
+            AND r.programado = 1 AND `maq_asignada` = '$maquina'
+                                             AND c.tamano >0
+                                             ORDER BY  c.urgencia DESC, c.aws ASC, 
+                                             c.term1 ASC,
+                                             CASE 
+                                                WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
+                                                ELSE 1
+                                            END,
+                                            c.tipo ASC";
+                                             $maxtime=27000*3;
     }
 
     // SI EN TU ARCHIVO CONECTION.PHP LA VARIABLE SE LLAMA $conexion, CAMBIA ESTO A $conexion
