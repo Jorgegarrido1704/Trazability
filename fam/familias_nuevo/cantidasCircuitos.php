@@ -45,6 +45,6 @@ while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
     <title>registro Familias</title>
 </head>
 <body>
-        <button onclick="window.location.href='procesos.php'">Ver Cantidades de procesos</button>
+        <button onclick="window.location.href='prosesos.php'">Ver Cantidades de procesos</button>
 </body>
 </html>
