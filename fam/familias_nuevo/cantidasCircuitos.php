@@ -4,14 +4,14 @@ try {
     
 
 //$delete=mysqli_query($con,"DELETE FROM familias");
-$buscarFamilias=mysqli_query($con,"SELECT pn FROM familias WHERE familia_circuitos IS NULL  ORDER BY pn  ASC ");
+$buscarFamilias=mysqli_query($con,"SELECT pn FROM familias WHERE familia_circuitos IS NULL  ORDER BY pn  ASC LIMIT 100");
 while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
 
     $familia="";
+    $subFamilia=0;
     $pn_routing=$rowFamilias['pn'];
-    $revisarCircuitos=mysqli_query($con,"SELECT COUNT(*) AS cantidad FROM listascorte WHERE pn='$pn_routing' ");
-    $rowCircuitos=mysqli_fetch_array($revisarCircuitos);
-    $cantidad=$rowCircuitos['cantidad'];
+    $revisarCircuitos=mysqli_query($con,"SELECT cons,terminal2,terminal1 FROM listascorte WHERE pn='$pn_routing' ");
+    $cantidad=mysqli_num_rows($revisarCircuitos);
    
     switch ($cantidad) {
         case $cantidad >= 150:
@@ -30,8 +30,40 @@ while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
         default:
             $familia = 'E';
     }
-    $updateFamilia=mysqli_query($con,"UPDATE familias SET familia_circuitos='$familia', cantidad_circuitos='$cantidad' WHERE pn='$pn_routing'");
+    while($rowCircuitos=mysqli_fetch_array($revisarCircuitos)){
+        $terminal2=$rowCircuitos['terminal2'];
+        $terminal1=$rowCircuitos['terminal1'];
+        $cons=$rowCircuitos['cons'];
+       if(strpos($cons,"C")){
+            $subFamilia=5;
+       }else if(strpos($cons,"T") || strpos($terminal2,"SOLDAR") || strpos($terminal1,"SOLDAR")){
+            if($subFamilia<4){
+                $subFamilia=4;
+            }
+       }else if(strpos($terminal2,"Empalme") || strpos($terminal1,"Empalme")){
+            if($subFamilia<3){
+                $subFamilia=3;
+            }
+       }else if(strpos($terminal2,"SELLO") || strpos($terminal1,"SELLO")){   
+            if($subFamilia<2){
+                $subFamilia=2;
+            }
+       }else {
+            if($subFamilia<1){
+                $subFamilia=1;
+            }
+       }
+            
+
+    }
+
+
+    $updateFamilia=mysqli_query($con,"UPDATE familias SET familia_circuitos='$familia', cantidad_circuitos='$cantidad', subfamilia='$subFamilia' WHERE pn='$pn_routing'");
     
+}
+$buscarfaltanres= mysqli_query($con,"SELECT pn FROM familias WHERE familia_circuitos IS NULL  ORDER BY pn  ASC");
+if(mysqli_num_rows($buscarfaltanres)>0){
+    echo "Faltan por procesar: ".mysqli_num_rows($buscarfaltanres);
 }
 }catch (Exception $e) {
     echo "Error: " . $e->getMessage();
