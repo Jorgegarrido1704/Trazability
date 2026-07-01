@@ -121,6 +121,9 @@
                     <button class="btn btn-warning" onclick="dashboard('maquinas')">Carga Total</button>
                     <button class="btn btn-success" onclick="dashboard('porMaquinas')">Carga por Máquinas</button>
                     <button class="btn btn-primary" onclick="dashboard('materialistas')">Carga Materialista y Crimpers</button>
+                    <button class="btn btn-warning" onclick="dashboard('configuracionCarga')">Confirguracion de carga</button>
+                
+            
                 </div>
                 
             </div>
@@ -385,6 +388,98 @@
                 </div>
             </div>
         </div>
+        <div class="container-fluid px-4 tab-content-all" id="configuracionCarga">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="card-title mb-0 text-secondary"><i class="bi bi-calendar-week me-2"></i>Seleccionar maquinas a cargar</h5>
+                </div>
+                <div class="card-body p-0">
+                 <form id="formCarga" onsubmit="event.preventDefault(); repartirCarga();">
+                <!-- Fila contenedora con espacio entre elementos (g-3) -->
+                <div class="row g-3">
+                    
+                    <!-- Máquina 1 -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                            <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-1" name="maquinas[]" value="MCUT-1">
+                            <label class="form-check-label fw-semibold text-secondary" for="MCUT-1">
+                                MCUT-1
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Máquina 2 -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                            <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-2" name="maquinas[]" value="MCUT-2">
+                            <label class="form-check-label fw-semibold text-secondary" for="MCUT-2">
+                                MCUT-2
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Máquina 3 -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                            <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-3" name="maquinas[]" value="MCUT-3">
+                            <label class="form-check-label fw-semibold text-secondary" for="MCUT-3">
+                                MCUT-3
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Máquina 4 -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                            <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-4" name="maquinas[]" value="MCUT-4">
+                            <label class="form-check-label fw-semibold text-secondary" for="MCUT-4">
+                                MCUT-4
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Máquina 5 -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                            <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-5" name="maquinas[]" value="MCUT-5">
+                            <label class="form-check-label fw-semibold text-secondary" for="MCUT-5">
+                                MCUT-5
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Máquina 6 -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                            <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-6" name="maquinas[]" value="MCUT-6">
+                            <label class="form-check-label fw-semibold text-secondary" for="MCUT-6">
+                                MCUT-6
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Máquina 7 (Cables Especiales) -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                            <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-7" name="maquinas[]" value="MCUT-7">
+                            <label class="form-check-label fw-semibold text-secondary" for="MCUT-7">
+                                Cables Especiales
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Envío -->
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <button type="submit" class="btn btn-primary px-4 shadow-sm w-100 h-100 d-flex align-items-center justify-content-center">
+                            <i class="fas fa-share-alt me-2"></i> Repartir Carga
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+                </div>
+            </div>
+        </div>
 
     
 
@@ -416,6 +511,7 @@
             document.getElementById('porMaquinas').style.display = 'none'
             document.getElementById('materialistas').style.display = 'none';
             document.getElementById('cargaSemanal').style.display = 'none';
+            document.getElementById('configuracionCarga').style.display = 'none';
             if (section === 'listas') {
                 document.getElementById('listas').style.display = 'block';
                 fetchLists();
@@ -442,6 +538,16 @@
                      window.location.reload();
                 }
                
+            }else if (section === 'configuracionCarga'){
+                document.getElementById('configuracionCarga').style.display = 'block';
+                var codigoDevisual=prompt('Ingrese el codigo de visualización');
+                codigoDevisual = parseInt(codigoDevisual);
+                if (codigoDevisual === codigoOficial){
+                    alert('Bienvenido a la carga de las maquinas');
+                    //ConfiguracionCarga();
+                }else{
+                     window.location.reload();
+                }
             }
 
         }
@@ -846,6 +952,41 @@ function imprimirEtiqueta2() {
                     else { alert("No se pudo cambiar la urgencia: " + data.error); }
                 });
         }
+        function repartirCarga() {
+                        let registrosMaquinas = [];
+                        
+                        // CRÍTICO: Selecciona directamente todos los checkboxes marcados que tengan el name "maquinas[]"
+                        let checkboxesSeleccionados = document.querySelectorAll('input[name="maquinas[]"]:checked');
+                        
+                        checkboxesSeleccionados.forEach(checkbox => {
+                            registrosMaquinas.push(checkbox.value);
+                        });
+
+                        if (registrosMaquinas.length === 0) {
+                            alert("Por favor, selecciona al menos una máquina activa.");
+                            return;
+                        }
+
+                        alert("Se cargará la carga en las siguientes máquinas: " + registrosMaquinas.join(", "));
+
+                        let queryParams = registrosMaquinas.map(m => `maquinas[]=${encodeURIComponent(m)}`).join('&');
+
+                        fetch(`../checoutCorte/updatemaquinas.php?${queryParams}`)
+                            .then(response => {
+                                if (!response.ok) throw new Error("Error en la respuesta del servidor");
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data && !data.error) { 
+                                    window.location.reload(); 
+                                } else { 
+                                    alert("No se pudo procesar la carga: " + (data.error || "Error desconocido")); 
+                                }
+                            })
+                            .catch(error => {
+                                alert("Ocurrió un problema con la petición: " + error.message);
+                            });
+                    }
     </script>
 </body>
 </html>
