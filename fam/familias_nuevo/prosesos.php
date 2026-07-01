@@ -4,7 +4,7 @@ try {
     
 
 //$delete=mysqli_query($con,"DELETE FROM familias");
-$buscarFamilias=mysqli_query($con,"SELECT pn FROM familias WHERE procesos IS NULL  ORDER BY pn  ASC");
+$buscarFamilias=mysqli_query($con,"SELECT pn FROM familias WHERE procesos IS NULL  ORDER BY pn  ASC LIMIT 300");
 while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
     $works="";
     
@@ -23,6 +23,10 @@ while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
     }
 }catch (Exception $e) {
     echo "Error: " . $e->getMessage();
+}
+$buscarfaltanres= mysqli_query($con,"SELECT pn FROM familias WHERE procesos IS NULL  ORDER BY pn  ASC");
+if(mysqli_num_rows($buscarfaltanres)>0){
+    echo "Faltan por procesar: ".mysqli_num_rows($buscarfaltanres);
 }
 ?>
 <!DOCTYPE html>

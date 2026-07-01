@@ -4,7 +4,7 @@ try {
     
 
 //$delete=mysqli_query($con,"DELETE FROM familias");
-$buscarFamilias=mysqli_query($con,"SELECT pn FROM familias WHERE familia_circuitos IS NULL  ORDER BY pn  ASC LIMIT 100");
+$buscarFamilias=mysqli_query($con,"SELECT pn FROM familias WHERE familia_circuitos IS NULL  ORDER BY pn  ASC LIMIT 300");
 while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
 
     $familia="";
@@ -34,7 +34,7 @@ while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
         $terminal2=$rowCircuitos['terminal2'];
         $terminal1=$rowCircuitos['terminal1'];
         $cons=$rowCircuitos['cons'];
-       if(strpos($cons,"C")){
+       if(strpos($cons,"CORTE")){
             $subFamilia=5;
        }else if(strpos($cons,"T") || strpos($terminal2,"SOLDAR") || strpos($terminal1,"SOLDAR")){
             if($subFamilia<4){
