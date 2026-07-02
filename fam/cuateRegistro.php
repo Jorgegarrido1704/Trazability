@@ -107,14 +107,14 @@ if ($datos != '') {
     foreach ($compatibilidad as $pn => $matches) {
         $porcentaje = round(($matches / $totalItems) * 100, 2);
 
-        if ($porcentaje >= 50) {
+        if ($porcentaje >= 30) {
             $encontroCoincidencias = true;
             echo "Compatibilidad con <strong>$pn</strong> : $porcentaje% ($matches de $totalItems items)<br>";
         }
     }
 
     if (!$encontroCoincidencias) {
-        echo "No se encontraron otros números de parte del cliente con más del 60% de compatibilidad.";
+        echo "No se encontraron otros números de parte del cliente con más del 30% de compatibilidad.";
     }
 
 } else {
