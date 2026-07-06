@@ -86,7 +86,7 @@
 <script>
     window.onload = function() {
         var today = new Date().toISOString().split('T')[0];
-        var yesterday = new Date(Date.now()-(24*60*60*1000)).toISOString().split('T')[0];
+        var yesterday = new Date(Date.now()-(2*24*60*60*1000)).toISOString().split('T')[0];
         document.getElementById("dateRegistered").value=yesterday;
         document.getElementById("dateRegistered").setAttribute('max', today);
         document.getElementById("dateRegistered").setAttribute('min', yesterday);
