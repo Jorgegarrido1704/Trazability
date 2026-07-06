@@ -113,7 +113,7 @@ try {
 
         if (stripos($term1, "Sello") !== false || stripos($term2, "Sello") !== false) {
             $rango = 'sello';
-        } elseif (stripos($cons, "Corte") !== false || stripos($cons, "CORTE") !== false) {
+        } elseif (stripos($cons, "C") !== false || stripos($cons, "C") !== false) {
             $rango = '>10';
         } else {
             if ($calibre == 10 || $calibre == 12) {
