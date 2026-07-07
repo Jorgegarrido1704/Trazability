@@ -5,7 +5,7 @@ try {
     $maquina = isset($_GET['maquina']) ? $_GET['maquina'] : 'todas';
     $calibres = [];
     $totalCables = 0;
-    $maxtime = 135000*3;
+   
     $tiempoTotal = 0; 
 
     if ($maquina == 'todas') {

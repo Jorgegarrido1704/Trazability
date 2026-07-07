@@ -6,8 +6,9 @@ try {
     if(!$codigo) {
         throw new Exception("Código ausente.");
     }
+    $fechaCorte = date('Y-m-d H:i:s');
   
-    $changeEstatus = "UPDATE corte SET cutStatus='Cortado' WHERE codigo='$codigo'";
+    $changeEstatus = "UPDATE corte SET cutStatus='Cortado', fechaCorte='$fechaCorte' WHERE codigo='$codigo'";
     mysqli_query($con, $changeEstatus);
     
     $buscarWo = mysqli_query($con, "SELECT wo FROM corte WHERE codigo='$codigo'");
@@ -20,6 +21,7 @@ try {
         if (mysqli_num_rows($buscar) == 0) {
             mysqli_query($con, "UPDATE registro SET count='4', donde='En espera de liberacion' WHERE wo='$wo'");
             mysqli_query($con, "UPDATE registroparcial SET libePar=libePar+cortPar, cortPar='0' WHERE wo='$wo'");
+            mysqli_query($con, "UPDATE timesharn SET cutF='$fechaCorte' WHERE wo='$wo'");
         }
     }
     
