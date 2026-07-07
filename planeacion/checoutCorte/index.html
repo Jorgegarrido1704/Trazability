@@ -239,7 +239,9 @@
             Promise.all(promesas)
             .then(resultados => {
                 console.log("Lote procesado con éxito:", resultados);
-                pormaquina();
+                alert(`Se han procesado ${resultados.length} elementos correctamente.`);
+                window.location.reload();
+                
             })
             .catch(err => {
                 console.error("Error procesando lote:", err);
