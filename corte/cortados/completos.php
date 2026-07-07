@@ -11,22 +11,13 @@ try {
             COUNT(*) as total_cortes,
             SUM(CASE WHEN cutStatus = 'Activo' THEN 1 ELSE 0 END) as activos,
             ROUND((SUM(CASE WHEN cutStatus != 'Activo' THEN 1 ELSE 0 END) / COUNT(*)) * 100, 2) as porcentaje_activos
-        FROM `corte` 
+        FROM `corte` JOIN timesharn t ON corte.wo = t.wo
         GROUP BY np, wo
         ORDER BY wo DESC
     ";
 
     $cortes = mysqli_query($con, $query);
-    foreach ($cortes as $corte) {
-        $buscarTiemposFinales = mysqli_query($con, "SELECT cutF FROM timesharn WHERE  wo='{$corte['wo']}'");
-        if ($buscarTiemposFinales && mysqli_num_rows($buscarTiemposFinales) > 0) {
-            $tiempoFinal = mysqli_fetch_assoc($buscarTiemposFinales)['cutF'];
-            $corte['tiempo_final'] = $tiempoFinal;
-        } else {
-            $corte['tiempo_final'] = null;
-        }
-
-    }
+    
 
     if (!$cortes) {
         throw new Exception("Error en la consulta: " . mysqli_error($con));
@@ -182,7 +173,7 @@ try {
                                 </td>
                                   <td class="text-center">
                                     <span class="badge bg-info text-dark px-2 py-1 fs-6">
-                                        <?php echo $corte['tiempo_final']; ?>
+                                        <?php echo $corte['cutF']; ?>
                                     </span>
                                 </td>
                                 <td class="pe-4">
