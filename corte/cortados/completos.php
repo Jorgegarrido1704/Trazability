@@ -17,6 +17,16 @@ try {
     ";
 
     $cortes = mysqli_query($con, $query);
+    foreach ($cortes as $corte) {
+        $buscarTiemposFinales = mysqli_query($con, "SELECT cutF FROM timesharn WHERE  wo='{$corte['wo']}'");
+        if ($buscarTiemposFinales && mysqli_num_rows($buscarTiemposFinales) > 0) {
+            $tiempoFinal = mysqli_fetch_assoc($buscarTiemposFinales)['cutF'];
+            $corte['tiempo_final'] = $tiempoFinal;
+        } else {
+            $corte['tiempo_final'] = null;
+        }
+
+    }
 
     if (!$cortes) {
         throw new Exception("Error en la consulta: " . mysqli_error($con));
@@ -124,6 +134,7 @@ try {
                             <th class="py-3 text-center">Cantidad Orden</th>
                             <th class="py-3 text-center">Total Cortes</th>
                             <th class="py-3 text-center">Cortes Activos</th>
+                            <th class="py-3 text-center">Fecha de Ultimo Corte</th>
                             <th class="py-3 pe-4" style="width: 30%;">Progreso de Cortes Activos</th>
                         </tr>
                     </thead>
@@ -167,6 +178,11 @@ try {
                                 <td class="text-center">
                                     <span class="badge bg-info text-dark px-2 py-1 fs-6">
                                         <?php echo $corte['activos']; ?>
+                                    </span>
+                                </td>
+                                  <td class="text-center">
+                                    <span class="badge bg-info text-dark px-2 py-1 fs-6">
+                                        <?php echo $corte['tiempo_final']; ?>
                                     </span>
                                 </td>
                                 <td class="pe-4">
