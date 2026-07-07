@@ -6,7 +6,7 @@ try {
     $query = "
         SELECT 
             np,
-            wo,
+            corte.wo,
             qty,
             COUNT(*) as total_cortes,
             SUM(CASE WHEN cutStatus = 'Activo' THEN 1 ELSE 0 END) as activos,
@@ -155,7 +155,7 @@ try {
                                 <td>
                                     <a href="detalle_corte.php?wo=<?php echo urlencode($corte['wo']); ?>" class="text-decoration-none">
                                         <span class="badge badge-wo px-3 py-2 rounded-pill" style="cursor: pointer;">
-                                            <i class="fa-solid fa-eye me-1 small"></i> <?php echo htmlspecialchars($corte['corte.wo']); ?>
+                                            <i class="fa-solid fa-eye me-1 small"></i> <?php echo htmlspecialchars($corte['wo']); ?>
                                         </span>
                                     </a>
                                 </td>
