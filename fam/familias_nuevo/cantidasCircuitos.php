@@ -10,7 +10,7 @@ while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
     $familia="";
     $subFamilia=0;
     $pn_routing=$rowFamilias['pn'];
-    $revisarCircuitos=mysqli_query($con,"SELECT cons,terminal2,terminal1 FROM listascorte WHERE pn='$pn_routing' ");
+    $revisarCircuitos=mysqli_query($con,"SELECT cons,terminal2,terminal1 FROM listascorte WHERE pn='$pn_routing' ORDER BY cons  ASC");
     $cantidad=mysqli_num_rows($revisarCircuitos);
    
     switch ($cantidad) {
@@ -34,25 +34,26 @@ while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
         $terminal2=$rowCircuitos['terminal2'];
         $terminal1=$rowCircuitos['terminal1'];
         $cons=$rowCircuitos['cons'];
-       if(strpos($cons,"C" ) || strpos($cons,"c")){
-            $subFamilia=5;
-       }else if(strpos($cons,"T") || strpos($terminal2,"SOLDAR") || strpos($terminal1,"SOLDAR")){
-            if($subFamilia<=4){
-                $subFamilia=4;
+      // Usamos stripos para buscar 'c' sin importar si es mayúscula o minúscula
+        if (stripos($cons, "C") !== false) {
+            $subFamilia = 5;
+        } else if (stripos($cons, "T") !== false || stripos($terminal2, "SOLDAR") !== false || stripos($terminal1, "SOLDAR") !== false) {
+            if ($subFamilia <= 4) {
+                $subFamilia = 4;
             }
-       }else if(strpos($terminal2,"Empalme") || strpos($terminal1,"Empalme")){
-            if($subFamilia<=3){
-                $subFamilia=3;
+        } else if (stripos($terminal2, "Empalme") !== false || stripos($terminal1, "Empalme") !== false) {
+            if ($subFamilia <= 3) {
+                $subFamilia = 3;
             }
-       }else if(strpos($terminal2,"SELLO") || strpos($terminal1,"SELLO")){   
-            if($subFamilia<=2){
-                $subFamilia=2;
+        } else if (stripos($terminal2, "SELLO") !== false || stripos($terminal1, "SELLO") !== false) {   
+            if ($subFamilia <= 2) {
+                $subFamilia = 2;
             }
-       }else {
-            if($subFamilia<=1){
-                $subFamilia=1;
+        } else {
+            if ($subFamilia <= 1) {
+                $subFamilia = 1;
             }
-       }
+        }
             
 
     }
@@ -64,7 +65,14 @@ while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
 $buscarfaltanres= mysqli_query($con,"SELECT pn FROM familias WHERE familia_circuitos IS NULL  ORDER BY pn  ASC");
 if(mysqli_num_rows($buscarfaltanres)>0){
     echo "Faltan por procesar: ".mysqli_num_rows($buscarfaltanres);
+   
+        echo "Se procesaran 300 registros en 15 seg";
+        header("Refresh: 15; url=cantidasCircuitos.php");
+    
 }
+else{
+        header("Refresh: 15; url=prosesos.php");
+    }
 }catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }

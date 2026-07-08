@@ -27,7 +27,11 @@ while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
 $buscarfaltanres= mysqli_query($con,"SELECT pn FROM familias WHERE procesos IS NULL  ORDER BY pn  ASC");
 if(mysqli_num_rows($buscarfaltanres)>0){
     echo "Faltan por procesar: ".mysqli_num_rows($buscarfaltanres);
+        echo "Se procesaran 300 registros en 15 seg";
+        header("Refresh: 15; url=procesos.php");
+    
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
