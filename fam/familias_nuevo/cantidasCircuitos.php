@@ -37,19 +37,19 @@ while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
        if(strpos($cons,"C" ) || strpos($cons,"c")){
             $subFamilia=5;
        }else if(strpos($cons,"T") || strpos($terminal2,"SOLDAR") || strpos($terminal1,"SOLDAR")){
-            if($subFamilia<4){
+            if($subFamilia<=4){
                 $subFamilia=4;
             }
        }else if(strpos($terminal2,"Empalme") || strpos($terminal1,"Empalme")){
-            if($subFamilia<3){
+            if($subFamilia<=3){
                 $subFamilia=3;
             }
        }else if(strpos($terminal2,"SELLO") || strpos($terminal1,"SELLO")){   
-            if($subFamilia<2){
+            if($subFamilia<=2){
                 $subFamilia=2;
             }
        }else {
-            if($subFamilia<1){
+            if($subFamilia<=1){
                 $subFamilia=1;
             }
        }

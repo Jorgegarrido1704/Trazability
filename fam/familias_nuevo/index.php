@@ -4,10 +4,10 @@ try {
     
 
 $delete=mysqli_query($con,"DELETE FROM familias");
-$buscarFamilias=mysqli_query($con,"SELECT DISTINCT pn_routing FROM routing_models  ORDER BY pn_routing  ASC ");
+$buscarFamilias=mysqli_query($con,"SELECT DISTINCT pn FROM listascorte  ORDER BY pn  ASC ");
 while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
    
-    $pn_routing=$rowFamilias['pn_routing'];
+    $pn_routing=$rowFamilias['pn'];
   
     
     $insertarFamilia=mysqli_query($con,"INSERT INTO familias ( `pn`) VALUES ('$pn_routing')");
