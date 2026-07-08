@@ -34,7 +34,7 @@ while($rowFamilias=mysqli_fetch_array($buscarFamilias)){
         $terminal2=$rowCircuitos['terminal2'];
         $terminal1=$rowCircuitos['terminal1'];
         $cons=$rowCircuitos['cons'];
-       if(strpos($cons,"CORTE")){
+       if(strpos($cons,"C" ) || strpos($cons,"c")){
             $subFamilia=5;
        }else if(strpos($cons,"T") || strpos($terminal2,"SOLDAR") || strpos($terminal1,"SOLDAR")){
             if($subFamilia<4){
