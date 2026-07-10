@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Listas de cortes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="iframe-wrapper" style="
+        width: 100%;
+        height: 100vh;
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+    "></div>
+
+<script>
+try {
+    const iframe = document.createElement("iframe");
+
+    iframe.src = "http://mxloficina.corp.internal.bergstrominc.com:8000/juntas/calidad";
+    iframe.style.width = "100%";
+    iframe.style.height = "2000px";
+    iframe.style.border = "none";
+
+    document.getElementById("iframe-wrapper").appendChild(iframe);
+
+} catch (error) {
+    console.error("Error inserting iframe:", error.message);
+    window.location.href = "rh.html";
+}
+
+function scrollWrapper() {
+    const w = document.getElementById("iframe-wrapper");
+    w.scrollBy({ top: 280, behavior: "smooth" });
+}
+
+function goback() {
+    window.location.href = "rh.html";
+}
+
+setInterval(scrollWrapper, 35000);
+setInterval(goback, 60000);
+</script>
+
+</body>
+</html>
