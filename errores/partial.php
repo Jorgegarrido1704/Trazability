@@ -2,13 +2,17 @@
  require "../app/conection.php";
  date_default_timezone_set("America/Mexico_City");
 
-$datosregistro=mysqli_query($con,"SELECT NumPart,Qty,wo,info,count FROM registro ");
+$datosregistro=mysqli_query($con,"SELECT NumPart,Qty,wo,info,count FROM registro WHERE count NOT IN ('20','12') ");
 while($row=mysqli_fetch_array($datosregistro)){
     $NumPart=$row['NumPart'];
     $Qty=$row['Qty'];
     $wo=$row['wo'];
     $info=$row['info'];
     $count=$row['count'];
+    $buscarcSiExiste=mysqli_query($con,"SELECT * FROM registroparcial WHERE pn='$NumPart' AND wo='$wo' AND codeBar='$info'");
+    if(mysqli_num_rows($buscarcSiExiste)>0){
+        continue;
+    }
     echo $NumPart." ".$Qty." ".$wo." ".$info." ".$count."<br>";
     switch($count){
         case '1':
