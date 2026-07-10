@@ -232,5 +232,5 @@
             document.getElementById('maquina_material_name').textContent = maquina;
             document.getElementById('maquina_material').value = maquina;
             materialista(maquina);
-        }, 5000); // Actualizar cada 5 minutos 1000*5*60
+        }, 1000*2*60); // Actualizar cada 5 minutos 1000*5*60
 </script>
