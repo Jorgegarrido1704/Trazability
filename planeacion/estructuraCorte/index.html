@@ -305,15 +305,9 @@
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-7')">Cables Especiales</button>
                 </div>
             </nav>
-            <nav class="navbar navbar-expand bg-light mb-3 rounded px-2" id="diasCongeladosNav" style="display:none;">
-                <div class="navbar-nav gap-2 align-items-center">
-                    <span class="text-muted small me-2">Días congelados:</span>
-                    <div id="diasCongeladosBotones" class="d-flex gap-2 flex-wrap"></div>
-                    <button class="btn btn-outline-secondary btn-sm ms-3" onclick="verLiveMaquina()">
-                        <i class="bi bi-arrow-repeat me-1"></i>Ver carga en vivo
-                    </button>
-                </div>
-            </nav>
+           <select id="fechaSeleccionada">
+                <option value="todas">Todas las fechas</option>
+            </select>
             <div class="card shadow-sm">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                     <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Lista por máquina</h5>
@@ -713,41 +707,77 @@
 
         function clearFilters(){ window.location.href = 'index.html'; }
 
+        let datosGlobal = [];
+
         function pormaquina() {
             const maquina = document.getElementById('maquinaSeleccionada').value;
-            document.getElementById('maquinaSeleccionada').value = maquina;
 
             fetch(`app/pormaquina/todas.php?maquina=${encodeURIComponent(maquina)}`)
-            .then(response => response.json())
-            .then(data => {
-                
-                if (data.status === "error") {
-                    console.error("Error del servidor:", data.message);
-                    alert("Error en el servidor: " + data.message);
-                    return;
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "error") {
+                        console.error("Error del servidor:", data.message);
+                        alert("Error en el servidor: " + data.message);
+                        return;
+                    }
+
+                    datosGlobal = data;
+                    renderTablaAgrupada(datosGlobal);
+                    poblarSelectorFechas(datosGlobal);
+                })
+                .catch(err => console.error("Error en el procesamiento del Fetch:", err));
+        }
+
+        function renderTablaAgrupada(data) {
+            const tbody = document.getElementById('resultTotal');
+            tbody.innerHTML = '';
+            let totalRecords = 0;
+            let id = 1;
+            let grupoActual = null;
+
+            data.forEach(item => {
+                const claveGrupo = `${item.fecha_asignada}|${item.dia_bloque}`;
+
+                if (claveGrupo !== grupoActual) {
+                    grupoActual = claveGrupo;
+                    const headerRow = document.createElement('tr');
+                    headerRow.classList.add('grupo-fecha');
+                    headerRow.innerHTML = `
+                        <td colspan="16" style="background:#e8e8e8; font-weight:bold; padding:6px;">
+                            📅 ${item.fecha_asignada} &nbsp;|&nbsp; Turno ${item.dia_bloque}
+                        </td>`;
+                    tbody.appendChild(headerRow);
                 }
 
-                const tbody = document.getElementById('resultTotal');
-                tbody.innerHTML = '';
-                let totalRecords = 0;
-                let id = 1;
-                
-                data.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${id}</td><td>${item.pn}</td><td>${item.Qty}</td><td>${item.wo}</td><td>${item.consumo}</td><td>${item.tipo}</td><td>${item.calibre}</td>
-                        <td>${item.color}</td><td>${item.tamano}</td><td>${item.strip1}</td>
-                        <td>${item.terminal1}</td> <td>${item.strip2}</td> <td>${item.terminal2}</td> 
-                        <td>${item.conector}</td> <td>${item.tinta}</td> <td>${item.estampado}</td>`;
-                    tbody.appendChild(row);
-                    totalRecords++;
-                    id++;
-                });
-                document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
-            })
-            .catch(err => console.error("Error en el procesamiento del Fetch:", err));
+                const row = document.createElement('tr');
+                row.dataset.fecha = item.fecha_asignada;
+                row.dataset.turno = item.dia_bloque;
+                row.innerHTML = `
+                    <td>${id}</td><td>${item.pn}</td><td>${item.Qty}</td><td>${item.wo}</td><td>${item.consumo}</td><td>${item.tipo}</td><td>${item.calibre}</td>
+                    <td>${item.color}</td><td>${item.tamano}</td><td>${item.strip1}</td>
+                    <td>${item.terminal1}</td><td>${item.strip2}</td><td>${item.terminal2}</td>
+                    <td>${item.conector}</td><td>${item.tinta}</td><td>${item.estampado}</td>`;
+                tbody.appendChild(row);
+
+                totalRecords++;
+                id++;
+            });
+
+            document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
         }
-        // Función para sumar minutos a una hora y devolver HH:mm
+
+        function poblarSelectorFechas(data) {
+            const selector = document.getElementById('fechaSeleccionada');
+            if (!selector) return;
+
+            const combinaciones = [...new Set(data.map(item => `${item.fecha_asignada}|${item.dia_bloque}`))];
+
+            selector.innerHTML = '<option value="todas">Todas las fechas</option>' +
+                combinaciones.map(c => {
+                    const [fecha, turno] = c.split('|');
+                    return `<option value="${c}">${fecha} - Turno ${turno}</option>`;
+                }).join('');
+        }
 function sumarMinutos(minutosTotales,ultimaHora ) {
     try {
         
@@ -766,34 +796,36 @@ function sumarMinutos(minutosTotales,ultimaHora ) {
     }
 }
 
-function imprimirEtiqueta2() {
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('etiquetas').style.display = 'block';
+        function imprimirEtiqueta2() {
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('etiquetas').style.display = 'block';
 
-    const maquina = document.getElementById('maquinaSeleccionada').value;
-    let query = `?maquina=${encodeURIComponent(maquina)}`;
+            const filtro = document.getElementById('fechaSeleccionada')?.value || 'todas';
 
-    fetch(`app/pormaquina/todas.php${query}`)
-        .then(response => response.json())
-        .then(data => {
+            let data = datosGlobal;
+            if (filtro !== 'todas') {
+                const [fecha, turno] = filtro.split('|');
+                data = datosGlobal.filter(item =>
+                    String(item.fecha_asignada) === fecha && String(item.dia_bloque) === turno
+                );
+            }
+
             const contenedorEtiquetas = document.getElementById('etiquetas');
-            contenedorEtiquetas.innerHTML = ''; // Limpiamos el contenedor
-            
+            contenedorEtiquetas.innerHTML = '';
+
             let totalRecords = 0;
-            let id = 1; // ID único para los contenedores de QR
+            let id = 1;
 
             data.forEach(item => {
                 const label_container = document.createElement('div');
                 label_container.classList.add('label-container');
-                
-                // 1. Inyectamos la estructura HTML. 
-                // Cambiamos los <svg> de barras por <div> para los códigos QR.
+
                 label_container.innerHTML = `
-                    <div class="barcode-side" style="  margin-left:17px; margin-right:10px;">
+                    <div class="barcode-side" style="margin-left:17px; margin-right:10px;">
                         <div class="row">
                             <div style="font-size: 8pt; margin-top: 2px;"><strong>${item.codigo || ''}</strong></div>
                             <div id="qrcode-lateral${id}" class="qr-vertical"></div>
-                            </div>
+                        </div>
                     </div>
 
                     <div class="info-side">
@@ -803,12 +835,10 @@ function imprimirEtiqueta2() {
                             <div><span class="label-bold">WO:</span> ${item.wo || ''}</div>
                             <div><span class="label-bold">PN:</span> ${item.pn || ''}</div>
                             <div><span class="label-bold"><b>Cons:</b></span> ${item.consumo || ''}</div>
-
                             <div class="full-width" style="font-size: 8pt; margin-top: 1px; margin-bottom: 2px;">
                                 <b>T1:</b> ${item.terminal1 || ''} | <b>T2:</b> ${item.terminal2 || ''}<br>
                             </div>
                         </div>
-                        
                         <div class="footer-barcode" style="margin-top: 5px; margin-left:45px;">
                             <div id="qrcode-inferior${id}"></div>
                             <div style="font-size: 8pt; margin-top: 2px;"><strong>ESTAMPADO:</strong>${item.conector || ''}</div>
@@ -816,41 +846,28 @@ function imprimirEtiqueta2() {
                     </div>
                 `;
 
-                // 2. Agregamos la etiqueta al DOM antes de generar el QR
                 contenedorEtiquetas.appendChild(label_container);
 
-                // 3. Definimos el contenido que llevará el QR (puedes usar el item.codigo o el ID)
-                // Nota: Si quieres que el QR tenga el ID de la fila usa String(id). Si quieres los datos de tu BD usa item.codigo
-                const contenidoQR = item.conector || String(id); 
+                const contenidoQR = item.conector || String(id);
                 const codigoQR = item.codigo || String(id);
 
-                // 4. Generar QR Lateral
                 new QRCode(document.getElementById(`qrcode-lateral${id}`), {
-                    text: codigoQR,
-                    width: 50,  // Ajusta el tamaño según tus necesidades en mm/px
-                    height: 50,
-                    correctLevel: QRCode.CorrectLevel.H
+                    text: codigoQR, width: 50, height: 50, correctLevel: QRCode.CorrectLevel.H
                 });
-
-                // 5. Generar QR Inferior
                 new QRCode(document.getElementById(`qrcode-inferior${id}`), {
-                    text: contenidoQR,
-                    width: 55,
-                    height: 55,
-                    correctLevel: QRCode.CorrectLevel.H
+                    text: contenidoQR, width: 55, height: 55, correctLevel: QRCode.CorrectLevel.H
                 });
 
                 totalRecords++;
                 id++;
             });
-            
+
             document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
             window.print();
             document.getElementById('app').style.display = 'block';
             document.getElementById('etiquetas').style.display = 'none';
-        })
-        .catch(error => console.error("Error al obtener los datos:", error));
-}
+        }
+
         function materialista(material) {
             fetch(`app/pormaquina/materialista.php?maquina=${encodeURIComponent(material)}`)
                 .then(response => response.json())
