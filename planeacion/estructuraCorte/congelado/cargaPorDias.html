@@ -93,9 +93,9 @@
 </div>
 
 <script>
-const RUTA_PENDIENTES  = 'app/pormaquina/todas.php';        // endpoint existente (Qty/wo/pn/etc.)
-const RUTA_CONGELADO   = 'app/pormaquina/obtenerCongelado.php';
-const RUTA_GUARDAR     = 'app/pormaquina/congelar.php';
+const RUTA_PENDIENTES  = 'todas.php';        // endpoint existente (Qty/wo/pn/etc.)
+const RUTA_CONGELADO   = 'obtenerCongelado.php';
+const RUTA_GUARDAR     = 'congelar.php';
 
 let repartoActual = []; // [{fecha, items:[...]}, ...] generado en pantalla, aún sin congelar
 
@@ -128,10 +128,10 @@ function cargarCongelado() {
                     <div class="card-body py-2">
                         <div class="d-flex justify-content-between align-items-center">
                             <strong>Día ${dia.dia_bloque} ${dia.fecha_asignada ? '· ' + dia.fecha_asignada : ''}</strong>
-                            <span class="badge bg-secondary">${Number(dia.total_minutos).toFixed(0)} min</span>
+                            <span class="badge bg-secondary">${Number(dia.min).toFixed(0)} min</span>
                         </div>
                         <ul class="list-unstyled small mb-0 mt-2">
-                            ${dia.items.map(it => `<li>WO ${it.wo} · ${it.pn} (${it.minutos} min)</li>`).join('')}
+                            ${dia.items.map(it => `<li>WO ${it.wo} · ${it.pn} (${it.min} min)</li>`).join('')}
                         </ul>
                     </div>
                 </div>`).join('');
@@ -210,7 +210,7 @@ function repartirEnBloques(itemsOrdenados, capacidad) {
     let minutosActuales = 0;
 
     itemsOrdenados.forEach(item => {
-        const minutos = parseFloat(item.minutos) || 0;
+        const minutos = parseFloat(item.min) || 0;
 
         // Si un solo WO ya excede la capacidad del día, ocupa su propio día
         if (minutos > capacidad) {
@@ -253,7 +253,7 @@ function asignarFechas(bloques, fechaInicioStr, saltarFines) {
 function renderPropuesta(dias, capacidad) {
     const cont = document.getElementById('propuestaContainer');
     cont.innerHTML = dias.map((dia, idx) => {
-        const total = dia.items.reduce((s, it) => s + (parseFloat(it.minutos) || 0), 0);
+        const total = dia.items.reduce((s, it) => s + (parseFloat(it.min) || 0), 0);
         const pct = Math.min(100, (total / capacidad) * 100);
         const completo = total >= capacidad ? 'completo' : '';
         return `
@@ -271,7 +271,7 @@ function renderPropuesta(dias, capacidad) {
                             <tr>
                                 <td>${it.wo}</td><td>${it.pn}</td>
                                 <td>${it.terminal1 || ''}</td><td>${it.terminal2 || ''}</td>
-                                <td>${it.color || ''}</td><td>${it.minutos}</td>
+                                <td>${it.color || ''}</td><td>${it.min}</td>
                             </tr>`).join('')}
                     </tbody>
                 </table>
@@ -292,10 +292,11 @@ function construirPayload(bloquesAEnviar) {
         maquina: maquina,
         usuario: null, // opcional: coloca aquí el usuario logueado si lo tienes
         bloques: bloquesAEnviar.map(dia => dia.items.map(it => ({
+            
             wo: it.wo, pn: it.pn, consumo: it.consumo, calibre: it.calibre,
             color: it.color, tipo: it.tipo, terminal1: it.terminal1,
             terminal2: it.terminal2, urgencia: it.urgencia,
-            minutos: it.minutos, fecha: dia.fecha
+            minutos: it.min, fecha: dia.fecha, id_corte: it.id,
         })))
     };
 }
@@ -314,6 +315,7 @@ function congelarDia(idx) {
 }
 
 function enviarCongelado(payload) {
+  //  console.log(payload);
     fetch(RUTA_GUARDAR, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -1,13 +1,7 @@
 <?php
-/**
- * obtenerCongelado.php
- * -----------------------------------------------------------------
- * GET app/pormaquina/obtenerCongelado.php?maquina=MCUT-4
- * -----------------------------------------------------------------
- */
 header('Content-Type: application/json; charset=utf-8');
 
-require '../app/conection.php'; // debe exponer un $pdo (PDO) ya conectado
+require '../app/conection.php';
 
 $maquina = $_GET['maquina'] ?? null;
 
@@ -18,24 +12,24 @@ $sql = "SELECT
             cc.fecha_asignada,
             cc.minutos       AS min,
             cc.id_corte,
+            c.id             AS id,
             c.np              AS pn,
             c.color,
             c.wo,
             c.codigo,
-            c.aws,
-            c.cons,
+            c.aws             AS calibre,
+            c.cons            AS consumo,
             c.tipo,
-            c.dist_stamp,
+            c.dist_stamp      AS estampado,
             c.tamano,
-            c.term1,
-            c.term2,
+            c.term1           AS terminal1,
+            c.term2           AS terminal2,
             c.strip1,
             c.strip2,
-            c.tintaColor,
-            c.qty,
+            c.tintaColor      AS tinta,
+            c.qty             AS Qty,
             c.time_ruteo,
-            c.conector,
-            c.cutStatus
+            c.conector
         FROM carga_congelada cc
         JOIN corte c ON c.id = cc.id_corte";
 
@@ -50,7 +44,6 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Agrupamos por máquina+día
 $agrupado = [];
 foreach ($rows as $row) {
     $key = $row['maquina'] . '-' . $row['dia_bloque'];
@@ -60,7 +53,7 @@ foreach ($rows as $row) {
             'dia_bloque'     => (int) $row['dia_bloque'],
             'fecha_asignada' => $row['fecha_asignada'],
             'items'          => [],
-            'min'            => 0, // total de minutos del día
+            'min'            => 0,
         ];
     }
     $agrupado[$key]['items'][] = $row;

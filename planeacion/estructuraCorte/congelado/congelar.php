@@ -20,14 +20,17 @@
  *   ]
  * }
  *
- * IMPORTANTE: ajusta el require de conexion.php a tu archivo real de
- * conexión PDO existente en el proyecto.
+ * IMPORTANTE:
+ * - Requiere un UNIQUE KEY en carga_congelada, por ejemplo:
+ *     ALTER TABLE carga_congelada
+ *       ADD UNIQUE KEY uq_congelado (maquina, wo, pn, dia_bloque);
+ *   Sin eso, el ON DUPLICATE KEY UPDATE de abajo nunca se activa.
  * -----------------------------------------------------------------
  */
 
 header('Content-Type: application/json; charset=utf-8');
 
-require_once __DIR__ . '/conexion.php'; // debe exponer un $pdo (PDO) ya conectado
+require '../app/conection.php'; // debe exponer un $pdo (PDO) ya conectado
 
 $input = json_decode(file_get_contents('php://input'), true);
 
@@ -45,20 +48,21 @@ try {
     $pdo->beginTransaction();
 
     // ON DUPLICATE KEY: si por error se vuelve a enviar el mismo WO+PN+maquina,
-    // se actualiza en vez de duplicar (protección extra, aunque el frontend
-    // ya debería excluir lo que está congelado).
+    // se actualiza en vez de duplicar. Requiere un UNIQUE KEY real en la tabla
+    // (ver nota arriba); si no existe, esta cláusula no tiene efecto.
     $stmt = $pdo->prepare("
         INSERT INTO carga_congelada
             (maquina, dia_bloque, fecha_asignada, wo, pn, consumo, calibre,
-             color, tipo, terminal1, terminal2, urgencia, minutos, orden_en_dia, usuario)
+             color, tipo, terminal1, terminal2, urgencia, minutos, orden_en_dia, usuario,id_corte)
         VALUES
             (:maquina, :dia_bloque, :fecha_asignada, :wo, :pn, :consumo, :calibre,
-             :color, :tipo, :terminal1, :terminal2, :urgencia, :minutos, :orden_en_dia, :usuario)
+             :color, :tipo, :terminal1, :terminal2, :urgencia, :minutos, :orden_en_dia, :usuario,:id_corte)
         ON DUPLICATE KEY UPDATE
             dia_bloque      = VALUES(dia_bloque),
             fecha_asignada  = VALUES(fecha_asignada),
             minutos         = VALUES(minutos),
-            orden_en_dia    = VALUES(orden_en_dia)
+            orden_en_dia    = VALUES(orden_en_dia),
+            usuario         = VALUES(usuario)
     ");
 
     foreach ($bloques as $diaIndex => $items) {
@@ -80,9 +84,10 @@ try {
                 ':terminal1'      => $item['terminal1'] ?? null,
                 ':terminal2'      => $item['terminal2'] ?? null,
                 ':urgencia'       => $item['urgencia'] ?? null,
-                ':minutos'        => $item['minutos'],
+                ':minutos'        => $item['minutos'], // antes decía $item['min'] (bug)
                 ':orden_en_dia'   => $ordenEnDia,
                 ':usuario'        => $usuario,
+                ':id_corte'       => $item['id_corte']
             ]);
             $ordenEnDia++;
         }

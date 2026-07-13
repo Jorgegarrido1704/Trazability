@@ -122,6 +122,7 @@
                     <button class="btn btn-success" onclick="dashboard('porMaquinas')">Carga por Máquinas</button>
                     <button class="btn btn-primary" onclick="dashboard('materialistas')">Carga Materialista y Crimpers</button>
                     <button class="btn btn-warning" onclick="dashboard('configuracionCarga')">Confirguracion de carga</button>
+                     <button class="btn btn-danger" onclick="dashboard('congelar')">Congelar cargas</button>
                 
             
                 </div>
@@ -293,7 +294,7 @@
             <nav class="navbar navbar-expand bg-secondary mb-4 rounded px-2">
                 <input type="hidden" id="maquinaSeleccionada" value="todas">
                 <div class="navbar-nav gap-2">
-                    <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('todas')">Todas las máquinas</button>
+                   <!-- <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('todas')">Todas las máquinas</button> -->
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-1')">MCUT-1</button>
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-2')">MCUT-2</button><!--falta  ponerla es igual que MCUT7-->
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-3')">MCUT-3</button>
@@ -302,6 +303,15 @@
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-6')">MCUT-6</button>
         
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-7')">Cables Especiales</button>
+                </div>
+            </nav>
+            <nav class="navbar navbar-expand bg-light mb-3 rounded px-2" id="diasCongeladosNav" style="display:none;">
+                <div class="navbar-nav gap-2 align-items-center">
+                    <span class="text-muted small me-2">Días congelados:</span>
+                    <div id="diasCongeladosBotones" class="d-flex gap-2 flex-wrap"></div>
+                    <button class="btn btn-outline-secondary btn-sm ms-3" onclick="verLiveMaquina()">
+                        <i class="bi bi-arrow-repeat me-1"></i>Ver carga en vivo
+                    </button>
                 </div>
             </nav>
             <div class="card shadow-sm">
@@ -549,6 +559,9 @@
                 }else{
                      window.location.reload();
                 }
+            }
+            else if (section === 'congelar'){
+                window.location.href = 'congelado/cargaPorDias.html';
             }
 
         }
@@ -989,5 +1002,6 @@ function imprimirEtiqueta2() {
                             });
                     }
     </script>
+  
 </body>
 </html>
