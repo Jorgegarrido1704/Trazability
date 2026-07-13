@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reparto y Congelado de Carga por Días</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body { background:#f4f6f9; }
+        .dia-card { border-left: 6px solid #0d6efd; }
+        .dia-card.completo { border-left-color: #198754; }
+        .dia-card.congelado { border-left-color: #6c757d; background:#f1f1f1; }
+        .barra-min { height: 8px; border-radius: 4px; background:#e9ecef; overflow:hidden; }
+        .barra-min > div { height:100%; background:#0d6efd; }
+        .badge-grupo { font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark mb-4 p-2">
+    <div class="container-fluid">
+        <span class="navbar-brand"><i class="bi bi-calendar2-check me-2"></i>Reparto y Congelado de Carga por Días</span>
+        <a href="../index.html" class="btn btn-outline-light btn-sm">Volver al panel principal</a>
+    </div>
+</nav>
+
+<div class="container-fluid px-4">
+
+    <!-- Selección de máquina y parámetros -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Máquina</label>
+                    <select id="maquina" class="form-select" onchange="cargarTodo()">
+                        <option value="MCUT-1">MCUT-1</option>
+                        <option value="MCUT-2">MCUT-2</option>
+                        <option value="MCUT-3">MCUT-3</option>
+                        <option value="MCUT-4">MCUT-4</option>
+                        <option value="MCUT-5">MCUT-5</option>
+                        <option value="MCUT-6">MCUT-6</option>
+                        <option value="MCUT-7">Cables Especiales</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Minutos por día</label>
+                    <input type="number" id="capacidadDia" class="form-control" value="450" min="1">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Fecha de inicio</label>
+                    <input type="date" id="fechaInicio" class="form-control">
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" id="saltarFines" checked>
+                        <label class="form-check-label" for="saltarFines">Saltar sáb/dom</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100" onclick="cargarTodo()">
+                        <i class="bi bi-arrow-repeat me-1"></i>Generar reparto
+                    </button>
+                </div>
+            </div>
+            <div class="form-text mt-2">
+                Orden de reparto: 1) mismo terminal/color/cable (agrupa para minimizar cambios de herramental),
+                2) urgencia (Crítico → Alta → Media → Baja), 3) fecha programada más próxima, 4) WO más antigua.
+                Lo que ya está <span class="badge bg-secondary">congelado</span> no se vuelve a repartir.
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Columna: propuesta de reparto (pendiente de congelar) -->
+        <div class="col-lg-7">
+            <h5 class="text-primary"><i class="bi bi-hourglass-split me-2"></i>Propuesta de reparto (sin congelar)</h5>
+            <div id="propuestaContainer">
+                <div class="text-muted">Selecciona una máquina y presiona "Generar reparto".</div>
+            </div>
+            <button id="btnCongelarTodo" class="btn btn-success mt-2 w-100" style="display:none" onclick="congelarTodo()">
+                <i class="bi bi-snow me-2"></i>Congelar todo este reparto en la base de datos
+            </button>
+        </div>
+
+        <!-- Columna: historial ya congelado -->
+        <div class="col-lg-5">
+            <h5 class="text-secondary"><i class="bi bi-lock me-2"></i>Días ya congelados</h5>
+            <div id="congeladoContainer">
+                <div class="text-muted">Cargando...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const RUTA_PENDIENTES  = 'app/pormaquina/todas.php';        // endpoint existente (Qty/wo/pn/etc.)
+const RUTA_CONGELADO   = 'app/pormaquina/obtenerCongelado.php';
+const RUTA_GUARDAR     = 'app/pormaquina/congelar.php';
+
+let repartoActual = []; // [{fecha, items:[...]}, ...] generado en pantalla, aún sin congelar
+
+document.addEventListener('DOMContentLoaded', () => {
+    const hoy = new Date();
+    document.getElementById('fechaInicio').value = hoy.toISOString().split('T')[0];
+    cargarTodo();
+});
+
+function cargarTodo() {
+    cargarCongelado();
+    generarPropuesta();
+}
+
+// ---------------------------------------------------------------
+// 1. Traer lo ya congelado (para mostrarlo y para excluirlo del reparto)
+// ---------------------------------------------------------------
+function cargarCongelado() {
+    const maquina = document.getElementById('maquina').value;
+    fetch(`${RUTA_CONGELADO}?maquina=${encodeURIComponent(maquina)}`)
+        .then(r => r.json())
+        .then(dias => {
+            const cont = document.getElementById('congeladoContainer');
+            if (!dias.length) {
+                cont.innerHTML = '<div class="text-muted">Aún no hay días congelados para esta máquina.</div>';
+                return;
+            }
+            cont.innerHTML = dias.map(dia => `
+                <div class="card dia-card congelado mb-3">
+                    <div class="card-body py-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>Día ${dia.dia_bloque} ${dia.fecha_asignada ? '· ' + dia.fecha_asignada : ''}</strong>
+                            <span class="badge bg-secondary">${Number(dia.total_minutos).toFixed(0)} min</span>
+                        </div>
+                        <ul class="list-unstyled small mb-0 mt-2">
+                            ${dia.items.map(it => `<li>WO ${it.wo} · ${it.pn} (${it.minutos} min)</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>`).join('');
+        })
+        .catch(err => console.error('Error al cargar congelado:', err));
+}
+
+// ---------------------------------------------------------------
+// 2. Traer pendientes, filtrar los ya congelados, ordenar y repartir
+// ---------------------------------------------------------------
+function generarPropuesta() {
+    const maquina = document.getElementById('maquina').value;
+    const cont = document.getElementById('propuestaContainer');
+    cont.innerHTML = '<div class="text-muted">Cargando pendientes...</div>';
+
+    Promise.all([
+        fetch(`${RUTA_PENDIENTES}?maquina=${encodeURIComponent(maquina)}`).then(r => r.json()),
+        fetch(`${RUTA_CONGELADO}?maquina=${encodeURIComponent(maquina)}`).then(r => r.json())
+    ]).then(([pendientes, congelado]) => {
+
+        // Set de WO+PN que ya están congelados, para excluirlos
+        const yaCongelados = new Set();
+        congelado.forEach(dia => dia.items.forEach(it => yaCongelados.add(`${it.wo}|${it.pn}`)));
+
+        const disponibles = pendientes.filter(it => !yaCongelados.has(`${it.wo}|${it.pn}`));
+
+        if (!disponibles.length) {
+            cont.innerHTML = '<div class="text-muted">No hay pendientes por repartir: todo ya está congelado.</div>';
+            document.getElementById('btnCongelarTodo').style.display = 'none';
+            repartoActual = [];
+            return;
+        }
+
+        const ordenados = ordenarParaReparto(disponibles);
+        const capacidad = parseFloat(document.getElementById('capacidadDia').value) || 450;
+        const bloques = repartirEnBloques(ordenados, capacidad);
+        const fechaInicio = document.getElementById('fechaInicio').value;
+        const saltarFines = document.getElementById('saltarFines').checked;
+        repartoActual = asignarFechas(bloques, fechaInicio, saltarFines);
+
+        renderPropuesta(repartoActual, capacidad);
+        document.getElementById('btnCongelarTodo').style.display = 'block';
+    }).catch(err => {
+        console.error('Error al generar la propuesta:', err);
+        cont.innerHTML = '<div class="text-danger">Error al cargar datos. Revisa la consola.</div>';
+    });
+}
+
+// Criterio de orden: 1) grupo físico (terminal1+terminal2+color+calibre)
+// 2) urgencia  3) fecha programada  4) WO más antigua
+function ordenarParaReparto(items) {
+    const pesoUrgencia = { '4-Critico': 4, '3-Alta': 3, '2-Media': 2, '1-Baja': 1 };
+
+    return items.slice().sort((a, b) => {
+        const keyA = `${a.terminal1 || ''}|${a.terminal2 || ''}|${a.color || ''}|${a.calibre || ''}`;
+        const keyB = `${b.terminal1 || ''}|${b.terminal2 || ''}|${b.color || ''}|${b.calibre || ''}`;
+        if (keyA !== keyB) return keyA.localeCompare(keyB);
+
+        const uA = pesoUrgencia[a.urgencia] || 0;
+        const uB = pesoUrgencia[b.urgencia] || 0;
+        if (uA !== uB) return uB - uA;
+
+        const fA = a.fecha_programada ? new Date(a.fecha_programada).getTime() : Infinity;
+        const fB = b.fecha_programada ? new Date(b.fecha_programada).getTime() : Infinity;
+        if (fA !== fB) return fA - fB;
+
+        return (parseInt(a.wo) || 0) - (parseInt(b.wo) || 0);
+    });
+}
+
+// Reparte la lista ya ordenada en bloques que no superen "capacidad" minutos.
+// Mantiene juntos los items del mismo grupo siempre que quepan.
+function repartirEnBloques(itemsOrdenados, capacidad) {
+    const bloques = [];
+    let actual = [];
+    let minutosActuales = 0;
+
+    itemsOrdenados.forEach(item => {
+        const minutos = parseFloat(item.minutos) || 0;
+
+        // Si un solo WO ya excede la capacidad del día, ocupa su propio día
+        if (minutos > capacidad) {
+            if (actual.length) { bloques.push(actual); actual = []; minutosActuales = 0; }
+            bloques.push([item]);
+            return;
+        }
+
+        if (minutosActuales + minutos > capacidad) {
+            bloques.push(actual);
+            actual = [];
+            minutosActuales = 0;
+        }
+
+        actual.push(item);
+        minutosActuales += minutos;
+    });
+
+    if (actual.length) bloques.push(actual);
+    return bloques;
+}
+
+function asignarFechas(bloques, fechaInicioStr, saltarFines) {
+    let fecha = fechaInicioStr ? new Date(fechaInicioStr + 'T00:00:00') : new Date();
+
+    return bloques.map(bloque => {
+        while (saltarFines && (fecha.getDay() === 0 || fecha.getDay() === 6)) {
+            fecha.setDate(fecha.getDate() + 1);
+        }
+        const fechaAsignada = fecha.toISOString().split('T')[0];
+        fecha = new Date(fecha);
+        fecha.setDate(fecha.getDate() + 1);
+        return { fecha: fechaAsignada, items: bloque };
+    });
+}
+
+// ---------------------------------------------------------------
+// 3. Pintar la propuesta en pantalla
+// ---------------------------------------------------------------
+function renderPropuesta(dias, capacidad) {
+    const cont = document.getElementById('propuestaContainer');
+    cont.innerHTML = dias.map((dia, idx) => {
+        const total = dia.items.reduce((s, it) => s + (parseFloat(it.minutos) || 0), 0);
+        const pct = Math.min(100, (total / capacidad) * 100);
+        const completo = total >= capacidad ? 'completo' : '';
+        return `
+        <div class="card dia-card ${completo} mb-3">
+            <div class="card-body py-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <strong>Día ${idx + 1} · ${dia.fecha}</strong>
+                    <span class="badge ${total >= capacidad ? 'bg-success' : 'bg-primary'}">${total.toFixed(0)} / ${capacidad} min</span>
+                </div>
+                <div class="barra-min mb-2"><div style="width:${pct}%"></div></div>
+                <table class="table table-sm mb-2">
+                    <thead><tr><th>WO</th><th>PN</th><th>Terminal 1</th><th>Terminal 2</th><th>Color</th><th>Min</th></tr></thead>
+                    <tbody>
+                        ${dia.items.map(it => `
+                            <tr>
+                                <td>${it.wo}</td><td>${it.pn}</td>
+                                <td>${it.terminal1 || ''}</td><td>${it.terminal2 || ''}</td>
+                                <td>${it.color || ''}</td><td>${it.minutos}</td>
+                            </tr>`).join('')}
+                    </tbody>
+                </table>
+                <button class="btn btn-sm btn-outline-success" onclick="congelarDia(${idx})">
+                    <i class="bi bi-snow me-1"></i>Congelar solo este día
+                </button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ---------------------------------------------------------------
+// 4. Congelar (guardar permanente en MySQL)
+// ---------------------------------------------------------------
+function construirPayload(bloquesAEnviar) {
+    const maquina = document.getElementById('maquina').value;
+    return {
+        maquina: maquina,
+        usuario: null, // opcional: coloca aquí el usuario logueado si lo tienes
+        bloques: bloquesAEnviar.map(dia => dia.items.map(it => ({
+            wo: it.wo, pn: it.pn, consumo: it.consumo, calibre: it.calibre,
+            color: it.color, tipo: it.tipo, terminal1: it.terminal1,
+            terminal2: it.terminal2, urgencia: it.urgencia,
+            minutos: it.minutos, fecha: dia.fecha
+        })))
+    };
+}
+
+function congelarTodo() {
+    if (!repartoActual.length) return;
+    if (!confirm(`Vas a congelar ${repartoActual.length} día(s) de forma permanente. ¿Continuar?`)) return;
+    enviarCongelado(construirPayload(repartoActual));
+}
+
+function congelarDia(idx) {
+    const dia = repartoActual[idx];
+    if (!dia) return;
+    if (!confirm(`Vas a congelar el Día ${idx + 1} (${dia.fecha}) de forma permanente. ¿Continuar?`)) return;
+    enviarCongelado(construirPayload([dia]));
+}
+
+function enviarCongelado(payload) {
+    fetch(RUTA_GUARDAR, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert('Carga congelada correctamente.');
+            cargarTodo(); // recarga historial y vuelve a generar propuesta sin lo ya congelado
+        } else {
+            alert('No se pudo congelar: ' + (data.error || 'error desconocido'));
+        }
+    })
+    .catch(err => alert('Error de red al congelar: ' + err.message));
+}
+</script>
+</body>
+</html>
