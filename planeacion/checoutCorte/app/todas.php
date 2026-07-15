@@ -8,20 +8,55 @@ try {
    
     $tiempoTotal = 0; 
 
-    if ($maquina == 'todas') {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' AND r.programado = 1  AND c.tamano >0 AND r.count IN ('2','3','17')
-               ORDER BY c.urgencia DESC,c.wo ASC, c.cons ASC";
-    } else {
-        $qry ="SELECT c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
-               FROM corte c 
-               JOIN registro r ON c.wo = r.wo 
-               WHERE c.cutStatus != 'Cortado' 
-               AND r.programado = 1 AND maq_asignada = '$maquina' AND c.tamano >0 AND r.count IN ('2','3','17')
-               ORDER BY c.urgencia DESC,c.wo ASC, c.cons ASC";
-    } 
+     if ($maquina == 'todas') {
+       $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
+               c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
+               c.time_ruteo, c.conector,
+               cc.fecha_asignada, cc.dia_bloque
+        FROM corte c
+        JOIN registro r ON c.wo = r.wo
+        JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
+        WHERE c.cutStatus != 'Cortado'
+          AND r.programado = 1
+          AND c.tamano > 0
+          AND r.count IN ('2','3','17')
+        ORDER BY cc.fecha_asignada ASC,
+                 cc.dia_bloque ASC,
+                 c.urgencia DESC,
+                 c.aws ASC,
+                 c.term1 ASC,
+                 CASE
+                    WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
+                    ELSE 1
+                 END,
+                 c.tipo ASC";
+
+    }else {
+     
+      $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
+               c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
+               c.time_ruteo, c.conector,
+               cc.fecha_asignada, cc.dia_bloque
+        FROM corte c
+        JOIN registro r ON c.wo = r.wo
+        JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
+        WHERE c.cutStatus != 'Cortado'
+          AND r.programado = 1
+          AND c.maq_asignada = '$maquina'
+          AND c.tamano > 0
+          AND r.count IN ('2','3','17')
+        ORDER BY cc.fecha_asignada ASC,
+                 cc.dia_bloque ASC,
+                 c.urgencia DESC,
+                 c.aws ASC,
+                 c.term1 ASC,
+                 CASE
+                    WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
+                    ELSE 1
+                 END,
+                 c.tipo ASC";
+
+    }
 
     if (!isset($con) || !$con) {
         throw new Exception("La variable de conexión no está definida correctamente.");
