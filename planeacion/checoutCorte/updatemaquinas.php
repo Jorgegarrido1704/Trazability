@@ -85,10 +85,14 @@ try {
     $tiempoMayor10 = 0;
     $idsMayor10 = [];
 
-    $stmtListas = mysqli_prepare($con, "SELECT c.id, c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
-                                         FROM corte c
-                                         WHERE c.cutStatus != 'Cortado' AND c.tamano > 0 
-                                         ORDER BY c.aws, c.color, c.term1, c.term2 DESC");
+   $query = "SELECT c.id, c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+          FROM corte c
+          WHERE c.cutStatus != 'Cortado' 
+            AND c.tamano > 0 
+            AND NOT EXISTS (SELECT 1 FROM carga_congelada cc WHERE cc.id_corte = c.id)
+          ORDER BY c.aws, c.color, c.term1, c.term2 DESC";
+
+$stmtListas = mysqli_prepare($con, $query);
 
     if (!$stmtListas) {
         throw new Exception("Error al preparar la consulta: " . mysqli_error($con));
