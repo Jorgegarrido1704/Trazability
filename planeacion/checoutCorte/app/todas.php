@@ -21,15 +21,8 @@ try {
           AND c.tamano > 0
           AND r.count IN ('2','3','17')
         ORDER BY cc.fecha_asignada ASC,
-                 cc.dia_bloque ASC,
-                 c.urgencia DESC,
-                 c.aws ASC,
-                 c.term1 ASC,
-                 CASE
-                    WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
-                    ELSE 1
-                 END,
-                 c.tipo ASC";
+                 cc.dia_bloque ASC
+                ";
 
     }else {
      
@@ -46,15 +39,7 @@ try {
           AND c.tamano > 0
           AND r.count IN ('2','3','17')
         ORDER BY cc.fecha_asignada ASC,
-                 cc.dia_bloque ASC,
-                 c.urgencia DESC,
-                 c.aws ASC,
-                 c.term1 ASC,
-                 CASE
-                    WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
-                    ELSE 1
-                 END,
-                 c.tipo ASC";
+                 cc.dia_bloque ASC";
 
     }
 
