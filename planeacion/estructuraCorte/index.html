@@ -397,11 +397,13 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-white py-3">
                     <h5 class="card-title mb-0 text-secondary"><i class="bi bi-calendar-week me-2"></i>Seleccionar maquinas a cargar</h5>
+                    <h6>seleccionar Todas las maquinas <input class="form-check-input ms-0 me-3" type="checkbox" id="select_todas_maquinas" name="select_todas_maquinas" onclick="seleccionarTodasLasMaquinas();"></h6>
                 </div>
                 <div class="card-body p-0">
                  <form id="formCarga" onsubmit="event.preventDefault(); repartirCarga();">
                 <!-- Fila contenedora con espacio entre elementos (g-3) -->
                 <div class="row g-3">
+                    <
                     
                     <!-- Máquina 1 -->
                     <div class="col-6 col-md-4 col-lg-3">
@@ -982,6 +984,22 @@ function sumarMinutos(minutosTotales,ultimaHora ) {
                     if (data.success) { CargaSemanal(); } 
                     else { alert("No se pudo cambiar la urgencia: " + data.error); }
                 });
+        }
+       
+        function seleccionarTodasLasMaquinas() {
+            var todas=document.getElementById("select_todas_maquinas");
+             var checkboxes = document.querySelectorAll('input[name="maquinas[]"]');
+            if (todas.checked) {
+                 for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = true;
+            }
+            }else {
+                for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = false;
+            }
+            }
+           
+           
         }
         function repartirCarga() {
                         let registrosMaquinas = [];
