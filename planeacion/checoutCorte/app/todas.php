@@ -22,7 +22,7 @@ try {
           AND r.count IN ('2','3','17')
         ORDER BY cc.fecha_asignada ASC,
                  cc.dia_bloque ASC
-                ";
+                LIMIT 300";
 
     }else {
      
@@ -39,7 +39,8 @@ try {
           AND c.tamano > 0
           AND r.count IN ('2','3','17')
         ORDER BY cc.fecha_asignada ASC,
-                 cc.dia_bloque ASC";
+                 cc.dia_bloque ASC
+                LIMIT 150";
 
     }
 
