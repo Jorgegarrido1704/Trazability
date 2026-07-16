@@ -82,8 +82,10 @@ try {
         'BLANCA' => ['10_12' => [], '14_16' => [], '18_24' => [], 'sello' => []],
     ];
 
-    $tiempoMayor10 = 0;
-    $idsMayor10 = [];
+    // CRÍTICO: se separa la carga ">10" por tinta para no mezclar blanca/negra
+    // al momento de repartirla entre máquinas (misma exclusividad que el resto del pool).
+    $tiempoMayor10 = ['NEGRA' => 0, 'BLANCA' => 0];
+    $idsMayor10 = ['NEGRA' => [], 'BLANCA' => []];
 
    $query = "SELECT c.id, c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
           FROM corte c
@@ -132,8 +134,8 @@ $stmtListas = mysqli_prepare($con, $query);
         }
 
         if ($rango === '>10') {
-            $tiempoMayor10 += $tiempoTotal;
-            $idsMayor10[] = $idCorte;
+            $tiempoMayor10[$tinta] += $tiempoTotal;
+            $idsMayor10[$tinta][] = $idCorte;
         } else {
             $rawTimes[$tinta][$rango] += $tiempoTotal;
             $rawIds[$tinta][$rango][] = $idCorte;
@@ -167,23 +169,51 @@ $stmtListas = mysqli_prepare($con, $query);
     }
 
     // Ejecutar balance dinámico según máquinas encendidas
+    // MCUT-1/2/3 (activaBlancas) solo reciben pool BLANCA; MCUT-4/5/6 (activaNegras) solo pool NEGRA.
     balancearCargaPorTinta($rawIds['BLANCA'], $rawTimes['BLANCA'], array_values($activaBlancas), $idsPorMaquina, $maquinas);
     balancearCargaPorTinta($rawIds['NEGRA'], $rawTimes['NEGRA'], array_values($activaNegras), $idsPorMaquina, $maquinas);
 
-    // CRÍTICO: Gestión de contingencia para la carga mayor a 10 (>10) si MCUT-7 está apagada
-    if ($tiempoMayor10 > 0) {
+    // CRÍTICO: Gestión de contingencia para la carga mayor a 10 (>10) si MCUT-7 está apagada.
+    // Se respeta la exclusividad de tinta: lo BLANCA solo va a MCUT-1/2/3 y lo NEGRA solo a
+    // MCUT-4/5/6. Solo si un color no tiene NINGUNA máquina activa, su carga ">10" se
+    // reasigna al color opuesto como último recurso (igual que ya hacía el resto del script).
+    $tiempoMayor10Total = $tiempoMayor10['NEGRA'] + $tiempoMayor10['BLANCA'];
+    if ($tiempoMayor10Total > 0) {
         if ($activaMayor10) {
-            $maquinas['MCUT-7'] = $tiempoMayor10;
-            $idsPorMaquina['MCUT-7'] = $idsMayor10;
+            $maquinas['MCUT-7'] = $tiempoMayor10Total;
+            $idsPorMaquina['MCUT-7'] = array_merge($idsMayor10['NEGRA'], $idsMayor10['BLANCA']);
         } else {
-            $todasLasActivas = array_merge(array_values($activaBlancas), array_values($activaNegras));
-            if (!empty($todasLasActivas)) {
-                $numMaquinasGral = count($todasLasActivas);
-                $chunksGral = array_chunk($idsMayor10, ceil(count($idsMayor10) / $numMaquinasGral));
-                foreach ($todasLasActivas as $gIdx => $gMaq) {
+            $destinoPorTinta = [];
+
+            if (!empty($activaBlancas)) {
+                $destinoPorTinta['BLANCA'] = array_values($activaBlancas);
+            } elseif (!empty($activaNegras)) {
+                $destinoPorTinta['BLANCA'] = array_values($activaNegras); // fallback: no hay máquinas blancas encendidas
+            } else {
+                $destinoPorTinta['BLANCA'] = [];
+            }
+
+            if (!empty($activaNegras)) {
+                $destinoPorTinta['NEGRA'] = array_values($activaNegras);
+            } elseif (!empty($activaBlancas)) {
+                $destinoPorTinta['NEGRA'] = array_values($activaBlancas); // fallback: no hay máquinas negras encendidas
+            } else {
+                $destinoPorTinta['NEGRA'] = [];
+            }
+
+            foreach (['NEGRA', 'BLANCA'] as $tintaKey) {
+                $idsTinta = $idsMayor10[$tintaKey];
+                $tiempoTinta = $tiempoMayor10[$tintaKey];
+                $maquinasDestino = $destinoPorTinta[$tintaKey];
+
+                if (empty($idsTinta) || empty($maquinasDestino)) continue;
+
+                $numMaquinasGral = count($maquinasDestino);
+                $chunksGral = array_chunk($idsTinta, (int) ceil(count($idsTinta) / $numMaquinasGral));
+                foreach ($maquinasDestino as $gIdx => $gMaq) {
                     if (isset($chunksGral[$gIdx])) {
                         $idsPorMaquina[$gMaq] = array_merge($idsPorMaquina[$gMaq], $chunksGral[$gIdx]);
-                        $maquinas[$gMaq] += ($tiempoMayor10 * (count($chunksGral[$gIdx]) / count($idsMayor10)));
+                        $maquinas[$gMaq] += ($tiempoTinta * (count($chunksGral[$gIdx]) / count($idsTinta)));
                     }
                 }
             }
@@ -206,4 +236,3 @@ $stmtListas = mysqli_prepare($con, $query);
         "detalle" => $e->getMessage()
     ]);
 }
-?>
