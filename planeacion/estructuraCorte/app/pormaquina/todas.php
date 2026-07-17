@@ -130,8 +130,8 @@ try {
                 'strip2' => $strip2,
                 'conector' => $conector,
                 'estampado' => $estamp,
-                'fecha_asignada' => $rowlistas['fecha_asignada'],   
-                 'dia_bloque' => $rowlistas['dia_bloque']
+             //   'fecha_asignada' => $rowlistas['fecha_asignada'],   
+               //  'dia_bloque' => $rowlistas['dia_bloque']
             ];                  
        
     }
