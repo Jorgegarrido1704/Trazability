@@ -5,13 +5,8 @@ try {
 $pn= isset($_POST['np']) ? $_POST['np'] : '';
 
 $delCore=mysqli_query($con,"DELETE FROM corte WHERE cutStatus = 'Activo' AND wo = '$pn' ");
-} catch (\Throwable $th) {
-    echo $th;
-}
-try {
-    
 
-   // echo "<h1>Se Eliminaron Correctamente</h1>";
+
 $buscar=mysqli_query($con,"SELECT * FROM registro WHERE count IN ('2','3','17','1') AND wo = '$pn'  ORDER BY count ASC");
 while($row=mysqli_fetch_array($buscar)){
     $pn=$row['NumPart'];
