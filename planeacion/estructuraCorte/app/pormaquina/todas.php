@@ -106,8 +106,8 @@ try {
         $minutos = round(((float)$time_ruteo / 60), 2);
         
         $tiempoTotal += $time_ruteo;
-        $fecha_asignada = $rowlistas['fecha_asignada'];
-        $dia_bloque = $rowlistas['dia_bloque'];
+       // $fecha_asignada = $rowlistas['fecha_asignada'];
+        //$dia_bloque = $rowlistas['dia_bloque'];
 
         
         
