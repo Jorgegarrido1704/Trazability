@@ -21,7 +21,7 @@ try {
     if ($maquina === 'todas') {
         $qry = $baseQry . " AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569')";
     } else {
-        $qry = $baseQry . " AND c.maq_asignada = ?";
+        $qry = $baseQry . " AND c.maq_asignada = '$maquina' ";
     }
 
     // Añadimos el ordenamiento
