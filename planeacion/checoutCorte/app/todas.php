@@ -7,27 +7,42 @@ try {
     $totalCables = 0;
    
     $tiempoTotal = 0; 
-  $baseQry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp, c.tamano, 
-                       c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty, c.conector 
-                FROM corte c 
-                INNER JOIN registro r ON c.wo = r.wo 
-                LEFT JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
-                WHERE cc.wo IS NULL /* Filtro Anti-Join mucho más eficiente */
-                  AND c.cutStatus != 'Cortado' 
-                  AND r.programado = 1 
-                  AND c.tamano > 0 
-                  AND r.count IN ('2','3','17')";
 
-    if ($maquina === 'todas') {
-        $qry = $baseQry . " AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569')";
-    } else {
-        $qry = $baseQry . " AND c.maq_asignada = '$maquina' ";
+     if ($maquina == 'todas') {
+       $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
+               c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
+               c.time_ruteo, c.conector,
+               cc.fecha_asignada, cc.dia_bloque
+        FROM corte c
+        JOIN registro r ON c.wo = r.wo
+        JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
+        WHERE c.cutStatus != 'Cortado'
+          AND r.programado = 1
+          AND c.tamano > 0
+          AND r.count IN ('2','3','17')
+        ORDER BY cc.fecha_asignada ASC,
+                 cc.dia_bloque ASC
+                LIMIT 300";
+
+    }else {
+     
+      $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
+               c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
+               c.time_ruteo, c.conector,
+               cc.fecha_asignada, cc.dia_bloque
+        FROM corte c
+        JOIN registro r ON c.wo = r.wo
+        JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
+        WHERE c.cutStatus != 'Cortado'
+          AND r.programado = 1
+          AND c.maq_asignada = '$maquina'
+          AND c.tamano > 0
+          AND r.count IN ('2','3','17')
+        ORDER BY cc.fecha_asignada ASC,
+                 cc.dia_bloque ASC
+                LIMIT 150";
+
     }
-
-    // Añadimos el ordenamiento
-    $qry .= " ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
-                       CASE WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0 ELSE 1 END,
-                       c.tipo ASC";
 
     if (!isset($con) || !$con) {
         throw new Exception("La variable de conexión no está definida correctamente.");
