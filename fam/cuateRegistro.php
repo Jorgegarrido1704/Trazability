@@ -2,6 +2,7 @@
 require "../app/conection.php";
 
 $datos = isset($_GET['grupo']) ? trim($_GET['grupo']) : '';
+$items = isset($_GET['items']) ? $_GET['items'] : '';
 
 if ($datos != '') {
     $exclusivosNumerosdeparte = '';
@@ -117,6 +118,34 @@ if ($datos != '') {
         echo "No se encontraron otros números de parte del cliente con más del 30% de compatibilidad.";
     }
 
+}else if($items){
+    $items = explode(",", $items);
+    $ItemsCount = count($items);
+
+    $cuenta = $ItemsCount<3 ? $ItemsCount-1 : ($ItemsCount>3 ? $ItemsCount-2 : $ItemsCount);
+    if($ItemsCount <= 1){
+        header("Location: cuateRegistro.php");
+    }
+   
+    $items = "('" . implode("', '", $items) . "')";
+    echo $items;
+    $buscarDatos= $con->prepare("SELECT part_num
+    FROM `datos`     WHERE item IN $items
+    GROUP BY part_num HAVING COUNT(item) > $cuenta;");
+   
+    $buscarDatos->execute();
+    $registrosItems = $buscarDatos->get_result();
+   
+
+    while ($row = $registrosItems->fetch_assoc()) {
+        $parte = $row['part_num'];
+       
+        echo "<h3>Parte: $parte</h3>";
+        
+    }
+    $buscarDatos->close();
+    
+
 } else {
 ?>
 <!DOCTYPE html>
@@ -131,6 +160,12 @@ if ($datos != '') {
         <label for="grupo">Ingrese el número de parte:</label>
         <input type="text" name="grupo" id="grupo" required>
         <button type="submit">Buscar</button>
+    </form>
+    <br><hr><br>
+     <form method="GET" action="cuateRegistro.php">
+        <label for="items">Ingresa Items separados por comas: AT21-2, AT22-2</label>
+      <textarea name="items" id="items" cols="30" rows="10" required></textarea>
+        <button type="submit">Encontrar</button>
     </form>
 </body>
 </html>
