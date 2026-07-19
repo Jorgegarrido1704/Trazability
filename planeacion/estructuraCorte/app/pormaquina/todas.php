@@ -20,99 +20,85 @@ try {
     
     $tiempoTotal = 0; 
     $i = 0;
-    // TEMPORAL - para depurar el 500
+
+    // TEMPORAL - para depurar errores
     ini_set('display_errors', 0);
     error_reporting(E_ALL);
+    
     set_exception_handler(function($e) {
         header('Content-Type: application/json');
         echo json_encode(["status" => "error", "message" => $e->getMessage()]);
         exit;
     });
+    
     set_error_handler(function($errno, $errstr) {
         header('Content-Type: application/json');
         echo json_encode(["status" => "error", "message" => "$errstr (código $errno)"]);
         exit;
     });
-    $baseQry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp, c.tamano, 
-                       c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty, c.conector 
-                FROM corte c 
-                INNER JOIN registro r ON c.wo = r.wo 
-                LEFT JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
-                WHERE cc.wo IS NULL /* Filtro Anti-Join mucho más eficiente */
-                  AND c.cutStatus != 'Cortado' 
-                  AND r.programado = 1 
-                  AND c.tamano > 0 
-                  AND r.count IN ('2','3','17')";
 
-    if ($maquina === 'todas') {
-        $qry = $baseQry . " AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569')";
+    // Construcción del Query según la máquina seleccionada aplicando GROUP BY anti-duplicados
+    if ($maquina == 'todas') {
+        $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
+                       c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
+                       c.time_ruteo, c.conector,
+                       MIN(cc.fecha_asignada) as fecha_asignada, MIN(cc.dia_bloque) as dia_bloque
+                FROM corte c
+                JOIN registro r ON c.wo = r.wo
+                JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
+                WHERE c.cutStatus != 'Cortado'
+                  AND r.programado = 1
+                  AND c.tamano > 0
+                  AND r.count IN ('2','3','17')
+                GROUP BY c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
+                         c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
+                         c.time_ruteo, c.conector
+                ORDER BY MIN(cc.fecha_asignada) ASC,
+                         MIN(cc.dia_bloque) ASC,
+                         c.urgencia DESC,
+                         c.aws ASC,
+                         c.term1 ASC,
+                         CASE
+                            WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
+                            ELSE 1
+                         END,
+                         c.tipo ASC";
     } else {
-        $qry = $baseQry . " AND c.maq_asignada = ?";
+        $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
+                       c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
+                       c.time_ruteo, c.conector,
+                       MIN(cc.fecha_asignada) as fecha_asignada, MIN(cc.dia_bloque) as dia_bloque
+                FROM corte c
+                JOIN registro r ON c.wo = r.wo
+                JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
+                WHERE c.cutStatus != 'Cortado'
+                  AND r.programado = 1
+                  AND c.maq_asignada = '" . mysqli_real_escape_string($con, $maquina) . "'
+                  AND c.tamano > 0
+                  AND r.count IN ('2','3','17')
+                GROUP BY c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
+                         c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
+                         c.time_ruteo, c.conector
+                ORDER BY MIN(cc.fecha_asignada) ASC,
+                         MIN(cc.dia_bloque) ASC,
+                         c.urgencia DESC,
+                         c.aws ASC,
+                         c.term1 ASC,
+                         CASE
+                            WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
+                            ELSE 1
+                         END,
+                         c.tipo ASC";
     }
 
-    // Añadimos el ordenamiento
-    $qry .= " ORDER BY c.urgencia DESC, c.aws ASC, c.term1 ASC,
-                       CASE WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0 ELSE 1 END,
-                       c.tipo ASC";
-     if ($maquina == 'todas') {
-       $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
-               c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
-               c.time_ruteo, c.conector,
-               cc.fecha_asignada, cc.dia_bloque
-        FROM corte c
-        JOIN registro r ON c.wo = r.wo
-        JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
-        WHERE c.cutStatus != 'Cortado'
-          AND r.programado = 1
-          AND c.tamano > 0
-          AND r.count IN ('2','3','17')
-        ORDER BY cc.fecha_asignada ASC,
-                 cc.dia_bloque ASC,
-                 c.urgencia DESC,
-                 c.aws ASC,
-                 c.term1 ASC,
-                 CASE
-                    WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
-                    ELSE 1
-                 END,
-                 c.tipo ASC";
-
-    }else {
-     
-      $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
-               c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
-               c.time_ruteo, c.conector,
-               cc.fecha_asignada, cc.dia_bloque
-        FROM corte c
-        JOIN registro r ON c.wo = r.wo
-        JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
-        WHERE c.cutStatus != 'Cortado'
-          AND r.programado = 1
-          AND c.maq_asignada = '$maquina'
-          AND c.tamano > 0
-          AND r.count IN ('2','3','17')
-        ORDER BY cc.fecha_asignada ASC,
-                 cc.dia_bloque ASC,
-                 c.urgencia DESC,
-                 c.aws ASC,
-                 c.term1 ASC,
-                 CASE
-                    WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
-                    ELSE 1
-                 END,
-                 c.tipo ASC";
-
-    }
-
-    // SI EN TU ARCHIVO CONECTION.PHP LA VARIABLE SE LLAMA $conexion, CAMBIA ESTO A $conexion
     if (!isset($con) || !$con) {
-        throw new Exception("La variable de conexión no está definida correctamente.");
+        throw new \Exception("La variable de conexión no está definida correctamente.");
     }
 
     $listasdecorte = mysqli_query($con, $qry); 
     
     if (!$listasdecorte) {
-        throw new Exception("Error en la consulta SQL: " . mysqli_error($con));
+        throw new \Exception("Error en la consulta SQL: " . mysqli_error($con));
     }
 
     while ($rowlistas = mysqli_fetch_array($listasdecorte)) {
@@ -157,36 +143,34 @@ try {
         $fecha_asignada = $rowlistas['fecha_asignada'];
         $dia_bloque = $rowlistas['dia_bloque'];
 
-        
-        
-            $calibres[] = [ 
-                'id' => $id,
-                'pn' => $pn,
-                'calibre' => $calibre,
-                'consumo' => $consumo,
-                'tipo' => $tipo,
-                'color' => $color,
-                'tamano' => $tamano,
-                'Qty' => $qty,
-                'min' => $minutos,
-                'tinta' => $tinta,
-                'terminal1' => $terminal1,
-                'terminal2' => $terminal2,
-                'wo' => $wo, 
-                'codigo' => $codigo,
-                'strip1' => $strip1,
-                'strip2' => $strip2,
-                'conector' => $conector,
-                'estampado' => $estamp,
-                'fecha_asignada' => $rowlistas['fecha_asignada'],   
-                 'dia_bloque' => $rowlistas['dia_bloque']
-            ];                  
-       
+        $calibres[] = [ 
+            'id' => $id,
+            'pn' => $pn,
+            'calibre' => $calibre,
+            'consumo' => $consumo,
+            'tipo' => $tipo,
+            'color' => $color,
+            'tamano' => $tamano,
+            'Qty' => $qty,
+            'min' => $minutos,
+            'tinta' => $tinta,
+            'terminal1' => $terminal1,
+            'terminal2' => $terminal2,
+            'wo' => $wo, 
+            'codigo' => $codigo,
+            'strip1' => $strip1,
+            'strip2' => $strip2,
+            'conector' => $conector,
+            'estampado' => $estamp,
+            'fecha_asignada' => $fecha_asignada,   
+            'dia_bloque' => $dia_bloque
+        ];                  
     }
 
     header('Content-Type: application/json');
     echo json_encode($calibres);
-} catch (Exception $e) {
+
+} catch (\Exception $e) {
     error_log("Error cargando calibres: " . $e->getMessage());
     header('Content-Type: application/json');
     echo json_encode([
