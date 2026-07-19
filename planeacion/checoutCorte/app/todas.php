@@ -8,31 +8,24 @@ try {
    
     $tiempoTotal = 0; 
 
-     if ($maquina == 'todas') {
+     
        $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
                c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
                c.time_ruteo, c.conector,
                cc.fecha_asignada, cc.dia_bloque
         FROM corte c
-        JOIN registro r ON c.wo = r.wo
-        JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
+        JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons";
+
+    if($maquina == 'todas') {
+        $qry = $qry . "
         WHERE c.cutStatus != 'Cortado'
-          AND r.programado = 1
           AND c.tamano > 0
-          AND r.count IN ('2','3','17')
         ORDER BY cc.fecha_asignada ASC,
                  cc.dia_bloque ASC
                 LIMIT 300";
-
     }else {
      
-      $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
-               c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
-               c.time_ruteo, c.conector,
-               cc.fecha_asignada, cc.dia_bloque
-        FROM corte c
-        JOIN registro r ON c.wo = r.wo
-        JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons
+      $qry = $qry."
         WHERE c.cutStatus != 'Cortado'
           AND r.programado = 1
           AND c.maq_asignada = '$maquina'
