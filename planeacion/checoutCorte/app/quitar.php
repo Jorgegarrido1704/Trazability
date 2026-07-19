@@ -12,11 +12,14 @@ try {
     $changeEstatus = "UPDATE corte SET cutStatus='Cortado', fechaCorte='$fechaCorte' WHERE codigo='$codigo'";
     mysqli_query($con, $changeEstatus);
     
-    $buscarWo = mysqli_query($con, "SELECT wo FROM corte WHERE codigo='$codigo'");
+    $buscarWo = mysqli_query($con, "SELECT wo,cons FROM corte WHERE codigo='$codigo'");
     $filaWo = mysqli_fetch_row($buscarWo);
     
     if ($filaWo) {
+       
         $wo = $filaWo[0];
+        $cons = $filaWo[1];
+        $delte_congelados=mysqli_query($con, "DELETE FROM carga_congelada WHERE wo='$wo' AND consumo='$cons'");
         $buscar = mysqli_query($con, "SELECT * FROM corte WHERE wo='$wo' AND cutStatus='Activo'");
         
         if (mysqli_num_rows($buscar) == 0) {
