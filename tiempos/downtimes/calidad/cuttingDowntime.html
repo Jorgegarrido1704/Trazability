@@ -19,19 +19,26 @@
                 <label for="toolingCrimperName" class="form-label">Maquina de corte</label>
                 <select class="form-select" id="toolingCrimperName" name="toolingCrimperName" required>
                     <option value="" disabled selected>Selecciona maquina ID</option>
-                    <option value="M1">MCUT-4</option>
-                    <option value="M2">MCUT-5</option>
-                    <option value="M3">MCUT-6</option>
-                    <option value="M4">MCUT-10</option>
-                    <option value="M5">MCUT-1</option>
-                    <option value="M6">MCUT-7</option>
-
+                    <option value="M1">MCUT-1</option>
+                    <option value="M2">MCUT-2</option>
+                    <option value="M3">MCUT-3</option>
+                    <option value="M4">MCUT-4</option>
+                    <option value="M5">MCUT-5</option>
+                    <option value="M6">MCUT-6</option>
+                    <option value="M7">MCUT-7</option>
                         </select>   
                 </div>
                 <div class="col-md-2 mb-3">
                 <label for="Hour time" class="form-label">Horarios</label>
                    <select class="form-select" id="hourTime" name="hourTime" required onchange="CheckDuplicate();">
                     <option value="" disabled selected>Selecciona un horario</option>
+                   <option value="1">00:30:00-01:30:00</option>
+                    <option value="2">01:30:00-02:30:00</option>
+                    <option value="3">02:30:00-03:30:00</option>
+                    <option value="4">03:30:00-04:30:00</option>
+                    <option value="5">04:30:00-05:30:00</option>
+                    <option value="6">05:30:00-06:30:00</option>
+                     <option value="7">06:30:00-07:30:00</option>
                     <option value="8">07:30:00-08:30:00</option>
                     <option value="9">08:30:00-09:30:00</option>
                     <option value="10">09:30:00-10:30:00</option>
@@ -40,6 +47,15 @@
                     <option value="13">12:30:00-13:30:00</option>
                     <option value="14">13:30:00-14:30:00</option>
                     <option value="15">14:30:00-15:30:00</option>
+                    <option value="16">15:30:00-16:30:00</option>
+                    <option value="17">16:30:00-17:30:00</option>
+                    <option value="18">17:30:00-18:30:00</option>    
+                    <option value="19">18:30:00-19:30:00</option>
+                    <option value="20">19:30:00-20:30:00</option>
+                    <option value="21">20:30:00-21:30:00</option>
+                    <option value="22">21:30:00-22:30:00</option>
+                    <option value="23">22:30:00-23:30:00</option>
+                    <option value="24">23:30:00-00:30:00</option>
                     </select>   
                 </div>
                 <div class="col-md-2 mb-3">
