@@ -29,7 +29,7 @@ try {
         WHERE c.cutStatus != 'Cortado'
           AND c.maq_asignada = '$maquina'
           AND c.tamano > 0
-          AND r.count IN ('2','3','17')
+         
         ORDER BY cc.fecha_asignada ASC,
                  cc.dia_bloque ASC
                 LIMIT 150";
