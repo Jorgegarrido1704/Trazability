@@ -27,7 +27,6 @@ try {
      
       $qry = $qry."
         WHERE c.cutStatus != 'Cortado'
-          AND r.programado = 1
           AND c.maq_asignada = '$maquina'
           AND c.tamano > 0
           AND r.count IN ('2','3','17')
