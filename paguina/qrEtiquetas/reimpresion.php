@@ -108,8 +108,8 @@ try {
     }
 
     .bloque1 {
-        width: 14mm;
-        height: 14mm;
+        width: 16mm;
+        height: 16mm;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -117,8 +117,8 @@ try {
     }
 
     .bloque2 {
-        width: 16mm;
-        height: 14.9mm;
+        width: 19mm;
+        height: 16.9mm;
         padding-top: 6px;   
     }
 
@@ -141,7 +141,7 @@ try {
     .smallbox {
         border: 1px solid black;
         text-align: center;
-        font-size: 7px;
+        font-size: 9px;
         margin-bottom: 1px;
         white-space: nowrap;
         overflow: hidden;
@@ -150,7 +150,7 @@ try {
     .smallbox1 {
         border: 1px solid black;
         text-align: center;
-        font-size: 5px;
+        font-size: 7px;
         margin-bottom: 1px;
         white-space: nowrap;
         overflow: hidden;
@@ -164,7 +164,7 @@ try {
 <?php 
 
     $data = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivoSerial;
-    $qrcode = generarDataMatrixHTML($data, 12); // <-- tamaño en mm aquí
+    $qrcode = generarDataMatrixHTML($data, 15); // <-- tamaño en mm aquí
 ?>
     <div class="sheet">
         <div class="label">
