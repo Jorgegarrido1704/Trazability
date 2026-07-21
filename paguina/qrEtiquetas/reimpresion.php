@@ -62,63 +62,11 @@ function generarDataMatrixHTML($texto, $sizeMM = 10) {
 }
 
 try {
-    $wo = isset($_GET['wo']) ? $_GET['wo'] : "";
-    $cons = isset($_GET['cons']) ? intval($_GET['cons']) : 0;
-    
-    $today_db = date('mdY'); 
-    $today_qr = date('Ymd'); 
-    $todayDate = date('Y-m-d'); 
+   $np='300-1922-00-R01';
+   $rev='01';
+   $today_qr='20260612';
+   $consecutivoSerial='007';
 
-    $buscar = mysqli_query($con, "SELECT * FROM `registro` where `wo` = '$wo' limit 1");
-    
-    if (mysqli_num_rows($buscar) > 0) {
-        $rows = mysqli_fetch_array($buscar);
-        $np = $rows['NumPart'];
-        $rev = $rows['rev'];
-        $info = $rows['info'];
-        $desc = $rows['description'];
-        $qty = $rows['Qty'];
-
-        if (substr($rev, 0, 4) == "PPAP" or substr($rev, 0, 4) == "PRIM") {
-            $rev = substr($rev, 5);
-        }
-        $rev= strtoupper($rev);
-
-        $regstroCuenta = mysqli_query($con, "SELECT cuenta FROM `consterm` where `dias` = '$today_db' order by id desc limit 1");
-        if(mysqli_num_rows($regstroCuenta) > 0){
-            $rowsCuenta = mysqli_fetch_array($regstroCuenta);
-            $inicio = $rowsCuenta['cuenta'] + 1;
-            $cuentas = $rowsCuenta['cuenta'] + $cons;
-        } else {
-            $inicio = 1;
-            $cuentas = $cons;
-        }
-
-        // PROCESAMIENTO E INSERCIÓN EN BD
-        for($i = $inicio; $i <= $cuentas; $i++){
-            $consecutivo = str_pad($i, 3, "0", STR_PAD_LEFT);
-            if($np == '300-157000R01-R'){
-                $np = '300-1922-00-R01';
-            }
-            $dataDB = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivo;
-            mysqli_query($con, "INSERT INTO `registroqrs`( `infoQr`, `CodigoIdentificaicon`, `fecha`) VALUES ('$info','$dataDB','$todayDate')");
-        }
-        
-        $buscarCuenta = mysqli_query($con, "SELECT * FROM `consterm` where `codigo` = '$info' ");
-        if (mysqli_num_rows($buscarCuenta) > 0) {
-            $rowsCuenta = mysqli_fetch_array($buscarCuenta);
-            $total = $rowsCuenta['totalWo'] - $cons;
-            mysqli_query($con, "UPDATE `consterm` SET `dias` = '$today_db', `totalWo`= '$total' WHERE `consterm`.`codigo` = '$info' ");    
-            mysqli_query($con, "UPDATE `consterm` SET `cuenta` = '$cuentas' WHERE `dias` = '$today_db' ");
-        } else {
-            $rest = $qty - $cons;
-            mysqli_query($con, "INSERT INTO `consterm`( `pn`, `cuenta`, `rev`, `descri`, `dias`, `codigo`, `totalWo`) VALUES ('$np','$cuentas','$rev','$desc','$today_db','$info','$rest')");
-            mysqli_query($con, "UPDATE `consterm` SET `cuenta` = '$cuentas' WHERE `dias` = '$today_db' ");
-        }
-
-    } else {
-        throw new Exception("No se encontró el registro con la WO proporcionada.");
-    }
 ?>
 
 <!DOCTYPE html>
@@ -143,10 +91,9 @@ try {
     }
 
     .label {
-        width: 31.4mm;
-        height: 15.3mm;
-        border: 1px solid black;
-        border-radius: 2mm;
+        width: 35.4mm;
+        height: 20.3mm;
+       
         display: inline-block;
         padding: 0.3mm;
         font-family: Arial, sans-serif;
@@ -172,7 +119,7 @@ try {
     .bloque2 {
         width: 16mm;
         height: 14.9mm;
-        padding-top: 6px;
+        padding-top: 6px;   
     }
 
     @media print {
@@ -215,17 +162,9 @@ try {
 <body>
 
 <?php 
-for($j = $inicio; $j <= $cuentas; $j++){ 
-    if($j < 10){
-        $consecutivoSerial = "00".$j;
-    }
-    elseif($j < 100) {
-        $consecutivoSerial = "0".$j;
-    } else {
-        $consecutivoSerial = $j;
-    }
+
     $data = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivoSerial;
-    $qrcode = generarDataMatrixHTML($data, 10); // <-- tamaño en mm aquí
+    $qrcode = generarDataMatrixHTML($data, 12); // <-- tamaño en mm aquí
 ?>
     <div class="sheet">
         <div class="label">
@@ -243,7 +182,7 @@ for($j = $inicio; $j <= $cuentas; $j++){
             </div>
         </div>
     </div>
-<?php } ?>
+
 
 <script>
 window.onload = function() {
