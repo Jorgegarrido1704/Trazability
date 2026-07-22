@@ -164,7 +164,7 @@ try {
 <?php 
 
     $data = '5703|'.$np.'|'.$rev.'|'.$today_qr.'|'.$consecutivoSerial;
-    $qrcode = generarDataMatrixHTML($data, 15); // <-- tamaño en mm aquí
+    $qrcode = generarDataMatrixHTML($data, 12); // <-- tamaño en mm aquí
 ?>
     <div class="sheet">
         <div class="label">
