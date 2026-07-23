@@ -116,14 +116,14 @@ try {
         if ($strip1 == null) {
             $strip1 = 0;
         } else if ($strip1 < 1.5) {
-            $strip1 = $strip1 * 25.4;
+            $strip1 = floatval($strip1) * 25.4;
         }
         
         $strip2 = $rowlistas['strip2'];
         if ($strip2 == null) {
             $strip2 = 0;
         } else if ($strip2 < 1.5) {
-            $strip2 = $strip2 * 25.4;
+            $strip2 = floatval($strip2) * 25.4;
         }
         
         $strip1 = round((float)$strip1, 2);
@@ -136,7 +136,7 @@ try {
         $conector = $rowlistas['conector'];
         $estamp = isset($rowlistas['dist_stamp']) ? $rowlistas['dist_stamp'] : '';
         
-        $time_ruteo = round((2.92 * $qty) + 180, 2);
+        $time_ruteo = round((2.92 * intval($qty)) + 180, 2);
         $minutos = round(((float)$time_ruteo / 60), 2);
         
         $tiempoTotal += $time_ruteo;
