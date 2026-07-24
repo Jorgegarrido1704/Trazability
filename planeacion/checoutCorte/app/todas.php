@@ -22,7 +22,7 @@ try {
           AND c.tamano > 0
         ORDER BY cc.fecha_asignada ASC,
                  cc.dia_bloque ASC
-                LIMIT 300";
+               ";
     }else {
      
       $qry = $qry."
@@ -32,7 +32,7 @@ try {
          
         ORDER BY cc.fecha_asignada ASC,
                  cc.dia_bloque ASC
-                LIMIT 150";
+                ";
 
     }
 
