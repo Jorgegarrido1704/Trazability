@@ -237,4 +237,43 @@
             });
         });
 }
+ window.addEventListener('load', () => {
+            const maquina = document.getElementById('maquina_material').value;
+            materialista(maquina);
+        });
+        setInterval(() => {
+
+            let maquina = document.getElementById('maquina_material').value;
+            switch(maquina) {
+                case 'MCUT-1':
+                    maquina = 'MCUT-2';
+                    break;
+                case 'MCUT-2':
+                    maquina = 'MCUT-3';
+                    break;
+                case 'MCUT-3':
+                    maquina = 'MCUT-4';
+                    break;
+                case 'MCUT-4':
+                    maquina = 'MCUT-5';
+                    break;
+                case 'MCUT-5':
+                    maquina = 'MCUT-6';
+                    break;
+                case 'MCUT-6':
+                    maquina = 'MCUT-7';
+                    break;
+                case 'MCUT-7':
+                    window.location.reload();
+                    break;
+              
+                   
+                    break;
+                default:
+                    console.warn(`Maquina desconocida: ${maquina}`);
+            }
+            document.getElementById('maquina_material_name').textContent = maquina;
+            document.getElementById('maquina_material').value = maquina;
+            materialista(maquina);
+        }, 1000*2*60); // Actualizar cada 5 minutos 1000*5*60
 </script>
