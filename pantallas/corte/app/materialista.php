@@ -20,7 +20,7 @@ try {
         $result = mysqli_query($con, $qry);
     } else {
         $qry = "SELECT * FROM carga_congelada c
-                WHERE c.maq_asignada = ?
+                WHERE c.maquina = ?
                 ORDER BY
                     c.fecha_asignada, c.dia_bloque ASC,
                     c.color ASC,
