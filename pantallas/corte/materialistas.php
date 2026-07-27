@@ -225,6 +225,7 @@
 
                 const tiempoCalculado = `${formatoHora(inicio)} - ${formatoHora(fin)}${etiquetaDia}`;
 
+
                 tbodyCables.innerHTML += `<tr><td>${key}</td><td>${tiempoCalculado}</td></tr>`;
 
                 tiempoActual = fin;
@@ -232,8 +233,23 @@
 
             const tbodyTerminals = document.getElementById('terminalspormaquina');
             tbodyTerminals.innerHTML = '';
+            posiblesTerminales = {
+                'MCUT-1':['TT1-310','DT2-103','TT2-311','DT2-15','TT1-17'],
+                'MCUT-3':['TT2-311','DT2-17','DT2-21','DT2-690','DT2-74','TT2-14','TT2-309','TT2-310','DT2-310','TT1-310','TT2-311','DT2-11','DT2-45','DT2-17','TT1-310','TT2-310','TT2-311','DT2-15','DT2-4','DT2-5','DT1-5','DT1-54','DT2-4','DT1-31','DT2-14','ET2-27','ET1-36','MT1-20','DT1-62','ET1-35','TT1-31','TT1-310','DT2-36'],
+                'MCUT-2':[],
+                'MCUT-4':['DT2-15','DT2-17','DT2-74','TT2-14','TT1-310','TT2-310','TT2-311','DT2-74','DT2-85','MT2-48','DT2-128','DT2-17','TT1-310','TT2-311','ET1-35','MT1-131','MT1-62','MT1-4','ET1-35','DT2-36'],
+                'MCUT-5':['TT2-309','DT2-74','TT2-311','DT2-74','TT1-310','TT2-311','DT2-15','TT2-14','ET1-35','ET2-27','MT1-119','ET1-5','ET2-27','ET1-35'],
+                'MCUT-6':['DT2-11','DT2-119','DT2-103','DT2-128','DT2-17','DT2-74','TT2-14','TT2-311','DT2-74','DT1-775','DT2-11','DT2-11 ','DT2-45','DT2-85','DT2-85','DT2-12','DT2-128','DT2-17','DT2-16','TT2-311','DT2-15','DT2-45','DT2-36','DT1-17','TT2-9','ET2-41','ET1-36','ET2-36','MT1-131','MT2-132','TT2-70','ET2-27','DT2-23','ET1-35','DT2-36'],
+            }
             Object.keys(terminals).forEach(key => {
-                tbodyTerminals.innerHTML += `<tr><td>${key}</td></tr>`;
+                //buscar key en posiblesTerminales
+                if(posiblesTerminales[maquina].includes(key)){
+                    tbodyTerminals.innerHTML += `<tr><td class="bg-success">${key}</td></tr>`;
+                }else{
+                    tbodyTerminals.innerHTML += `<tr><td>${key}</td></tr>`;
+                }
+
+                
             });
         });
 }

@@ -43,6 +43,7 @@ try {
         $terminal1 = $rowlistas['terminal1'];
         $terminal2 = $rowlistas['terminal2'];
         $minutos = $rowlistas['minutos'];
+        $minutos = round($minutos, 2);
 
         $clave = $calibre . "-" . $tipo . "-" . $color;
         if (array_key_exists($clave, $cables)) {
@@ -51,10 +52,12 @@ try {
             $cables[$clave] = $minutos;
         }
 
-        if (!array_key_exists($terminal1, $terminales) && stripos($terminal1, 'Empalme') === false) {
+        if (!array_key_exists($terminal1, $terminales) && stripos($terminal1, 'Empalme') === false &&
+        stripos($terminal1, 'BLUNT') === false && stripos($terminal1, 'SPLICE') === false ) {
             $terminales[$terminal1] = 1;
         }
-        if (!array_key_exists($terminal2, $terminales) && stripos($terminal2, 'Empalme') === false) {
+        if (!array_key_exists($terminal2, $terminales) && stripos($terminal2, 'Empalme') === false &&
+        stripos($terminal2, 'BLUNT') === false && stripos($terminal2, 'SPLICE') === false ) {
             $terminales[$terminal2] = 1;
         }
     }
