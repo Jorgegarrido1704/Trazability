@@ -3,9 +3,7 @@
 require '../conection.php';
 
 try {
-    $color = isset($_GET['color']) ? $_GET['color'] : '';
-    $awg = isset($_GET['awg']) ? $_GET['awg'] : '';
-    $tipo = isset($_GET['type']) ? $_GET['type'] : '';
+  
     $maquina = isset($_GET['maquina']) ? $_GET['maquina'] : 'todas';
     $calibres = [];
     $totalCables = 0;

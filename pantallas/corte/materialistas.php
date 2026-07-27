@@ -154,83 +154,86 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-      function materialista(material) {
-            fetch(`app/materialista.php?maquina=${encodeURIComponent(material)}`)
-                .then(response => response.json())
-                .then(data => {
-                    const cables = data.cables;
-                    const terminals = data.terminales;
-                    const tbodyCables = document.getElementById('cablespormaquina');
-                    let tiempo_del_trabajo = 450;
-                    
-                    document.getElementById('totalCables').textContent = Object.keys(cables).length;
-                    document.getElementById('totalterminales').textContent = Object.keys(terminals).length;
-                    
-                    tbodyCables.innerHTML = '';
-                    Object.keys(cables).forEach(key => {
-                        const minutos = parseInt(cables[key]);
-                        tiempo_del_trabajo
-                        ulhh = (tiempo_del_trabajo/60).toFixed(3).split('.')[0];
-                        if(ulhh.length == 1) ulhh = '0'+ulhh;
-                        ulmm = (tiempo_del_trabajo%60).toFixed(0);
-                        if(ulmm.length == 1) ulmm = '0'+ulmm;
-                        let horaAcutal = minutos+tiempo_del_trabajo;
-                        hh = (horaAcutal/60).toFixed(3).split('.')[0];
-                        if(hh.length == 1) hh = '0'+hh;
-                        mm = (horaAcutal%60).toFixed(0);
-                        if(mm.length == 1) mm = '0'+mm;
-                        const tiempoCalculado = `${ulhh}:${ulmm} - ${hh}:${mm}`;
+    function materialista(material) {
+      fetch(`app/materialista.php?maquina=${encodeURIComponent(material)}`)
+        .then(response => response.json())
+        .then(data => {
+            const cables = data.cables;
+            const terminals = data.terminales;
+            const tbodyCables = document.getElementById('cablespormaquina');
 
-                        tbodyCables.innerHTML += `<tr><td>${key}</td><td>${tiempoCalculado}</td></tr>`;
-                        tiempo_del_trabajo += parseInt(cables[key]);
-                    });
-                    
-                    const tbodyTerminals = document.getElementById('terminalspormaquina');
-                    tbodyTerminals.innerHTML = '';
-                    Object.keys(terminals).forEach(key => {
-                        tbodyTerminals.innerHTML += `<tr><td>${key}</td></tr>`;
-                    });
-                });
-        }
-        
+            document.getElementById('totalCables').textContent = Object.keys(cables).length;
+            document.getElementById('totalterminales').textContent = Object.keys(terminals).length;
 
-       window.addEventListener('load', () => {
-            const maquina = document.getElementById('maquina_material').value;
-            materialista(maquina);
-        });
-        setInterval(() => {
-
-            let maquina = document.getElementById('maquina_material').value;
-            switch(maquina) {
-                case 'MCUT-1':
-                    maquina = 'MCUT-2';
-                    break;
-                case 'MCUT-2':
-                    maquina = 'MCUT-3';
-                    break;
-                case 'MCUT-3':
-                    maquina = 'MCUT-4';
-                    break;
-                case 'MCUT-4':
-                    maquina = 'MCUT-5';
-                    break;
-                case 'MCUT-5':
-                    maquina = 'MCUT-6';
-                    break;
-                case 'MCUT-6':
-                    maquina = 'MCUT-7';
-                    break;
-                case 'MCUT-7':
-                    window.location.reload();
-                    break;
-              
-                   
-                    break;
-                default:
-                    console.warn(`Maquina desconocida: ${maquina}`);
+            // ---- Helpers de tiempo ----
+            function pad(n) { return n < 10 ? '0' + n : '' + n; }
+            function formatoHora(fecha) {
+                return `${pad(fecha.getHours())}:${pad(fecha.getMinutes())}`;
             }
-            document.getElementById('maquina_material_name').textContent = maquina;
-            document.getElementById('maquina_material').value = maquina;
-            materialista(maquina);
-        }, 1000*2*60); // Actualizar cada 5 minutos 1000*5*60
+
+            // Devuelve el siguiente día hábil (si cae domingo, brinca a lunes) a las 7:40am
+            function siguienteDiaHabil(fecha) {
+                let nueva = new Date(fecha);
+                nueva.setDate(nueva.getDate() + 1);
+                if (nueva.getDay() === 0) { // 0 = domingo
+                    nueva.setDate(nueva.getDate() + 1);
+                }
+                nueva.setHours(7, 40, 0, 0);
+                return nueva;
+            }
+
+            // Si el punto de arranque ya es domingo o ya pasó las 5:30pm, lo reubica
+            function inicioValido(fecha) {
+                let f = new Date(fecha);
+                const limite = new Date(f);
+                limite.setHours(17, 30, 0, 0);
+                if (f.getDay() === 0 || f > limite) {
+                    return siguienteDiaHabil(f);
+                }
+                return f;
+            }
+
+            // Punto de partida: el momento actual, ya validado
+            let tiempoActual = inicioValido(new Date());
+            let ultimoDiaMostrado = tiempoActual.toDateString();
+
+            tbodyCables.innerHTML = '';
+            Object.keys(cables).forEach(key => {
+                const minutos = parseInt(cables[key]);
+
+                let inicio = new Date(tiempoActual);
+                let fin = new Date(inicio.getTime() + minutos * 60000);
+
+                // Límite de las 5:30pm del día de "inicio"
+                const limite = new Date(inicio);
+                limite.setHours(17, 30, 0, 0);
+
+                // Si esta tarea se pasaría de las 5:30pm, se recorre al siguiente día hábil
+                if (fin > limite) {
+                    inicio = siguienteDiaHabil(inicio);
+                    fin = new Date(inicio.getTime() + minutos * 60000);
+                }
+
+                // Etiqueta de día, solo si cambió respecto al renglón anterior
+                let etiquetaDia = '';
+                const diaActual = inicio.toDateString();
+                if (diaActual !== ultimoDiaMostrado) {
+                    etiquetaDia = ` (${inicio.toLocaleDateString('es-MX', { weekday: 'short', day: '2-digit', month: '2-digit' })})`;
+                    ultimoDiaMostrado = diaActual;
+                }
+
+                const tiempoCalculado = `${formatoHora(inicio)} - ${formatoHora(fin)}${etiquetaDia}`;
+
+                tbodyCables.innerHTML += `<tr><td>${key}</td><td>${tiempoCalculado}</td></tr>`;
+
+                tiempoActual = fin;
+            });
+
+            const tbodyTerminals = document.getElementById('terminalspormaquina');
+            tbodyTerminals.innerHTML = '';
+            Object.keys(terminals).forEach(key => {
+                tbodyTerminals.innerHTML += `<tr><td>${key}</td></tr>`;
+            });
+        });
+}
 </script>
