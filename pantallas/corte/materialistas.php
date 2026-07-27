@@ -243,7 +243,7 @@
             }
             Object.keys(terminals).forEach(key => {
                 //buscar key en posiblesTerminales
-                if(posiblesTerminales[maquina].includes(key)){
+                if(posiblesTerminales[material].includes(key)){
                     tbodyTerminals.innerHTML += `<tr><td class="bg-success">${key}</td></tr>`;
                 }else{
                     tbodyTerminals.innerHTML += `<tr><td>${key}</td></tr>`;
