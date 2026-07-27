@@ -158,6 +158,7 @@
       fetch(`app/materialista.php?maquina=${encodeURIComponent(material)}`)
         .then(response => response.json())
         .then(data => {
+            console.log(data);
             const cables = data.cables;
             const terminals = data.terminales;
             const tbodyCables = document.getElementById('cablespormaquina');
