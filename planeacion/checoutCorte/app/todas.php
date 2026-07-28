@@ -49,8 +49,15 @@ try {
         $consumo = $rowlistas['cons'];
         $tipo = $rowlistas['tipo'];
         $color = $rowlistas['color'];
+        $wo = $rowlistas['wo'];
+
         $tamano = round((float)$rowlistas['tamano'], 2);
         $terminal1 = $rowlistas['term1'];
+        $esta_congelado ='';
+        $congelada= mysqli_query($con,"SELECT * FROM carga_congelada WHERE wo = '$wo' AND cons = '$consumo LIMIT 1");
+        if(mysqli_num_rows($congelada) > 0){
+            $esta_congelado = 'Esta congelado';
+        }
         
         $strip1 = $rowlistas['strip1'] ?? 0;
         if ($strip1 < 1.5 && $strip1 > 0) $strip1 = $strip1 * 25.4;
@@ -91,7 +98,8 @@ try {
                 'strip1' => $strip1,
                 'strip2' => $strip2,
                 'conector' => $conector,
-                'estampado' => $estamp
+                'estampado' => $estamp,
+                'congelada' => $esta_congelado
             ];                  
         
     }
