@@ -14,7 +14,9 @@ try {
         FROM `corte` c JOIN `registro` r ON c.wo = r.wo
         WHERE r.count IN ('2','3','17','1')
         GROUP BY c.np, c.wo
-        ORDER BY porcentaje_activos DESC
+        ORDER BY 
+        porcentaje_activos DESC,
+        total_cortes ASC
     ";
 
     $cortes = mysqli_query($con, $query);
