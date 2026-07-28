@@ -85,7 +85,7 @@ foreach ($pnRegistros as $pn => $weeks) {
             $times = 0;
 
             if ($value > 0) {
-             $times = (($row['processtime'] * $value) + $row['setupTime'])*1.15;
+             $times = (($row['processtime'] * $value) + $row['setupTime']);//*1.15;
                 $perDay = $times / 5;
                 
                 $perDay = round($perDay/60, 2);
