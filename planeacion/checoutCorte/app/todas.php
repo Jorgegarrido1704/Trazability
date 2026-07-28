@@ -54,7 +54,7 @@ try {
         $tamano = round((float)$rowlistas['tamano'], 2);
         $terminal1 = $rowlistas['term1'];
         $esta_congelado ='';
-        $congelada= mysqli_query($con,"SELECT * FROM carga_congelada WHERE wo = '$wo' AND cons = '$consumo' LIMIT 1");
+        $congelada= mysqli_query($con,"SELECT * FROM carga_congelada WHERE wo = '$wo' AND consumo = '$consumo' LIMIT 1");
         if(mysqli_num_rows($congelada) > 0){
             $esta_congelado = 'Esta congelado';
         }
