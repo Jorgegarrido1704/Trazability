@@ -48,7 +48,7 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
         $insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `rev`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`,`strip1`, `term2`,`strip2`, `dataFrom`, `dataTo`, `qty`, `tamano`, `conector`,`tintaColor`,`time_ruteo`,`dist_stamp` ) VALUES ('$pn','$client','$rev','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$strip1','$term2','$strip2','$dataForm','$dataTo','$cuantos','$tamano','$conector','$tinta','$tiempo','$distEstamp')");
     }else{
         $update= mysqli_query($con,"UPDATE corte SET
-       `color`='$color',`tipo`='$tipo',`aws`='$aws',`term1`='$term1',`strip1`='$strip1',`term2`='$term2',`strip2`='$strip2',`dataFrom`='$dataForm',`dataTo`='$dataTo',`tamano`='$tamano',`conector`='$conector',
+       `color`='$color',`tipo`='$tipo',`aws`='$aws',`term1`='$term1',`strip1`='$strip1',`term2`='$term2',`strip2`='$strip2',`dataFrom`='$dataForm',`dataTo`='$dataTo',`tamano`='$tamano',`conector`='$conector'
          WHERE cons='$cons' AND wo='$wo' AND cutStatus='Activo'");
         
     }
