@@ -59,7 +59,7 @@ foreach ($allWeeks as $week => $_) {
 echo "<th rowspan='2'>Total</th></tr>";
 
 // Header días
-$dias = ["Mon","Tue","Wed","Thu","Fri","Sat"];
+$dias = ["Mon(hrs)","Tue(hrs)","Wed(hrs)","Thu(hrs)","Fri(hrs)","Sat(hrs)"];
 echo "<tr>";
 foreach ($allWeeks as $week => $_) {
     foreach ($dias as $d) {
@@ -89,13 +89,16 @@ foreach ($pnRegistros as $pn => $weeks) {
                 $perDay = $times / 6;
                 
                 $perDay = round($perDay/60, 2);
+
                 for ($i = 0; $i < 6; $i++) {
                     
                     if (!isset($totalsPerDay[$week])) {
                         $totalsPerDay[$week] = 0;
                     }
                     $pzs = $value / 6;
-                    echo "<td>{$perDay} Hr/{$pzs} Pzs</td>";
+                    $pzs = round($pzs,2);
+                    $perDay = round($perDay,2);
+                    echo "<td>{$perDay} Hrs / {$pzs} Pzs</td>";
                 }
                 $totalsPerDay[$week] += $times;
             } else {
