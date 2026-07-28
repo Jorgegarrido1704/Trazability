@@ -4,7 +4,7 @@ try {
 
 $pn= isset($_POST['np']) ? $_POST['np'] : '';
 
-$delCore=mysqli_query($con,"DELETE FROM corte WHERE cutStatus = 'Activo' AND wo = '$pn' ");
+
 
 
 $buscar=mysqli_query($con,"SELECT * FROM registro WHERE count IN ('2','3','17','1') AND wo = '$pn'  ORDER BY count ASC");
@@ -35,19 +35,24 @@ $selectlist=mysqli_query($con,"SELECT * FROM listascorte WHERE pn='$pn' AND rev=
         $tinta=$rowList['colorTinta'];
         $distEstamp= $rowList['dist_stamp'];
     $tiempo = round(($rowList['defaultTime'] * $cuantos),2);
-    $codigo=substr($wo,2).$cons;
+    $codigo=$wo."-".$cons;
 
       
        if(substr($cons,0,5)=="C"){
         $cons=str_replace([".","-"," "],"",$cons);
-        $codigo=substr($wo,2).substr($cons,5);
+        $codigo=$wo."-".substr($cons,5);
 
-        }else{ $codigo=substr($wo,2).$cons;}
-    $buscarDuplicado=mysqli_query($con,"SELECT * FROM corte WHERE wo='$wo' AND cons='$cons' ");
+        }else{ $codigo=$wo."-".$cons;}
+    $buscarDuplicado=mysqli_query($con,"SELECT * FROM corte WHERE wo='$wo' AND cons='$cons' AND cutStatus='Activo'");
     if(mysqli_num_rows($buscarDuplicado)==0){
         $insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `rev`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`,`strip1`, `term2`,`strip2`, `dataFrom`, `dataTo`, `qty`, `tamano`, `conector`,`tintaColor`,`time_ruteo`,`dist_stamp` ) VALUES ('$pn','$client','$rev','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$strip1','$term2','$strip2','$dataForm','$dataTo','$cuantos','$tamano','$conector','$tinta','$tiempo','$distEstamp')");
+    }else{
+        $update= mysqli_query($con,"UPDATE corte SET
+       `color`='$color',`tipo`='$tipo',`aws`='$aws',`term1`='$term1',`strip1`='$strip1',`term2`='$term2',`strip2`='$strip2',`dataFrom`='$dataForm',`dataTo`='$dataTo',`tamano`='$tamano',`conector`='$conector',
+         WHERE cons='$cons' AND wo='$wo' AND cutStatus='Activo'");
+        
     }
-    //$insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `rev`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`,`strip1`, `term2`,`strip2`, `dataFrom`, `dataTo`, `qty`, `tamano`, `conector`,`tintaColor`,`time_ruteo`,`dist_stamp` ) VALUES ('$pn','$client','$rev','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$strip1','$term2','$strip2','$dataForm','$dataTo','$cuantos','$tamano','$conector','$tinta','$tiempo','$distEstamp')");
+    //$insertar=mysqli_query($con,"INSERT INTO corte (`np`, `cliente`, `rev`, `wo`, `cons`, `color`, `tipo`, `aws`, `codigo`, `term1`,`strip1`, `term2`,`strip2`, `dataFrom`, `dataTo`, `qty`, `tamano`, `conector`,`tintaColor`,`time_ruteo`,`dist_stamp` )('$pn','$client','$rev','$wo','$cons','$color','$tipo','$aws','$codigo','$term1','$strip1','$term2','$strip2','$dataForm','$dataTo','$cuantos','$tamano','$conector','$tinta','$tiempo','$distEstamp')");
 }}
 
     //echo "<br><br><h1>Se Agregaron correctamente Correctamente</h1>";
