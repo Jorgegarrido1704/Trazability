@@ -9,19 +9,17 @@ try {
     $tiempoTotal = 0; 
 
      
-       $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
-               c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
-               c.time_ruteo, c.conector,
-               cc.fecha_asignada, cc.dia_bloque
+       $qry = "SELECT c.*
         FROM corte c
-        JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons";
+                    ";
+       
 
     if($maquina == 'todas') {
         $qry = $qry . "
         WHERE c.cutStatus != 'Cortado'
           AND c.tamano > 0
-        ORDER BY cc.fecha_asignada ASC,
-                 cc.dia_bloque ASC
+        ORDER BY c.wo ASC,
+                 c.cons ASC
                ";
     }else {
      
@@ -29,9 +27,8 @@ try {
         WHERE c.cutStatus != 'Cortado'
           AND c.maq_asignada = '$maquina'
           AND c.tamano > 0
-         
-        ORDER BY cc.fecha_asignada ASC,
-                 cc.dia_bloque ASC
+        ORDER BY c.wo ASC,
+                 c.cons ASC
                 ";
 
     }
