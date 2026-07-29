@@ -72,7 +72,7 @@ echo "</tr>";
 foreach ($pnRegistros as $pn => $weeks) {
     
 
-    $timeProcess = mysqli_query($con, "SELECT COUNT(*) as cuentas FROM `routing_models` WHERE `pn_routing`='$pn' and `work_routing`='10341' ORDER BY `id_routing` ASC; ");
+    $timeProcess = mysqli_query($con, "SELECT SUM(`timePerProcess`) as tiempo, COUNT(`id_routing`) as cuentas FROM `routing_models` WHERE `pn_routing`='$pn' and `work_routing`='10341' ORDER BY `id_routing` ASC; ");
 
     while ($row = mysqli_fetch_assoc($timeProcess)) {
 
@@ -87,7 +87,7 @@ foreach ($pnRegistros as $pn => $weeks) {
             if ($value > 0) {
               // 
               $valoresCorte=[];
-                $times = (($row['cuentas']*10) * $value);
+                $times = (($row['tiempo']) * $value);
                 $perDay = $times / 5;
                 $valores=$value/5;
                 for($i=0; $i<5; $i++){
@@ -110,7 +110,7 @@ foreach ($pnRegistros as $pn => $weeks) {
                         $valoresCorte[$i]=0;
                         $perDay=0;
                     }else{
-                        $perDay=round(($row['cuentas']*10) * $valoresCorte[$i] / 60, 2);
+                        $perDay=round(($row['tiempo']) * $valoresCorte[$i] / 60, 2);
                          $totalsPerDay[$week][$i] += $perDay;
                     }
 
