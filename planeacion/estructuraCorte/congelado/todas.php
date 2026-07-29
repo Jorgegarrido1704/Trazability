@@ -42,7 +42,7 @@ try {
               )
           AND c.cutStatus != 'Cortado' 
           AND r.programado = 1 
-          AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569')
+         
           AND c.tamano > 0 
           AND r.count IN ('2','3','17')
         ORDER BY c.urgencia DESC, c.aws ASC, 

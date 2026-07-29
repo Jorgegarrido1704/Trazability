@@ -9,10 +9,10 @@ try {
     $fechaCorte = date('Y-m-d H:i:s');
     $nuevafechaCutF= date('d-m-Y H:i');
   
-    $changeEstatus = "UPDATE corte SET cutStatus='Cortado', fechaCorte='$fechaCorte' WHERE codigo='$codigo'";
+    $changeEstatus = "UPDATE corte SET cutStatus='Cortado', fechaCorte='$fechaCorte' WHERE id='$codigo'";
     mysqli_query($con, $changeEstatus);
     
-    $buscarWo = mysqli_query($con, "SELECT wo,cons FROM corte WHERE codigo='$codigo'");
+    $buscarWo = mysqli_query($con, "SELECT wo,cons FROM corte WHERE id='$codigo'");
     $filaWo = mysqli_fetch_row($buscarWo);
     
     if ($filaWo) {

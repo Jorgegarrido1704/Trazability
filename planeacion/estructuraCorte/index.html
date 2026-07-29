@@ -714,7 +714,7 @@
         function pormaquina() {
             const maquina = document.getElementById('maquinaSeleccionada').value;
 
-            fetch(`app/pormaquina/todas.php?maquina=${encodeURIComponent(maquina)}`)
+            fetch(`app/pormaquina/carga_congelada.php?maquina=${encodeURIComponent(maquina)}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === "error") {
