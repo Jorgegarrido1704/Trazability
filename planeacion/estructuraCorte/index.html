@@ -305,7 +305,7 @@
                     <button class="btn btn-light btn-sm" onclick="maquinaSelecionada('MCUT-7')">Cables Especiales</button>
                 </div>
             </nav>
-           <select id="fechaSeleccionada">
+           <select id="fechaSeleccionada" onchange="renderTablaAgrupada()">
                 <option value="todas">Todas las fechas</option>
             </select>
             <div class="card shadow-sm">
@@ -724,13 +724,22 @@
                     }
 
                     datosGlobal = data;
-                    renderTablaAgrupada(datosGlobal);
+                    renderTablaAgrupada();
                     poblarSelectorFechas(datosGlobal);
                 })
                 .catch(err => console.error("Error en el procesamiento del Fetch:", err));
         }
 
-        function renderTablaAgrupada(data) {
+        function renderTablaAgrupada() {
+             const filtro = document.getElementById('fechaSeleccionada')?.value || 'todas';
+
+            let data = datosGlobal;
+            if (filtro !== 'todas') {
+                const [fecha, turno] = filtro.split('|');
+                data = datosGlobal.filter(item =>
+                    String(item.fecha_asignada) === fecha && String(item.dia_bloque) === turno
+                );
+            }
             const tbody = document.getElementById('resultTotal');
             tbody.innerHTML = '';
             let totalRecords = 0;
@@ -769,6 +778,7 @@
             document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
         }
 
+
         function poblarSelectorFechas(data) {
             const selector = document.getElementById('fechaSeleccionada');
             if (!selector) return;
@@ -798,7 +808,7 @@
                 return "07:30";
             }
         }
-
+      
         function imprimirEtiqueta2() {
             document.getElementById('app').style.display = 'none';
             document.getElementById('etiquetas').style.display = 'block';
