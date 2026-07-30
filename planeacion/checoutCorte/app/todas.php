@@ -16,16 +16,23 @@ try {
 
     if($maquina == 'todas') {
         $qry = $qry . "
-        WHERE fecha_asignada = (SELECT fecha_asignada FROM carga_congelada  ORDER BY id ASC LIMIT 1)  
-        ORDER BY c.wo ASC,
-                 c.consumo ASC
+        WHERE
+        ORDER BY 
+         c.dia_bloque ASC,
+        c.fecha_asignada ASC,
+        c.wo ASC,
+        c.consumo ASC
                ";
     }else {
      
       $qry = $qry."
         WHERE c.maquina = '$maquina'
-        AND  fecha_asignada = (SELECT fecha_asignada FROM carga_congelada WHERE maquina = '$maquina' ORDER BY id ASC LIMIT 1) 
-        ORDER BY c.wo ASC,
+        
+        ORDER BY 
+        c.dia_bloque ASC,
+        c.fecha_asignada ASC,
+
+        c.wo ASC,
                  c.consumo ASC
                 ";
 
