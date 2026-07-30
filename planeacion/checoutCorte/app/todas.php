@@ -16,10 +16,11 @@ try {
 
     if($maquina == 'todas') {
         $qry = $qry . "
-        WHERE
+       
         ORDER BY 
-         c.dia_bloque ASC,
+         
         c.fecha_asignada ASC,
+        c.dia_bloque ASC,
         c.wo ASC,
         c.consumo ASC
                ";
@@ -27,11 +28,10 @@ try {
      
       $qry = $qry."
         WHERE c.maquina = '$maquina'
-        
         ORDER BY 
-        c.dia_bloque ASC,
+       
         c.fecha_asignada ASC,
-
+        c.dia_bloque ASC,
         c.wo ASC,
                  c.consumo ASC
                 ";
@@ -52,8 +52,9 @@ try {
         $pn = $rowlistas['pn'];
         $consumo = $rowlistas['consumo']; 
         $wo = $rowlistas['wo'];
-        $esta_congelado = 'Esta congelado';
+        $esta_congelado = $rowlistas['fecha_asignada'].'-'.$rowlistas['dia_bloque'];
         $codigo = $rowlistas['id_corte'];
+
       
         
             $calibres[] = [ 
