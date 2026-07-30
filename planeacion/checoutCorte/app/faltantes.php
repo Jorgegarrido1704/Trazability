@@ -16,7 +16,7 @@ try {
 
     if($maquina == 'todas') {
         $qry = $qry . "
-       WHERE c.urgencia is null
+       WHERE c.urgencia = 1
         ORDER BY 
          
         c.fecha_asignada ASC,
@@ -27,7 +27,7 @@ try {
     }else {
      
       $qry = $qry."
-        WHERE c.maquina = '$maquina' AND c.urgencia is null
+        WHERE c.maquina = '$maquina' AND c.urgencia =1
         ORDER BY 
        
         c.fecha_asignada ASC,
