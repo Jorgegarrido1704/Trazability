@@ -153,10 +153,10 @@ function generarPropuesta() {
     ]).then(([pendientes, congelado]) => {
 
         // Set de WO+PN que ya están congelados, para excluirlos
-        const yaCongelados = new Set();
-        congelado.forEach(dia => dia.items.forEach(it => yaCongelados.add(`${it.wo}|${it.pn}`)));
+       const yaCongelados = new Set();
+        congelado.forEach(dia => dia.items.forEach(it => yaCongelados.add(`${it.wo}|${it.consumo}`)));
 
-        const disponibles = pendientes.filter(it => !yaCongelados.has(`${it.wo}|${it.pn}`));
+        const disponibles = pendientes.filter(it => !yaCongelados.has(`${it.wo}|${it.consumo}`));
 
         if (!disponibles.length) {
             cont.innerHTML = '<div class="text-muted">No hay pendientes por repartir: todo ya está congelado.</div>';

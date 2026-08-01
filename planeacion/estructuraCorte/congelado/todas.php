@@ -44,7 +44,7 @@ try {
           AND r.programado = 1 
          
           AND c.tamano > 0 
-          AND r.count IN ('1','2','3','17')
+          AND r.count IN ('2','3','17')
         ORDER BY c.urgencia DESC, c.aws ASC, 
                  c.term1 ASC,
                  CASE 
