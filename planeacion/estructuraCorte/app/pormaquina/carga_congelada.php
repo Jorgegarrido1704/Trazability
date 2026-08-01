@@ -45,10 +45,11 @@ try {
     // Construcción del Query según la máquina seleccionada aplicando GROUP BY anti-duplicados
     if ($maquina == 'todas') {
         $qry = $qry . " WHERE c.cutStatus != 'Cortado'
-                      AND c.tamano > 0     
+                      AND c.tamano > 0  AND cc.urgencia IS NULL 
                 GROUP BY c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
                          c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
                          c.time_ruteo, c.conector
+                        
                 ORDER BY MIN(cc.fecha_asignada) ASC,
                          MIN(cc.dia_bloque) ASC,
                          c.urgencia DESC,
@@ -62,6 +63,7 @@ try {
     } else {
         $qry = $qry . " WHERE c.cutStatus != 'Cortado'
                   AND cc.maquina = '" . mysqli_real_escape_string($con, $maquina) . "'
+                  AND cc.urgencia IS NULL
                 GROUP BY c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
                          c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
                          c.time_ruteo, c.conector
