@@ -59,7 +59,7 @@ try {
         FROM corte c 
         JOIN registro r ON c.wo = r.wo 
         WHERE NOT EXISTS (
-                SELECT * FROM carga_congelada cc WHERE cc.wo = c.wo AND cc.consumo = c.cons
+                SELECT 1 FROM carga_congelada cc WHERE cc.wo = c.wo AND cc.consumo = c.cons
               )
           AND c.cutStatus != 'Cortado' 
           AND r.programado = 1 
