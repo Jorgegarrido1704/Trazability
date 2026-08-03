@@ -52,6 +52,9 @@ try {
         $pn = $rowlistas['pn'];
         $consumo = $rowlistas['consumo']; 
         $wo = $rowlistas['wo'];
+        $calibre = $rowlistas['calibre'];
+        $color = $rowlistas['color'];
+        $tipo = $rowlistas['tipo'];
         $esta_congelado = $rowlistas['fecha_asignada'].'-'.$rowlistas['dia_bloque'];
         $codigo = $rowlistas['id_corte'];
 
@@ -62,7 +65,8 @@ try {
                 'consumo' => $consumo,
                 'wo' => $wo, 
                 'codigo' => $codigo,
-                'congelada' => $esta_congelado
+                'congelada' => $esta_congelado,
+                'cable'=>$calibre.'-'.$color.'-'.$tipo
             ];                  
         
     }
