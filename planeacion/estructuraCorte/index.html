@@ -866,10 +866,10 @@
      
 
                 new QRCode(document.getElementById(`qrcode-lateral${id}`), {
-                    text: codigoQR, width: 55, height: 55, correctLevel: QRCode.CorrectLevel.L
+                    text: codigoQR, width: 128, height: 128, correctLevel: QRCode.CorrectLevel.M
                 });
                 new QRCode(document.getElementById(`qrcode-inferior${id}`), {
-                    text: contenidoQR, width: 55, height: 55, correctLevel: QRCode.CorrectLevel.L
+                    text: contenidoQR, width: 128, height: 128, correctLevel: QRCode.CorrectLevel.M
                 });
 
                 totalRecords++;
