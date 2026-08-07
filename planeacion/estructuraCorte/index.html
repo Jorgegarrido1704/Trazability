@@ -863,14 +863,20 @@
 
                 const contenidoQR = item.conector || String(id);
                 const codigoQR = item.codigo || String(id);
-     
-
-                new QRCode(document.getElementById(`qrcode-lateral${id}`), {
-                    text: codigoQR, width: 128, height: 128, correctLevel: QRCode.CorrectLevel.M
+                try {
+                     new QRCode(document.getElementById(`qrcode-lateral${id}`), {
+                    text: codigoQR, width: 50, height: 50, correctLevel: QRCode.CorrectLevel.H
                 });
                 new QRCode(document.getElementById(`qrcode-inferior${id}`), {
-                    text: contenidoQR, width: 128, height: 128, correctLevel: QRCode.CorrectLevel.M
-                });
+                    text: contenidoQR, width: 55, height: 55, correctLevel: QRCode.CorrectLevel.H
+                });                       
+                        } catch (error) {
+                        // Omitir en caso de error de capacidad
+                        container.innerHTML = "";
+                        container.style.display = "none";
+                        }
+
+               
 
                 totalRecords++;
                 id++;
