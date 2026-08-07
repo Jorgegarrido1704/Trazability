@@ -872,8 +872,11 @@
                 });                       
                         } catch (error) {
                         // Omitir en caso de error de capacidad
-                        container.innerHTML = "";
-                        container.style.display = "none";
+                        document.getElementById(`qrcode-lateral${id}`).innerHTML = "";
+                        document.getElementById(`qrcode-lateral${id}`).style.display = "none";
+                        document.getElementById(`qrcode-inferior${id}`).innerHTML = "";
+                        document.getElementById(`qrcode-inferior${id}`).style.display = "none";
+
                         }
 
                
