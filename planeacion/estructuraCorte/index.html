@@ -863,12 +863,13 @@
 
                 const contenidoQR = item.conector || String(id);
                 const codigoQR = item.codigo || String(id);
+     
 
                 new QRCode(document.getElementById(`qrcode-lateral${id}`), {
-                    text: codigoQR, width: 50, height: 50, correctLevel: QRCode.CorrectLevel.H
+                    text: codigoQR, width: 55, height: 55, correctLevel: QRCode.CorrectLevel.L
                 });
                 new QRCode(document.getElementById(`qrcode-inferior${id}`), {
-                    text: contenidoQR, width: 55, height: 55, correctLevel: QRCode.CorrectLevel.H
+                    text: contenidoQR, width: 55, height: 55, correctLevel: QRCode.CorrectLevel.L
                 });
 
                 totalRecords++;
