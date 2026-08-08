@@ -8,24 +8,8 @@ if ($datos != '') {
     $exclusivosNumerosdeparte = '';
     $rows = 0;
     
-    // 1. Corregido: Usar Prepared Statements para evitar Inyección SQL
-    $stmtBuscarGrupo = $con->prepare("SELECT customer FROM workschedule WHERE pn = ? LIMIT 1");
-    $stmtBuscarGrupo->bind_param("s", $datos);
-    $stmtBuscarGrupo->execute();
-    $buscarGrupo = $stmtBuscarGrupo->get_result();
-    
-    if ($buscarGrupo->num_rows == 0) {
-        echo "No se encontró ningún grupo para el número de parte: " . htmlspecialchars($datos);
-        exit;
-    }
-    
-    $cliente = $buscarGrupo->fetch_assoc();
-    $customer = $cliente['customer'];
-    $stmtBuscarGrupo->close();
-    
-    // 2. Obtener los números de parte del cliente (Familias)
-    $stmtBuscarFamilias = $con->prepare("SELECT NumPart FROM registro WHERE cliente = ?");
-    $stmtBuscarFamilias->bind_param("s", $customer);
+$stmtBuscarFamilias = $con->prepare("SELECT DISTINCT pn FROM po WHERE cliente = (SELECT cliente FROM po WHERE pn = ?)");
+    $stmtBuscarFamilias->bind_param("s", $datos);
     $stmtBuscarFamilias->execute();
     $buscarFamilias = $stmtBuscarFamilias->get_result();
     
@@ -37,7 +21,7 @@ if ($datos != '') {
     // Guardamos los números de parte válidos del cliente en un array tipo espejo para búsquedas rápidas
     $partesDelCliente = [];
     while ($rowFamilias = $buscarFamilias->fetch_assoc()) {
-        $partesDelCliente[$rowFamilias['NumPart']] = true;
+        $partesDelCliente[$rowFamilias['pn']] = true;
     }
     $stmtBuscarFamilias->close();
 
@@ -52,6 +36,7 @@ if ($datos != '') {
           AND item NOT LIKE 'LTP%'
           AND item NOT LIKE 'LW-%'
           AND item NOT LIKE 'TAPE-25%'
+          AND item NOT LIKE '%T_-%'
     ");
     
     $stmtItems->bind_param("s", $datos);
@@ -82,6 +67,7 @@ if ($datos != '') {
           AND item NOT LIKE 'LTP%'
           AND item NOT LIKE 'LW-%'
           AND item NOT LIKE 'TAPE%'
+          AND item NOT LIKE '%T_-%'
     ");
 
     $compatibilidad = [];
