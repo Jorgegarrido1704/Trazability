@@ -115,9 +115,9 @@ if ($datos != '') {
    
     $items = "('" . implode("', '", $items) . "')";
     echo $items;
-    $buscarDatos= $con->prepare("SELECT part_num
+    $buscarDatos= $con->prepare("SELECT part_num, COUNT(item) as coincidencias
     FROM `datos`     WHERE item IN $items
-    GROUP BY part_num HAVING COUNT(item) > 0;");
+    GROUP BY part_num HAVING COUNT(item) >= 1;");
    
     $buscarDatos->execute();
     $registrosItems = $buscarDatos->get_result();
@@ -125,8 +125,9 @@ if ($datos != '') {
 
     while ($row = $registrosItems->fetch_assoc()) {
         $parte = $row['part_num'];
-       
+        $coincidencias = $row['coincidencias'];
         echo "<h3>Parte: $parte</h3>";
+        echo "<p>Coincidencias: $coincidencias</p>";
         
     }
     $buscarDatos->close();
