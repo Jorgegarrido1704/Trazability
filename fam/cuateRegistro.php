@@ -8,13 +8,13 @@ if ($datos != '') {
     $exclusivosNumerosdeparte = '';
     $rows = 0;
     
-$stmtBuscarFamilias = $con->prepare("SELECT DISTINCT pn FROM po WHERE cliente = (SELECT cliente FROM po WHERE pn = ?)");
+$stmtBuscarFamilias = $con->prepare("SELECT DISTINCT pn FROM po WHERE client = (SELECT DISTINCT client FROM po WHERE pn = ?)");
     $stmtBuscarFamilias->bind_param("s", $datos);
     $stmtBuscarFamilias->execute();
     $buscarFamilias = $stmtBuscarFamilias->get_result();
     
     if ($buscarFamilias->num_rows == 0) {
-        echo "No se encontraron números de parte para el cliente: " . htmlspecialchars($customer);
+        echo "No se encontraron números de parte";
         exit;
     }
     
