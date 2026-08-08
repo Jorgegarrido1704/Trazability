@@ -234,7 +234,7 @@ try {
     $tinta = '';
     $tiempo = '';
     $maxtime = 135000*3;
-    $orden_especial=['021158','021122','021138'];
+    $orden_especial=['021158','021122','021138',' 019104',' 019105','020778'];
     $tiempoTotal = 0; 
     $i = 0;
 
@@ -278,7 +278,7 @@ try {
                 GROUP BY c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
                         c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
                         c.time_ruteo, c.conector
-                HAVING total_congelados < 15
+                HAVING total_congelados < 20
                 ORDER BY CASE WHEN c.wo IN ($orden_especial_sql) THEN 0 ELSE 1 END ASC,
                         FIELD(c.wo, $orden_especial_sql) ASC,
                         total_congelados ASC,
@@ -299,7 +299,7 @@ try {
                 GROUP BY c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
                         c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
                         c.time_ruteo, c.conector
-                HAVING total_congelados < 15
+                HAVING total_congelados < 20
                 ORDER BY CASE WHEN c.wo IN ($orden_especial_sql) THEN 0 ELSE 1 END ASC,
                         FIELD(c.wo, $orden_especial_sql) ASC,
                         total_congelados ASC,
