@@ -8,7 +8,7 @@ if ($datos != '') {
     $exclusivosNumerosdeparte = '';
     $rows = 0;
     
-$stmtBuscarFamilias = $con->prepare("SELECT DISTINCT pn FROM po WHERE client = (SELECT DISTINCT client FROM po WHERE pn = ?)");
+    $stmtBuscarFamilias = $con->prepare("SELECT DISTINCT pn FROM po WHERE client = (SELECT DISTINCT client FROM po WHERE pn = ?)");
     $stmtBuscarFamilias->bind_param("s", $datos);
     $stmtBuscarFamilias->execute();
     $buscarFamilias = $stmtBuscarFamilias->get_result();
@@ -108,7 +108,7 @@ $stmtBuscarFamilias = $con->prepare("SELECT DISTINCT pn FROM po WHERE client = (
     $items = explode(",", $items);
     $ItemsCount = count($items);
 
-    $cuenta = $ItemsCount<3 ? $ItemsCount-1 : ($ItemsCount>3 ? $ItemsCount-2 : $ItemsCount);
+    $cuenta = 0;
     if($ItemsCount <= 1){
         header("Location: cuateRegistro.php");
     }
@@ -117,7 +117,7 @@ $stmtBuscarFamilias = $con->prepare("SELECT DISTINCT pn FROM po WHERE client = (
     echo $items;
     $buscarDatos= $con->prepare("SELECT part_num
     FROM `datos`     WHERE item IN $items
-    GROUP BY part_num HAVING COUNT(item) > $cuenta;");
+    GROUP BY part_num HAVING COUNT(item) > 0;");
    
     $buscarDatos->execute();
     $registrosItems = $buscarDatos->get_result();
