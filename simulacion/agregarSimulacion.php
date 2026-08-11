@@ -11,7 +11,7 @@
     <div class="row">
      <div class="col-lg-2 mb-4 border">
             <h1>Cargar MPS </h1>
-            <form action="../reportes/MPS/updateDatos.php" method="POST" enctype="multipart/form-data">
+            <form action="updateDatos.php" method="POST" enctype="multipart/form-data">
                 <input type="file" name="csv_file" accept=".csv">
                 <br>
                 <input type="submit" name="upload" value="Cargar MSP">
