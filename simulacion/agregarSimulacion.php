@@ -1,3 +1,13 @@
+<?php
+echo "<button><a href='stations/corte.php'> Cutting</a></button>";
+echo "<button><a href='stations/empalmes.php'> splicing</a></button>";
+echo "<button><a href='stations/terminales.php'> Terminales</a></button>";
+echo "<button><a href='stations/liberacion.php'> Liberacion</a></button>";
+echo "<button><a href='stations/ensamble.php'> Assembly</a></button>";
+echo "<button><a href='stations/loom.php'> lomming</a></button>";
+echo "<button><a href='stations/calidad.php'> Quality</a></button>";
+echo "<button><a href='stations/embarque.php'>Packing</a></button>";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
