@@ -40,7 +40,6 @@ uksort($pnRegistros, function($a, $b) use ($rowTotals) {
     return $rowTotals[$b] <=> $rowTotals[$a];
 });
 
-require "links.php";
 echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width:100%; border-collapse:collapse; text-align:center;'>";
 
 // Header semanas
