@@ -2,12 +2,13 @@
 require "../../app/conection.php";
 try {
 
-$pn= isset($_POST['np']) ? $_POST['np'] : '';
+//$pn= isset($_POST['np']) ? $_POST['np'] : '';
 
 
 
 
-$buscar=mysqli_query($con,"SELECT * FROM registro WHERE count IN ('2','3','17','1') AND wo = '$pn'  ORDER BY count ASC");
+$buscar=mysqli_query($con,"SELECT * FROM registro WHERE count IN ('2','3','17','1')  ORDER BY count ASC");
+//$buscar=mysqli_query($con,"SELECT * FROM registro WHERE count IN ('2','3','17','1') AND wo = '$pn'  ORDER BY count ASC");
 while($row=mysqli_fetch_array($buscar)){
     $pn=$row['NumPart'];
     $client=$row['cliente'];
