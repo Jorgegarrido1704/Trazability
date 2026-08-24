@@ -4,11 +4,11 @@ require "../app/conection.php";
 //Conection de tiempo de ruteo. 
 
 
-$registrosMPS = mysqli_query($con,"SELECT pn, work, processtime, setupTime FROM `tiemposderuteo` ORDER BY pn ASC");
+$registrosMPS = mysqli_query($con,"SELECT DISTINCT pn FROM `tiemposderuteo` ORDER BY pn ASC");
 
 echo "<table border='1' cellpadding='5' cellspacing='0' align='center' style='width: 60%;'>";
 echo "<thead>";
-echo "<tr><th>PN</th><th>Work</th><th>Process Time (hrs)</th><th>Setup Time (hrs)</th></tr>";
+//echo "<tr><th>PN</th><th>Work</th><th>Process Time (hrs)</th><th>Setup Time (hrs)</th></tr>";
 echo "<tr><th>Numero de parte</th>
 <th>Corte</th><th>Corte Set Up</th>
 <th>Liberacion</th><th>Liberacion Set Up</th>
