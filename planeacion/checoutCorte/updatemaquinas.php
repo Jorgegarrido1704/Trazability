@@ -2,10 +2,10 @@
 
 require 'app/conection.php';
 
-const TAMANO_BATCH = 540.0; // Tamaño de cada lote/ronda de minutos (editable)
+const TAMANO_BATCH = 540.0; // Tamaño de cada lote/ronda en minutos
 
 /**
- * Asigna IDs respetando el tope de minutos en las máquinas candidatas.
+ * Asigna IDs respetando el tope acumulado en las máquinas candidatas.
  */
 function asignarConTope(array $ids, float $tiempoTotal, array $maquinasCandidatas, array $maquinasActivas, float $tope, array &$idsPorMaquina, array &$maquinas): array {
     if (empty($ids)) {
@@ -187,21 +187,21 @@ try {
         $consEmpiezaC  = ($cons !== '' && strtoupper($cons[0]) === 'C');
         $calibreValido = in_array($calibre, [10, 12, 14, 16, 18, 20, 22, 24], true);
 
-        // 1) MCUT-7 EXCLUSIVO: calibres fuera de 10-24 (1,2,4,6,8) o cons que empieza con C/c
+        // 1) RESTRICCIÓN MCUT-7: Calibres fuera de 10-24 (1,2,4,6,8,etc) o cons que empieza con C/c
         if ($consEmpiezaC || !$calibreValido) {
             $poolMCUT7['ids'][] = $idCorte;
             $poolMCUT7['time'] += $tiempoTotal;
             continue;
         }
 
-        // 2) SELLO: Exclusivo MCUT-3
+        // 2) RESTRICCIÓN SELLO: Exclusivo MCUT-3
         if ($esSello) {
             $poolSello['ids'][] = $idCorte;
             $poolSello['time'] += $tiempoTotal;
             continue;
         }
 
-        // 3) BUCKETS NORMALES (10 al 24)
+        // 3) CLASIFICACIÓN POR CALIBRES NORMALES (10 a 24)
         if ($calibre === 10 || $calibre === 12) {
             $bucket = 'G10_12';
         } elseif ($calibre === 14 || $calibre === 16) {
@@ -216,28 +216,20 @@ try {
     mysqli_stmt_close($stmtListas);
 
     // =========================================================
-    // 1. CARGA EXCLUSIVA MCUT-7
-    // =========================================================
-    if (!empty($poolMCUT7['ids']) && in_array('MCUT-7', $maquinasActivasInput, true)) {
-        $idsPorMaquina['MCUT-7'] = array_merge($idsPorMaquina['MCUT-7'], $poolMCUT7['ids']);
-        $maquinas['MCUT-7'] += $poolMCUT7['time'];
-    }
-
-    // =========================================================
-    // 2. CARGA DE SELLOS (TODO A MCUT-3)
+    // 1. CARGA DE SELLOS (TODO A MCUT-3)
     // =========================================================
     if (!empty($poolSello['ids'])) {
         if (in_array('MCUT-3', $maquinasActivasInput, true)) {
             $idsPorMaquina['MCUT-3'] = array_merge($idsPorMaquina['MCUT-3'], $poolSello['ids']);
             $maquinas['MCUT-3'] += $poolSello['time'];
         } else {
-            // Si MCUT-3 está inactiva se canaliza a MCUT-1
+            // Si MCUT-3 no está activa, pasa a MCUT-1
             repartirEntreMaquinas($poolSello['ids'], $poolSello['time'], array_intersect(['MCUT-1'], $maquinasActivasInput), $idsPorMaquina, $maquinas);
         }
     }
 
     // =========================================================
-    // 3. REPARTO POR RONDAS / BATCHES DE 540 MIN (MCUT-1 a MCUT-6)
+    // 2. REPARTO: PRIMERO ESPECIALISTAS (2,4,5,6) LUEGO GENERALISTAS (1,3)
     // =========================================================
     $especialistas = [
         'G10_12' => ['BLANCA' => null,     'NEGRA' => null],
@@ -245,7 +237,7 @@ try {
         'G18_24' => ['BLANCA' => 'MCUT-4', 'NEGRA' => 'MCUT-6'],
     ];
 
-    foreach (['G10_12', 'G14_16', 'G18_24'] as $bucket) {
+    foreach (['G14_16', 'G18_24', 'G10_12'] as $bucket) {
         foreach (['BLANCA', 'NEGRA'] as $tinta) {
             $data = $poolGaugeNormal[$bucket][$tinta];
             if (empty($data['ids'])) continue;
@@ -254,13 +246,11 @@ try {
             $tiempoPendiente = $data['time'];
             $esp = $especialistas[$bucket][$tinta];
 
-            // Generalistas y Especialista correspondientes
             $generalistas = ['MCUT-1', 'MCUT-3'];
-            $compatibles = $esp !== null ? ['MCUT-1', 'MCUT-3', $esp] : ['MCUT-1', 'MCUT-3'];
+            $compatibles = $esp !== null ? [$esp, 'MCUT-1', 'MCUT-3'] : ['MCUT-1', 'MCUT-3'];
             $activasCompatibles = array_values(array_intersect($compatibles, $maquinasActivasInput));
 
             if (empty($activasCompatibles)) {
-                // Fallback de corte si ninguna compatible está activa (nunca MCUT-7)
                 $activasCompatibles = array_values(array_intersect(['MCUT-1', 'MCUT-2', 'MCUT-3', 'MCUT-4', 'MCUT-5', 'MCUT-6'], $maquinasActivasInput));
             }
 
@@ -268,19 +258,7 @@ try {
             while (!empty($idsPendientes)) {
                 $limiteActual = $ronda * TAMANO_BATCH;
 
-                // Paso 1: Carga a Generalistas (MCUT-1 y MCUT-3) hasta el límite de la ronda actual
-                $resGen = asignarConTope(
-                    $idsPendientes, $tiempoPendiente,
-                    $generalistas, $maquinasActivasInput, $limiteActual,
-                    $idsPorMaquina, $maquinas
-                );
-
-                $idsPendientes = $resGen['ids'];
-                $tiempoPendiente = $resGen['time'];
-
-                if (empty($idsPendientes)) break;
-
-                // Paso 2: Si sobran, carga a la Especialista hasta el límite de la ronda actual
+                // PASO A: Primero a la ESPECIALISTA asignada (MCUT-2, 4, 5, 6) hasta el límite de la ronda
                 if ($esp !== null && in_array($esp, $maquinasActivasInput, true)) {
                     $resEsp = asignarConTope(
                         $idsPendientes, $tiempoPendiente,
@@ -294,21 +272,40 @@ try {
                     if (empty($idsPendientes)) break;
                 }
 
-                // Si ninguna máquina disponible puede recibir más tiempo en esta ronda, pasamos a la siguiente
+                // PASO B: Después a las GENERALISTAS (MCUT-1 y MCUT-3) hasta el límite de la ronda
+                $resGen = asignarConTope(
+                    $idsPendientes, $tiempoPendiente,
+                    $generalistas, $maquinasActivasInput, $limiteActual,
+                    $idsPorMaquina, $maquinas
+                );
+
+                $idsPendientes = $resGen['ids'];
+                $tiempoPendiente = $resGen['time'];
+
+                if (empty($idsPendientes)) break;
+
+                // Verificar si se agotó el espacio del lote en todas las compatibles
                 $espacioEnEstaRonda = 0.0;
                 foreach ($activasCompatibles as $m) {
                     $espacioEnEstaRonda += max(0.0, $limiteActual - $maquinas[$m]);
                 }
 
                 if ($espacioEnEstaRonda <= 0.0) {
-                    $ronda++; // Abre nuevo batch de +540 min iniciando otra vez en MCUT-1/MCUT-3
+                    $ronda++; // Abre nueva ronda (+540 min) iniciando otra vez en la especialista
                 } else {
-                    // Si sobra residuo indivisible menor al promedio, repartir y terminar
                     repartirEntreMaquinas($idsPendientes, $tiempoPendiente, $activasCompatibles, $idsPorMaquina, $maquinas);
                     break;
                 }
             }
         }
+    }
+
+    // =========================================================
+    // 3. CARGA EXCLUSIVA MCUT-7 (AL FINAL, CON SUS RESTRICCIONES)
+    // =========================================================
+    if (!empty($poolMCUT7['ids']) && in_array('MCUT-7', $maquinasActivasInput, true)) {
+        $idsPorMaquina['MCUT-7'] = array_merge($idsPorMaquina['MCUT-7'], $poolMCUT7['ids']);
+        $maquinas['MCUT-7'] += $poolMCUT7['time'];
     }
 
     // =========================================================
