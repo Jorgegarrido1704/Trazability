@@ -271,14 +271,14 @@ try {
                (SELECT COUNT(*) FROM carga_congelada cc2 WHERE cc2.wo = c.wo) AS total_congelados
         FROM corte c
         JOIN carga_congelada cc ON cc.wo = c.wo AND cc.consumo = c.cons ";
-
+/*
     if ($maquina == 'todas') {
         $qry = $qry . " WHERE c.cutStatus != 'Cortado'
                     AND c.tamano > 0  AND cc.urgencia IS NULL 
                 GROUP BY c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
                         c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
                         c.time_ruteo, c.conector
-                HAVING total_congelados < 150
+                HAVING total_congelados < 250
                 ORDER BY CASE WHEN c.wo IN ($orden_especial_sql) THEN 0 ELSE 1 END ASC,
                         FIELD(c.wo, $orden_especial_sql) ASC,
                         total_congelados ASC,
@@ -314,9 +314,9 @@ try {
                         END,
                         c.tipo ASC";
     }
-
+*/
     // normal
- /*   $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
+    $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
                        c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
                        c.time_ruteo, c.conector,
                        MIN(cc.fecha_asignada) as fecha_asignada, MIN(cc.dia_bloque) as dia_bloque
@@ -332,14 +332,17 @@ try {
                         
                 ORDER BY MIN(cc.fecha_asignada) ASC,
                          MIN(cc.dia_bloque) ASC,
-                         c.urgencia DESC,
+                        
                          c.aws ASC,
+                         c.color ASC,
+                          c.tipo ASC
                          c.term1 ASC,
+                         
                          CASE
                             WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
                             ELSE 1
-                         END,
-                         c.tipo ASC";
+                         END
+                        ";
     } else {
         $qry = $qry . " WHERE c.cutStatus != 'Cortado'
                   AND cc.maquina = '" . mysqli_real_escape_string($con, $maquina) . "'
@@ -349,15 +352,16 @@ try {
                          c.time_ruteo, c.conector
                 ORDER BY MIN(cc.fecha_asignada) ASC,
                          MIN(cc.dia_bloque) ASC,
-                         c.urgencia DESC,
                          c.aws ASC,
+                         c.color ASC,
+                          c.tipo ASC,
                          c.term1 ASC,
                          CASE
                             WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
                             ELSE 1
-                         END,
-                         c.tipo ASC";
-    }*/
+                         END
+                        ";
+    }
 
     $listasdecorte = mysqli_query($con, $qry); 
     

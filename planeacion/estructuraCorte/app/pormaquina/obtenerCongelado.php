@@ -40,8 +40,10 @@ try {
                EXISTS (
                 SELECT 1 FROM carga_congelada cc WHERE cc.wo = c.wo AND cc.consumo = c.cons
               ) AND c.cutStatus != 'Cortado' AND r.programado = 1 AND TRIM(c.tipo) IN ('GXL','TXL','SGX','UL1569') AND c.tamano >0 AND r.count IN ('2','3','17')
-               ORDER BY  c.aws ASC, c.term1 ASC,
-               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END, c.tipo ASC";
+               ORDER BY   c.aws ASC,
+                         c.color ASC,
+                         c.tipo ASC, c.term1 ASC,
+               CASE WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 ELSE 1 END";
     }else {
      
        $qry ="SELECT c.id,c.np, c.color, c.wo,c.codigo, c.aws, c.cons, c.tipo,c.dist_stamp, c.tamano, c.term1, c.term2,c.strip1,c.strip2, c.tintaColor, c.qty, c.time_ruteo,c.conector 
@@ -52,13 +54,15 @@ try {
               ) AND c.cutStatus != 'Cortado' 
             AND r.programado = 1 AND `maq_asignada` = '$maquina'
                                              AND c.tamano >0 AND r.count IN ('2','3','17')
-                                             ORDER BY  c.urgencia DESC, c.aws ASC, 
+                                             ORDER BY   c.aws ASC,
+                                            c.color ASC,
+                                            c.tipo ASC, 
                                              c.term1 ASC,
                                              CASE 
                                                 WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
                                                 ELSE 1
-                                            END,
-                                            c.tipo ASC";
+                                            END
+                                           ";
                                              $maxtime=27000*3;
     }
 

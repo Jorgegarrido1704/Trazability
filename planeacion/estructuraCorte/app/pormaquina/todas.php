@@ -55,14 +55,15 @@ try {
                          c.time_ruteo, c.conector
                 ORDER BY MIN(cc.fecha_asignada) ASC,
                          MIN(cc.dia_bloque) ASC,
-                         c.urgencia DESC,
                          c.aws ASC,
+                         c.color ASC,
+                         c.tipo ASC,
                          c.term1 ASC,
                          CASE
                             WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
                             ELSE 1
                          END,
-                         c.tipo ASC";
+                        ";
     } else {
         $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp,
                        c.tamano, c.term1, c.term2, c.strip1, c.strip2, c.tintaColor, c.qty,
@@ -81,14 +82,15 @@ try {
                          c.time_ruteo, c.conector
                 ORDER BY MIN(cc.fecha_asignada) ASC,
                          MIN(cc.dia_bloque) ASC,
-                         c.urgencia DESC,
                          c.aws ASC,
+                         c.color ASC,
+                         c.tipo ASC,
                          c.term1 ASC,
                          CASE
                             WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
                             ELSE 1
-                         END,
-                         c.tipo ASC";
+                         END
+                       ";
     }
 
     if (!isset($con) || !$con) {

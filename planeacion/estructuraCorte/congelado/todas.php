@@ -45,13 +45,14 @@ try {
          
           AND c.tamano > 0 
           AND r.count IN ('2','3','17')
-        ORDER BY c.urgencia DESC, c.aws ASC, 
+        ORDER BY  c.aws ASC,
+                         c.color ASC,
+                         c.tipo ASC,
                  c.term1 ASC,
                  CASE 
                     WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0 
                     ELSE 1
-                 END,
-                 c.tipo ASC";
+                 END";
     }else {
      
       $qry = "SELECT c.id, c.np, c.color, c.wo, c.codigo, c.aws, c.cons, c.tipo, c.dist_stamp, c.tamano, 
@@ -66,13 +67,14 @@ try {
           AND c.maq_asignada = '$maquina'
           AND c.tamano > 0 
           AND r.count IN ('1','2','3','17')
-        ORDER BY c.urgencia DESC, c.aws ASC, 
+        ORDER BY  c.aws ASC,
+                         c.color ASC,
+                         c.tipo ASC,
                  c.term1 ASC,
                  CASE 
                     WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0 
                     ELSE 1
-                 END,
-                 c.tipo ASC";
+                 END";
                                             
     }
 

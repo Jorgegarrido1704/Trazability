@@ -31,14 +31,15 @@ try {
                                               WHERE c.cutStatus != 'Cortado' 
             AND r.programado = 1  AND r.count IN ('2','3','17')  AND c.tamano >0
                                              ORDER BY
-                                             c.urgencia DESC, 
-                                             c.aws ASC, 
+                                             c.aws ASC,
+                                            c.color ASC,
+                                            c.tipo ASC,
                                              c.term1 ASC,
                                              CASE 
                                                 WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
                                                 ELSE 1
-                                            END,
-                                            c.tipo ASC
+                                            END
+                                           
                                             ";
     }else {
      
@@ -48,13 +49,15 @@ try {
                                               WHERE c.cutStatus != 'Cortado' 
             AND r.programado = 1 AND `maq_asignada` = '$maquina'
                                               AND c.tamano >0 AND r.count IN ('2','3','17')
-                                             ORDER BY  c.urgencia DESC, c.aws ASC, 
+                                             ORDER BY  
+                                              c.aws ASC,
+                                                c.color ASC,
+                                                c.tipo ASC, 
                                              c.term1 ASC,
                                              CASE 
                                                 WHEN c.term2 LIKE CONCAT('%',c.term1,'%') THEN 0 
                                                 ELSE 1
-                                            END,
-                                            c.tipo ASC";
+                                            END";
                                              $maxtime=27000*3;
     }
     $listasdecorte= mysqli_query($con,$qry);

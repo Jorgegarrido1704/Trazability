@@ -2,36 +2,80 @@
 
 require 'app/conection.php';
 
-function balancearCargaPorTinta(array $poolIds, array $poolTimes, array $maquinasActivas, array &$idsPorMaquina, array &$maquinas): void {
-    if (empty($maquinasActivas)) return;
 
-    $tiempoTotalPool = array_sum($poolTimes);
-    $numMaquinas = count($maquinasActivas);
-    $cargaIdealPorMaquina = $tiempoTotalPool / $numMaquinas;
-
-    // Consolidar todos los IDs secuencialmente para su distribución uniforme
-    $todosLosIds = [];
-    foreach (['10_12', '14_16', '18_24'] as $rango) {
-        if (!empty($poolIds[$rango])) {
-            $todosLosIds = array_merge($todosLosIds, $poolIds[$rango]);
-        }
+function repartirEntreMaquinas(array $ids, float $tiempoTotal, array $maquinasDestino, array &$idsPorMaquina, array &$maquinas): void {
+    $total = count($ids);
+    if ($total === 0 || empty($maquinasDestino)) {
+        return;
     }
 
-    $totalElementos = count($todosLosIds);
-    if ($totalElementos === 0) return;
+    $numMaquinas = count($maquinasDestino);
+    $elementosPorMaquina = (int) ceil($total / $numMaquinas);
+    $chunks = array_chunk($ids, max($elementosPorMaquina, 1));
 
-    // CRÍTICO: Reparto equitativo de IDs basado en la proporción de tiempo
-    $elementosPorMaquina = ceil($totalElementos / $numMaquinas);
-    $chunksIds = array_chunk($todosLosIds, $elementosPorMaquina);
-
-    foreach ($maquinasActivas as $index => $maq) {
-        if (isset($chunksIds[$index])) {
-            $idsPorMaquina[$maq] = array_merge($idsPorMaquina[$maq], $chunksIds[$index]);
-            // Asignación proporcional del tiempo estimado
-            $proporcionTiempo = count($chunksIds[$index]) / $totalElementos;
-            $maquinas[$maq] += ($tiempoTotalPool * $proporcionTiempo);
+    foreach ($maquinasDestino as $index => $maq) {
+        if (isset($chunks[$index])) {
+            $idsPorMaquina[$maq] = array_merge($idsPorMaquina[$maq], $chunks[$index]);
+            $proporcion = count($chunks[$index]) / $total;
+            $maquinas[$maq] += $tiempoTotal * $proporcion;
         }
     }
+}
+
+/** Asigna el pool completo a una sola máquina. */
+function asignarTodoAMaquina(array $ids, float $tiempoTotal, string $maquina, array &$idsPorMaquina, array &$maquinas): void {
+    if (empty($ids)) {
+        return;
+    }
+    $idsPorMaquina[$maquina] = array_merge($idsPorMaquina[$maquina], $ids);
+    $maquinas[$maquina] += $tiempoTotal;
+}
+
+/**
+ * Recorre los "tiers" de prioridad en orden y devuelve el primero que
+ * tenga al menos una máquina activa (filtrado a solo las activas de
+ * ese tier). Si ningún tier tiene nada activo, devuelve [].
+ */
+function resolverDestino(array $tiers, array $maquinasActivas): array {
+    foreach ($tiers as $tier) {
+        $activasEnTier = array_values(array_intersect($tier, $maquinasActivas));
+        if (!empty($activasEnTier)) {
+            return $activasEnTier;
+        }
+    }
+    return [];
+}
+
+/** Cadena de prioridad para calibres 10-12, 14-16 y 18-22 (no sello). */
+function tiersRangoGeneral(string $tinta, ?string $especialista): array {
+    $tiers = [
+        ['MCUT-1', 'MCUT-3'], // generalistas: prioridad total
+    ];
+    if ($especialista !== null) {
+        $tiers[] = [$especialista];
+    }
+    $tiers[] = ['MCUT-7']; // último recurso antes del fallback genérico
+    return $tiers;
+}
+
+/** Cadena de prioridad para calibre 24 (no sello): fuera del rango de MCUT-1. */
+function tiersG24(string $especialista): array {
+    return [
+        ['MCUT-3'],
+        [$especialista],
+        ['MCUT-7'],
+    ];
+}
+
+/** Cadena de prioridad para el pool de MCUT-7 (calibres fuera de 10-24 / cons "C"). */
+function tiersOther(string $tinta): array {
+    $tiers = [['MCUT-7']];
+    if ($tinta === 'BLANCA') {
+        $tiers[] = ['MCUT-1', 'MCUT-3', 'MCUT-2', 'MCUT-4'];
+    } else {
+        $tiers[] = ['MCUT-1', 'MCUT-3', 'MCUT-5', 'MCUT-6'];
+    }
+    return $tiers;
 }
 
 function actualizarMaquinaEnBD($con, array $ids, string $nombreMaquina): void {
@@ -56,6 +100,8 @@ try {
         $maquinasActivasInput = ["MCUT-1", "MCUT-2", "MCUT-3", "MCUT-4", "MCUT-5", "MCUT-6", "MCUT-7"];
     }
 
+    $mcut3Activa = in_array("MCUT-3", $maquinasActivasInput, true);
+
     $maquinas = [
         "MCUT-1" => 0, "MCUT-2" => 0, "MCUT-3" => 0,
         "MCUT-4" => 0, "MCUT-5" => 0, "MCUT-6" => 0,
@@ -68,33 +114,32 @@ try {
         "MCUT-7" => []
     ];
 
-    $activaBlancas = array_intersect(["MCUT-1", "MCUT-2", "MCUT-3"], $maquinasActivasInput);
-    $activaNegras  = array_intersect(["MCUT-4", "MCUT-5", "MCUT-6"], $maquinasActivasInput);
-    $activaMayor10 = in_array("MCUT-7", $maquinasActivasInput);
+    // Pool exclusivo de sello (solo se llena si MCUT-3 está activa;
+    // si no, cada renglón con sello cae directo al pool de su rango normal)
+    $poolSello = ['ids' => [], 'time' => 0.0];
 
-    $rawTimes = [
-        'NEGRA'  => ['10_12' => 0, '14_16' => 0, '18_24' => 0, 'sello' => 0],
-        'BLANCA' => ['10_12' => 0, '14_16' => 0, '18_24' => 0, 'sello' => 0],
+    // Pools por rango de calibre y tinta (para MCUT-1/3 + especialistas)
+    $poolGauge = [
+        'G10_12' => ['BLANCA' => ['ids' => [], 'time' => 0.0], 'NEGRA' => ['ids' => [], 'time' => 0.0]],
+        'G14_16' => ['BLANCA' => ['ids' => [], 'time' => 0.0], 'NEGRA' => ['ids' => [], 'time' => 0.0]],
+        'G18_22' => ['BLANCA' => ['ids' => [], 'time' => 0.0], 'NEGRA' => ['ids' => [], 'time' => 0.0]],
+        'G24'    => ['BLANCA' => ['ids' => [], 'time' => 0.0], 'NEGRA' => ['ids' => [], 'time' => 0.0]],
     ];
 
-    $rawIds = [
-        'NEGRA'  => ['10_12' => [], '14_16' => [], '18_24' => [], 'sello' => []],
-        'BLANCA' => ['10_12' => [], '14_16' => [], '18_24' => [], 'sello' => []],
+    // Pool "OTHER" -> MCUT-7 (calibres 1,2,4,6,8, fuera de 10-24, o cons que empieza con C)
+    $poolOther = [
+        'BLANCA' => ['ids' => [], 'time' => 0.0],
+        'NEGRA'  => ['ids' => [], 'time' => 0.0],
     ];
 
-    // CRÍTICO: se separa la carga ">10" por tinta para no mezclar blanca/negra
-    // al momento de repartirla entre máquinas (misma exclusividad que el resto del pool).
-    $tiempoMayor10 = ['NEGRA' => 0, 'BLANCA' => 0];
-    $idsMayor10 = ['NEGRA' => [], 'BLANCA' => []];
-
-   $query = "SELECT c.id, c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
+    $query = "SELECT c.id, c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
           FROM corte c
           WHERE c.cutStatus != 'Cortado' 
             AND c.tamano > 0 
             AND NOT EXISTS (SELECT 1 FROM carga_congelada cc WHERE cc.id_corte = c.id)
           ORDER BY c.aws, c.color, c.term1, c.term2 DESC";
 
-$stmtListas = mysqli_prepare($con, $query);
+    $stmtListas = mysqli_prepare($con, $query);
 
     if (!$stmtListas) {
         throw new Exception("Error al preparar la consulta: " . mysqli_error($con));
@@ -104,120 +149,112 @@ $stmtListas = mysqli_prepare($con, $query);
     $resListas = mysqli_stmt_get_result($stmtListas);
 
     while ($rowlistas = mysqli_fetch_assoc($resListas)) {
-        $idCorte  = $rowlistas['id']; 
+        $idCorte  = $rowlistas['id'];
         $calibre  = (int)$rowlistas['aws'];
         $term1    = $rowlistas['term1'];
         $term2    = $rowlistas['term2'];
-        $cons     = $rowlistas['cons'];
+        $cons     = trim((string)$rowlistas['cons']);
         $tinta    = trim(strtoupper($rowlistas['tintaColor']));
 
         if ($tinta !== 'BLANCA' && $tinta !== 'NEGRA') {
-            $tinta = 'NEGRA'; 
+            $tinta = 'NEGRA';
         }
 
         $tiempoTotal = round($rowlistas['time_ruteo'] / 60, 2) + 5;
-
-        if (stripos($term1, "Sello") !== false || stripos($term2, "Sello") !== false) {
-            $rango = 'sello';
-        } elseif (stripos($cons, "C") !== false || stripos($cons, "C") !== false) {
-            $rango = '>10';
-        } else {
-            if ($calibre == 10 || $calibre == 12) {
-                $rango = '10_12';
-            } elseif ($calibre == 14 || $calibre == 16) {
-                $rango = '14_16';
-            } elseif ($calibre >= 18 && $calibre <= 24 && $calibre % 2 == 0) {
-                $rango = '18_24';
-            } else {
-                $rango = '>10';
-            }
-        }
-
-        if ($rango === '>10') {
-            $tiempoMayor10[$tinta] += $tiempoTotal;
-            $idsMayor10[$tinta][] = $idCorte;
-        } else {
-            $rawTimes[$tinta][$rango] += $tiempoTotal;
-            $rawIds[$tinta][$rango][] = $idCorte;
-        }
-
         $maquinas['TOTAL_MAQUINAS'] += $tiempoTotal;
+
+        $esSello       = (stripos($term1, "Sello") !== false || stripos($term2, "Sello") !== false);
+        $consEmpiezaC  = ($cons !== '' && strtoupper($cons[0]) === 'C');
+        $calibreValido = in_array($calibre, [10, 12, 14, 16, 18, 20, 22, 24], true);
+
+        // 1) MCUT-7: calibres fuera de la lista válida (incluye 1,2,4,6,8) o cons que empieza con C
+        if ($consEmpiezaC || !$calibreValido) {
+            $poolOther[$tinta]['ids'][] = $idCorte;
+            $poolOther[$tinta]['time'] += $tiempoTotal;
+            continue;
+        }
+
+        // 2) Sello exclusivo de MCUT-3 (solo si MCUT-3 está activa; si no, sigue como calibre normal)
+        if ($esSello && $mcut3Activa) {
+            $poolSello['ids'][] = $idCorte;
+            $poolSello['time'] += $tiempoTotal;
+            continue;
+        }
+
+        // 3) Ruteo normal por calibre + tinta
+        if ($calibre === 10 || $calibre === 12) {
+            $bucket = 'G10_12';
+        } elseif ($calibre === 14 || $calibre === 16) {
+            $bucket = 'G14_16';
+        } elseif ($calibre === 24) {
+            $bucket = 'G24';
+        } else { // 18, 20, 22
+            $bucket = 'G18_22';
+        }
+
+        $poolGauge[$bucket][$tinta]['ids'][] = $idCorte;
+        $poolGauge[$bucket][$tinta]['time'] += $tiempoTotal;
     }
     mysqli_stmt_close($stmtListas);
 
-    // CRÍTICO: Si no hay máquinas de un color específico activas, su carga pasa al pool del color opuesto
-    if (empty($activaBlancas) && !empty($activaNegras)) {
-        foreach (['10_12', '14_16', '18_24', 'sello'] as $r) {
-            $rawTimes['NEGRA'][$r] += $rawTimes['BLANCA'][$r];
-            $rawIds['NEGRA'][$r] = array_merge($rawIds['NEGRA'][$r], $rawIds['BLANCA'][$r]);
-            $rawTimes['BLANCA'][$r] = 0; $rawIds['BLANCA'][$r] = [];
-        }
-    } elseif (empty($activaNegras) && !empty($activaBlancas)) {
-        foreach (['10_12', '14_16', '18_24', 'sello'] as $r) {
-            $rawTimes['BLANCA'][$r] += $rawTimes['NEGRA'][$r];
-            $rawIds['BLANCA'][$r] = array_merge($rawIds['BLANCA'][$r], $rawIds['NEGRA'][$r]);
-            $rawTimes['NEGRA'][$r] = 0; $rawIds['NEGRA'][$r] = [];
+    // --- Asignación: sello exclusivo MCUT-3 ---
+    if ($mcut3Activa && !empty($poolSello['ids'])) {
+        asignarTodoAMaquina($poolSello['ids'], $poolSello['time'], 'MCUT-3', $idsPorMaquina, $maquinas);
+    }
+
+    // --- Asignación: rangos generales (10-12, 14-16, 18-22) ---
+    $especialistaPorTintaYRango = [
+        'G10_12' => ['BLANCA' => null,      'NEGRA' => null],
+        'G14_16' => ['BLANCA' => 'MCUT-2',  'NEGRA' => 'MCUT-5'],
+        'G18_22' => ['BLANCA' => 'MCUT-4',  'NEGRA' => 'MCUT-6'],
+    ];
+
+    foreach ($especialistaPorTintaYRango as $bucket => $porTinta) {
+        foreach ($porTinta as $tinta => $especialista) {
+            $pool = $poolGauge[$bucket][$tinta];
+            if (empty($pool['ids'])) continue;
+
+            $tiers = tiersRangoGeneral($tinta, $especialista);
+            $destino = resolverDestino($tiers, $maquinasActivasInput);
+
+            if (empty($destino)) {
+                // Último recurso: ninguna máquina de la cadena de prioridad está activa
+                $destino = $maquinasActivasInput;
+            }
+
+            repartirEntreMaquinas($pool['ids'], $pool['time'], $destino, $idsPorMaquina, $maquinas);
         }
     }
 
-    // Integrar Sellos a los flujos principales antes de balancear
-    foreach (['BLANCA', 'NEGRA'] as $t) {
-        if (!empty($rawIds[$t]['sello'])) {
-            $rawTimes[$t]['10_12'] += $rawTimes[$t]['sello'];
-            $rawIds[$t]['10_12'] = array_merge($rawIds[$t]['10_12'], $rawIds[$t]['sello']);
+    // --- Asignación: calibre 24 (fuera del rango de MCUT-1) ---
+    $especialista24 = ['BLANCA' => 'MCUT-4', 'NEGRA' => 'MCUT-6'];
+    foreach (['BLANCA', 'NEGRA'] as $tinta) {
+        $pool = $poolGauge['G24'][$tinta];
+        if (empty($pool['ids'])) continue;
+
+        $tiers = tiersG24($especialista24[$tinta]);
+        $destino = resolverDestino($tiers, $maquinasActivasInput);
+
+        if (empty($destino)) {
+            $destino = $maquinasActivasInput;
         }
+
+        repartirEntreMaquinas($pool['ids'], $pool['time'], $destino, $idsPorMaquina, $maquinas);
     }
 
-    // Ejecutar balance dinámico según máquinas encendidas
-    // MCUT-1/2/3 (activaBlancas) solo reciben pool BLANCA; MCUT-4/5/6 (activaNegras) solo pool NEGRA.
-    balancearCargaPorTinta($rawIds['BLANCA'], $rawTimes['BLANCA'], array_values($activaBlancas), $idsPorMaquina, $maquinas);
-    balancearCargaPorTinta($rawIds['NEGRA'], $rawTimes['NEGRA'], array_values($activaNegras), $idsPorMaquina, $maquinas);
+    // --- Asignación: pool MCUT-7 (fuera de 10-24 / cons "C") ---
+    foreach (['BLANCA', 'NEGRA'] as $tinta) {
+        $pool = $poolOther[$tinta];
+        if (empty($pool['ids'])) continue;
 
-    // CRÍTICO: Gestión de contingencia para la carga mayor a 10 (>10) si MCUT-7 está apagada.
-    // Se respeta la exclusividad de tinta: lo BLANCA solo va a MCUT-1/2/3 y lo NEGRA solo a
-    // MCUT-4/5/6. Solo si un color no tiene NINGUNA máquina activa, su carga ">10" se
-    // reasigna al color opuesto como último recurso (igual que ya hacía el resto del script).
-    $tiempoMayor10Total = $tiempoMayor10['NEGRA'] + $tiempoMayor10['BLANCA'];
-    if ($tiempoMayor10Total > 0) {
-        if ($activaMayor10) {
-            $maquinas['MCUT-7'] = $tiempoMayor10Total;
-            $idsPorMaquina['MCUT-7'] = array_merge($idsMayor10['NEGRA'], $idsMayor10['BLANCA']);
-        } else {
-            $destinoPorTinta = [];
+        $tiers = tiersOther($tinta);
+        $destino = resolverDestino($tiers, $maquinasActivasInput);
 
-            if (!empty($activaBlancas)) {
-                $destinoPorTinta['BLANCA'] = array_values($activaBlancas);
-            } elseif (!empty($activaNegras)) {
-                $destinoPorTinta['BLANCA'] = array_values($activaNegras); // fallback: no hay máquinas blancas encendidas
-            } else {
-                $destinoPorTinta['BLANCA'] = [];
-            }
-
-            if (!empty($activaNegras)) {
-                $destinoPorTinta['NEGRA'] = array_values($activaNegras);
-            } elseif (!empty($activaBlancas)) {
-                $destinoPorTinta['NEGRA'] = array_values($activaBlancas); // fallback: no hay máquinas negras encendidas
-            } else {
-                $destinoPorTinta['NEGRA'] = [];
-            }
-
-            foreach (['NEGRA', 'BLANCA'] as $tintaKey) {
-                $idsTinta = $idsMayor10[$tintaKey];
-                $tiempoTinta = $tiempoMayor10[$tintaKey];
-                $maquinasDestino = $destinoPorTinta[$tintaKey];
-
-                if (empty($idsTinta) || empty($maquinasDestino)) continue;
-
-                $numMaquinasGral = count($maquinasDestino);
-                $chunksGral = array_chunk($idsTinta, (int) ceil(count($idsTinta) / $numMaquinasGral));
-                foreach ($maquinasDestino as $gIdx => $gMaq) {
-                    if (isset($chunksGral[$gIdx])) {
-                        $idsPorMaquina[$gMaq] = array_merge($idsPorMaquina[$gMaq], $chunksGral[$gIdx]);
-                        $maquinas[$gMaq] += ($tiempoTinta * (count($chunksGral[$gIdx]) / count($idsTinta)));
-                    }
-                }
-            }
+        if (empty($destino)) {
+            $destino = $maquinasActivasInput;
         }
+
+        repartirEntreMaquinas($pool['ids'], $pool['time'], $destino, $idsPorMaquina, $maquinas);
     }
 
     foreach ($idsPorMaquina as $nombreMaquina => $arregloIds) {
