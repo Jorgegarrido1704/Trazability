@@ -2,7 +2,7 @@
 
 require 'app/conection.php';
 
-const TOPE_BLOQUE = 540.0;
+const TAMANO_BATCH = 540.0; // Tamaño de cada lote/ronda de minutos (editable)
 
 /**
  * Asigna IDs respetando el tope de minutos en las máquinas candidatas.
@@ -81,9 +81,6 @@ function asignarConTope(array $ids, float $tiempoTotal, array $maquinasCandidata
     return ['ids' => [], 'time' => 0.0];
 }
 
-/**
- * Reparte IDs entre máquinas sin aplicar tope (para balancear desbordes finales).
- */
 function repartirEntreMaquinas(array $ids, float $tiempoTotal, array $maquinasDestino, array &$idsPorMaquina, array &$maquinas): void {
     $total = count($ids);
     if ($total === 0 || empty($maquinasDestino)) {
@@ -197,14 +194,14 @@ try {
             continue;
         }
 
-        // 2) SELLO: Todo va a MCUT-3
+        // 2) SELLO: Exclusivo MCUT-3
         if ($esSello) {
             $poolSello['ids'][] = $idCorte;
             $poolSello['time'] += $tiempoTotal;
             continue;
         }
 
-        // 3) CLASIFICACIÓN NORMAL (10 a 24)
+        // 3) BUCKETS NORMALES (10 al 24)
         if ($calibre === 10 || $calibre === 12) {
             $bucket = 'G10_12';
         } elseif ($calibre === 14 || $calibre === 16) {
@@ -219,7 +216,7 @@ try {
     mysqli_stmt_close($stmtListas);
 
     // =========================================================
-    // 1. ASIGNACIÓN EXCLUSIVA DE MCUT-7
+    // 1. CARGA EXCLUSIVA MCUT-7
     // =========================================================
     if (!empty($poolMCUT7['ids']) && in_array('MCUT-7', $maquinasActivasInput, true)) {
         $idsPorMaquina['MCUT-7'] = array_merge($idsPorMaquina['MCUT-7'], $poolMCUT7['ids']);
@@ -227,20 +224,20 @@ try {
     }
 
     // =========================================================
-    // 2. ASIGNACIÓN DE SELLO (TODO A MCUT-3)
+    // 2. CARGA DE SELLOS (TODO A MCUT-3)
     // =========================================================
     if (!empty($poolSello['ids'])) {
         if (in_array('MCUT-3', $maquinasActivasInput, true)) {
             $idsPorMaquina['MCUT-3'] = array_merge($idsPorMaquina['MCUT-3'], $poolSello['ids']);
             $maquinas['MCUT-3'] += $poolSello['time'];
         } else {
-            // Si MCUT-3 está apagada, se envía a MCUT-1 (sin tocar MCUT-7)
+            // Si MCUT-3 está inactiva se canaliza a MCUT-1
             repartirEntreMaquinas($poolSello['ids'], $poolSello['time'], array_intersect(['MCUT-1'], $maquinasActivasInput), $idsPorMaquina, $maquinas);
         }
     }
 
     // =========================================================
-    // 3. ASIGNACIÓN TRABAJO NORMAL (10 a 24) ENTRE MCUT-1 A MCUT-6
+    // 3. REPARTO POR RONDAS / BATCHES DE 540 MIN (MCUT-1 a MCUT-6)
     // =========================================================
     $especialistas = [
         'G10_12' => ['BLANCA' => null,     'NEGRA' => null],
@@ -253,55 +250,69 @@ try {
             $data = $poolGaugeNormal[$bucket][$tinta];
             if (empty($data['ids'])) continue;
 
-            // Paso A: Reparto en Generalistas MCUT-1 y MCUT-3 (hasta 540 min)
-            $leftover = asignarConTope(
-                $data['ids'], $data['time'],
-                ['MCUT-1', 'MCUT-3'], $maquinasActivasInput, TOPE_BLOQUE,
-                $idsPorMaquina, $maquinas
-            );
-
-            if (empty($leftover['ids'])) continue;
-
-            // Paso B: Especialista correspondiente (MCUT-2, 4, 5 o 6 hasta 540 min)
+            $idsPendientes = $data['ids'];
+            $tiempoPendiente = $data['time'];
             $esp = $especialistas[$bucket][$tinta];
-            if ($esp !== null) {
-                $leftover = asignarConTope(
-                    $leftover['ids'], $leftover['time'],
-                    [$esp], $maquinasActivasInput, TOPE_BLOQUE,
+
+            // Generalistas y Especialista correspondientes
+            $generalistas = ['MCUT-1', 'MCUT-3'];
+            $compatibles = $esp !== null ? ['MCUT-1', 'MCUT-3', $esp] : ['MCUT-1', 'MCUT-3'];
+            $activasCompatibles = array_values(array_intersect($compatibles, $maquinasActivasInput));
+
+            if (empty($activasCompatibles)) {
+                // Fallback de corte si ninguna compatible está activa (nunca MCUT-7)
+                $activasCompatibles = array_values(array_intersect(['MCUT-1', 'MCUT-2', 'MCUT-3', 'MCUT-4', 'MCUT-5', 'MCUT-6'], $maquinasActivasInput));
+            }
+
+            $ronda = 1;
+            while (!empty($idsPendientes)) {
+                $limiteActual = $ronda * TAMANO_BATCH;
+
+                // Paso 1: Carga a Generalistas (MCUT-1 y MCUT-3) hasta el límite de la ronda actual
+                $resGen = asignarConTope(
+                    $idsPendientes, $tiempoPendiente,
+                    $generalistas, $maquinasActivasInput, $limiteActual,
                     $idsPorMaquina, $maquinas
                 );
+
+                $idsPendientes = $resGen['ids'];
+                $tiempoPendiente = $resGen['time'];
+
+                if (empty($idsPendientes)) break;
+
+                // Paso 2: Si sobran, carga a la Especialista hasta el límite de la ronda actual
+                if ($esp !== null && in_array($esp, $maquinasActivasInput, true)) {
+                    $resEsp = asignarConTope(
+                        $idsPendientes, $tiempoPendiente,
+                        [$esp], $maquinasActivasInput, $limiteActual,
+                        $idsPorMaquina, $maquinas
+                    );
+
+                    $idsPendientes = $resEsp['ids'];
+                    $tiempoPendiente = $resEsp['time'];
+
+                    if (empty($idsPendientes)) break;
+                }
+
+                // Si ninguna máquina disponible puede recibir más tiempo en esta ronda, pasamos a la siguiente
+                $espacioEnEstaRonda = 0.0;
+                foreach ($activasCompatibles as $m) {
+                    $espacioEnEstaRonda += max(0.0, $limiteActual - $maquinas[$m]);
+                }
+
+                if ($espacioEnEstaRonda <= 0.0) {
+                    $ronda++; // Abre nuevo batch de +540 min iniciando otra vez en MCUT-1/MCUT-3
+                } else {
+                    // Si sobra residuo indivisible menor al promedio, repartir y terminar
+                    repartirEntreMaquinas($idsPendientes, $tiempoPendiente, $activasCompatibles, $idsPorMaquina, $maquinas);
+                    break;
+                }
             }
-
-            if (empty($leftover['ids'])) continue;
-
-            // Paso C: Segunda vuelta a Generalistas MCUT-1 y MCUT-3 (hasta 1080 min)
-            $leftover = asignarConTope(
-                $leftover['ids'], $leftover['time'],
-                ['MCUT-1', 'MCUT-3'], $maquinasActivasInput, TOPE_BLOQUE * 2,
-                $idsPorMaquina, $maquinas
-            );
-
-            if (empty($leftover['ids'])) continue;
-
-            // Paso D: Desborde final -> Solo entre las máquinas compatibles activas (MCUT-1 a MCUT-6)
-            $compatibles = ['MCUT-1', 'MCUT-3'];
-            if ($esp !== null) {
-                $compatibles[] = $esp;
-            }
-            $destinoFinal = array_values(array_intersect($compatibles, $maquinasActivasInput));
-
-            if (empty($destinoFinal)) {
-                // Si no hay ninguna compatible activa, usar cualquier máquina activa de corte (1 a 6)
-                $destinoFinal = array_values(array_intersect(['MCUT-1', 'MCUT-2', 'MCUT-3', 'MCUT-4', 'MCUT-5', 'MCUT-6'], $maquinasActivasInput));
-            }
-
-            // Reparto final sin tope (NUNCA pasa a MCUT-7)
-            repartirEntreMaquinas($leftover['ids'], $leftover['time'], $destinoFinal, $idsPorMaquina, $maquinas);
         }
     }
 
     // =========================================================
-    // 4. GUARDAR CAMBIOS EN BD
+    // 4. PERSISTENCIA EN BASE DE DATOS
     // =========================================================
     foreach ($idsPorMaquina as $nombreMaquina => $arregloIds) {
         actualizarMaquinaEnBD($con, $arregloIds, $nombreMaquina);
