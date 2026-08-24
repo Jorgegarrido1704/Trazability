@@ -19,13 +19,14 @@ echo "<tr><th>Numero de parte</th>
 echo "</thead>";
 echo "<tbody>";    
 while ($row = mysqli_fetch_assoc($registrosMPS)) {
-    $datos_de_trabajo= mysqli_query($con,"SELECT   processtime, setupTime FROM `tiemposderuteo` WHERE pn = '$row[pn]' ORDER BY id ASC");
+     $pn = $row['pn'];
+    $datos_de_trabajo= mysqli_query($con,"SELECT   processtime, setupTime FROM `tiemposderuteo` WHERE pn = '$pn' ORDER BY id ASC");
     $pn = $row['pn'];
       echo "<tr><td>{$pn}</td>";
     while ($row2 = mysqli_fetch_assoc($datos_de_trabajo)) {
       
-         $processtime = $row['processtime'];
-         $setupTime = $row['setupTime'];
+         $processtime = $row2['processtime'];
+         $setupTime = $row2['setupTime'];
     echo "<td style='font-weight:bold;'>{$processtime}</td><td style='font-weight:bold;'>{$setupTime}</td>";
     }
    echo "</tr>";
