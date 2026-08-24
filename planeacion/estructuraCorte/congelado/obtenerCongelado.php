@@ -63,8 +63,9 @@ foreach ($rows as $row) {
             'min'            => 0, // total de minutos del día
         ];
     }
+    $setup=3;
     $agrupado[$key]['items'][] = $row;
-    $agrupado[$key]['min'] += (float) $row['min'];
+    $agrupado[$key]['min'] += (float) $row['min']+$setup;
 }
 
 echo json_encode(array_values($agrupado));

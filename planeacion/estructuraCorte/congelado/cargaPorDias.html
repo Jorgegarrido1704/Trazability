@@ -166,7 +166,7 @@ function generarPropuesta() {
         }
 
         const ordenados = ordenarParaReparto(disponibles);
-        const capacidad = parseFloat(document.getElementById('capacidadDia').value) || 450;
+        const capacidad = parseFloat(document.getElementById('capacidadDia').value) || 540;
         const bloques = repartirEnBloques(ordenados, capacidad);
         const fechaInicio = document.getElementById('fechaInicio').value;
         const saltarFines = document.getElementById('saltarFines').checked;
@@ -186,8 +186,8 @@ function ordenarParaReparto(items) {
     const pesoUrgencia = { '4-Critico': 4, '3-Alta': 3, '2-Media': 2, '1-Baja': 1 };
 
     return items.slice().sort((a, b) => {
-        const keyA = `${a.terminal1 || ''}|${a.terminal2 || ''}|${a.color || ''}|${a.calibre || ''}`;
-        const keyB = `${b.terminal1 || ''}|${b.terminal2 || ''}|${b.color || ''}|${b.calibre || ''}`;
+        const keyA = `${a.calibre || ''}|${a.color || ''}|${a.terminal1 || ''}|${a.terminal2 || ''}`;
+        const keyB = `${b.calibre || ''}|${b.color || ''}|${b.terminal1 || ''}|${b.terminal2 || ''}`;
         if (keyA !== keyB) return keyA.localeCompare(keyB);
 
         const uA = pesoUrgencia[a.urgencia] || 0;
@@ -211,6 +211,7 @@ function repartirEnBloques(itemsOrdenados, capacidad) {
 
     itemsOrdenados.forEach(item => {
         const minutos = parseFloat(item.min) || 0;
+       
 
         // Si un solo WO ya excede la capacidad del día, ocupa su propio día
         if (minutos > capacidad) {
