@@ -3,6 +3,87 @@
 require 'app/conection.php';
 
 
+const CAPACIDAD_MAX_GENERALISTA = 540.0; // minutos, tope individual de MCUT-1 y MCUT-3
+
+function asignarConTope(array $ids, float $tiempoTotal, array $maquinasCandidatas, array $maquinasActivas, float $tope, array &$idsPorMaquina, array &$maquinas): array {
+    if (empty($ids)) {
+        return ['ids' => [], 'time' => 0.0];
+    }
+
+    $activas = array_values(array_intersect($maquinasCandidatas, $maquinasActivas));
+    if (empty($activas)) {
+        return ['ids' => $ids, 'time' => $tiempoTotal];
+    }
+
+    $totalIds = count($ids);
+    $avgTime = $totalIds > 0 ? $tiempoTotal / $totalIds : 0.0;
+
+    $capacidades = [];
+    $capacidadTotal = 0.0;
+    foreach ($activas as $maq) {
+        $libre = max(0.0, $tope - $maquinas[$maq]);
+        $capacidades[$maq] = $libre;
+        $capacidadTotal += $libre;
+    }
+
+    if ($capacidadTotal <= 0.0) {
+        // Ninguna de las máquinas candidatas tiene espacio libre
+        return ['ids' => $ids, 'time' => $tiempoTotal];
+    }
+
+    $restanteIds = $ids;
+
+    if ($avgTime > 0 && $tiempoTotal > $capacidadTotal) {
+        // No cabe todo: llenar cada máquina hasta su tope; lo que sobre se devuelve
+        foreach ($activas as $maq) {
+            if ($capacidades[$maq] <= 0 || empty($restanteIds)) continue;
+            $cantidad = (int) floor($capacidades[$maq] / $avgTime);
+            $cantidad = max(0, min($cantidad, count($restanteIds)));
+            if ($cantidad > 0) {
+                $chunk = array_splice($restanteIds, 0, $cantidad);
+                $tiempoChunk = count($chunk) * $avgTime;
+                $idsPorMaquina[$maq] = array_merge($idsPorMaquina[$maq], $chunk);
+                $maquinas[$maq] += $tiempoChunk;
+            }
+        }
+        $tiempoRestante = count($restanteIds) * $avgTime;
+        return ['ids' => $restanteIds, 'time' => $tiempoRestante];
+    }
+
+    // Cabe todo: reparto proporcional a la capacidad libre de cada máquina
+    $asignaciones = [];
+    $sumaAsignada = 0;
+    foreach ($activas as $maq) {
+        if ($capacidades[$maq] <= 0) {
+            $asignaciones[$maq] = 0;
+            continue;
+        }
+        $cantidad = (int) floor($totalIds * ($capacidades[$maq] / $capacidadTotal));
+        $asignaciones[$maq] = $cantidad;
+        $sumaAsignada += $cantidad;
+    }
+
+    // Los ids que sobran por redondeo van a la máquina con más espacio libre
+    $faltantes = $totalIds - $sumaAsignada;
+    if ($faltantes > 0) {
+        $capacidadesOrdenadas = $capacidades;
+        arsort($capacidadesOrdenadas);
+        $maqConMasEspacio = array_key_first($capacidadesOrdenadas);
+        $asignaciones[$maqConMasEspacio] += $faltantes;
+    }
+
+    foreach ($asignaciones as $maq => $cantidad) {
+        if ($cantidad <= 0) continue;
+        $chunk = array_splice($restanteIds, 0, $cantidad);
+        $tiempoChunk = count($chunk) * $avgTime;
+        $idsPorMaquina[$maq] = array_merge($idsPorMaquina[$maq], $chunk);
+        $maquinas[$maq] += $tiempoChunk;
+    }
+
+    return ['ids' => [], 'time' => 0.0];
+}
+
+/** Reparte un pool SIN tope entre un conjunto de máquinas, proporcional a la cantidad de IDs. */
 function repartirEntreMaquinas(array $ids, float $tiempoTotal, array $maquinasDestino, array &$idsPorMaquina, array &$maquinas): void {
     $total = count($ids);
     if ($total === 0 || empty($maquinasDestino)) {
@@ -22,19 +103,9 @@ function repartirEntreMaquinas(array $ids, float $tiempoTotal, array $maquinasDe
     }
 }
 
-/** Asigna el pool completo a una sola máquina. */
-function asignarTodoAMaquina(array $ids, float $tiempoTotal, string $maquina, array &$idsPorMaquina, array &$maquinas): void {
-    if (empty($ids)) {
-        return;
-    }
-    $idsPorMaquina[$maquina] = array_merge($idsPorMaquina[$maquina], $ids);
-    $maquinas[$maquina] += $tiempoTotal;
-}
-
 /**
  * Recorre los "tiers" de prioridad en orden y devuelve el primero que
- * tenga al menos una máquina activa (filtrado a solo las activas de
- * ese tier). Si ningún tier tiene nada activo, devuelve [].
+ * tenga al menos una máquina activa (filtrado a solo las activas).
  */
 function resolverDestino(array $tiers, array $maquinasActivas): array {
     foreach ($tiers as $tier) {
@@ -44,38 +115,6 @@ function resolverDestino(array $tiers, array $maquinasActivas): array {
         }
     }
     return [];
-}
-
-/** Cadena de prioridad para calibres 10-12, 14-16 y 18-22 (no sello). */
-function tiersRangoGeneral(string $tinta, ?string $especialista): array {
-    $tiers = [
-        ['MCUT-1', 'MCUT-3'], // generalistas: prioridad total
-    ];
-    if ($especialista !== null) {
-        $tiers[] = [$especialista];
-    }
-    $tiers[] = ['MCUT-7']; // último recurso antes del fallback genérico
-    return $tiers;
-}
-
-/** Cadena de prioridad para calibre 24 (no sello): fuera del rango de MCUT-1. */
-function tiersG24(string $especialista): array {
-    return [
-        ['MCUT-3'],
-        [$especialista],
-        ['MCUT-7'],
-    ];
-}
-
-/** Cadena de prioridad para el pool de MCUT-7 (calibres fuera de 10-24 / cons "C"). */
-function tiersOther(string $tinta): array {
-    $tiers = [['MCUT-7']];
-    if ($tinta === 'BLANCA') {
-        $tiers[] = ['MCUT-1', 'MCUT-3', 'MCUT-2', 'MCUT-4'];
-    } else {
-        $tiers[] = ['MCUT-1', 'MCUT-3', 'MCUT-5', 'MCUT-6'];
-    }
-    return $tiers;
 }
 
 function actualizarMaquinaEnBD($con, array $ids, string $nombreMaquina): void {
@@ -100,8 +139,6 @@ try {
         $maquinasActivasInput = ["MCUT-1", "MCUT-2", "MCUT-3", "MCUT-4", "MCUT-5", "MCUT-6", "MCUT-7"];
     }
 
-    $mcut3Activa = in_array("MCUT-3", $maquinasActivasInput, true);
-
     $maquinas = [
         "MCUT-1" => 0, "MCUT-2" => 0, "MCUT-3" => 0,
         "MCUT-4" => 0, "MCUT-5" => 0, "MCUT-6" => 0,
@@ -114,16 +151,24 @@ try {
         "MCUT-7" => []
     ];
 
-    // Pool exclusivo de sello (solo se llena si MCUT-3 está activa;
-    // si no, cada renglón con sello cae directo al pool de su rango normal)
-    $poolSello = ['ids' => [], 'time' => 0.0];
-
-    // Pools por rango de calibre y tinta (para MCUT-1/3 + especialistas)
+    // Pools por rango de calibre y tinta, separando sello de trabajo normal
     $poolGauge = [
-        'G10_12' => ['BLANCA' => ['ids' => [], 'time' => 0.0], 'NEGRA' => ['ids' => [], 'time' => 0.0]],
-        'G14_16' => ['BLANCA' => ['ids' => [], 'time' => 0.0], 'NEGRA' => ['ids' => [], 'time' => 0.0]],
-        'G18_22' => ['BLANCA' => ['ids' => [], 'time' => 0.0], 'NEGRA' => ['ids' => [], 'time' => 0.0]],
-        'G24'    => ['BLANCA' => ['ids' => [], 'time' => 0.0], 'NEGRA' => ['ids' => [], 'time' => 0.0]],
+        'G10_12' => [
+            'BLANCA' => ['idsSello' => [], 'timeSello' => 0.0, 'idsNormal' => [], 'timeNormal' => 0.0],
+            'NEGRA'  => ['idsSello' => [], 'timeSello' => 0.0, 'idsNormal' => [], 'timeNormal' => 0.0],
+        ],
+        'G14_16' => [
+            'BLANCA' => ['idsSello' => [], 'timeSello' => 0.0, 'idsNormal' => [], 'timeNormal' => 0.0],
+            'NEGRA'  => ['idsSello' => [], 'timeSello' => 0.0, 'idsNormal' => [], 'timeNormal' => 0.0],
+        ],
+        'G18_22' => [
+            'BLANCA' => ['idsSello' => [], 'timeSello' => 0.0, 'idsNormal' => [], 'timeNormal' => 0.0],
+            'NEGRA'  => ['idsSello' => [], 'timeSello' => 0.0, 'idsNormal' => [], 'timeNormal' => 0.0],
+        ],
+        'G24' => [
+            'BLANCA' => ['idsSello' => [], 'timeSello' => 0.0, 'idsNormal' => [], 'timeNormal' => 0.0],
+            'NEGRA'  => ['idsSello' => [], 'timeSello' => 0.0, 'idsNormal' => [], 'timeNormal' => 0.0],
+        ],
     ];
 
     // Pool "OTHER" -> MCUT-7 (calibres 1,2,4,6,8, fuera de 10-24, o cons que empieza con C)
@@ -174,14 +219,7 @@ try {
             continue;
         }
 
-        // 2) Sello exclusivo de MCUT-3 (solo si MCUT-3 está activa; si no, sigue como calibre normal)
-        if ($esSello && $mcut3Activa) {
-            $poolSello['ids'][] = $idCorte;
-            $poolSello['time'] += $tiempoTotal;
-            continue;
-        }
-
-        // 3) Ruteo normal por calibre + tinta
+        // 2) Bucket de calibre
         if ($calibre === 10 || $calibre === 12) {
             $bucket = 'G10_12';
         } elseif ($calibre === 14 || $calibre === 16) {
@@ -192,69 +230,99 @@ try {
             $bucket = 'G18_22';
         }
 
-        $poolGauge[$bucket][$tinta]['ids'][] = $idCorte;
-        $poolGauge[$bucket][$tinta]['time'] += $tiempoTotal;
+        if ($esSello) {
+            $poolGauge[$bucket][$tinta]['idsSello'][] = $idCorte;
+            $poolGauge[$bucket][$tinta]['timeSello'] += $tiempoTotal;
+        } else {
+            $poolGauge[$bucket][$tinta]['idsNormal'][] = $idCorte;
+            $poolGauge[$bucket][$tinta]['timeNormal'] += $tiempoTotal;
+        }
     }
     mysqli_stmt_close($stmtListas);
 
-    // --- Asignación: sello exclusivo MCUT-3 ---
-    if ($mcut3Activa && !empty($poolSello['ids'])) {
-        asignarTodoAMaquina($poolSello['ids'], $poolSello['time'], 'MCUT-3', $idsPorMaquina, $maquinas);
-    }
-
-    // --- Asignación: rangos generales (10-12, 14-16, 18-22) ---
-    $especialistaPorTintaYRango = [
+    // =========================================================
+    // PROCESAMIENTO PRINCIPAL (orden: 10-12, 14-16, 18-22, 24, luego OTHER->MCUT-7)
+    // =========================================================
+    $especialistaPorBucketYTinta = [
         'G10_12' => ['BLANCA' => null,      'NEGRA' => null],
         'G14_16' => ['BLANCA' => 'MCUT-2',  'NEGRA' => 'MCUT-5'],
         'G18_22' => ['BLANCA' => 'MCUT-4',  'NEGRA' => 'MCUT-6'],
+        'G24'    => ['BLANCA' => 'MCUT-4',  'NEGRA' => 'MCUT-6'],
     ];
 
-    foreach ($especialistaPorTintaYRango as $bucket => $porTinta) {
-        foreach ($porTinta as $tinta => $especialista) {
-            $pool = $poolGauge[$bucket][$tinta];
-            if (empty($pool['ids'])) continue;
+    foreach (['G10_12', 'G14_16', 'G18_22', 'G24'] as $bucket) {
+        $generalistas = ($bucket === 'G24') ? ['MCUT-3'] : ['MCUT-1', 'MCUT-3'];
 
-            $tiers = tiersRangoGeneral($tinta, $especialista);
+        foreach (['BLANCA', 'NEGRA'] as $tinta) {
+            $data = $poolGauge[$bucket][$tinta];
+            $especialista = $especialistaPorBucketYTinta[$bucket][$tinta];
+
+            // 1) Sello: exclusivo de MCUT-3 mientras tenga espacio bajo su tope
+            $selloLeftover = asignarConTope(
+                $data['idsSello'], $data['timeSello'],
+                ['MCUT-3'], $maquinasActivasInput, CAPACIDAD_MAX_GENERALISTA,
+                $idsPorMaquina, $maquinas
+            );
+
+            // El sello que no cupo en MCUT-3 se une al trabajo normal del mismo rango
+            $idsNormal = array_merge($data['idsNormal'], $selloLeftover['ids']);
+            $timeNormal = $data['timeNormal'] + $selloLeftover['time'];
+
+            if (empty($idsNormal)) continue;
+
+            // 2) Trabajo normal (+ sello desbordado): generalistas con tope
+            $leftoverGeneralistas = asignarConTope(
+                $idsNormal, $timeNormal,
+                $generalistas, $maquinasActivasInput, CAPACIDAD_MAX_GENERALISTA,
+                $idsPorMaquina, $maquinas
+            );
+
+            if (empty($leftoverGeneralistas['ids'])) continue;
+
+            // 3) Lo que no cupo en los generalistas: especialista (sin tope) -> MCUT-7 -> último recurso
+            $tiers = [];
+            if ($especialista !== null) {
+                $tiers[] = [$especialista];
+            }
+            $tiers[] = ['MCUT-7'];
+
             $destino = resolverDestino($tiers, $maquinasActivasInput);
-
             if (empty($destino)) {
-                // Último recurso: ninguna máquina de la cadena de prioridad está activa
-                $destino = $maquinasActivasInput;
+                $destino = $maquinasActivasInput; // último recurso
             }
 
-            repartirEntreMaquinas($pool['ids'], $pool['time'], $destino, $idsPorMaquina, $maquinas);
+            repartirEntreMaquinas($leftoverGeneralistas['ids'], $leftoverGeneralistas['time'], $destino, $idsPorMaquina, $maquinas);
         }
     }
 
-    // --- Asignación: calibre 24 (fuera del rango de MCUT-1) ---
-    $especialista24 = ['BLANCA' => 'MCUT-4', 'NEGRA' => 'MCUT-6'];
-    foreach (['BLANCA', 'NEGRA'] as $tinta) {
-        $pool = $poolGauge['G24'][$tinta];
-        if (empty($pool['ids'])) continue;
-
-        $tiers = tiersG24($especialista24[$tinta]);
-        $destino = resolverDestino($tiers, $maquinasActivasInput);
-
-        if (empty($destino)) {
-            $destino = $maquinasActivasInput;
-        }
-
-        repartirEntreMaquinas($pool['ids'], $pool['time'], $destino, $idsPorMaquina, $maquinas);
-    }
-
-    // --- Asignación: pool MCUT-7 (fuera de 10-24 / cons "C") ---
+    // --- Pool MCUT-7 (calibres fuera de 10-24 / cons "C") ---
     foreach (['BLANCA', 'NEGRA'] as $tinta) {
         $pool = $poolOther[$tinta];
         if (empty($pool['ids'])) continue;
 
-        $tiers = tiersOther($tinta);
-        $destino = resolverDestino($tiers, $maquinasActivasInput);
-
-        if (empty($destino)) {
-            $destino = $maquinasActivasInput;
+        if (in_array('MCUT-7', $maquinasActivasInput, true)) {
+            $idsPorMaquina['MCUT-7'] = array_merge($idsPorMaquina['MCUT-7'], $pool['ids']);
+            $maquinas['MCUT-7'] += $pool['time'];
+            continue;
         }
 
-        repartirEntreMaquinas($pool['ids'], $pool['time'], $destino, $idsPorMaquina, $maquinas);
+        // MCUT-7 apagada: generalistas con tope primero...
+        $leftoverGeneralistas = asignarConTope(
+            $pool['ids'], $pool['time'],
+            ['MCUT-1', 'MCUT-3'], $maquinasActivasInput, CAPACIDAD_MAX_GENERALISTA,
+            $idsPorMaquina, $maquinas
+        );
+
+        if (empty($leftoverGeneralistas['ids'])) continue;
+
+        // ...luego especialistas del color (sin tope) como último recurso normal
+        $especialistas = ($tinta === 'BLANCA') ? ['MCUT-2', 'MCUT-4'] : ['MCUT-5', 'MCUT-6'];
+        $destino = resolverDestino([$especialistas], $maquinasActivasInput);
+        if (empty($destino)) {
+            $destino = $maquinasActivasInput; // último recurso absoluto
+        }
+
+        repartirEntreMaquinas($leftoverGeneralistas['ids'], $leftoverGeneralistas['time'], $destino, $idsPorMaquina, $maquinas);
     }
 
     foreach ($idsPorMaquina as $nombreMaquina => $arregloIds) {
