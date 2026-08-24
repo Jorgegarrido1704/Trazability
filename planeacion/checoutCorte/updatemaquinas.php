@@ -2,23 +2,11 @@
 
 require 'app/conection.php';
 
-/**
- * REGLAS DE NEGOCIO ACTUALIZADAS:
- *
- * - TOPE 540 min: MCUT-1, MCUT-2, MCUT-3, MCUT-4, MCUT-5, MCUT-6.
- *   Si llegan al tope, inician de nuevo a cargar desde MCUT-1 y MCUT-3.
- * - SIN TOPE (Destino final / desborde): MCUT-7.
- *
- * Flujo de asignación:
- * 1. Sello: MCUT-3 (todo el sello va a MCUT-3 sin importar calibre).
- * 2. Normal: Generalistas (MCUT-1 y/o MCUT-3 hasta 540 min).
- * 3. Desborde Generalistas: Especialista del calibre/tinta (hasta 540 min).
- * 4. Segunda vuelta / Desborde Especialista: Vuelve a MCUT-1 y MCUT-3.
- * 5. Destino final / Casos especiales: MCUT-7 (calibres fuera de 10-24 y cons con 'C'/'c') -> Cualquier activa (último recurso).
- */
-
 const TOPE_BLOQUE = 540.0;
 
+/**
+ * Asigna IDs respetando el tope de minutos en las máquinas candidatas.
+ */
 function asignarConTope(array $ids, float $tiempoTotal, array $maquinasCandidatas, array $maquinasActivas, float $tope, array &$idsPorMaquina, array &$maquinas): array {
     if (empty($ids)) {
         return ['ids' => [], 'time' => 0.0];
@@ -93,6 +81,9 @@ function asignarConTope(array $ids, float $tiempoTotal, array $maquinasCandidata
     return ['ids' => [], 'time' => 0.0];
 }
 
+/**
+ * Reparte IDs entre máquinas sin aplicar tope (para balancear desbordes finales).
+ */
 function repartirEntreMaquinas(array $ids, float $tiempoTotal, array $maquinasDestino, array &$idsPorMaquina, array &$maquinas): void {
     $total = count($ids);
     if ($total === 0 || empty($maquinasDestino)) {
@@ -156,20 +147,13 @@ try {
             'BLANCA' => ['ids' => [], 'time' => 0.0],
             'NEGRA'  => ['ids' => [], 'time' => 0.0],
         ],
-        'G18_22' => [
-            'BLANCA' => ['ids' => [], 'time' => 0.0],
-            'NEGRA'  => ['ids' => [], 'time' => 0.0],
-        ],
-        'G24' => [
+        'G18_24' => [
             'BLANCA' => ['ids' => [], 'time' => 0.0],
             'NEGRA'  => ['ids' => [], 'time' => 0.0],
         ],
     ];
 
-    $poolMCUT7 = [
-        'BLANCA' => ['ids' => [], 'time' => 0.0],
-        'NEGRA'  => ['ids' => [], 'time' => 0.0],
-    ];
+    $poolMCUT7 = ['ids' => [], 'time' => 0.0];
 
     $query = "SELECT c.id, c.np, c.color, c.aws, c.cons, c.tipo, c.tamano, c.term1, c.term2, c.tintaColor, c.qty, c.time_ruteo 
               FROM corte c
@@ -206,29 +190,27 @@ try {
         $consEmpiezaC  = ($cons !== '' && strtoupper($cons[0]) === 'C');
         $calibreValido = in_array($calibre, [10, 12, 14, 16, 18, 20, 22, 24], true);
 
-        // Destino MCUT-7: cons que empiece con C/c o calibres fuera de 10-24 (1,2,4,6,8,etc.)
+        // 1) MCUT-7 EXCLUSIVO: calibres fuera de 10-24 (1,2,4,6,8) o cons que empieza con C/c
         if ($consEmpiezaC || !$calibreValido) {
-            $poolMCUT7[$tinta]['ids'][] = $idCorte;
-            $poolMCUT7[$tinta]['time'] += $tiempoTotal;
+            $poolMCUT7['ids'][] = $idCorte;
+            $poolMCUT7['time'] += $tiempoTotal;
             continue;
         }
 
-        // Regla 1: Todo el sello va a MCUT-3
+        // 2) SELLO: Todo va a MCUT-3
         if ($esSello) {
             $poolSello['ids'][] = $idCorte;
             $poolSello['time'] += $tiempoTotal;
             continue;
         }
 
-        // Clasificación por rangos normales
+        // 3) CLASIFICACIÓN NORMAL (10 a 24)
         if ($calibre === 10 || $calibre === 12) {
             $bucket = 'G10_12';
         } elseif ($calibre === 14 || $calibre === 16) {
             $bucket = 'G14_16';
-        } elseif ($calibre === 24) {
-            $bucket = 'G24';
-        } else {
-            $bucket = 'G18_22';
+        } else { // 18, 20, 22, 24
+            $bucket = 'G18_24';
         }
 
         $poolGaugeNormal[$bucket][$tinta]['ids'][] = $idCorte;
@@ -237,125 +219,90 @@ try {
     mysqli_stmt_close($stmtListas);
 
     // =========================================================
-    // 1. ASIGNACIÓN DE SELLO (DIRECTO A MCUT-3)
+    // 1. ASIGNACIÓN EXCLUSIVA DE MCUT-7
+    // =========================================================
+    if (!empty($poolMCUT7['ids']) && in_array('MCUT-7', $maquinasActivasInput, true)) {
+        $idsPorMaquina['MCUT-7'] = array_merge($idsPorMaquina['MCUT-7'], $poolMCUT7['ids']);
+        $maquinas['MCUT-7'] += $poolMCUT7['time'];
+    }
+
+    // =========================================================
+    // 2. ASIGNACIÓN DE SELLO (TODO A MCUT-3)
     // =========================================================
     if (!empty($poolSello['ids'])) {
         if (in_array('MCUT-3', $maquinasActivasInput, true)) {
             $idsPorMaquina['MCUT-3'] = array_merge($idsPorMaquina['MCUT-3'], $poolSello['ids']);
             $maquinas['MCUT-3'] += $poolSello['time'];
         } else {
-            // Si MCUT-3 está inactiva, pasa a MCUT-1 o MCUT-7
-            $fallbackSello = in_array('MCUT-1', $maquinasActivasInput, true) ? ['MCUT-1'] : ['MCUT-7'];
-            $destinoSello = array_intersect($fallbackSello, $maquinasActivasInput);
-            if (empty($destinoSello)) $destinoSello = $maquinasActivasInput;
-            repartirEntreMaquinas($poolSello['ids'], $poolSello['time'], $destinoSello, $idsPorMaquina, $maquinas);
+            // Si MCUT-3 está apagada, se envía a MCUT-1 (sin tocar MCUT-7)
+            repartirEntreMaquinas($poolSello['ids'], $poolSello['time'], array_intersect(['MCUT-1'], $maquinasActivasInput), $idsPorMaquina, $maquinas);
         }
     }
 
     // =========================================================
-    // 2. ASIGNACIÓN TRABAJO NORMAL (CASCADA + SEGUNDA VUELTA)
+    // 3. ASIGNACIÓN TRABAJO NORMAL (10 a 24) ENTRE MCUT-1 A MCUT-6
     // =========================================================
-    $especialistasColor = [
-        'BLANCA' => ['MCUT-2', 'MCUT-4'],
-        'NEGRA'  => ['MCUT-5', 'MCUT-6'],
-    ];
-
-    $especialistaExacto = [
+    $especialistas = [
         'G10_12' => ['BLANCA' => null,     'NEGRA' => null],
         'G14_16' => ['BLANCA' => 'MCUT-2', 'NEGRA' => 'MCUT-5'],
-        'G18_22' => ['BLANCA' => 'MCUT-4', 'NEGRA' => 'MCUT-6'],
-        'G24'    => ['BLANCA' => 'MCUT-4', 'NEGRA' => 'MCUT-6'],
+        'G18_24' => ['BLANCA' => 'MCUT-4', 'NEGRA' => 'MCUT-6'],
     ];
 
-    foreach (['G10_12', 'G14_16', 'G18_22', 'G24'] as $bucket) {
-        $generalistas = ($bucket === 'G24') ? ['MCUT-3'] : ['MCUT-1', 'MCUT-3'];
-
+    foreach (['G10_12', 'G14_16', 'G18_24'] as $bucket) {
         foreach (['BLANCA', 'NEGRA'] as $tinta) {
             $data = $poolGaugeNormal[$bucket][$tinta];
             if (empty($data['ids'])) continue;
 
-            // Paso 2: Generalistas hasta 540 min
-            $leftoverGen = asignarConTope(
+            // Paso A: Reparto en Generalistas MCUT-1 y MCUT-3 (hasta 540 min)
+            $leftover = asignarConTope(
                 $data['ids'], $data['time'],
-                $generalistas, $maquinasActivasInput, TOPE_BLOQUE,
+                ['MCUT-1', 'MCUT-3'], $maquinasActivasInput, TOPE_BLOQUE,
                 $idsPorMaquina, $maquinas
             );
 
-            if (empty($leftoverGen['ids'])) continue;
+            if (empty($leftover['ids'])) continue;
 
-            // Paso 3: Especialista correspondiente hasta 540 min
-            $esp = $especialistaExacto[$bucket][$tinta];
-            $maquinasEsp = $esp !== null ? [$esp] : $especialistasColor[$tinta];
-
-            $leftoverEsp = asignarConTope(
-                $leftoverGen['ids'], $leftoverGen['time'],
-                $maquinasEsp, $maquinasActivasInput, TOPE_BLOQUE,
-                $idsPorMaquina, $maquinas
-            );
-
-            if (empty($leftoverEsp['ids'])) continue;
-
-            // Paso 3b: Si el especialista exacto se llena, intentar con la otra especialista del mismo color hasta 540 min
-            $otrasEsp = array_diff($especialistasColor[$tinta], $maquinasEsp);
-            if (!empty($otrasEsp)) {
-                $leftoverEsp = asignarConTope(
-                    $leftoverEsp['ids'], $leftoverEsp['time'],
-                    $otrasEsp, $maquinasActivasInput, TOPE_BLOQUE,
+            // Paso B: Especialista correspondiente (MCUT-2, 4, 5 o 6 hasta 540 min)
+            $esp = $especialistas[$bucket][$tinta];
+            if ($esp !== null) {
+                $leftover = asignarConTope(
+                    $leftover['ids'], $leftover['time'],
+                    [$esp], $maquinasActivasInput, TOPE_BLOQUE,
                     $idsPorMaquina, $maquinas
                 );
             }
 
-            if (empty($leftoverEsp['ids'])) continue;
+            if (empty($leftover['ids'])) continue;
 
-            // Paso 4 (Reinicio de ciclo): Si todas llegaron a 540 min, inician de nuevo desde MCUT-1 y MCUT-3
-            $leftoverVuelta2 = asignarConTope(
-                $leftoverEsp['ids'], $leftoverEsp['time'],
-                $generalistas, $maquinasActivasInput, TOPE_BLOQUE * 2,
+            // Paso C: Segunda vuelta a Generalistas MCUT-1 y MCUT-3 (hasta 1080 min)
+            $leftover = asignarConTope(
+                $leftover['ids'], $leftover['time'],
+                ['MCUT-1', 'MCUT-3'], $maquinasActivasInput, TOPE_BLOQUE * 2,
                 $idsPorMaquina, $maquinas
             );
 
-            if (empty($leftoverVuelta2['ids'])) continue;
+            if (empty($leftover['ids'])) continue;
 
-            // Paso 5: Desborde total va a MCUT-7 (sin tope) o activas como último recurso
-            $destinoFinal = in_array('MCUT-7', $maquinasActivasInput, true) ? ['MCUT-7'] : $maquinasActivasInput;
-            repartirEntreMaquinas($leftoverVuelta2['ids'], $leftoverVuelta2['time'], $destinoFinal, $idsPorMaquina, $maquinas);
+            // Paso D: Desborde final -> Solo entre las máquinas compatibles activas (MCUT-1 a MCUT-6)
+            $compatibles = ['MCUT-1', 'MCUT-3'];
+            if ($esp !== null) {
+                $compatibles[] = $esp;
+            }
+            $destinoFinal = array_values(array_intersect($compatibles, $maquinasActivasInput));
+
+            if (empty($destinoFinal)) {
+                // Si no hay ninguna compatible activa, usar cualquier máquina activa de corte (1 a 6)
+                $destinoFinal = array_values(array_intersect(['MCUT-1', 'MCUT-2', 'MCUT-3', 'MCUT-4', 'MCUT-5', 'MCUT-6'], $maquinasActivasInput));
+            }
+
+            // Reparto final sin tope (NUNCA pasa a MCUT-7)
+            repartirEntreMaquinas($leftover['ids'], $leftover['time'], $destinoFinal, $idsPorMaquina, $maquinas);
         }
     }
 
     // =========================================================
-    // 3. ASIGNACIÓN POOL MCUT-7 (CALIBRES FUERA DE RANGO / CONS "C")
+    // 4. GUARDAR CAMBIOS EN BD
     // =========================================================
-    foreach (['BLANCA', 'NEGRA'] as $tinta) {
-        $pool = $poolMCUT7[$tinta];
-        if (empty($pool['ids'])) continue;
-
-        if (in_array('MCUT-7', $maquinasActivasInput, true)) {
-            $idsPorMaquina['MCUT-7'] = array_merge($idsPorMaquina['MCUT-7'], $pool['ids']);
-            $maquinas['MCUT-7'] += $pool['time'];
-            continue;
-        }
-
-        // Si MCUT-7 no está activa: llena generalistas -> especialistas -> activas
-        $leftoverGen = asignarConTope(
-            $pool['ids'], $pool['time'],
-            ['MCUT-1', 'MCUT-3'], $maquinasActivasInput, TOPE_BLOQUE,
-            $idsPorMaquina, $maquinas
-        );
-
-        if (empty($leftoverGen['ids'])) continue;
-
-        $leftoverEsp = asignarConTope(
-            $leftoverGen['ids'], $leftoverGen['time'],
-            $especialistasColor[$tinta], $maquinasActivasInput, TOPE_BLOQUE,
-            $idsPorMaquina, $maquinas
-        );
-
-        if (empty($leftoverEsp['ids'])) continue;
-
-        repartirEntreMaquinas($leftoverEsp['ids'], $leftoverEsp['time'], $maquinasActivasInput, $idsPorMaquina, $maquinas);
-    }
-
-    // Guardar asignaciones en Base de Datos
     foreach ($idsPorMaquina as $nombreMaquina => $arregloIds) {
         actualizarMaquinaEnBD($con, $arregloIds, $nombreMaquina);
     }
