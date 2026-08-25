@@ -137,7 +137,7 @@ try {
     $poolSello = ['ids' => [], 'time' => 0.0];
     $poolMCUT7 = ['ids' => [], 'time' => 0.0];
 
-    // Pools de trabajo normal por máquina especialista
+    // Pools de trabajo normal (sin sello) por máquina especialista
     $poolEsp = [
         'MCUT-2' => ['ids' => [], 'time' => 0.0], // Blanca 14-16
         'MCUT-4' => ['ids' => [], 'time' => 0.0], // Blanca 18-24
@@ -181,21 +181,23 @@ try {
         $consEmpiezaC  = ($cons !== '' && strtoupper($cons[0]) === 'C');
         $calibreValido = in_array($calibre, [10, 12, 14, 16, 18, 20, 22, 24], true);
 
-        // Restricción MCUT-7: Fuera de 10-24 (1,2,4,6,8) o cons con 'C'/'c'
+        // Restricción MCUT-7: fuera de calibres 10-24 (p.ej. 1,2,4,6,8) o cons con 'C'/'c'.
+        // El calibre (gauge) manda sobre el terminal/sello: si el calibre cae en MCUT-7,
+        // se va a MCUT-7 sin importar si tiene sello o no.
         if ($consEmpiezaC || !$calibreValido) {
             $poolMCUT7['ids'][] = $idCorte;
             $poolMCUT7['time'] += $tiempoTotal;
             continue;
         }
 
-        // Restricción MCUT-3: Todo el sello
+        // Restricción MCUT-3: todo el sello (calibre 10-24, cualquier tinta), exclusivo.
         if ($esSello) {
             $poolSello['ids'][] = $idCorte;
             $poolSello['time'] += $tiempoTotal;
             continue;
         }
 
-        // Clasificación por Especialistas
+        // Clasificación por especialistas (siempre sin sello, cons ya validado arriba)
         if ($calibre === 10 || $calibre === 12) {
             $poolEsp['G10_12']['ids'][] = $idCorte;
             $poolEsp['G10_12']['time'] += $tiempoTotal;
@@ -213,27 +215,29 @@ try {
 
     // =========================================================
     // PROCESAMIENTO SECUENCIAL POR RONDAS DE 540 MIN
-    // Orden: MCUT-2 -> MCUT-4 -> MCUT-5 -> MCUT-6 -> MCUT-1 -> MCUT-3
+    // Orden por ronda: (MCUT-2 y MCUT-5, calibre 14-16) -> (MCUT-4 y MCUT-6, calibre 18-24)
+    //                   -> MCUT-1 (sobrante sin sello, cualquier calibre/tinta 10-24)
+    //                   -> MCUT-3 (todo lo que tenga sello, exclusivo)
+    //
+    // IMPORTANTE: el pool de sello (con sello) NUNCA se mezcla con el pool "sin sello"
+    // que llena MCUT-1. Cada uno avanza por su propio camino ronda a ronda; solo se
+    // reparten juntos entre las máquinas de corte como último recurso si en una ronda
+    // ya no hay más capacidad para abrir (p.ej. porque MCUT-1 o MCUT-3 están apagadas).
     // =========================================================
-    
-    // Carga inicial de sellos a MCUT-3 con su primer tope de 540 min
-    $selloLeftover = ['ids' => [], 'time' => 0.0];
-    if (!empty($poolSello['ids'])) {
-        $selloLeftover = asignarConTope(
-            $poolSello['ids'], $poolSello['time'],
-            ['MCUT-3'], $maquinasActivasInput, TAMANO_BATCH,
-            $idsPorMaquina, $maquinas
-        );
-    }
+
+    $ordenEspecialistas = ['MCUT-2', 'MCUT-5', 'MCUT-4', 'MCUT-6'];
+    $ordenMaquinasCorte = ['MCUT-1', 'MCUT-2', 'MCUT-3', 'MCUT-4', 'MCUT-5', 'MCUT-6'];
+
+    $restoNormal = ['ids' => [], 'time' => 0.0]; // sin sello -> candidato exclusivo de MCUT-1
+    $restoSello  = $poolSello;                    // con sello -> candidato exclusivo de MCUT-3
 
     $ronda = 1;
-    $ordenEspecialistas = ['MCUT-2', 'MCUT-4', 'MCUT-5', 'MCUT-6'];
-    
-    while (true) {
-        $limiteActual = $ronda * TAMANO_BATCH;
-        $desbordeRonda = ['ids' => [], 'time' => 0.0];
+    $rondaMaxima = 500; // resguardo anti-loop infinito
 
-        // 1. LLENA MCUT-2, 2. LLENA MCUT-4, 3. LLENA MCUT-5, 4. LLENA MCUT-6
+    while ($ronda <= $rondaMaxima) {
+        $limiteActual = $ronda * TAMANO_BATCH;
+
+        // 1-4. Llena especialistas en orden: MCUT-2, MCUT-5, MCUT-4, MCUT-6
         foreach ($ordenEspecialistas as $maqEsp) {
             if (!empty($poolEsp[$maqEsp]['ids'])) {
                 $res = asignarConTope(
@@ -241,62 +245,71 @@ try {
                     [$maqEsp], $maquinasActivasInput, $limiteActual,
                     $idsPorMaquina, $maquinas
                 );
-                // Si la especialista se llena a 540 min, lo que sobra pasa a desborde
-                $desbordeRonda['ids'] = array_merge($desbordeRonda['ids'], $res['ids']);
-                $desbordeRonda['time'] += $res['time'];
+                // Lo que no cupo en la especialista pasa al lote "sin sello" (candidato a MCUT-1)
+                $restoNormal['ids'] = array_merge($restoNormal['ids'], $res['ids']);
+                $restoNormal['time'] += $res['time'];
                 $poolEsp[$maqEsp] = ['ids' => [], 'time' => 0.0];
             }
         }
 
-        // Agregar calibres 10-12 y sellos que no alcanzaron en la vuelta anterior
-        $desbordeRonda['ids'] = array_merge($desbordeRonda['ids'], $poolEsp['G10_12']['ids'], $selloLeftover['ids']);
-        $desbordeRonda['time'] += ($poolEsp['G10_12']['time'] + $selloLeftover['time']);
-        $poolEsp['G10_12'] = ['ids' => [], 'time' => 0.0];
-        $selloLeftover = ['ids' => [], 'time' => 0.0];
-
-        if (empty($desbordeRonda['ids'])) {
-            break; // No hay más material normal pendiente
+        // Calibres 10-12 (sin especialista) se suman al lote "sin sello"
+        if (!empty($poolEsp['G10_12']['ids'])) {
+            $restoNormal['ids'] = array_merge($restoNormal['ids'], $poolEsp['G10_12']['ids']);
+            $restoNormal['time'] += $poolEsp['G10_12']['time'];
+            $poolEsp['G10_12'] = ['ids' => [], 'time' => 0.0];
         }
 
-        // 5. LLENA MCUT-1 (Ambas tintas, calibres 10-24 hasta 540 min)
-        $resMCUT1 = asignarConTope(
-            $desbordeRonda['ids'], $desbordeRonda['time'],
-            ['MCUT-1'], $maquinasActivasInput, $limiteActual,
-            $idsPorMaquina, $maquinas
-        );
-
-        // 6. LLENA MCUT-3 (Lo que sobre de MCUT-1 hasta 540 min)
-        $resMCUT3 = asignarConTope(
-            $resMCUT1['ids'], $resMCUT1['time'],
-            ['MCUT-3'], $maquinasActivasInput, $limiteActual,
-            $idsPorMaquina, $maquinas
-        );
-
-        if (empty($resMCUT3['ids'])) {
-            break; // Se asignó todo correctamente
+        // 5. LLENA MCUT-1 (todo lo sin sello, calibre 10-24, cualquier tinta)
+        if (!empty($restoNormal['ids'])) {
+            $restoNormal = asignarConTope(
+                $restoNormal['ids'], $restoNormal['time'],
+                ['MCUT-1'], $maquinasActivasInput, $limiteActual,
+                $idsPorMaquina, $maquinas
+            );
         }
 
-        // Si todavía sobra material después de llenar la 1 y la 3, iniciamos otra ronda desde la 2
-        // Re-clasificamos los sobrantes para la siguiente vuelta
-        $selloLeftover = ['ids' => [], 'time' => 0.0];
-        $poolEsp['G10_12'] = ['ids' => [], 'time' => 0.0];
-        $ordenMaquinasCorte = ['MCUT-1', 'MCUT-2', 'MCUT-3', 'MCUT-4', 'MCUT-5', 'MCUT-6'];
+        // 6. LLENA MCUT-3 (exclusivo: todo lo que tiene sello) — camino totalmente aparte
+        if (!empty($restoSello['ids'])) {
+            $restoSello = asignarConTope(
+                $restoSello['ids'], $restoSello['time'],
+                ['MCUT-3'], $maquinasActivasInput, $limiteActual,
+                $idsPorMaquina, $maquinas
+            );
+        }
+
+        if (empty($restoNormal['ids']) && empty($restoSello['ids'])) {
+            break; // Todo el material normal y de sello quedó asignado
+        }
+
         $activasCorte = array_values(array_intersect($ordenMaquinasCorte, $maquinasActivasInput));
+        if (empty($activasCorte)) {
+            break; // No hay máquinas de corte activas; no se puede seguir repartiendo
+        }
 
-        // Checar si hay espacio libre en esta ronda
         $espacioLibreRonda = 0.0;
         foreach ($activasCorte as $m) {
             $espacioLibreRonda += max(0.0, $limiteActual - $maquinas[$m]);
         }
 
         if ($espacioLibreRonda <= 0.0) {
-            $ronda++; // Abre el siguiente batch (+540 min) empezando de nuevo por MCUT-2
-            $poolEsp['G10_12'] = $resMCUT3; // Se mandan a la siguiente ronda
-        } else {
-            // Residuo indivisible final repartido entre activas de corte (sin tocar MCUT-7)
-            repartirEntreMaquinas($resMCUT3['ids'], $resMCUT3['time'], $activasCorte, $idsPorMaquina, $maquinas);
-            break;
+            // Todas las máquinas de corte llegaron a su tope en esta ronda: abrir el
+            // siguiente batch de 540 min y reintentar (restoNormal/restoSello se conservan).
+            $ronda++;
+            continue;
         }
+
+        // Hay espacio libre en la ronda pero no se pudo colocar (p.ej. MCUT-1 o MCUT-3
+        // están apagadas): reparto de último recurso, sin mezclar sello con lo demás.
+        if (!empty($restoNormal['ids'])) {
+            repartirEntreMaquinas($restoNormal['ids'], $restoNormal['time'], $activasCorte, $idsPorMaquina, $maquinas);
+            $restoNormal = ['ids' => [], 'time' => 0.0];
+        }
+        if (!empty($restoSello['ids'])) {
+            $activasSello = in_array('MCUT-3', $maquinasActivasInput, true) ? ['MCUT-3'] : $activasCorte;
+            repartirEntreMaquinas($restoSello['ids'], $restoSello['time'], $activasSello, $idsPorMaquina, $maquinas);
+            $restoSello = ['ids' => [], 'time' => 0.0];
+        }
+        break;
     }
 
     // =========================================================
