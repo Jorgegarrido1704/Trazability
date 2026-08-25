@@ -332,12 +332,10 @@ try {
                         
                 ORDER BY MIN(cc.fecha_asignada) ASC,
                          MIN(cc.dia_bloque) ASC,
-                        
                          c.aws ASC,
                          c.color ASC,
                           c.tipo ASC
                          c.term1 ASC,
-                         
                          CASE
                             WHEN c.term2 LIKE CONCAT('%', c.term1, '%') THEN 0
                             ELSE 1
