@@ -122,9 +122,13 @@ try {
         $wo = $rowlistas['wo'];
         $codigo = $rowlistas['codigo'];
         $conector = $rowlistas['conector'];
+        $tamano = round((float)$rowlistas['tamano'], 2);
+        $tiempo_ruteo = $rowlistas['time_ruteo'];
         $estamp = isset($rowlistas['dist_stamp']) ? $rowlistas['dist_stamp'] : '';
-        
-        $time_ruteo = round((2.92 * $qty) + 180, 2);
+       
+       // $time_ruteo = round((2.92 * $qty) + 180, 2);
+       $time_ruteo=round($tiempo_ruteo+180,2);
+
         $minutos = round(((float)$time_ruteo / 60), 2);
         
         $tiempoTotal += $time_ruteo;
