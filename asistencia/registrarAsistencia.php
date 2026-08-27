@@ -59,6 +59,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
                         $status='R';
             }else if($timeNow > '17:35:00' and $timeNow < '23:59:59'){
                 $status='N';
+            }else {
+                $status='-';
             }
                 $updateregistro=mysqli_query($con,"UPDATE assistence SET `$todayIs`='$status' WHERE `name`='$name' ORDER BY id DESC LIMIT 1"); 
                 
