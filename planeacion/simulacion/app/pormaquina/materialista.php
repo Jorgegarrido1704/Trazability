@@ -50,7 +50,9 @@ try {
         $color = $rowlistas['color'];
         $tamano = round($rowlistas['tamano'], 2)*$qty;
         $terminal1 = $rowlistas['terminal1'];
+        $terminal1=explode(" ",$terminal1)[0];
         $terminal2 = $rowlistas['terminal2'];
+        $terminal2=explode(" ",$terminal2)[0];
 
 
             // if exist the key in the array no add key else add key
@@ -61,9 +63,13 @@ try {
             }
             if(!array_key_exists($terminal1, $terminales) && stripos($terminal1, 'Empalme') === false){
                 $terminales[$terminal1]=$qty;
+            }else if(array_key_exists($terminal1, $terminales) && stripos($terminal1, 'Empalme') === false){
+                $terminales[$terminal1]+=$qty;
             }
             if(!array_key_exists($terminal2, $terminales) && stripos($terminal2, 'Empalme') === false ){
                 $terminales[$terminal2]=$qty;
+            }else if(array_key_exists($terminal2, $terminales) && stripos($terminal2, 'Empalme') === false){
+                $terminales[$terminal2]+=$qty;
             }
            
    

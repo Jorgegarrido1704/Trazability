@@ -759,7 +759,7 @@ function poblarSelectorFechas(data) {
                 Object.keys(cables).forEach(key => {
                     const minutos = parseInt(cables[key]);
                    
-                    tbodyCables.innerHTML += `<tr><td>${key}</td><td>${minutos} mm</td></tr>`;
+                    tbodyCables.innerHTML += `<tr><td>${key}</td><td>${minutos} mm</td> <td>${(minutos/(12*25.4)).toFixed(2)} FT</td></tr>`;
                     
                 });
 
