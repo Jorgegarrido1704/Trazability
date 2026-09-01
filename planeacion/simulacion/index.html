@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         @page {
@@ -324,6 +325,18 @@
                 </form>
             </div>
         </div>
+
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0 text-secondary"><i class="bi bi-file-earmark-excel me-2"></i>Exportar a Excel</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">Genera un archivo Excel (.xlsx) con una hoja por cada máquina (detalle de la carga), una hoja de resumen general y una hoja adicional con el resumen total del materialista (cables y terminales/sellos de todas las máquinas).</p>
+                <button type="button" class="btn btn-success px-4 shadow-sm" id="btnGenerarExcel" onclick="generarExcelCarga()">
+                    <i class="bi bi-file-earmark-excel me-2"></i> Generar Excel de Carga
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -332,6 +345,7 @@
 <script>
     const codigoOficial = 83;
     let datosGlobal = [];
+    const LISTA_MAQUINAS = ['MCUT-1', 'MCUT-2', 'MCUT-3', 'MCUT-4', 'MCUT-5', 'MCUT-6', 'MCUT-7'];
 
     // Arreglo en memoria para simulación de Carga Semanal
     let simulacionCargaSemanal = [
@@ -806,6 +820,147 @@ function poblarSelectorFechas(data) {
             .catch(error => {
                 alert("Ocurrió un problema con la petición: " + error.message);
             });
+    }
+
+    // ==========================================
+    // EXPORTAR A EXCEL (Config. de Carga)
+    // ==========================================
+
+    async function fetchPorMaquina(maquina) {
+        try {
+            const response = await fetch('app/pormaquina/simulacion.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maquina: maquina, items: simulacionCargaSemanal })
+            });
+            const data = await response.json();
+            if (Array.isArray(data)) return data;
+            if (data && Array.isArray(data.data)) return data.data;
+            return [];
+        } catch (err) {
+            console.error(`Error obteniendo carga de ${maquina}:`, err);
+            return [];
+        }
+    }
+
+    async function fetchMaterialista(maquina) {
+        try {
+            const response = await fetch(`app/pormaquina/materialista.php?maquina=${encodeURIComponent(maquina)}&items=${encodeURIComponent(JSON.stringify(simulacionCargaSemanal))}`);
+            const data = await response.json();
+            return {
+                cables: data.cables || {},
+                terminales: data.terminales || {}
+            };
+        } catch (err) {
+            console.error(`Error obteniendo materialista de ${maquina}:`, err);
+            return { cables: {}, terminales: {} };
+        }
+    }
+
+    function filasParaHoja(data) {
+        const encabezados = ['ID', 'Nº Parte', 'Cantidad', 'Work Order', 'Cons', 'Tipo', 'Calibre', 'Color',
+            'Tamaño(MM)', 'Desforre 1', 'Terminal 1', 'Desforre 2', 'Terminal 2', 'Estampados', 'Tinta',
+            'Minutos', 'Fecha Asignada', 'Turno/Bloque'];
+        const filas = [encabezados];
+
+        let id = 1;
+        data.forEach(item => {
+            filas.push([
+                id++,
+                item.pn || '',
+                item.Qty || 0,
+                item.wo || '',
+                item.consumo || '',
+                item.tipo || '',
+                item.calibre || '',
+                item.color || '',
+                item.tamano || '',
+                item.strip1 || 0,
+                item.terminal1 || '',
+                item.strip2 || 0,
+                item.terminal2 || '',
+                item.conector || '',
+                item.tinta || '',
+                item.min || 0,
+                item.fecha_asignada || '',
+                item.dia_bloque || ''
+            ]);
+        });
+
+        return filas;
+    }
+
+    async function generarExcelCarga() {
+        const btn = document.getElementById('btnGenerarExcel');
+        const textoOriginal = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generando Excel...';
+
+        try {
+            const wb = XLSX.utils.book_new();
+
+            // 1. Una hoja por cada máquina con el detalle de la carga
+            const resumenPorMaquina = [];
+            for (const maquina of LISTA_MAQUINAS) {
+                const data = await fetchPorMaquina(maquina);
+                const filas = filasParaHoja(data);
+                const ws = XLSX.utils.aoa_to_sheet(filas);
+                ws['!cols'] = filas[0].map(() => ({ wch: 14 }));
+                XLSX.utils.book_append_sheet(wb, ws, maquina);
+
+                const totalPiezas = data.reduce((acc, item) => acc + (parseInt(item.Qty) || 0), 0);
+                const totalMinutos = data.reduce((acc, item) => acc + (parseFloat(item.min) || 0), 0);
+                resumenPorMaquina.push([maquina, data.length, totalPiezas, totalMinutos.toFixed(1)]);
+            }
+
+            // 2. Hoja de resumen general por máquina
+            const filasResumen = [['Máquina', 'Nº Registros', 'Total Piezas', 'Total Minutos'], ...resumenPorMaquina];
+            const wsResumen = XLSX.utils.aoa_to_sheet(filasResumen);
+            wsResumen['!cols'] = [{ wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 16 }];
+            XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen por Máquina');
+
+            // 3. Hoja de materialista total (todas las máquinas combinadas)
+            const totalCablesMm = {};
+            const totalTerminales = {};
+
+            for (const maquina of LISTA_MAQUINAS) {
+                const { cables, terminales } = await fetchMaterialista(maquina);
+                Object.entries(cables).forEach(([clave, mm]) => {
+                    totalCablesMm[clave] = (totalCablesMm[clave] || 0) + (parseInt(mm) || 0);
+                });
+                Object.entries(terminales).forEach(([clave, unidades]) => {
+                    totalTerminales[clave] = (totalTerminales[clave] || 0) + (parseInt(unidades) || 0);
+                });
+            }
+
+            const filasMaterialista = [['MATERIALISTA TOTAL - CABLES'], ['Cable', 'Total MM', 'Total FT']];
+            Object.keys(totalCablesMm).sort().forEach(clave => {
+                const mm = totalCablesMm[clave];
+                filasMaterialista.push([clave, mm, (mm / (12 * 25.4)).toFixed(2)]);
+            });
+
+            filasMaterialista.push([]);
+            filasMaterialista.push(['MATERIALISTA TOTAL - TERMINALES Y SELLOS']);
+            filasMaterialista.push(['Terminal / Sello', 'Total Unidades']);
+            Object.keys(totalTerminales).sort().forEach(clave => {
+                filasMaterialista.push([clave, (totalTerminales[clave]/7).toFixed(0)]);
+            });
+
+            const wsMaterialista = XLSX.utils.aoa_to_sheet(filasMaterialista);
+            wsMaterialista['!cols'] = [{ wch: 22 }, { wch: 14 }, { wch: 14 }];
+            XLSX.utils.book_append_sheet(wb, wsMaterialista, 'Materialista Total');
+
+            // Descargar archivo
+            const hoy = new Date();
+            const fechaStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+            XLSX.writeFile(wb, `Carga_Maquinas_${fechaStr}.xlsx`);
+        } catch (error) {
+            console.error('Error generando el Excel:', error);
+            alert('Ocurrió un problema al generar el Excel: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = textoOriginal;
+        }
     }
 </script>
 </body>
