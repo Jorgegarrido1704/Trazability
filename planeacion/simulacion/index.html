@@ -335,9 +335,9 @@
 
     // Arreglo en memoria para simulación de Carga Semanal
     let simulacionCargaSemanal = [
-        [1, "PN-10203-A", "WO-4401", 1200, 1, "3-Alta"],
-        [2, "PN-40502-B", "WO-4402", 850, 0, "2-Media"],
-        [3, "PN-99182-C", "WO-4403", 300, 1, "4-Critico"]
+        [1, "1001488939", "WO-4401", 300, 1, "3-Alta"],
+        [2, "1001489409", "WO-4402", 200, 0, "2-Media"],
+        [3, "660925", "WO-4403", 100, 1, "4-Critico"]
     ];
     let contadorIdSimulacion = 4;
 
@@ -741,9 +741,12 @@ function poblarSelectorFechas(data) {
     }
 
     function materialista(material) {
-        fetch(`app/pormaquina/materialista.php?maquina=${encodeURIComponent(material)}`)
+        console.log('material', material);
+        console.log('item', simulacionCargaSemanal);
+        fetch(`app/pormaquina/materialista.php?maquina=${encodeURIComponent(material)}&items=${encodeURIComponent(JSON.stringify(simulacionCargaSemanal))}`)
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 const cables = data.cables || {};
                 const terminals = data.terminales || {};
                 const tbodyCables = document.getElementById('cablespormaquina');
@@ -755,22 +758,16 @@ function poblarSelectorFechas(data) {
                 tbodyCables.innerHTML = '';
                 Object.keys(cables).forEach(key => {
                     const minutos = parseInt(cables[key]);
-                    let ulhh = String(Math.floor(tiempo_del_trabajo / 60)).padStart(2, '0');
-                    let ulmm = String(tiempo_del_trabajo % 60).padStart(2, '0');
-
-                    let horaActual = minutos + tiempo_del_trabajo;
-                    let hh = String(Math.floor(horaActual / 60)).padStart(2, '0');
-                    let mm = String(horaActual % 60).padStart(2, '0');
-
-                    const tiempoCalculado = `${ulhh}:${ulmm} - ${hh}:${mm}`;
-                    tbodyCables.innerHTML += `<tr><td>${key}</td><td>${tiempoCalculado}</td></tr>`;
-                    tiempo_del_trabajo += minutos;
+                   
+                    tbodyCables.innerHTML += `<tr><td>${key}</td><td>${minutos} mm</td></tr>`;
+                    
                 });
 
                 const tbodyTerminals = document.getElementById('terminalspormaquina');
                 tbodyTerminals.innerHTML = '';
                 Object.keys(terminals).forEach(key => {
-                    tbodyTerminals.innerHTML += `<tr><td>${key}</td></tr>`;
+                    const minutos = parseInt(terminals[key]);
+                    tbodyTerminals.innerHTML += `<tr><td>${key}</td><td>${minutos} units</td></tr>`;
                 });
             })
             .catch(err => console.error("Error al cargar materialistas:", err));
