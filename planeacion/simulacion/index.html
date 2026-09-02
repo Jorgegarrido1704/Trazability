@@ -964,6 +964,9 @@ function poblarSelectorFechas(data) {
                 const valorOriginal = (term || '').toString().trim();
                 if (!valorOriginal || valorOriginal === '-') return;
                 if (/^empalme/i.test(valorOriginal)) return;
+                if (/^terminal/i.test(valorOriginal)) return;
+                if (/^jumper/i.test(valorOriginal)) return;
+                if (/^blunt/i.test(valorOriginal)) return;
 
                 const valor = valorOriginal.split(' ')[0];
                 if (!valor) return;
