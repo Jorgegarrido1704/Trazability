@@ -574,7 +574,7 @@ function unificarCortesEspeciales(data, maquinaActual) {
         // y/o su propio color, aunque en realidad es el mismo corte físico.
         const clave = `${item.fecha_asignada}|${item.dia_bloque}|${item.wo}|${item.pn}|${item.calibre}|${item.tipo}|${item.tamano}`;
 
-        if (grupos.has(clave)) {
+      /*  if (grupos.has(clave)) {
             const existente = grupos.get(clave);
 
             // Combinar colores distintos entre los cores del mismo corte
@@ -592,30 +592,30 @@ function unificarCortesEspeciales(data, maquinaActual) {
             }*/
 
             // Combinar los distintos Estampados (conector) en un solo texto
-            const estampadosPrevios = String(existente.conector || '').split(', ').map(c => c.trim()).filter(Boolean);
-            const estampadoNuevo = String(item.conector || '').trim();
+       //     const estampadosPrevios = String(existente.conector || '').split(', ').map(c => c.trim()).filter(Boolean);
+         //   const estampadoNuevo = String(item.conector || '').trim();
             /*if (estampadoNuevo && !estampadosPrevios.includes(estampadoNuevo)) {
                 existente.conector = [...estampadosPrevios, estampadoNuevo].join(', ');
             }*/
 
             // Sumar los minutos: cada core representa una operación de estampado aparte
-            existente.min = (parseFloat(existente.min) || 0) + (parseFloat(item.min) || 0);
-            existente.estampado = (parseFloat(existente.estampado) || 0) + (parseFloat(item.estampado) || 0);
+         //   existente.min = (parseFloat(existente.min) || 0) + (parseFloat(item.min) || 0);
+           // existente.estampado = (parseFloat(existente.estampado) || 0) + (parseFloat(item.estampado) || 0);
 
             // Rellenar tamaño/tipo si la fila base llegó vacía en alguno de esos campos
-            if (!String(existente.tamano || '').trim() && String(item.tamano || '').trim()) {
-                existente.tamano = item.tamano;
-            }
-            if (!String(existente.tipo || '').trim() && String(item.tipo || '').trim()) {
-                existente.tipo = item.tipo;
-            }
+         //   if (!String(existente.tamano || '').trim() && String(item.tamano || '').trim()) {
+         //       existente.tamano = item.tamano;
+         //   }
+//if (!String(existente.tipo || '').trim() && String(item.tipo || '').trim()) {
+//existente.tipo = item.tipo;
+//}
 
             // La cantidad de piezas (Qty) es la misma para todos los cores de un mismo
             // corte físico, no se suma; nos quedamos con el valor mayor por seguridad.
-            const qtyNuevo = parseInt(item.Qty) || 0;
+         /*   const qtyNuevo = parseInt(item.Qty) || 0;
             const qtyExistente = parseInt(existente.Qty) || 0;
             if (qtyNuevo > qtyExistente) existente.Qty = item.Qty;
-        } else {
+        }else {*/
             const copia = { ...item };
             copia.strip1 = '-';
             copia.terminal1 = '-';
@@ -623,7 +623,7 @@ function unificarCortesEspeciales(data, maquinaActual) {
             copia.terminal2 = '-';
             grupos.set(clave, copia);
             resultado.push(copia);
-        }
+       // }
     });
 
     return resultado;
