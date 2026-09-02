@@ -587,16 +587,16 @@ function unificarCortesEspeciales(data, maquinaActual) {
             // Combinar los distintos Consecutivos (Cons) en un solo texto
             const consPrevios = String(existente.consumo || '').split(', ').map(c => c.trim()).filter(Boolean);
             const consNuevo = String(item.consumo || '').trim();
-            if (consNuevo && !consPrevios.includes(consNuevo)) {
+          /*  if (consNuevo && !consPrevios.includes(consNuevo)) {
                 existente.consumo = [...consPrevios, consNuevo].join(', ');
-            }
+            }*/
 
             // Combinar los distintos Estampados (conector) en un solo texto
             const estampadosPrevios = String(existente.conector || '').split(', ').map(c => c.trim()).filter(Boolean);
             const estampadoNuevo = String(item.conector || '').trim();
-            if (estampadoNuevo && !estampadosPrevios.includes(estampadoNuevo)) {
+            /*if (estampadoNuevo && !estampadosPrevios.includes(estampadoNuevo)) {
                 existente.conector = [...estampadosPrevios, estampadoNuevo].join(', ');
-            }
+            }*/
 
             // Sumar los minutos: cada core representa una operación de estampado aparte
             existente.min = (parseFloat(existente.min) || 0) + (parseFloat(item.min) || 0);
