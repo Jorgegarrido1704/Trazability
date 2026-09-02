@@ -680,7 +680,8 @@ function renderTablaAgrupada() {
         totalMinutos += parseFloat(item.min || 0);
 
         const row = document.createElement('tr');
-        row.innerHTML = `
+        if (item.tamano > 0 || item.tamano === null)
+{        row.innerHTML = `
             <td>${id}</td>
             <td>${item.pn || ''}</td>
             <td><strong>${item.Qty || 0}</strong></td>
@@ -697,7 +698,8 @@ function renderTablaAgrupada() {
             <td>${item.conector || ''}</td>
             <td>${item.tinta || ''}</td>
             <td>${item.estampado || 0}</td>`;
-        tbody.appendChild(row);
+
+        tbody.appendChild(row);}
 
         totalRecords++;
         id++;
