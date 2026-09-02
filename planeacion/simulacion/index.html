@@ -351,7 +351,7 @@
     let simulacionCargaSemanal = [
         [1, "1001488939", "WO-4401", 300, 1, "3-Alta"],
         [2, "1001489409", "WO-4402", 200, 0, "2-Media"],
-        [3, "621655", "WO-4403", 5, 1, "4-Critico"]
+        [3, "660925", "WO-4403", 100, 1, "4-Critico"]
     ];
     let contadorIdSimulacion = 4;
 
@@ -539,71 +539,9 @@
     });
 }
 
-// ==========================================
-// UNIFICACIÓN DE CORTES ESPECIALES (MCUT-7)
-// ==========================================
-// En MCUT-7 (cables especiales) un mismo corte puede llegar como varias filas
-// (una por cada "core"/color del cable), aunque en realidad es un solo corte físico.
-// Esta función agrupa esas filas por Fecha+Turno+WO+PN+Consecutivo, combina los
-// colores en un solo texto y deja Desforre/Terminal como "-" porque no aplican
-// a nivel de corte unificado.
-function unificarCortesEspeciales(data, maquinaActual) {
-    if (!Array.isArray(data) || data.length === 0) return data;
-
-    const grupos = new Map();
-    const resultado = [];
-
-    data.forEach(item => {
-        const esEspecial = (maquinaActual === 'MCUT-7') || (item.maquina === 'MCUT-7');
-
-        if (!esEspecial) {
-            resultado.push(item);
-            return;
-        }
-
-        // La clave que identifica un mismo corte físico es Fecha+Turno+WO+PN+Consecutivo.
-        // NO se incluyen tamaño/tipo en la clave porque, aunque en teoría son iguales
-        // entre los distintos "cores"/colores de un mismo corte, a veces llegan vacíos
-        // o con formato distinto en alguna de las filas duplicadas — si se exige que
-        // coincidan exactamente, esas filas dejan de unificarse.
-        const clave = `${item.fecha_asignada}|${item.dia_bloque}|${item.wo}|${item.pn}|${item.consumo}`;
-
-        if (grupos.has(clave)) {
-            const existente = grupos.get(clave);
-            const coloresPrevios = String(existente.color || '').split('/').map(c => c.trim()).filter(Boolean);
-            const colorNuevo = String(item.color || '').trim();
-            if (colorNuevo && !coloresPrevios.includes(colorNuevo)) {
-                existente.color = [...coloresPrevios, colorNuevo].join('/');
-            }
-
-            // Si la fila que quedó como base llegó sin tamaño o sin tipo, se rellena
-            // con el valor de la fila duplicada que sí lo traiga.
-            if (!String(existente.tamano || '').trim() && String(item.tamano || '').trim()) {
-                existente.tamano = item.tamano;
-                console.log(`Rellenando tamaño para corte unificado ${clave}: ${item.tamano}`);
-                console.log('Fila base antes de rellenar:', existente.tamano);
-            }
-            if (!String(existente.tipo || '').trim() && String(item.tipo || '').trim()) {
-                existente.tipo = item.tipo;
-            }
-        } else {
-            const copia = { ...item };
-            copia.strip1 = '-';
-            copia.terminal1 = '-';
-            copia.strip2 = '-';
-            copia.terminal2 = '-';
-            grupos.set(clave, copia);
-            resultado.push(copia);
-        }
-    });
-
-    return resultado;
-}
-
 function renderTablaAgrupada() {
     const filtro = document.getElementById('fechaSeleccionada')?.value || 'todas';
-    const maquinaActual = document.getElementById('maquinaSeleccionada')?.value || 'todas';
-
+    
     // Asegurar que data sea un array válido antes de operar
     let data = Array.isArray(datosGlobal) ? datosGlobal : [];
 
@@ -613,9 +551,6 @@ function renderTablaAgrupada() {
             String(item.fecha_asignada) === fecha && String(item.dia_bloque) === turno
         );
     }
-
-    // En MCUT-7, un mismo corte con varios "cores"/colores se muestra como una sola fila
-   // data = unificarCortesEspeciales(data, maquinaActual);
 
     const tbody = document.getElementById('resultTotal');
     if (!tbody) return;
@@ -667,7 +602,7 @@ function renderTablaAgrupada() {
             <td>${item.terminal2 || ''}</td>
             <td>${item.conector || ''}</td>
             <td>${item.tinta || ''}</td>
-            <td>${item.estampado || 0}</td>`;
+            <td>${item.min || 0} min</td>`;
         tbody.appendChild(row);
 
         totalRecords++;
@@ -697,6 +632,63 @@ function poblarSelectorFechas(data) {
             return `<option value="${c}">${fecha} - Turno ${turno}</option>`;
         }).join('');
 }
+    function renderTablaAgrupada() {
+        const filtro = document.getElementById('fechaSeleccionada')?.value || 'todas';
+        let data = datosGlobal;
+
+        if (filtro !== 'todas') {
+            const [fecha, turno] = filtro.split('|');
+            data = datosGlobal.filter(item =>
+                String(item.fecha_asignada) === fecha && String(item.dia_bloque) === turno
+            );
+        }
+
+        const tbody = document.getElementById('resultTotal');
+        tbody.innerHTML = '';
+        let totalRecords = 0;
+        let id = 1;
+        let grupoActual = null;
+
+        data.forEach(item => {
+            const claveGrupo = `${item.fecha_asignada}|${item.dia_bloque}`;
+
+            if (claveGrupo !== grupoActual) {
+                grupoActual = claveGrupo;
+                const headerRow = document.createElement('tr');
+                headerRow.innerHTML = `
+                    <td colspan="16" style="background:#e8e8e8; font-weight:bold; padding:6px;">
+                        📅 ${item.fecha_asignada} &nbsp;|&nbsp; Turno ${item.dia_bloque}
+                    </td>`;
+                tbody.appendChild(headerRow);
+            }
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${id}</td><td>${item.pn}</td><td>${item.Qty}</td><td>${item.wo}</td>
+                <td>${item.consumo}</td><td>${item.tipo}</td><td>${item.calibre}</td>
+                <td>${item.color}</td><td>${item.tamano}</td><td>${item.strip1}</td>
+                <td>${item.terminal1}</td><td>${item.strip2}</td><td>${item.terminal2}</td>
+                <td>${item.conector}</td><td>${item.tinta}</td><td>${item.estampado}</td>`;
+            tbody.appendChild(row);
+
+            totalRecords++;
+            id++;
+        });
+
+        document.getElementById('totalRecords2').textContent = totalRecords + ' registros';
+    }
+
+    function poblarSelectorFechas(data) {
+        const selector = document.getElementById('fechaSeleccionada');
+        if (!selector) return;
+
+        const combinaciones = [...new Set(data.map(item => `${item.fecha_asignada}|${item.dia_bloque}`))];
+        selector.innerHTML = '<option value="todas">Todas las fechas</option>' +
+            combinaciones.map(c => {
+                const [fecha, turno] = c.split('|');
+                return `<option value="${c}">${fecha} - Turno ${turno}</option>`;
+            }).join('');
+    }
 
     function imprimirEtiqueta2() {
         document.getElementById('app').style.display = 'none';
@@ -705,19 +697,14 @@ function poblarSelectorFechas(data) {
         contenedorEtiquetas.innerHTML = '';
 
         const filtro = document.getElementById('fechaSeleccionada')?.value || 'todas';
-        const maquinaActual = document.getElementById('maquinaSeleccionada')?.value || 'todas';
-        let data = Array.isArray(datosGlobal) ? datosGlobal : [];
+        let data = datosGlobal;
 
         if (filtro !== 'todas') {
             const [fecha, turno] = filtro.split('|');
-            data = data.filter(item =>
+            data = datosGlobal.filter(item =>
                 String(item.fecha_asignada) === fecha && String(item.dia_bloque) === turno
             );
         }
-
-        // Mismo criterio de unificación que en la tabla, para no imprimir una
-        // etiqueta por cada color/core del mismo corte en MCUT-7
-        data = unificarCortesEspeciales(data, maquinaActual);
 
         let id = 1;
         data.forEach(item => {
@@ -903,49 +890,6 @@ function poblarSelectorFechas(data) {
         return filas;
     }
 
-    // Calcula los materiales (cables y terminales) de UNA máquina a partir de sus
-    // propios datos de detalle (los mismos que arma su hoja "MCUT-X"), en lugar de
-    // depender de materialista.php, que no filtra correctamente por máquina.
-    function materialesLocalesPorMaquina(data) {
-        const cablesMap = new Map();       // clave: tamano|calibre|color|tipo
-        const terminalesMap = new Map();   // clave: valor del terminal
-
-        (data || []).forEach(item => {
-            const tamano = item.tamano || '';
-            const calibre = item.calibre || '';
-            const color = item.color || '';
-            const tipo = item.tipo || '';
-            const qty = parseInt(item.Qty) || 0;
-            const mmPorPieza = parseFloat(item.tamano) || 0;
-
-            // Cables: se identifican por la combinación Tamaño + Calibre + Color + Tipo
-            const claveCable = `${tamano}|${calibre}|${color}|${tipo}`;
-            if (!cablesMap.has(claveCable)) {
-                cablesMap.set(claveCable, { tamano, calibre, color, tipo, piezas: 0, mm: 0 });
-            }
-            const cableEntry = cablesMap.get(claveCable);
-            cableEntry.piezas += qty;
-            cableEntry.mm += qty * mmPorPieza;
-
-            // Terminales: se suma lo usado en Terminal 1 y Terminal 2
-            // - Se ignoran los que empiezan con "Empalme"
-            // - Solo se toma la parte antes del primer espacio, ej.
-            //   "DT2-802 (SOLDAR TERMINAL)" -> "DT2-802"
-            [item.terminal1, item.terminal2].forEach(term => {
-                const valorOriginal = (term || '').toString().trim();
-                if (!valorOriginal || valorOriginal === '-') return;
-                if (/^empalme/i.test(valorOriginal)) return;
-
-                const valor = valorOriginal.split(' ')[0];
-                if (!valor) return;
-
-                terminalesMap.set(valor, (terminalesMap.get(valor) || 0) + qty);
-            });
-        });
-
-        return { cablesMap, terminalesMap };
-    }
-
     async function generarExcelCarga() {
         const btn = document.getElementById('btnGenerarExcel');
         const textoOriginal = btn.innerHTML;
@@ -957,13 +901,8 @@ function poblarSelectorFechas(data) {
 
             // 1. Una hoja por cada máquina con el detalle de la carga
             const resumenPorMaquina = [];
-            const datosPorMaquina = {};
             for (const maquina of LISTA_MAQUINAS) {
-                let data = await fetchPorMaquina(maquina);
-                // En MCUT-7 (cables especiales) unificamos los cortes multi-core en una sola fila
-                data = unificarCortesEspeciales(data, maquina);
-                datosPorMaquina[maquina] = data;
-
+                const data = await fetchPorMaquina(maquina);
                 const filas = filasParaHoja(data);
                 const ws = XLSX.utils.aoa_to_sheet(filas);
                 ws['!cols'] = filas[0].map(() => ({ wch: 14 }));
@@ -980,52 +919,20 @@ function poblarSelectorFechas(data) {
             wsResumen['!cols'] = [{ wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 16 }];
             XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen por Máquina');
 
-            // 3. Una hoja de materialista (cables y terminales/sellos) POR CADA máquina,
-            //    y además acumulamos los totales para la hoja combinada del punto 4.
+            // 3. Hoja de materialista total (todas las máquinas combinadas)
             const totalCablesMm = {};
             const totalTerminales = {};
 
             for (const maquina of LISTA_MAQUINAS) {
                 const { cables, terminales } = await fetchMaterialista(maquina);
-
-                // Acumular para el total general (hoja combinada)
                 Object.entries(cables).forEach(([clave, mm]) => {
                     totalCablesMm[clave] = (totalCablesMm[clave] || 0) + (parseInt(mm) || 0);
                 });
                 Object.entries(terminales).forEach(([clave, unidades]) => {
                     totalTerminales[clave] = (totalTerminales[clave] || 0) + (parseInt(unidades) || 0);
                 });
-
-                // Hoja individual con el materialista de ESTA máquina, calculado a
-                // partir de sus propios datos de detalle (los mismos de su hoja "MCUT-X"),
-                // en vez de la respuesta de materialista.php (que no filtra por máquina).
-                const { cablesMap, terminalesMap } = materialesLocalesPorMaquina(datosPorMaquina[maquina]);
-
-                const filasMatMaquina = [
-                    [`MATERIALISTA - ${maquina} - CABLES`],
-                    ['Tamaño (MM)', 'Calibre', 'Color', 'Tipo', 'Total Piezas', 'Total MM', 'Total FT']
-                ];
-                [...cablesMap.values()]
-                    .sort((a, b) => `${a.calibre}${a.color}${a.tipo}${a.tamano}`.localeCompare(`${b.calibre}${b.color}${b.tipo}${b.tamano}`))
-                    .forEach(c => {
-                        filasMatMaquina.push([c.tamano, c.calibre, c.color, c.tipo, c.piezas, c.mm.toFixed(0), (c.mm / (12 * 25.4)).toFixed(2)]);
-                    });
-
-                filasMatMaquina.push([]);
-                filasMatMaquina.push([`MATERIALISTA - ${maquina} - TERMINALES (SUMA T1 + T2)`]);
-                filasMatMaquina.push(['Terminal / Sello', 'Total Unidades']);
-                [...terminalesMap.entries()]
-                    .sort((a, b) => a[0].localeCompare(b[0]))
-                    .forEach(([clave, unidades]) => {
-                        filasMatMaquina.push([clave, unidades]);
-                    });
-
-                const wsMatMaquina = XLSX.utils.aoa_to_sheet(filasMatMaquina);
-                wsMatMaquina['!cols'] = [{ wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 13 }, { wch: 12 }, { wch: 12 }];
-                XLSX.utils.book_append_sheet(wb, wsMatMaquina, `Mat-${maquina}`);
             }
 
-            // 4. Hoja de materialista total (todas las máquinas combinadas)
             const filasMaterialista = [['MATERIALISTA TOTAL - CABLES'], ['Cable', 'Total MM', 'Total FT']];
             Object.keys(totalCablesMm).sort().forEach(clave => {
                 const mm = totalCablesMm[clave];
