@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulación - Control de Cargas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        @page {
+            size: 104mm 57.5mm;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            font-size: 9pt;
+            background-color: white;
+        }
+
+        .label-container {
+            width: 104mm;
+            height: 57.5mm;
+            box-sizing: border-box;
+            padding: 3mm;
+            padding-top: 35px;
+            display: flex;
+            overflow: hidden;
+            page-break-after: always;
+            border: 0.5mm dashed #eee;
+        }
+
+        .barcode-side {
+            width: 12mm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-side {
+            flex: 1;
+            padding-left: 2mm;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            line-height: 1.1;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .label-bold {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 8pt;
+        }
+
+        .footer-barcode {
+            text-align: center;
+        }
+
+        .tab-content-all { 
+            display: none; 
+        }
+        
+        .tab-content-all.active { 
+            display: block; 
+        }
+    </style>
+</head>
+<body class="bg-light">
+<div id="app">
+    <nav class="navbar navbar-dark bg-dark mb-4 p-2">
+        <div class="container-fluid">
+            <div class="d-flex flex-wrap gap-2 w-100 justify-content-between align-items-center">
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-warning" onclick="dashboard('cargaSemanal')">Carga Semanal</button>
+                    <button class="btn btn-success" onclick="dashboard('porMaquinas')">Carga por Máquinas</button>
+                    <button class="btn btn-primary" onclick="dashboard('materialistas')">Carga Materialista y Crimpers</button>
+                    <button class="btn btn-warning" onclick="dashboard('configuracionCarga')">Configuración de Carga</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Carga Semanal (Modo Simulación / Manual) -->
+    <div class="container-fluid px-4 tab-content-all active" id="cargaSemanal">
+        <!-- Formulario para agregar registros simulados -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0 text-primary"><i class="bi bi-plus-circle me-2"></i>Simulador: Agregar Número de Parte y Cantidad</h5>
+            </div>
+            <div class="card-body">
+                <form id="formSimulacionSemanal" class="row g-3" onsubmit="event.preventDefault(); agregarRegistroSimulado();">
+                    <div class="col-md-3">
+                        <label for="simPn" class="form-label fw-semibold">Número de Parte (PN)</label>
+                        <input type="text" class="form-control" id="simPn" placeholder="Ej. PN-98234-A" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="simWo" class="form-label fw-semibold">Work Order (WO)</label>
+                        <input type="text" class="form-control" id="simWo" placeholder="Ej. WO-10023" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="simQty" class="form-label fw-semibold">Cantidad</label>
+                        <input type="number" min="1" class="form-control" id="simQty" placeholder="Ej. 500" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="simUrgencia" class="form-label fw-semibold">Urgencia</label>
+                        <select class="form-select" id="simUrgencia" required>
+                            <option value="1-Baja">1 - Baja</option>
+                            <option value="2-Media" selected>2 - Media</option>
+                            <option value="3-Alta">3 - Alta</option>
+                            <option value="4-Critico">4 - Crítico</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-plus-lg me-1"></i> Agregar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="card-title mb-0 text-secondary"><i class="bi bi-calendar-week me-2"></i>Work Orders en Simulación</h5>
+                <button class="btn btn-outline-danger btn-sm" onclick="limpiarRegistrosSimulados()">
+                    <i class="bi bi-trash me-1"></i> Limpiar Todo
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Número de Parte</th><th>Work Order</th><th>Cantidad</th><th>Estado</th><th>Cambiar Programación</th><th>Cambiar Urgencia</th><th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaDesemana"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carga por Máquinas -->
+    <div class="container-fluid px-4 tab-content-all" id="porMaquinas">
+      <!-- Barra de selección de máquinas con nuevas reglas -->
+<nav class="navbar navbar-expand bg-secondary mb-4 rounded px-3 py-2">
+    <input type="hidden" id="maquinaSeleccionada" value="todas">
+    <div class="d-flex flex-wrap gap-2 w-100 align-items-center">
+        <button class="btn btn-dark btn-sm btn-maq active" onclick="maquinaSelecionada('todas', this)">
+            <i class="bi bi-grid-fill me-1"></i> Todas
+        </button>
+        <button class="btn btn-light btn-sm btn-maq" onclick="maquinaSelecionada('MCUT-1', this)">
+            <strong>MCUT-1</strong> <span class="badge text-bg-secondary ms-1">AWG 10, 12</span>
+        </button>
+        <button class="btn btn-light btn-sm btn-maq" onclick="maquinaSelecionada('MCUT-2', this)">
+            <strong>MCUT-2</strong> <span class="badge text-bg-light border text-dark ms-1">AWG 14, 16 (Blanca)</span>
+        </button>
+        <button class="btn btn-light btn-sm btn-maq" onclick="maquinaSelecionada('MCUT-3', this)">
+            <strong>MCUT-3</strong> <span class="badge text-bg-success ms-1">Sellos</span>
+        </button>
+        <button class="btn btn-light btn-sm btn-maq" onclick="maquinaSelecionada('MCUT-4', this)">
+            <strong>MCUT-4</strong> <span class="badge text-bg-light border text-dark ms-1">AWG 18-24 (Blanca)</span>
+        </button>
+        <button class="btn btn-light btn-sm btn-maq" onclick="maquinaSelecionada('MCUT-5', this)">
+            <strong>MCUT-5</strong> <span class="badge text-bg-dark ms-1">AWG 14, 16 (Negra)</span>
+        </button>
+        <button class="btn btn-light btn-sm btn-maq" onclick="maquinaSelecionada('MCUT-6', this)">
+            <strong>MCUT-6</strong> <span class="badge text-bg-dark ms-1">AWG 18-24 (Negra)</span>
+        </button>
+        <button class="btn btn-light btn-sm btn-maq" onclick="maquinaSelecionada('MCUT-7', this)">
+            <strong>MCUT-7</strong> <span class="badge text-bg-info ms-1">Especiales (C% / AWG 1-8)</span>
+        </button>
+    </div>
+</nav>
+        <div class="mb-3">
+            <select id="fechaSeleccionada" class="form-select w-auto" onchange="renderTablaAgrupada()">
+                <option value="todas">Todas las fechas</option>
+            </select>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="card-title mb-0 text-secondary"><i class="bi bi-list-task me-2"></i>Lista por máquina</h5>
+                <button class="btn btn-sm btn-primary" onclick="imprimirEtiqueta2()"><i class="bi bi-printer me-2"></i>Imprimir Etiqueta</button>
+                <span class="badge bg-primary rounded-pill" id="totalRecords2">0 registros</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th><th>Nº Parte</th><th>Cantidad</th><th>Work Order</th><th>Cons</th><th>Tipo</th><th>Calibre</th>
+                                <th>Color</th><th>Tamaño(MM)</th><th>Desforre 1</th><th>Terminal 1</th><th>Desforre 2</th>
+                                <th>Terminal 2</th><th>Estampados</th><th>Tinta</th><th>Estampar cada</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultTotal"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carga Materialistas -->
+    <div class="container-fluid px-4 tab-content-all" id="materialistas">
+        <nav class="navbar navbar-expand bg-secondary mb-4 rounded px-2">
+            <input type="hidden" id="maquina_material" value="todas">
+            <div class="navbar-nav gap-2">
+                <button class="btn btn-light btn-sm" onclick="materialista('MCUT-1')">MCUT-1</button>
+                <button class="btn btn-light btn-sm" onclick="materialista('MCUT-2')">MCUT-2</button>
+                <button class="btn btn-light btn-sm" onclick="materialista('MCUT-3')">MCUT-3</button>
+                <button class="btn btn-light btn-sm" onclick="materialista('MCUT-4')">MCUT-4</button>
+                <button class="btn btn-light btn-sm" onclick="materialista('MCUT-5')">MCUT-5</button>
+                <button class="btn btn-light btn-sm" onclick="materialista('MCUT-6')">MCUT-6</button>
+                <button class="btn btn-light btn-sm" onclick="materialista('MCUT-7')">Cables Especiales</button>
+            </div>
+        </nav>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="card-title mb-0 text-secondary">Cables</h5>
+                        <span class="badge bg-primary rounded-pill" id="totalCables">0</span>
+                    </div>
+                    <div class="card-body p-0"><table class="table mb-0"><tbody id="cablespormaquina"></tbody></table></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="card-title mb-0 text-secondary">Terminales y sellos</h5>
+                        <span class="badge bg-primary rounded-pill" id="totalterminales">0</span>
+                    </div>
+                    <div class="card-body p-0"><table class="table mb-0"><tbody id="terminalspormaquina"></tbody></table></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="card-title mb-0 text-secondary">Herramentales</h5>
+                    </div>
+                    <div class="card-body p-0"><table class="table mb-0"><tbody id="herramentales"></tbody></table></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuración de Carga -->
+    <div class="container-fluid px-4 tab-content-all" id="configuracionCarga">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0 text-secondary"><i class="bi bi-gear me-2"></i>Seleccionar máquinas a cargar</h5>
+                <div class="mt-2">
+                    <label class="form-check-label fw-semibold">
+                        <input class="form-check-input me-2" type="checkbox" id="select_todas_maquinas" onclick="seleccionarTodasLasMaquinas();">
+                        Seleccionar todas las máquinas
+                    </label>
+                </div>
+            </div>
+            <div class="card-body">
+                <form id="formCarga" onsubmit="event.preventDefault(); repartirCarga();">
+                    <div class="row g-3">
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                                <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-1" name="maquinas[]" value="MCUT-1">
+                                <label class="form-check-label fw-semibold text-secondary" for="MCUT-1">MCUT-1</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                                <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-2" name="maquinas[]" value="MCUT-2">
+                                <label class="form-check-label fw-semibold text-secondary" for="MCUT-2">MCUT-2</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                                <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-3" name="maquinas[]" value="MCUT-3">
+                                <label class="form-check-label fw-semibold text-secondary" for="MCUT-3">MCUT-3</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                                <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-4" name="maquinas[]" value="MCUT-4">
+                                <label class="form-check-label fw-semibold text-secondary" for="MCUT-4">MCUT-4</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                                <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-5" name="maquinas[]" value="MCUT-5">
+                                <label class="form-check-label fw-semibold text-secondary" for="MCUT-5">MCUT-5</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                                <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-6" name="maquinas[]" value="MCUT-6">
+                                <label class="form-check-label fw-semibold text-secondary" for="MCUT-6">MCUT-6</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="form-check p-3 border rounded shadow-sm h-100 d-flex align-items-center">
+                                <input class="form-check-input ms-0 me-3" type="checkbox" id="MCUT-7" name="maquinas[]" value="MCUT-7">
+                                <label class="form-check-label fw-semibold text-secondary" for="MCUT-7">Cables Especiales</label>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <button type="submit" class="btn btn-primary px-4 shadow-sm w-100 h-100 d-flex align-items-center justify-content-center">
+                                <i class="bi bi-diagram-3 me-2"></i> Repartir Carga
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0 text-secondary"><i class="bi bi-file-earmark-excel me-2"></i>Exportar a Excel</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">Genera un archivo Excel (.xlsx) con una hoja por cada máquina (detalle de la carga), una hoja de resumen general y una hoja adicional con el resumen total del materialista (cables y terminales/sellos de todas las máquinas).</p>
+                <button type="button" class="btn btn-success px-4 shadow-sm" id="btnGenerarExcel" onclick="generarExcelCarga()">
+                    <i class="bi bi-file-earmark-excel me-2"></i> Generar Excel de Carga
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="etiquetas" style="display: none;"></div>
+
+<script>
+    const codigoOficial = 83;
+    let datosGlobal = [];
+    const LISTA_MAQUINAS = ['MCUT-1', 'MCUT-2', 'MCUT-3', 'MCUT-4', 'MCUT-5', 'MCUT-6', 'MCUT-7'];
+
+    // Arreglo en memoria para simulación de Carga Semanal
+    let simulacionCargaSemanal = [
+        [1, "1001488939", "WO-4401", 300, 1, "3-Alta"],
+        [2, "1001489409", "WO-4402", 200, 0, "2-Media"],
+        [3, "621655", "WO-4403", 5, 1, "4-Critico"]
+    ];
+    let contadorIdSimulacion = 4;
+
+    window.onload = function() {
+        dashboard('cargaSemanal');
+    };
+
+    function dashboard(section) {
+        document.getElementById('porMaquinas').style.display = 'none';
+        document.getElementById('materialistas').style.display = 'none';
+        document.getElementById('cargaSemanal').style.display = 'none';
+        document.getElementById('configuracionCarga').style.display = 'none';
+
+        if (section === 'porMaquinas') {
+            document.getElementById('porMaquinas').style.display = 'block';
+            pormaquina();
+        } else if (section === 'materialistas') {
+            document.getElementById('materialistas').style.display = 'block';
+            materialista('todas');
+        } else if (section === 'cargaSemanal') {
+            document.getElementById('cargaSemanal').style.display = 'block';
+            CargaSemanal();
+        } else if (section === 'configuracionCarga') {
+            let codigo = parseInt(prompt('Ingrese el código de visualización:'));
+            if (codigo === codigoOficial) {
+                document.getElementById('configuracionCarga').style.display = 'block';
+            } else {
+                alert('Código incorrecto');
+            }
+        }
+    }
+
+    // ==========================================
+    // FUNCIONES DE SIMULACIÓN (CARGA SEMANAL)
+    // ==========================================
+    function CargaSemanal() {
+        const listaWo = document.getElementById('listaDesemana');
+        listaWo.innerHTML = "";
+
+        simulacionCargaSemanal.forEach(wo => {
+            let id = wo[0];
+            let urgencias = wo[5];
+            let color = 'transparent';
+
+            if (urgencias === '1-Baja') color = 'rgba(255, 251, 235, 0.7)';
+            else if (urgencias === '2-Media') color = 'rgba(255, 170, 0, 0.15)';
+            else if (urgencias === '3-Alta') color = 'rgba(255, 75, 0, 0.2)';
+            else if (urgencias === '4-Critico') color = 'rgba(255, 0, 0, 0.18)';
+
+            let textoEstado = (wo[4] == 0) ? "No programado" : "Programado";
+            const row = document.createElement('tr');
+            row.style.backgroundColor = color;
+            row.innerHTML = `
+                <td class="text-center fw-bold">${wo[1]}</td>
+                <td class="text-center">${wo[2]}</td>
+                <td class="text-center">${wo[3]}</td>
+                <td class="text-center"><span class="badge ${wo[4] == 1 ? 'bg-success' : 'bg-secondary'}">${textoEstado}</span> (${wo[5]})</td>
+                <td class="text-center">
+                    <select class="form-select form-select-sm" onchange="programar(${id}, this.value)">
+                        <option value="" selected disabled>Cambiar estado...</option>
+                        <option value="1" ${wo[4] == 1 ? 'disabled' : ''}>Programar</option>
+                        <option value="0" ${wo[4] == 0 ? 'disabled' : ''}>Quitar</option>
+                    </select>
+                </td>
+                <td class="text-center">
+                    <select class="form-select form-select-sm" onchange="urgencia(${id}, this.value)">
+                        <option value="1-Baja" ${urgencias === '1-Baja' ? 'selected' : ''}>1 - Baja</option>
+                        <option value="2-Media" ${urgencias === '2-Media' ? 'selected' : ''}>2 - Media</option>
+                        <option value="3-Alta" ${urgencias === '3-Alta' ? 'selected' : ''}>3 - Alta</option>
+                        <option value="4-Critico" ${urgencias === '4-Critico' ? 'selected' : ''}>4 - Crítico</option>
+                    </select>
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-danger" onclick="eliminarRegistroSimulado(${id})" title="Eliminar de simulación">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </td>`;
+            listaWo.appendChild(row);
+        });
+    }
+
+    function agregarRegistroSimulado() {
+        const pn = document.getElementById('simPn').value.trim();
+        const wo = document.getElementById('simWo').value.trim();
+        const qty = parseInt(document.getElementById('simQty').value);
+        const urgencia = document.getElementById('simUrgencia').value;
+
+        if (!pn || !wo || isNaN(qty)) return;
+
+        // Estructura: [id, pn, wo, qty, estado (1=programado, 0=no), urgencia]
+        simulacionCargaSemanal.push([contadorIdSimulacion++, pn, wo, qty, 1, urgencia]);
+
+        // Resetear campos
+        document.getElementById('simPn').value = '';
+        document.getElementById('simWo').value = '';
+        document.getElementById('simQty').value = '';
+        document.getElementById('simPn').focus();
+
+        CargaSemanal();
+    }
+
+    function eliminarRegistroSimulado(id) {
+        simulacionCargaSemanal = simulacionCargaSemanal.filter(item => item[0] !== id);
+        CargaSemanal();
+    }
+
+    function limpiarRegistrosSimulados() {
+        if (confirm("¿Deseas vaciar la lista de simulación semanal?")) {
+            simulacionCargaSemanal = [];
+            CargaSemanal();
+        }
+    }
+
+    function programar(id, valor) {
+        const item = simulacionCargaSemanal.find(r => r[0] === id);
+        if (item) {
+            item[4] = parseInt(valor);
+            CargaSemanal();
+        }
+    }
+
+    function urgencia(id, nuevaUrgencia) {
+        const item = simulacionCargaSemanal.find(r => r[0] === id);
+        if (item) {
+            item[5] = nuevaUrgencia;
+            CargaSemanal();
+        }
+    }
+
+    // ==========================================
+    // OTRAS VISTAS (POR MÁQUINA, MATERIALISTAS, CONFIG)
+    // ==========================================
+    function maquinaSelecionada(maquina, elementoBtn = null) {
+    document.getElementById('maquinaSeleccionada').value = maquina;
+
+    // Actualizar estilo de botón activo
+    if (elementoBtn) {
+        document.querySelectorAll('.btn-maq').forEach(btn => {
+            btn.classList.remove('btn-dark', 'active');
+            btn.classList.add('btn-light');
+        });
+        elementoBtn.classList.remove('btn-light');
+        elementoBtn.classList.add('btn-dark', 'active');
+    }
+
+    pormaquina();
+}
+
+   function pormaquina() {
+    const maquina = document.getElementById('maquinaSeleccionada')?.value || 'todas';
+
+    fetch('app/pormaquina/simulacion.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            maquina: maquina,
+            items: simulacionCargaSemanal
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Validación estricta para asegurar que datosGlobal sea siempre un arreglo
+        if (Array.isArray(data)) {
+            datosGlobal = data;
+        } else if (data && Array.isArray(data.data)) {
+            datosGlobal = data.data;
+        } else {
+            console.warn("La respuesta no contiene un arreglo directo:", data);
+            datosGlobal = [];
+            if (data && data.status === "error") {
+                alert("Error en el servidor: " + data.message);
+            }
+        }
+
+        const selFecha = document.getElementById('fechaSeleccionada');
+        if (selFecha) selFecha.value = 'todas';
+
+        poblarSelectorFechas(datosGlobal);
+        renderTablaAgrupada();
+    })
+    .catch(err => {
+        console.error("Error al obtener carga por máquina:", err);
+        datosGlobal = [];
+        renderTablaAgrupada();
+    });
+}
+
+// ==========================================
+// UNIFICACIÓN DE CORTES ESPECIALES (MCUT-7)
+// ==========================================
+// En MCUT-7 (cables especiales) un mismo corte puede llegar como varias filas
+// (una por cada "core"/color del cable), aunque en realidad es un solo corte físico.
+// Esta función agrupa esas filas por Fecha+Turno+WO+PN+Consecutivo, combina los
+// colores en un solo texto y deja Desforre/Terminal como "-" porque no aplican
+// a nivel de corte unificado.
+function unificarCortesEspeciales(data, maquinaActual) {
+    if (!Array.isArray(data) || data.length === 0) return data;
+
+    const grupos = new Map();
+    const resultado = [];
+
+    data.forEach(item => {
+        const esEspecial = (maquinaActual === 'MCUT-7') || (item.maquina === 'MCUT-7');
+
+        if (!esEspecial) {
+            resultado.push(item);
+            return;
+        }
+
+        // La clave que identifica un mismo corte físico es Fecha+Turno+WO+PN+Consecutivo.
+        // NO se incluyen tamaño/tipo en la clave porque, aunque en teoría son iguales
+        // entre los distintos "cores"/colores de un mismo corte, a veces llegan vacíos
+        // o con formato distinto en alguna de las filas duplicadas — si se exige que
+        // coincidan exactamente, esas filas dejan de unificarse.
+        const clave = `${item.fecha_asignada}|${item.dia_bloque}|${item.wo}|${item.pn}|${item.consumo}`;
+
+        if (grupos.has(clave)) {
+            const existente = grupos.get(clave);
+            const coloresPrevios = String(existente.color || '').split('/').map(c => c.trim()).filter(Boolean);
+            const colorNuevo = String(item.color || '').trim();
+            if (colorNuevo && !coloresPrevios.includes(colorNuevo)) {
+                existente.color = [...coloresPrevios, colorNuevo].join('/');
+            }
+
+            // Si la fila que quedó como base llegó sin tamaño o sin tipo, se rellena
+            // con el valor de la fila duplicada que sí lo traiga.
+            if (!String(existente.tamano || '').trim() && String(item.tamano || '').trim()) {
+                existente.tamano = item.tamano;
+                console.log(`Rellenando tamaño para corte unificado ${clave}: ${item.tamano}`);
+                console.log('Fila base antes de rellenar:', existente.tamano);
+            }
+            if (!String(existente.tipo || '').trim() && String(item.tipo || '').trim()) {
+                existente.tipo = item.tipo;
+            }
+        } else {
+            const copia = { ...item };
+            copia.strip1 = '-';
+            copia.terminal1 = '-';
+            copia.strip2 = '-';
+            copia.terminal2 = '-';
+            grupos.set(clave, copia);
+            resultado.push(copia);
+        }
+    });
+
+    return resultado;
+}
+
+function renderTablaAgrupada() {
+    const filtro = document.getElementById('fechaSeleccionada')?.value || 'todas';
+    const maquinaActual = document.getElementById('maquinaSeleccionada')?.value || 'todas';
+
+    // Asegurar que data sea un array válido antes de operar
+    let data = Array.isArray(datosGlobal) ? datosGlobal : [];
+
+    if (filtro !== 'todas') {
+        const [fecha, turno] = filtro.split('|');
+        data = data.filter(item =>
+            String(item.fecha_asignada) === fecha && String(item.dia_bloque) === turno
+        );
+    }
+
+    // En MCUT-7, un mismo corte con varios "cores"/colores se muestra como una sola fila
+   // data = unificarCortesEspeciales(data, maquinaActual);
+
+    const tbody = document.getElementById('resultTotal');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    let totalRecords = 0;
+    let totalPiezas = 0;
+    let totalMinutos = 0;
+    let id = 1;
+    let grupoActual = null;
+
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="16" class="text-center text-muted py-4">No se encontraron cables para la selección actual.</td></tr>`;
+        const badge = document.getElementById('totalRecords2');
+        if (badge) badge.innerHTML = `0 registros | 0 cables | ⏱️ 0.0 min`;
+        return;
+    }
+
+    data.forEach(item => {
+        const claveGrupo = `${item.fecha_asignada}|${item.dia_bloque}`;
+
+        if (claveGrupo !== grupoActual) {
+            grupoActual = claveGrupo;
+            const headerRow = document.createElement('tr');
+            headerRow.innerHTML = `
+                <td colspan="16" style="background:#e8e8e8; font-weight:bold; padding:6px;">
+                    📅 ${item.fecha_asignada} &nbsp;|&nbsp; Turno ${item.dia_bloque} &nbsp;|&nbsp; Máquina: ${item.maquina || 'General'}
+                </td>`;
+            tbody.appendChild(headerRow);
+        }
+
+        totalPiezas += parseInt(item.Qty || 0);
+        totalMinutos += parseFloat(item.min || 0);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${id}</td>
+            <td>${item.pn || ''}</td>
+            <td><strong>${item.Qty || 0}</strong></td>
+            <td>${item.wo || ''}</td>
+            <td>${item.consumo || ''}</td>
+            <td>${item.tipo || ''}</td>
+            <td>${item.calibre || ''}</td>
+            <td>${item.color || ''}</td>
+            <td>${item.tamano || ''}</td>
+            <td>${item.strip1 || 0}</td>
+            <td>${item.terminal1 || ''}</td>
+            <td>${item.strip2 || 0}</td>
+            <td>${item.terminal2 || ''}</td>
+            <td>${item.conector || ''}</td>
+            <td>${item.tinta || ''}</td>
+            <td>${item.estampado || 0}</td>`;
+        tbody.appendChild(row);
+
+        totalRecords++;
+        id++;
+    });
+
+    const totalHoras = (totalMinutos / 60).toFixed(2);
+    const badge = document.getElementById('totalRecords2');
+    if (badge) {
+        badge.innerHTML = `${totalRecords} registros | ${totalPiezas} cables | ⏱️ ${totalMinutos.toFixed(1)} min (~${totalHoras} hrs)`;
+    }
+}
+
+function poblarSelectorFechas(data) {
+    const selector = document.getElementById('fechaSeleccionada');
+    if (!selector) return;
+
+    if (!Array.isArray(data) || data.length === 0) {
+        selector.innerHTML = '<option value="todas">Todas las fechas</option>';
+        return;
+    }
+
+    const combinaciones = [...new Set(data.map(item => `${item.fecha_asignada}|${item.dia_bloque}`))];
+    selector.innerHTML = '<option value="todas">Todas las fechas</option>' +
+        combinaciones.map(c => {
+            const [fecha, turno] = c.split('|');
+            return `<option value="${c}">${fecha} - Turno ${turno}</option>`;
+        }).join('');
+}
+
+    function imprimirEtiqueta2() {
+        document.getElementById('app').style.display = 'none';
+        const contenedorEtiquetas = document.getElementById('etiquetas');
+        contenedorEtiquetas.style.display = 'block';
+        contenedorEtiquetas.innerHTML = '';
+
+        const filtro = document.getElementById('fechaSeleccionada')?.value || 'todas';
+        const maquinaActual = document.getElementById('maquinaSeleccionada')?.value || 'todas';
+        let data = Array.isArray(datosGlobal) ? datosGlobal : [];
+
+        if (filtro !== 'todas') {
+            const [fecha, turno] = filtro.split('|');
+            data = data.filter(item =>
+                String(item.fecha_asignada) === fecha && String(item.dia_bloque) === turno
+            );
+        }
+
+        // Mismo criterio de unificación que en la tabla, para no imprimir una
+        // etiqueta por cada color/core del mismo corte en MCUT-7
+        data = unificarCortesEspeciales(data, maquinaActual);
+
+        let id = 1;
+        data.forEach(item => {
+            const label_container = document.createElement('div');
+            label_container.classList.add('label-container');
+            label_container.innerHTML = `
+                <div class="barcode-side" style="margin-left:17px; margin-right:10px;">
+                    <div class="row">
+                        <div style="font-size: 8pt; margin-top: 2px;"><strong>${item.codigo || ''}</strong></div>
+                        <div id="qrcode-lateral${id}" class="qr-vertical"></div>
+                    </div>
+                </div>
+                <div class="info-side">
+                    <div class="content-grid">
+                        <div><span class="label-bold">AWG:</span> ${item.calibre || ''}-${item.color || ''}-${item.tipo || ''}</div>
+                        <div><span class="label-bold">Qty:</span> ${item.Qty || ''}</div>
+                        <div><span class="label-bold">WO:</span> ${item.wo || ''}</div>
+                        <div><span class="label-bold">PN:</span> ${item.pn || ''}</div>
+                        <div><span class="label-bold">Cons:</span> ${item.consumo || ''}</div>
+                        <div class="full-width" style="font-size: 8pt; margin-top: 1px; margin-bottom: 2px;">
+                            <b>T1:</b> ${item.terminal1 || ''} | <b>T2:</b> ${item.terminal2 || ''}
+                        </div>
+                    </div>
+                    <div class="footer-barcode" style="margin-top: 5px; margin-left:45px;">
+                        <div id="qrcode-inferior${id}"></div>
+                        <div style="font-size: 8pt; margin-top: 2px;"><strong>ESTAMPADO:</strong>${item.conector || ''}</div>
+                    </div>
+                </div>
+            `;
+            contenedorEtiquetas.appendChild(label_container);
+
+            try {
+                new QRCode(document.getElementById(`qrcode-lateral${id}`), {
+                    text: item.codigo || String(id), width: 50, height: 50, correctLevel: QRCode.CorrectLevel.H
+                });
+                new QRCode(document.getElementById(`qrcode-inferior${id}`), {
+                    text: item.conector || String(id), width: 55, height: 55, correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (error) {
+                console.warn("Error generando QR:", id);
+            }
+            id++;
+        });
+
+        window.print();
+        document.getElementById('app').style.display = 'block';
+        contenedorEtiquetas.style.display = 'none';
+    }
+
+    function materialista(material) {
+        console.log('material', material);
+        console.log('item', simulacionCargaSemanal);
+        fetch(`app/pormaquina/materialista.php?maquina=${encodeURIComponent(material)}&items=${encodeURIComponent(JSON.stringify(simulacionCargaSemanal))}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                const cables = data.cables || {};
+                const terminals = data.terminales || {};
+                const tbodyCables = document.getElementById('cablespormaquina');
+                let tiempo_del_trabajo = 450;
+
+                document.getElementById('totalCables').textContent = Object.keys(cables).length;
+                document.getElementById('totalterminales').textContent = Object.keys(terminals).length;
+
+                tbodyCables.innerHTML = '';
+                Object.keys(cables).forEach(key => {
+                    const minutos = parseInt(cables[key]);
+                   
+                    tbodyCables.innerHTML += `<tr><td>${key}</td><td>${minutos} mm</td> <td>${(minutos/(12*25.4)).toFixed(2)} FT</td></tr>`;
+                    
+                });
+
+                const tbodyTerminals = document.getElementById('terminalspormaquina');
+                tbodyTerminals.innerHTML = '';
+                Object.keys(terminals).forEach(key => {
+                    const minutos = parseInt(terminals[key]);
+                    tbodyTerminals.innerHTML += `<tr><td>${key}</td><td>${minutos} units</td></tr>`;
+                });
+            })
+            .catch(err => console.error("Error al cargar materialistas:", err));
+    }
+
+    function seleccionarTodasLasMaquinas() {
+        const todas = document.getElementById("select_todas_maquinas");
+        const checkboxes = document.querySelectorAll('input[name="maquinas[]"]');
+        checkboxes.forEach(cb => cb.checked = todas.checked);
+    }
+
+    function repartirCarga() {
+        const checkboxesSeleccionados = document.querySelectorAll('input[name="maquinas[]"]:checked');
+        let registrosMaquinas = Array.from(checkboxesSeleccionados).map(cb => cb.value);
+
+        if (registrosMaquinas.length === 0) {
+            alert("Por favor, selecciona al menos una máquina activa.");
+            return;
+        }
+
+        let queryParams = registrosMaquinas.map(m => `maquinas[]=${encodeURIComponent(m)}`).join('&');
+
+        fetch(`../checoutCorte/updatemaquinas.php?${queryParams}`)
+            .then(response => {
+                if (!response.ok) throw new Error("Error en la respuesta del servidor");
+                return response.json();
+            })
+            .then(data => {
+                if (data && !data.error) {
+                    alert("Carga repartida exitosamente.");
+                    pormaquina();
+                } else {
+                    alert("No se pudo procesar la carga: " + (data.error || "Error desconocido"));
+                }
+            })
+            .catch(error => {
+                alert("Ocurrió un problema con la petición: " + error.message);
+            });
+    }
+
+    // ==========================================
+    // EXPORTAR A EXCEL (Config. de Carga)
+    // ==========================================
+
+    async function fetchPorMaquina(maquina) {
+        try {
+            const response = await fetch('app/pormaquina/simulacion.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maquina: maquina, items: simulacionCargaSemanal })
+            });
+            const data = await response.json();
+            if (Array.isArray(data)) return data;
+            if (data && Array.isArray(data.data)) return data.data;
+            return [];
+        } catch (err) {
+            console.error(`Error obteniendo carga de ${maquina}:`, err);
+            return [];
+        }
+    }
+
+    async function fetchMaterialista(maquina) {
+        try {
+            const response = await fetch(`app/pormaquina/materialista.php?maquina=${encodeURIComponent(maquina)}&items=${encodeURIComponent(JSON.stringify(simulacionCargaSemanal))}`);
+            const data = await response.json();
+            return {
+                cables: data.cables || {},
+                terminales: data.terminales || {}
+            };
+        } catch (err) {
+            console.error(`Error obteniendo materialista de ${maquina}:`, err);
+            return { cables: {}, terminales: {} };
+        }
+    }
+
+    function filasParaHoja(data) {
+        const encabezados = ['ID', 'Nº Parte', 'Cantidad', 'Work Order', 'Cons', 'Tipo', 'Calibre', 'Color',
+            'Tamaño(MM)', 'Desforre 1', 'Terminal 1', 'Desforre 2', 'Terminal 2', 'Estampados', 'Tinta',
+            'Minutos', 'Fecha Asignada', 'Turno/Bloque'];
+        const filas = [encabezados];
+
+        let id = 1;
+        data.forEach(item => {
+            filas.push([
+                id++,
+                item.pn || '',
+                item.Qty || 0,
+                item.wo || '',
+                item.consumo || '',
+                item.tipo || '',
+                item.calibre || '',
+                item.color || '',
+                item.tamano || '',
+                item.strip1 || 0,
+                item.terminal1 || '',
+                item.strip2 || 0,
+                item.terminal2 || '',
+                item.conector || '',
+                item.tinta || '',
+                item.min || 0,
+                item.fecha_asignada || '',
+                item.dia_bloque || ''
+            ]);
+        });
+
+        return filas;
+    }
+
+    // Calcula los materiales (cables y terminales) de UNA máquina a partir de sus
+    // propios datos de detalle (los mismos que arma su hoja "MCUT-X"), en lugar de
+    // depender de materialista.php, que no filtra correctamente por máquina.
+    function materialesLocalesPorMaquina(data) {
+        const cablesMap = new Map();       // clave: tamano|calibre|color|tipo
+        const terminalesMap = new Map();   // clave: valor del terminal
+
+        (data || []).forEach(item => {
+            const tamano = item.tamano || '';
+            const calibre = item.calibre || '';
+            const color = item.color || '';
+            const tipo = item.tipo || '';
+            const qty = parseInt(item.Qty) || 0;
+            const mmPorPieza = parseFloat(item.tamano) || 0;
+
+            // Cables: se identifican por la combinación Tamaño + Calibre + Color + Tipo
+            const claveCable = `${tamano}|${calibre}|${color}|${tipo}`;
+            if (!cablesMap.has(claveCable)) {
+                cablesMap.set(claveCable, { tamano, calibre, color, tipo, piezas: 0, mm: 0 });
+            }
+            const cableEntry = cablesMap.get(claveCable);
+            cableEntry.piezas += qty;
+            cableEntry.mm += qty * mmPorPieza;
+
+            // Terminales: se suma lo usado en Terminal 1 y Terminal 2
+            // - Se ignoran los que empiezan con "Empalme"
+            // - Solo se toma la parte antes del primer espacio, ej.
+            //   "DT2-802 (SOLDAR TERMINAL)" -> "DT2-802"
+            [item.terminal1, item.terminal2].forEach(term => {
+                const valorOriginal = (term || '').toString().trim();
+                if (!valorOriginal || valorOriginal === '-') return;
+                if (/^empalme/i.test(valorOriginal)) return;
+
+                const valor = valorOriginal.split(' ')[0];
+                if (!valor) return;
+
+                terminalesMap.set(valor, (terminalesMap.get(valor) || 0) + qty);
+            });
+        });
+
+        return { cablesMap, terminalesMap };
+    }
+
+    async function generarExcelCarga() {
+        const btn = document.getElementById('btnGenerarExcel');
+        const textoOriginal = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generando Excel...';
+
+        try {
+            const wb = XLSX.utils.book_new();
+
+            // 1. Una hoja por cada máquina con el detalle de la carga
+            const resumenPorMaquina = [];
+            const datosPorMaquina = {};
+            for (const maquina of LISTA_MAQUINAS) {
+                let data = await fetchPorMaquina(maquina);
+                // En MCUT-7 (cables especiales) unificamos los cortes multi-core en una sola fila
+                data = unificarCortesEspeciales(data, maquina);
+                datosPorMaquina[maquina] = data;
+
+                const filas = filasParaHoja(data);
+                const ws = XLSX.utils.aoa_to_sheet(filas);
+                ws['!cols'] = filas[0].map(() => ({ wch: 14 }));
+                XLSX.utils.book_append_sheet(wb, ws, maquina);
+
+                const totalPiezas = data.reduce((acc, item) => acc + (parseInt(item.Qty) || 0), 0);
+                const totalMinutos = data.reduce((acc, item) => acc + (parseFloat(item.min) || 0), 0);
+                resumenPorMaquina.push([maquina, data.length, totalPiezas, totalMinutos.toFixed(1)]);
+            }
+
+            // 2. Hoja de resumen general por máquina
+            const filasResumen = [['Máquina', 'Nº Registros', 'Total Piezas', 'Total Minutos'], ...resumenPorMaquina];
+            const wsResumen = XLSX.utils.aoa_to_sheet(filasResumen);
+            wsResumen['!cols'] = [{ wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 16 }];
+            XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen por Máquina');
+
+            // 3. Una hoja de materialista (cables y terminales/sellos) POR CADA máquina,
+            //    y además acumulamos los totales para la hoja combinada del punto 4.
+            const totalCablesMm = {};
+            const totalTerminales = {};
+
+            for (const maquina of LISTA_MAQUINAS) {
+                const { cables, terminales } = await fetchMaterialista(maquina);
+
+                // Acumular para el total general (hoja combinada)
+                Object.entries(cables).forEach(([clave, mm]) => {
+                    totalCablesMm[clave] = (totalCablesMm[clave] || 0) + (parseInt(mm) || 0);
+                });
+                Object.entries(terminales).forEach(([clave, unidades]) => {
+                    totalTerminales[clave] = (totalTerminales[clave] || 0) + (parseInt(unidades) || 0);
+                });
+
+                // Hoja individual con el materialista de ESTA máquina, calculado a
+                // partir de sus propios datos de detalle (los mismos de su hoja "MCUT-X"),
+                // en vez de la respuesta de materialista.php (que no filtra por máquina).
+                const { cablesMap, terminalesMap } = materialesLocalesPorMaquina(datosPorMaquina[maquina]);
+
+                const filasMatMaquina = [
+                    [`MATERIALISTA - ${maquina} - CABLES`],
+                    ['Tamaño (MM)', 'Calibre', 'Color', 'Tipo', 'Total Piezas', 'Total MM', 'Total FT']
+                ];
+                [...cablesMap.values()]
+                    .sort((a, b) => `${a.calibre}${a.color}${a.tipo}${a.tamano}`.localeCompare(`${b.calibre}${b.color}${b.tipo}${b.tamano}`))
+                    .forEach(c => {
+                        filasMatMaquina.push([c.tamano, c.calibre, c.color, c.tipo, c.piezas, c.mm.toFixed(0), (c.mm / (12 * 25.4)).toFixed(2)]);
+                    });
+
+                filasMatMaquina.push([]);
+                filasMatMaquina.push([`MATERIALISTA - ${maquina} - TERMINALES (SUMA T1 + T2)`]);
+                filasMatMaquina.push(['Terminal / Sello', 'Total Unidades']);
+                [...terminalesMap.entries()]
+                    .sort((a, b) => a[0].localeCompare(b[0]))
+                    .forEach(([clave, unidades]) => {
+                        filasMatMaquina.push([clave, unidades]);
+                    });
+
+                const wsMatMaquina = XLSX.utils.aoa_to_sheet(filasMatMaquina);
+                wsMatMaquina['!cols'] = [{ wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 13 }, { wch: 12 }, { wch: 12 }];
+                XLSX.utils.book_append_sheet(wb, wsMatMaquina, `Mat-${maquina}`);
+            }
+
+            // 4. Hoja de materialista total (todas las máquinas combinadas)
+            const filasMaterialista = [['MATERIALISTA TOTAL - CABLES'], ['Cable', 'Total MM', 'Total FT']];
+            Object.keys(totalCablesMm).sort().forEach(clave => {
+                const mm = totalCablesMm[clave];
+                filasMaterialista.push([clave, mm, (mm / (12 * 25.4)).toFixed(2)]);
+            });
+
+            filasMaterialista.push([]);
+            filasMaterialista.push(['MATERIALISTA TOTAL - TERMINALES Y SELLOS']);
+            filasMaterialista.push(['Terminal / Sello', 'Total Unidades']);
+            Object.keys(totalTerminales).sort().forEach(clave => {
+                filasMaterialista.push([clave, (totalTerminales[clave]/7).toFixed(0)]);
+            });
+
+            const wsMaterialista = XLSX.utils.aoa_to_sheet(filasMaterialista);
+            wsMaterialista['!cols'] = [{ wch: 22 }, { wch: 14 }, { wch: 14 }];
+            XLSX.utils.book_append_sheet(wb, wsMaterialista, 'Materialista Total');
+
+            // Descargar archivo
+            const hoy = new Date();
+            const fechaStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+            XLSX.writeFile(wb, `Carga_Maquinas_${fechaStr}.xlsx`);
+        } catch (error) {
+            console.error('Error generando el Excel:', error);
+            alert('Ocurrió un problema al generar el Excel: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = textoOriginal;
+        }
+    }
+</script>
+</body>
+</html>
