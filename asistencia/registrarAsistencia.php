@@ -96,11 +96,11 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             $status = ' ';
         }
 
-        // Update por employeeNumber en vez de name (evita colisiones
+        // Update por id_empleado en vez de name (evita colisiones
         // de nombres duplicados). Se asume que `assistence` tiene
-        // columna employeeNumber; si no la tiene, agrégala.
+        // columna id_empleado; si no la tiene, agrégala.
         $stmt = mysqli_prepare($con, "UPDATE assistence SET `$todayIs` = ?
-                                       WHERE `employeeNumber` = ?
+                                       WHERE `id_empleado` = ?
                                        ORDER BY id DESC LIMIT 1");
         mysqli_stmt_bind_param($stmt, "ss", $status, $cardCode);
         mysqli_stmt_execute($stmt);
