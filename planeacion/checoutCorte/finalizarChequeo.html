@@ -244,7 +244,7 @@
             }
 
             const promesas = codigos.map(codigo => {
-                return fetch(`app/quitar.php?codigo=${encodeURIComponent(codigo)}`)
+                return fetch(`app/finalizar.php?codigo=${encodeURIComponent(codigo)}`)
                     .then(response => response.json());
             });
 
