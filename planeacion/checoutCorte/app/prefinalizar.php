@@ -24,7 +24,7 @@ try {
     }else {
      
       $qry = $qry."
-        WHERE c.maquina = '$maquina' AND c.cutStatus='Cortado'
+        WHERE c.maq_asignada = '$maquina' AND c.cutStatus='Cortado'
         ORDER BY 
         c.wo ASC,
         c.cons ASC
