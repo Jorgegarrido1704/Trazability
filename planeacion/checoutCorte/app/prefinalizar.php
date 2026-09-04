@@ -43,7 +43,7 @@ try {
     }
 
     while ($rowlistas = mysqli_fetch_array($listasdecorte)) {
-        $pn = $rowlistas['pn'];
+        $pn = $rowlistas['np'];
         $consumo = $rowlistas['cons']; 
         $wo = $rowlistas['wo'];
         $esta_congelado = '';
