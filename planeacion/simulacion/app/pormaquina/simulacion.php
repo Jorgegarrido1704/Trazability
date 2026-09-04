@@ -96,7 +96,11 @@ try {
             FROM listascorte
             WHERE TRIM(UPPER(pn)) IN ($pnInQuery)
               AND (tamano > 0 OR tamano IS NOT NULL)
-            ORDER BY aws ASC, color ASC, tipo ASC";
+            ORDER BY aws ASC, color ASC, tipo ASC,
+            CASE
+                            WHEN terminal2 LIKE CONCAT('%', terminal1, '%') THEN 0
+                            ELSE 1
+                         END";
 
     $res = mysqli_query($con, $qry);
     if (!$res) {
