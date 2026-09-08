@@ -203,9 +203,10 @@
                     <table class="table table-hover table-striped mb-0">
                         <thead class="table-dark">
                             <tr>
-                                <th>ID</th><th>Nº Parte</th><th>Cantidad</th><th>Work Order</th><th>Cons</th><th>Tipo</th><th>Calibre</th>
+                                <th>ID</th><th>Cons</th><th>Tipo</th><th>Calibre</th>
                                 <th>Color</th><th>Tamaño(MM)</th><th>Desforre 1</th><th>Terminal 1</th><th>Desforre 2</th>
                                 <th>Terminal 2</th><th>Estampados</th><th>Tinta</th><th>Estampar cada</th>
+                                <th>Nº Parte</th><th>Cantidad</th><th>Work Order</th>
                             </tr>
                         </thead>
                         <tbody id="resultTotal"></tbody>
@@ -683,9 +684,6 @@ function renderTablaAgrupada() {
         if (item.tamano > 0 || item.tamano === null)
 {        row.innerHTML = `
             <td>${id}</td>
-            <td>${item.pn || ''}</td>
-            <td><strong>${item.Qty || 0}</strong></td>
-            <td>${item.wo || ''}</td>
             <td>${item.consumo || ''}</td>
             <td>${item.tipo || ''}</td>
             <td>${item.calibre || ''}</td>
@@ -697,6 +695,9 @@ function renderTablaAgrupada() {
             <td>${item.terminal2 || ''}</td>
             <td>${item.conector || ''}</td>
             <td>${item.tinta || ''}</td>
+             <td>${item.pn || ''}</td>
+            <td><strong>${item.Qty || 0}</strong></td>
+            <td>${item.wo || ''}</td>
             <td>${item.estampado || 0}</td>`;
 
         tbody.appendChild(row);}
@@ -902,8 +903,8 @@ function poblarSelectorFechas(data) {
     }
 
     function filasParaHoja(data) {
-        const encabezados = ['ID', 'Nº Parte', 'Cantidad', 'Work Order', 'Cons', 'Tipo', 'Calibre', 'Color',
-            'Tamaño(MM)', 'Desforre 1', 'Terminal 1', 'Desforre 2', 'Terminal 2', 'Estampados', 'Tinta',
+        const encabezados = ['ID',  'Cons', 'Tipo', 'Calibre', 'Color',
+            'Tamaño(MM)', 'Desforre 1', 'Terminal 1', 'Desforre 2', 'Terminal 2', 'Estampados', 'Tinta','Nº Parte', 'Cantidad', 'Work Order',
             'Minutos', 'Fecha Asignada', 'Turno/Bloque'];
         const filas = [encabezados];
 
@@ -912,9 +913,7 @@ function poblarSelectorFechas(data) {
             if(item.tamano > 0) {
             filas.push([
                 id++,
-                item.pn || '',
-                item.Qty || 0,
-                item.wo || '',
+             
                 item.consumo || '',
                 item.tipo || '',
                 item.calibre || '',
@@ -926,6 +925,9 @@ function poblarSelectorFechas(data) {
                 item.terminal2 || '',
                 item.conector || '',
                 item.tinta || '',
+                item.pn || '',
+                item.Qty || 0,
+                item.wo || '',
                 item.min || 0,
                 item.fecha_asignada || '',
                 item.dia_bloque || ''
