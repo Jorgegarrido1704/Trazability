@@ -134,11 +134,20 @@
         </div>
 
         <div class="card shadow-sm">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 flex-wrap gap-2">
                 <h5 class="card-title mb-0 text-secondary"><i class="bi bi-calendar-week me-2"></i>Work Orders en Simulación</h5>
-                <button class="btn btn-outline-danger btn-sm" onclick="limpiarRegistrosSimulados()">
-                    <i class="bi bi-trash me-1"></i> Limpiar Todo
-                </button>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-outline-primary btn-sm" onclick="descargarJSON()">
+                        <i class="bi bi-download me-1"></i> Descargar JSON
+                    </button>
+                    <label class="btn btn-outline-success btn-sm mb-0" for="inputCargarJSON">
+                        <i class="bi bi-upload me-1"></i> Cargar JSON
+                    </label>
+                    <input type="file" id="inputCargarJSON" accept="application/json,.json" style="display:none" onchange="cargarJSON(event)">
+                    <button class="btn btn-outline-danger btn-sm" onclick="limpiarRegistrosSimulados()">
+                        <i class="bi bi-trash me-1"></i> Limpiar Todo
+                    </button>
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -483,6 +492,115 @@
     }
 
     // ==========================================
+    // EXPORTAR / IMPORTAR JSON (CARGA SEMANAL)
+    // ==========================================
+
+    // Convierte el arreglo interno [id, pn, wo, qty, estado, urgencia]
+    // a una lista de objetos legibles para el archivo JSON.
+    function simulacionAObjetos() {
+        return simulacionCargaSemanal.map(wo => ({
+            id: wo[0],
+            pn: wo[1],
+            wo: wo[2],
+            cantidad: wo[3],
+            programado: wo[4] === 1,
+            urgencia: wo[5]
+        }));
+    }
+
+    // Convierte una lista de objetos (leída de un JSON) de vuelta al
+    // arreglo interno [id, pn, wo, qty, estado, urgencia].
+    function objetosASimulacion(objetos) {
+        const urgenciasValidas = ['1-Baja', '2-Media', '3-Alta', '4-Critico'];
+        let maxId = 0;
+
+        const convertido = objetos.map((obj, index) => {
+            const id = Number.isInteger(obj.id) ? obj.id : (index + 1);
+            const pn = String(obj.pn ?? '').trim();
+            const wo = String(obj.wo ?? '').trim();
+            const cantidad = parseInt(obj.cantidad ?? obj.qty ?? 0) || 0;
+            const programado = (obj.programado === true || obj.programado === 1) ? 1 : 0;
+            let urgencia = obj.urgencia ?? '2-Media';
+            if (!urgenciasValidas.includes(urgencia)) urgencia = '2-Media';
+
+            if (id > maxId) maxId = id;
+
+            return [id, pn, wo, cantidad, programado, urgencia];
+        }).filter(item => item[1] && item[2]); // descarta filas sin PN o WO
+
+        contadorIdSimulacion = maxId + 1;
+        return convertido;
+    }
+
+    function descargarJSON() {
+        const datos = simulacionAObjetos();
+        const contenido = JSON.stringify(datos, null, 2);
+        const blob = new Blob([contenido], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const hoy = new Date();
+        const fechaStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Ordenes_Carga_Semanal_${fechaStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function cargarJSON(event) {
+        const input = event.target;
+        const archivo = input.files && input.files[0];
+        if (!archivo) return;
+
+        const lector = new FileReader();
+        lector.onload = function(e) {
+            try {
+                const contenido = JSON.parse(e.target.result);
+
+                if (!Array.isArray(contenido)) {
+                    alert('El archivo JSON debe contener un arreglo de órdenes.');
+                    return;
+                }
+
+                const nuevaSimulacion = objetosASimulacion(contenido);
+
+                if (nuevaSimulacion.length === 0) {
+                    alert('No se encontraron órdenes válidas en el archivo (se requiere al menos "pn" y "wo" en cada registro).');
+                    return;
+                }
+
+                const reemplazar = confirm(
+                    `Se encontraron ${nuevaSimulacion.length} órdenes en el archivo.\n\n` +
+                    `Aceptar = Reemplazar la lista actual.\n` +
+                    `Cancelar = Agregar estas órdenes a la lista actual.`
+                );
+
+                if (reemplazar) {
+                    simulacionCargaSemanal = nuevaSimulacion;
+                } else {
+                    // Reasignar IDs para evitar choques con los registros existentes
+                    nuevaSimulacion.forEach(item => {
+                        item[0] = contadorIdSimulacion++;
+                    });
+                    simulacionCargaSemanal = simulacionCargaSemanal.concat(nuevaSimulacion);
+                }
+
+                CargaSemanal();
+                alert('Órdenes cargadas correctamente.');
+            } catch (err) {
+                console.error('Error al leer el archivo JSON:', err);
+                alert('El archivo no contiene un JSON válido: ' + err.message);
+            } finally {
+                input.value = ''; // permite volver a cargar el mismo archivo si se desea
+            }
+        };
+        lector.readAsText(archivo);
+    }
+
+    // ==========================================
     // OTRAS VISTAS (POR MÁQUINA, MATERIALISTAS, CONFIG)
     // ==========================================
     function maquinaSelecionada(maquina, elementoBtn = null) {
@@ -575,56 +693,13 @@ function unificarCortesEspeciales(data, maquinaActual) {
         // y/o su propio color, aunque en realidad es el mismo corte físico.
         const clave = `${item.fecha_asignada}|${item.dia_bloque}|${item.wo}|${item.pn}|${item.calibre}|${item.tipo}|${item.tamano}`;
 
-      /*  if (grupos.has(clave)) {
-            const existente = grupos.get(clave);
-
-            // Combinar colores distintos entre los cores del mismo corte
-            const coloresPrevios = String(existente.color || '').split('/').map(c => c.trim()).filter(Boolean);
-            const colorNuevo = String(item.color || '').trim();
-            if (colorNuevo && !coloresPrevios.includes(colorNuevo)) {
-                existente.color = [...coloresPrevios, colorNuevo].join('/');
-            }
-
-            // Combinar los distintos Consecutivos (Cons) en un solo texto
-            const consPrevios = String(existente.consumo || '').split(', ').map(c => c.trim()).filter(Boolean);
-            const consNuevo = String(item.consumo || '').trim();
-          /*  if (consNuevo && !consPrevios.includes(consNuevo)) {
-                existente.consumo = [...consPrevios, consNuevo].join(', ');
-            }*/
-
-            // Combinar los distintos Estampados (conector) en un solo texto
-       //     const estampadosPrevios = String(existente.conector || '').split(', ').map(c => c.trim()).filter(Boolean);
-         //   const estampadoNuevo = String(item.conector || '').trim();
-            /*if (estampadoNuevo && !estampadosPrevios.includes(estampadoNuevo)) {
-                existente.conector = [...estampadosPrevios, estampadoNuevo].join(', ');
-            }*/
-
-            // Sumar los minutos: cada core representa una operación de estampado aparte
-         //   existente.min = (parseFloat(existente.min) || 0) + (parseFloat(item.min) || 0);
-           // existente.estampado = (parseFloat(existente.estampado) || 0) + (parseFloat(item.estampado) || 0);
-
-            // Rellenar tamaño/tipo si la fila base llegó vacía en alguno de esos campos
-         //   if (!String(existente.tamano || '').trim() && String(item.tamano || '').trim()) {
-         //       existente.tamano = item.tamano;
-         //   }
-//if (!String(existente.tipo || '').trim() && String(item.tipo || '').trim()) {
-//existente.tipo = item.tipo;
-//}
-
-            // La cantidad de piezas (Qty) es la misma para todos los cores de un mismo
-            // corte físico, no se suma; nos quedamos con el valor mayor por seguridad.
-         /*   const qtyNuevo = parseInt(item.Qty) || 0;
-            const qtyExistente = parseInt(existente.Qty) || 0;
-            if (qtyNuevo > qtyExistente) existente.Qty = item.Qty;
-        }else {*/
-            const copia = { ...item };
-            copia.strip1 = '-';
-            copia.terminal1 = '-';
-            copia.strip2 = '-';
-            copia.terminal2 = '-';
-            grupos.set(clave, copia);
-            resultado.push(copia);
-       // }
+        const copia = { ...item };
+        copia.strip1 = '-';
+        copia.terminal1 = '-';
+        copia.strip2 = '-';
+        copia.terminal2 = '-';
+        grupos.set(clave, copia);
+        resultado.push(copia);
     });
 
     return resultado;
