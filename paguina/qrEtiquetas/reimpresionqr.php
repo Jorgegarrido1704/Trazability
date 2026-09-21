@@ -291,8 +291,8 @@ function generarDataMatrixHTML($texto, $sizeMM = 10) {
     }
 
     .bloque1 {
-        width: 14mm;
-        height: 14mm;
+        width: 13mm;
+        height: 13mm;
         display: flex;
         align-items: center;
         justify-content: center;
