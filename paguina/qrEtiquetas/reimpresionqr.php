@@ -318,7 +318,7 @@ function generarDataMatrixHTML($texto, $sizeMM = 10) {
     .qr {
         display: block;
         background-color: #FFFFFF !important;
-        padding: 4px; /* Margen de silencio esencial */
+        padding: 2px; /* Margen de silencio esencial */
     }
 
     .smallbox {
