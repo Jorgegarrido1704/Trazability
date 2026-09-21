@@ -300,9 +300,9 @@ function generarDataMatrixHTML($texto, $sizeMM = 10) {
     }
 
     .bloque2 {
-        width: 18mm;
+        width: 17mm;
         height: 14.9mm;
-        padding-top: 5px;
+        padding-top: 6px;
     }
 
     @media print {
