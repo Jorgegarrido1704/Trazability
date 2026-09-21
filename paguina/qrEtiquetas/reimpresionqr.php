@@ -325,6 +325,7 @@ function generarDataMatrixHTML($texto, $sizeMM = 10) {
         border: 1px solid black;
         text-align: center;
         font-size: 7px;
+        text-style: sans-serif;
        
         margin-bottom:4px;
         white-space: nowrap;
