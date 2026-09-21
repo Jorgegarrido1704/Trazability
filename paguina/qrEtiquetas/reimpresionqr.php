@@ -333,7 +333,7 @@ function generarDataMatrixHTML($texto, $sizeMM = 10) {
     .smallbox1 {
         border: 1px solid black;
         text-align: center;
-        font-size: 5px;
+        font-size: 6px;
         margin-bottom: 1px;
         white-space: nowrap;
         overflow: hidden;
