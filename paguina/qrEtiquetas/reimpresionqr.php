@@ -365,7 +365,7 @@ foreach ($data as $item) {
                 </div>
                 <div class="bloque2">
                     <div class="smallbox">5703</div>
-                    <div class="smallbox1"><?php echo htmlspecialchars($np."|".$rev);?></div>
+                    <div class="smallbox"><?php echo htmlspecialchars($np."|".$rev);?></div>
                     <div class="smallbox"><?php echo htmlspecialchars($today_qr."|".$consecutivoSerial); ?></div>
                 </div>
             </div>
