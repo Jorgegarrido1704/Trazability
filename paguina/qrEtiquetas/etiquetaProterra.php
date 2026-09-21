@@ -161,8 +161,8 @@ try {
     }
 
     .bloque1 {
-        width: 14mm;
-        height: 14mm;
+        width: 13mm;
+        height: 13mm;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -170,7 +170,7 @@ try {
     }
 
     .bloque2 {
-        width: 16mm;
+        width: 18.5mm;
         height: 14.9mm;
         padding-top: 6px;
     }
@@ -191,11 +191,13 @@ try {
         padding: 4px; /* Margen de silencio esencial */
     }
 
-    .smallbox {
+   .smallbox {
         border: 1px solid black;
         text-align: center;
         font-size: 7px;
-        margin-bottom: 1px;
+        padding: 1px;
+        font-family: sans-serif;
+        margin-bottom:4px;
         white-space: nowrap;
         overflow: hidden;
         background-color: #FFFFFF;
@@ -203,8 +205,9 @@ try {
     .smallbox1 {
         border: 1px solid black;
         text-align: center;
-        font-size: 5px;
-        margin-bottom: 1px;
+        font-size: 6px;
+        font-family: sans-serif;
+        margin-bottom: 4px;
         white-space: nowrap;
         overflow: hidden;
         background-color: #FFFFFF;
@@ -237,7 +240,7 @@ for($j = $inicio; $j <= $cuentas; $j++){
                 </div>
                 <div class="bloque2">
                     <div class="smallbox">5703</div>
-                    <div class="smallbox1"><?php echo htmlspecialchars($np."|".$rev);?></div>
+                    <div class="smallbox"><?php echo htmlspecialchars($np."|".$rev);?></div>
                     <div class="smallbox"><?php echo htmlspecialchars($today_qr."|".$consecutivoSerial); ?></div>
                 </div>
             </div>
