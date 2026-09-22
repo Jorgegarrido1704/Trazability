@@ -412,8 +412,8 @@
             document.getElementById('totalterminales').textContent = terminales.length;
             document.getElementById('totalterminales2').textContent = terminales2.length;
         };
-        const scrollStep = 150;
-const scrollInterval = 5000;
+        const scrollStep = 300;
+const scrollInterval = 8000;
 
 setInterval(() => {
 
