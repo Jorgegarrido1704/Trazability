@@ -37,6 +37,7 @@ while ($row = mysqli_fetch_assoc($registrosMPS)) {
 <body>
     <form id="setUptime" method="POST">
         <input type="date" name="fecha_seleccionas" id="fecha_seleccionas">
+        <input type="submit" value ="seleccionar">
 </form>    
 </body>
 </html>
