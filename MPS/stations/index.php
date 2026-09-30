@@ -18,7 +18,7 @@ while ($row = mysqli_fetch_assoc($registrosMPS)) {
     $time_process = $row['processtime'];
     $set_up = $row['setupTime'];
 
-
+echo $pn." ".$qty." ".$work." ".$fecha_seleccionada;
     
 }
 
