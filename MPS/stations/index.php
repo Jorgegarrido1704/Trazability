@@ -36,8 +36,13 @@ echo $pn." ".$qty." ".$work." ".$fecha_seleccionada;
 </head>
 <body>
     <form id="setUptime" method="POST">
-        <input type="date" name="fecha_seleccionas" id="fecha_seleccionas">
+        <input type="date" name="fecha_seleccionas" id="fecha_seleccionas" onChange=alerta(this.value)>
         <input type="submit" value ="seleccionar">
 </form>    
 </body>
 </html>
+<script>
+    function alerta(valor){
+        alert(valor);
+    }
+    </script>
