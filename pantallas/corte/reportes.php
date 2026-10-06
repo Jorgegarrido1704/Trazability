@@ -90,17 +90,17 @@
                 console.log('Datos recibidos:', data); // Para depuración
                     
                     // Actualizar los elementos del DOM con los nuevos datos
-                    document.getElementById('MCUT-1').textContent = data['M1'] || 0;
-                    document.getElementById('MCUT-2').textContent = data['M2'] || 0;
-                    document.getElementById('MCUT-3').textContent = data['M3'] || 0;
-                    document.getElementById('MCUT-4').textContent = data['M4'] || 0;
-                    document.getElementById('MCUT-5').textContent = data['M5'] || 0;
-                    document.getElementById('MCUT-6').textContent = data['M6'] || 0;
+                    document.getElementById('MCUT-1').textContent = data['maquinas']['M1'] || 0;
+                    document.getElementById('MCUT-2').textContent = data['maquinas']['M2'] || 0;
+                    document.getElementById('MCUT-3').textContent = data['maquinas']['M3'] || 0;
+                    document.getElementById('MCUT-4').textContent = data['maquinas']['M4'] || 0;
+                    document.getElementById('MCUT-5').textContent = data['maquinas']['M5'] || 0;
+                    document.getElementById('MCUT-6').textContent = data['maquinas']['M6'] || 0;
                 })
                 .catch(error => console.error('Error al refrescar la pantalla:', error));
         }
         refrescarPantalla(); // Llamar a la función al cargar la página
-        setInterval(refrescarPantalla, 60000); // Refrescar cada 60 segundos
+        setInterval(refrescarPantalla, 6000); // Refrescar cada 60 segundos
         
 
         </script>
