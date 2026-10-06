@@ -17,7 +17,7 @@
                     <div class="row text-center mb-4">
                         <div class="col-xl-6 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-6 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
                                     MCUT-1
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
@@ -27,7 +27,7 @@
                         </div>
                         <div class="col-xl-6 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-6 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
                                 MCUT-2
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
@@ -37,7 +37,7 @@
                         </div>
                         <div class="col-xl-6 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-6 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
                                     MCUT-3
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
@@ -47,7 +47,7 @@
                         </div>
                         <div class="col-xl-6 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-6 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
                                 MCUT-4
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
@@ -57,7 +57,7 @@
                         </div>
                         <div class="col-xl-6 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-6 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
                                     MCUT-5
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
@@ -77,7 +77,7 @@
                         </div>
                          <div class="col-xl-12 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-6 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
                                     Total de cortes en turno
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
