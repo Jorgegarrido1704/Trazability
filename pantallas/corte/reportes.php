@@ -17,51 +17,51 @@
                     <div class="row text-center mb-4">
                         <div class="col-xl-6 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-8 py-2">
                                     MCUT-1
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                    <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="MCUT-1">0</span></h5>
+                                    <h5 class="display-6 font-weight-bold text-primary mb-0"><span id="MCUT-1">0</span></h5>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xl-6 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-8 py-2">
                                 MCUT-2
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                    <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="MCUT-2">0</span></h5>
+                                    <h5 class="display-6 font-weight-bold text-primary mb-0"><span id="MCUT-2">0</span></h5>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xl-6 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-8 py-2">
                                     MCUT-3
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                    <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="MCUT-3">0</span></h5>
+                                    <h5 class="display-6 font-weight-bold text-primary mb-0"><span id="MCUT-3">0</span></h5>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xl-6 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-8 py-2">
                                 MCUT-4
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                    <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="MCUT-4">0</span></h5>
+                                    <h5 class="display-6 font-weight-bold text-primary mb-0"><span id="MCUT-4">0</span></h5>
                                 </div>
                             </div>
                         </div>
                         <div class="col-xl-6 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-8 py-2">
                                     MCUT-5
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                    <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="MCUT-5">0</span></h5>
+                                    <h5 class="display-6 font-weight-bold text-primary mb-0"><span id="MCUT-5">0</span></h5>
                                 </div>
                             </div>
                         </div>
@@ -71,17 +71,17 @@
                                     MCUT-6
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                    <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="MCUT-6">0</span></h5>
+                                    <h5 class="display-6 font-weight-bold text-primary mb-0"><span id="MCUT-6">0</span></h5>
                                 </div>
                             </div>
                         </div>
                          <div class="col-xl-12 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white font-weight-bold display-3 py-2">
+                                <div class="card-header bg-primary text-white font-weight-bold display-8 py-2">
                                     Total de cortes en turno
                                 </div>
                                 <div class="card-body d-flex align-items-center justify-content-center py-4">
-                                    <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="totales">0</span></h5>
+                                    <h5 class="display-6 font-weight-bold text-primary mb-0"><span id="totales">0</span></h5>
                                 </div>
                             </div>
                         </div>
