@@ -19,8 +19,31 @@ try{
         'M5' => 0,
         'M6' => 0
     ];
+    $ahora = new DateTime();
+$hoy   = $ahora->format('Y-m-d');
+$hora  = $ahora->format('H:i');
+
+if ($hora >= '19:00') {
+    // Turno nocturno (antes de medianoche): hoy 19:00 -> mañana 07:00
+    $inicio = "$hoy 19:00:00";
+    $fin    = (new DateTime("$hoy 07:00:00"))->modify('+1 day')->format('Y-m-d H:i:s');
+} elseif ($hora >= '07:30') {
+    // Turno de día: hoy 07:30 -> hoy 19:00
+    $inicio = "$hoy 07:30:00";
+    $fin    = "$hoy 19:00:00";
+} else {
+    // Turno nocturno (después de medianoche): ayer 19:00 -> hoy 07:00
+    $inicio = (new DateTime("$hoy 19:00:00"))->modify('-1 day')->format('Y-m-d H:i:s');
+    $fin    = "$hoy 07:00:00";
+}
         //busqueda de cantidad de cortes
-        $lectura = mysqli_query($con, "SELECT maquina, COUNT(*) AS cantidad FROM lecturas WHERE fecha LIKE'$fecha %' AND `estado` = 'RUN' GROUP BY maquina order BY maquina ASC");
+        $lectura = mysqli_query($con, "SELECT maquina, COUNT(*) AS cantidad
+        FROM lecturas
+        WHERE fecha >= '$inicio' AND fecha < '$fin'
+          AND estado = 'RUN'
+        GROUP BY maquina
+        ORDER BY maquina ASC
+        ");
         while ($row = mysqli_fetch_assoc($lectura)) {
             if($row['maquina'] == 'M1'){
                 $maquinas['M1'] = round($row['cantidad']/2, 0);
