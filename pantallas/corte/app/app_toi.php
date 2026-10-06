@@ -17,7 +17,8 @@ try{
         'M3' => 0,
         'M4' => 0,
         'M5' => 0,
-        'M6' => 0
+        'M6' => 0,
+        'totales'=> 0
     ];
     $ahora = new DateTime();
 $hoy   = $ahora->format('Y-m-d');
@@ -58,6 +59,7 @@ if ($hora >= '19:00') {
             }else if($row['maquina'] == 'M6'){
                 $maquinas['M6'] = round($row['cantidad']/2, 0);
             }
+            $maquinas['totales'] += $maquinas[$row['maquina']];
         }
 
         echo json_encode([

@@ -75,6 +75,16 @@
                                 </div>
                             </div>
                         </div>
+                         <div class="col-xl-12 col-md-6 mb-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-header bg-primary text-white font-weight-bold display-6 py-2">
+                                    Total de cortes en turno
+                                </div>
+                                <div class="card-body d-flex align-items-center justify-content-center py-4">
+                                    <h5 class="display-4 font-weight-bold text-primary mb-0"><span id="totales">0</span></h5>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>    
@@ -96,6 +106,7 @@
                     document.getElementById('MCUT-4').textContent = data['maquinas']['M4'] || 0;
                     document.getElementById('MCUT-5').textContent = data['maquinas']['M5'] || 0;
                     document.getElementById('MCUT-6').textContent = data['maquinas']['M6'] || 0;
+                    document.getElementById('totales').textContent = data['maquinas']['totales'] || 0;
                 })
                 .catch(error => console.error('Error al refrescar la pantalla:', error));
         }
