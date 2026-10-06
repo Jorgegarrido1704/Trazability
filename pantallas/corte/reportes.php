@@ -99,6 +99,7 @@
                 })
                 .catch(error => console.error('Error al refrescar la pantalla:', error));
         }
+        refrescarPantalla(); // Llamar a la función al cargar la página
         setInterval(refrescarPantalla, 60000); // Refrescar cada 60 segundos
         
 
