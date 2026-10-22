@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     $shift = $row['employeeShift'];
 
     $fechaRegistro = $dateNow;
-    if ($shift == 'secondShift' && $timeNow > '00:00:00' && $timeNow < '07:30:00') {
+    if ($shift == 'secondShift' && $timeNow > '00:00:00' && $timeNow < '12:30:00') {
         $fechaRegistro = $yesterday;
     }
 
@@ -86,11 +86,11 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             $status = 'R';
         } elseif ($type != 'Indirecto' && $shift != 'secondShift' && $timeNow <= '07:35:00') {
             $status = 'OK';
-        } elseif ($type != 'Indirecto' && $shift != 'secondShift' && $timeNow > '07:35:00' && $timeNow < '17:30:00') {
+        } elseif ($type != 'Indirecto' && $shift != 'secondShift' && $timeNow > '07:35:00' ) {
             $status = 'R';
-        } elseif ($shift == 'secondShift' && ($timeNow >= '19:00:00' || $timeNow < '07:30:00') && $timeNow <= '19:15:00') {
+        } elseif ($shift == 'secondShift' &&  $timeNow <= '19:05:00') {
             $status = 'N';
-        } elseif ($shift == 'secondShift' && $timeNow >= '19:15:00') {
+        } elseif ($shift == 'secondShift' && $timeNow >= '19:05:00') {
             $status = 'R';
          }else {
             $status = ' ';
@@ -109,7 +109,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         exit;
 
     } else {
-
         // -------------------------------------------------------
         // Ya existe registro hoy -> lógica de salida / permisos
         // -------------------------------------------------------
