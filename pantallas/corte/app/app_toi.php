@@ -56,7 +56,18 @@ if ($hora >= '19:00') {
                 $maquinas['M4'] = round($row['cantidad']/2, 0);
             }else if($row['maquina'] == 'M5'){
                 $maquinas['M5'] = round($row['cantidad']/2, 0);
-            }else if($row['maquina'] == 'M6'){
+            }
+            $maquinas['totales'] += $maquinas[$row['maquina']];
+        }
+        $lectura = mysqli_query($con, "SELECT maquina, COUNT(*) AS cantidad
+        FROM lecturas
+        WHERE fecha >= '$inicio' AND fecha < '$fin'
+          AND estado = 'Corte'
+        GROUP BY maquina
+        ORDER BY maquina ASC
+        ");
+        while ($row = mysqli_fetch_assoc($lectura)) {
+            if($row['maquina'] == 'M6'){
                 $maquinas['M6'] = round($row['cantidad']/2, 0);
             }
             $maquinas['totales'] += $maquinas[$row['maquina']];
