@@ -68,7 +68,7 @@ if ($hora >= '19:00') {
         ");
         while ($row = mysqli_fetch_assoc($lectura)) {
             if($row['maquina'] == 'M6'){
-                $maquinas['M6'] = round($row['cantidad']/2, 0);
+                $maquinas['M6'] = round($row['cantidad'], 0);
             }
             $maquinas['totales'] += $maquinas[$row['maquina']];
         }
