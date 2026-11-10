@@ -844,8 +844,42 @@ function poblarSelectorFechas(data) {
                         <div><span class="label-bold">WO:</span> ${item.wo || ''}</div>
                         <div><span class="label-bold">PN:</span> ${item.pn || ''}</div>
                         <div><span class="label-bold">Cons:</span> ${item.consumo || ''}</div>
-                        <div class="full-width" style="font-size: 8pt; margin-top: 1px; margin-bottom: 2px;">
-                            <b>T1:</b> ${item.terminal1 || ''} | <b>T2:</b> ${item.terminal2 || ''}
+                       <div class="full-width"
+                            style="grid-column: 1 / -1; font-size: 8pt; margin-top: 3px;">
+
+                            <div style="display: flex; gap: 12px;">
+                                <div style="flex: 1; min-width: 0;">
+                                    <div><b>T1:</b> ${item.terminal1 || ''}</div>
+
+                                    <div style="margin-top: 4px; white-space: nowrap;">
+                                        <span style="
+                                            display: inline-block;
+                                            width: 11px;
+                                            height: 11px;
+                                            border: 2px solid #000;
+                                            vertical-align: middle;
+                                            box-sizing: border-box;
+                                        "></span>
+                                        <b>BANCO:</b> ${item.banco1 ?? ''}
+                                    </div>
+                                </div>
+
+                                <div style="flex: 1; min-width: 0;">
+                                    <div><b>T2:</b> ${item.terminal2 || ''}</div>
+
+                                    <div style="margin-top: 4px; white-space: nowrap;">
+                                        <span style="
+                                            display: inline-block;
+                                            width: 11px;
+                                            height: 11px;
+                                            border: 2px solid #000;
+                                            vertical-align: middle;
+                                            box-sizing: border-box;
+                                        "></span>
+                                        <b>BANCO:</b> ${item.banco2 ?? ''}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="footer-barcode" style="margin-top: 5px; margin-left:45px;">
