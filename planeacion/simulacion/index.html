@@ -882,9 +882,9 @@ function poblarSelectorFechas(data) {
                             </div>
                         </div>
                     </div>
-                    <div class="footer-barcode" style="margin-top: 5px; margin-left:45px;">
+                    <div class="footer-barcode" style="margin-top: 4px; margin-left:40px;">
                         <div id="qrcode-inferior${id}"></div>
-                        <div style="font-size: 8pt; margin-top: 2px;"><strong>ESTAMPADO:</strong>${item.conector || ''}</div>
+                        <div style="font-size: 6pt; margin-top: 2px;"><strong>ESTAMPADO:</strong>${item.conector || ''}</div>
                     </div>
                 </div>
             `;
@@ -892,10 +892,10 @@ function poblarSelectorFechas(data) {
 
             try {
                 new QRCode(document.getElementById(`qrcode-lateral${id}`), {
-                    text: item.codigo || String(id), width: 50, height: 50, correctLevel: QRCode.CorrectLevel.H
+                    text: item.codigo || String(id), width: 40, height: 40, correctLevel: QRCode.CorrectLevel.H
                 });
                 new QRCode(document.getElementById(`qrcode-inferior${id}`), {
-                    text: item.conector || String(id), width: 55, height: 55, correctLevel: QRCode.CorrectLevel.H
+                    text: item.conector || String(id), width: 40, height: 40, correctLevel: QRCode.CorrectLevel.H
                 });
             } catch (error) {
                 console.warn("Error generando QR:", id);
