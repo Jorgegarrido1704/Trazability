@@ -16,7 +16,7 @@ echo "<tr><th>partNumber</th>
 echo "</thead>";
 echo "<tbody>";    
 
-    $datos_de_trabajo= mysqli_query($con,"SELECT pn,  processtime, work FROM `tiemposderuteo` WHERE  ORDER BY pn ASC");
+    $datos_de_trabajo= mysqli_query($con,"SELECT pn,  processtime, work FROM `tiemposderuteo`   ORDER BY pn ASC");
     while ($row2 = mysqli_fetch_assoc($datos_de_trabajo)) {
         $pn =$row2['pn'];
          $processtime = $row2['processtime'];
