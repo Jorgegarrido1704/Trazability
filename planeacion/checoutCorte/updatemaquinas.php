@@ -1,7 +1,14 @@
 <?php
-require __DIR__ . '/../app/conection.php';   // ajusta la ruta
-
-header('Content-Type: application/json');
+$rutas = [__DIR__ . '/app/conection.php', __DIR__ . '/../app/conection.php'];
+foreach ($rutas as $r) {
+    if (file_exists($r)) { require $r; break; }
+}
+if (!isset($con)) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(["error" => "No se encontró conection.php", "probado" => $rutas]);
+    exit;
+}
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $base = "cutStatus != 'Cortado'";
