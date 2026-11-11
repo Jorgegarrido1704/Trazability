@@ -23,18 +23,22 @@ if (!isset($con)) {
 }
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$base = "cutStatus != 'Cortado'";
+$base     = "cutStatus != 'Cortado'";
 $sinSello = "term1 NOT LIKE '%Sello%' AND term2 NOT LIKE '%Sello%'";
 
+// Calibres que van a Cables Especiales (MCUT-7)
+$especiales = "'1','2','4','6','8','1/0','2/0','3/0','4/0'";
+
 $reglas = [
-    'MCUT-1' => "aws IN (10,12) AND $base AND cons NOT LIKE 'C%' AND tamano > 0 AND $sinSello",
-    'MCUT-2' => "aws IN (14,16) AND $base AND cons NOT LIKE 'C%' AND $sinSello AND tintaColor='BLANCA' AND tamano > 0",
-    'MCUT-3' => "aws NOT IN (1,2,4,6,8) AND $base AND cons NOT LIKE 'C%' AND tamano > 0 AND (term1 LIKE '%Sello%' OR term2 LIKE '%Sello%')",
-    'MCUT-4' => "aws IN (18,20,22,24) AND $base AND cons NOT LIKE 'C%' AND $sinSello AND tintaColor='BLANCA' AND tamano > 0",
-    'MCUT-5' => "aws IN (14,16) AND $base AND cons NOT LIKE 'C%' AND $sinSello AND tintaColor='NEGRA' AND tamano > 0",
-    'MCUT-6' => "aws IN (18,20,22,24) AND $base AND cons NOT LIKE 'C%' AND $sinSello AND tintaColor='NEGRA' AND tamano > 0",
-    'MCUT-7' => "$base AND (cons LIKE 'C%' OR aws IN (1,2,4,6,8))",
+    'MCUT-1' => "aws IN ('10','12') AND $base AND cons NOT LIKE 'C%' AND tamano > 0 AND $sinSello",
+    'MCUT-2' => "aws IN ('14','16') AND $base AND cons NOT LIKE 'C%' AND $sinSello AND tintaColor='BLANCA' AND tamano > 0",
+    'MCUT-3' => "aws NOT IN ($especiales) AND $base AND cons NOT LIKE 'C%' AND tamano > 0 AND (term1 LIKE '%Sello%' OR term2 LIKE '%Sello%')",
+    'MCUT-4' => "aws IN ('18','20','22','24') AND $base AND cons NOT LIKE 'C%' AND $sinSello AND tintaColor='BLANCA' AND tamano > 0",
+    'MCUT-5' => "aws IN ('14','16') AND $base AND cons NOT LIKE 'C%' AND $sinSello AND tintaColor='NEGRA' AND tamano > 0",
+    'MCUT-6' => "aws IN ('18','20','22','24') AND $base AND cons NOT LIKE 'C%' AND $sinSello AND tintaColor='NEGRA' AND tamano > 0",
+    'MCUT-7' => "$base AND (cons LIKE 'C%' OR aws IN ($especiales))",
 ];
+
 
 try {
     // Solo máquinas válidas (lista blanca)
