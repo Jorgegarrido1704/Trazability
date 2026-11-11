@@ -551,7 +551,7 @@
                 codigoDevisual = parseInt(codigoDevisual);
                 if (codigoDevisual === codigoOficial){
                     alert('Bienvenido a la carga de las maquinas');
-                    //ConfiguracionCarga();
+                    preseleccionarMaquinas();   
                 }else{
                      window.location.reload();
                 }
@@ -1022,6 +1022,11 @@
            
            
         }
+        function preseleccionarMaquinas() {
+                document.querySelectorAll('input[name="maquinas[]"]').forEach(c => c.checked = true);
+                const todas = document.getElementById('select_todas_maquinas');
+                if (todas) todas.checked = true;
+            }
         function repartirCarga() {
                         let registrosMaquinas = [];
                         
