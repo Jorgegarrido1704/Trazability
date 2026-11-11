@@ -1047,10 +1047,14 @@
                         let queryParams = registrosMaquinas.map(m => `maquinas[]=${encodeURIComponent(m)}`).join('&');
 
                         fetch(`../checoutCorte/updatemaquinas.php?${queryParams}`)
-                            .then(response => {
-                                if (!response.ok) throw new Error("Error en la respuesta del servidor");
-                                return response.json();
-                            })
+                           .then(async response => {
+                                    if (!response.ok) {
+                                        const txt = await response.text();
+                                        console.error(response.status, txt);
+                                        throw new Error(`HTTP ${response.status}: ${txt.substring(0, 300)}`);
+                                    }
+                                    return response.json();
+                                })
                             .then(data => {
                                 if (data && !data.error) { 
                                     window.location.reload(); 
