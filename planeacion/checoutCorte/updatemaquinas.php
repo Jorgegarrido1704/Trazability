@@ -1,12 +1,24 @@
 <?php
+header('Content-Type: application/json');
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
+// Convierte cualquier error fatal en JSON legible
+register_shutdown_function(function () {
+    $e = error_get_last();
+    if ($e && in_array($e['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        http_response_code(500);
+        echo json_encode(["error" => "Error fatal PHP", "detalle" => $e['message'], "archivo" => $e['file'], "linea" => $e['line']]);
+    }
+});
+
 $rutas = [__DIR__ . '/app/conection.php', __DIR__ . '/../app/conection.php'];
 foreach ($rutas as $r) {
     if (file_exists($r)) { require $r; break; }
 }
 if (!isset($con)) {
     http_response_code(500);
-    header('Content-Type: application/json');
-    echo json_encode(["error" => "No se encontró conection.php", "probado" => $rutas]);
+    echo json_encode(["error" => "No se encontró conection.php o no define \$con", "probado" => $rutas]);
     exit;
 }
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
