@@ -1,39 +1,58 @@
 <?php
-require 'conection.php'; 
+require 'conection.php';
+header('Content-Type: application/json');
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 try {
-    $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : null;
-    if(!$codigo) {
-        throw new Exception("Código ausente.");
+    $wo   = $_GET['wo']   ?? null;
+    $cons = $_GET['cons'] ?? null;
+
+    if ($wo === null || $cons === null || $wo === '' || $cons === '') {
+        throw new Exception("Faltan wo o cons.");
     }
-    $fechaCorte = date('Y-m-d H:i:s');
-    $nuevafechaCutF= date('d-m-Y H:i');
-  
-    $changeEstatus = "UPDATE corte SET cutStatus='Cortado', fechaCorte='$fechaCorte' WHERE id='$codigo'";
-    mysqli_query($con, $changeEstatus);
-    
-    $buscarWo = mysqli_query($con, "SELECT wo,cons FROM corte WHERE id='$codigo'");
-    $filaWo = mysqli_fetch_row($buscarWo);
-    
-    if ($filaWo) {
-       
-        $wo = $filaWo[0];
-        $cons = $filaWo[1];
-        $delte_congelados=mysqli_query($con, "DELETE FROM carga_congelada WHERE wo='$wo' AND consumo='$cons'");
-        $buscar = mysqli_query($con, "SELECT * FROM corte WHERE wo='$wo' AND cutStatus='Activo'");
-        
-        if (mysqli_num_rows($buscar) == 0) {
-            mysqli_query($con, "UPDATE registro SET count='4', donde='En espera de liberacion' WHERE wo='$wo'");
-            mysqli_query($con, "UPDATE registroparcial SET libePar=libePar+cortPar, cortPar='0' WHERE wo='$wo'");
-            mysqli_query($con, "UPDATE timesharn SET cutF='$nuevafechaCutF' WHERE wo='$wo'");
-        }
+
+    $fechaCorte     = date('Y-m-d H:i:s');
+    $nuevafechaCutF = date('d-m-Y H:i');
+
+    // 1. Marcar como Cortado
+    $stmt = $con->prepare(
+        "UPDATE corte SET cutStatus='Cortado', fechaCorte=? 
+         WHERE wo=? AND cons=? AND cutStatus='Activo'"
+    );
+    $stmt->bind_param('sss', $fechaCorte, $wo, $cons);
+    $stmt->execute();
+
+    if ($stmt->affected_rows === 0) {
+        throw new Exception("No se encontró un registro Activo con wo=$wo y cons=$cons");
     }
-    
-    $dat['status'] = "success";
-    echo json_encode($dat);
- 
-} catch(Exception $e) {
-    header('Content-Type: application/json');
+
+    // 2. Quitar de congelados
+    $stmt = $con->prepare("DELETE FROM carga_congelada WHERE wo=? AND consumo=?");
+    $stmt->bind_param('ss', $wo, $cons);
+    $stmt->execute();
+
+    // 3. Si ya no quedan activos en esa WO, avanzar la WO
+    $stmt = $con->prepare("SELECT 1 FROM corte WHERE wo=? AND cutStatus='Activo' LIMIT 1");
+    $stmt->bind_param('s', $wo);
+    $stmt->execute();
+
+    if ($stmt->get_result()->num_rows === 0) {
+        $stmt = $con->prepare("UPDATE registro SET count='4', donde='En espera de liberacion' WHERE wo=?");
+        $stmt->bind_param('s', $wo);
+        $stmt->execute();
+
+        $stmt = $con->prepare("UPDATE registroparcial SET libePar=libePar+cortPar, cortPar='0' WHERE wo=?");
+        $stmt->bind_param('s', $wo);
+        $stmt->execute();
+
+        $stmt = $con->prepare("UPDATE timesharn SET cutF=? WHERE wo=?");
+        $stmt->bind_param('ss', $nuevafechaCutF, $wo);
+        $stmt->execute();
+    }
+
+    echo json_encode(["status" => "success"]);
+
+} catch (Throwable $e) {
+    http_response_code(500);
     echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
-?>

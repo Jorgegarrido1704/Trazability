@@ -199,7 +199,9 @@
                         <td>${item.congelada}</td>
                         <td>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input row-checkbox" data-codigo="${item.codigo}" onclick="actualizarContadorLote()">
+                               <input type="checkbox" class="form-check-input row-checkbox"
+                                    data-wo="${item.wo}" data-cons="${item.consumo}"
+                                    onclick="actualizarContadorLote()">
                             </div>
                         </td>`;
                     tbody.appendChild(row);
@@ -236,35 +238,49 @@
             document.getElementById('btnProcesarLote').disabled = (totalSeleccionados === 0);
         }
 
-        function procesarSeleccionados() {
-            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
-            const codigos = Array.from(checkboxes).map(cb => cb.getAttribute('data-codigo'));
+       function procesarSeleccionados() {
+                const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+                const items = Array.from(checkboxes).map(cb => ({
+                    wo: cb.dataset.wo,
+                    cons: cb.dataset.cons,
+                    cb
+                }));
 
-            if(codigos.length === 0) return;
+                if (items.length === 0) return;
+                if (!confirm(`¿Estás seguro de que deseas marcar como 'Cortado' los ${items.length} elementos seleccionados?`)) return;
 
-            if(!confirm(`¿Estás seguro de que deseas marcar como 'Cortado' los ${codigos.length} elementos seleccionados?`)) {
-                return;
+                document.getElementById('btnProcesarLote').disabled = true;
+
+                const promesas = items.map(({ wo, cons, cb }) =>
+                    fetch(`app/quitar.php?wo=${encodeURIComponent(wo)}&cons=${encodeURIComponent(cons)}`)
+                        .then(r => r.json())
+                        .then(res => ({ cb, res }))
+                        .catch(e => ({ cb, res: { status: 'error', message: e.message } }))
+                );
+
+                Promise.all(promesas).then(resultados => {
+                    let fallidos = 0;
+                    let ultimoError = '';
+
+                    resultados.forEach(({ cb, res }) => {
+                        if (res.status === 'error') {
+                            fallidos++;
+                            ultimoError = res.message;
+                            return; // la fila se queda
+                        }
+                        cb.closest('tr').remove();
+                    });
+
+                    document.getElementById('checkAll').checked = false;
+                    document.getElementById('totalRecords2').textContent =
+                        document.querySelectorAll('#resultTotal tr').length + ' registros';
+                    actualizarContadorLote();
+
+                    if (fallidos > 0) {
+                        alert(`${fallidos} elemento(s) no se pudieron procesar.\n${ultimoError}`);
+                    }
+                });
             }
-
-            const promesas = codigos.map(codigo => {
-                return fetch(`app/quitar.php?codigo=${encodeURIComponent(codigo)}`)
-                    .then(response => response.json());
-            });
-
-            Promise.all(promesas)
-            .then(resultados => {
-                console.log("Lote procesado con éxito:", resultados);
-                alert(`Se han procesado ${resultados.length} elementos correctamente.`);
-                window.location.reload();
-                
-            })
-            .catch(err => {
-                console.error("Error procesando lote:", err);
-                alert("Ocurrió un error en el procesamiento por lote.");
-                pormaquina();
-            });
-        }
-
         function marcarFaltante(codigo) {
             if(!confirm(`¿Estás seguro de que deseas marcar como 'Faltante' el elemento ${codigo}?`)) {
                 return;
