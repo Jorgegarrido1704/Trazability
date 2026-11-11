@@ -354,6 +354,8 @@ try {
     while ($row = mysqli_fetch_assoc($res)) {
         $app1="";
         $app2="";
+        $banco1 = "";
+        $banco2 = "";
         $pnKey = $row['pn_clean'];
         if (!isset($pnDataMap[$pnKey])) continue;
 
@@ -382,6 +384,34 @@ try {
             $qtyMultiplicada = $orden['qty'];
             $time_ruteo_seg  = round((2.92 * $qtyMultiplicada) + 180, 2);
             $minutos         = round(($time_ruteo_seg / 60), 2);
+            $terminal1 = $row['terminal1'];
+            $terminal2 = $row['terminal2'];
+            $term1=strpos($terminal1, ' ') !== false ? explode(' ', $terminal1)[0] : $terminal1;
+            $term2=strpos($terminal2, ' ') !== false ? explode(' ', $terminal2)[0] : $terminal2;
+            $bancos= [
+                '1'=>['TT1-310','DT2-6','TT2-72','TT1-18','TT1-53','ET2-26'],
+                '2'=>['DT2-74'],
+                '3'=>['DT2-58','DT2-36','DT1-87','DT1-54','DT2-103','TT2-47','TT2-90','DT2-132','DT2-116','TT1-2','DT2-47','MT1-2','TT2-32','DT2-112','TT2-51'],
+                '4' =>['TT2-311','DT2-16','ET1-5','TT2-267','TT2-901','DT2-70','PT2-1','PT2-2','MT2-46','DT2-67'],
+                '5'=>['ET1-35','DT1-27','YT2-42','MT1-20','DT1-8','MT1-131','DT2-100','MT2-132','DT1-78','TT2-276','MT2-136','TT2-127','YT2-13','FT2-5','TT2-102','TT2-235','MT2-71'],
+                '6'=>['DT2-4','DT1-5','DT2-139','DT2-8'],
+                '7'=>['DT1-775','DT1-134','YT2-26','TT2-103','TT2-63','TT1-102','ET1-36','TT2-187','FT2-12','TT2-111','TT2-279','TT1-110','DT1-59','DT2-95'],
+                '8'=>['DT2-11','DT2-45','TT2-209','MT4-24','MT4-23','MT1-4','MT1-119','TT2-224','MT3-86','YT2-28','MT1-54','TT3-117','DT1-57','MT3-41','MT2-3','TT3-14','TT3-51','DT2-79','MT2-102','MT3-126','MT1-78','PT1-17','MT3-75','MT2-1'],
+                '9'=>['ET2-27','DT2-14','TT2-309','TT2-180','TT2-219','TT2-310','TT1-74','TT2-60','DT1-83','TT2-221','TT2-167','TT2-15','DT2-42','TT2-64','TT2-271','TT2-308','TT1-257','TT2-22','TT2-217','TT2-3','TT2-231'],
+                '10'=>['TT2-14','DT2-690','MT2-48','DT1-61','DT1-3','DT1-13','MT2-55','TT3-158','TT2-33','TT1-307','DT2-50','MT3-87','DT1-14','DT2-35','TT2-152','ET1-37','DT1-53'],
+                '11'=>['YT1-13','DT1-31','DT2-802','DT1-74','DT2-85','TT2-9','DT2-12','DT1-34','TT2-23','ET2-6','TT2-222','DT2-52','DT2-111','DT2-1','ET2-34','DT2-32'],
+                '12'=>['DT2-15','DT1-7','TT2-139','DT2-119','DT2-10','DT2-21','DT2-127','AT1-9','MT2-31','TT2-21','TT3-104','PT3-30'],
+                '13'=>['DT2-17','MT2-118','DT2-59','DT2-22','DT2-126','DT2-128','TT2-58','TT2-218','TT2-27','DT2-94','TT2-900','TT2-65','DT2-66','TT2-31'],
+            ];
+
+            foreach ($bancos as $bancoNum => $terminales) {
+                if (in_array($term1, $terminales) ) {
+                    $banco1 =  $bancoNum;
+                }
+                if (in_array($term2, $terminales) ) {
+                    $banco2 =  $bancoNum;
+                }
+            }
 
             $calibres[] = [
                 'id'             => $row['id'],
@@ -404,7 +434,9 @@ try {
                 'estampado'      => $row['dist_stamp'] ?? '',
                 'maquina'        => $maquinaAsignada,
                 'fecha_asignada' => $fechaHoy,
-                'dia_bloque'     => $diaBloqueDefecto
+                'dia_bloque'     => $diaBloqueDefecto,
+                'banco1'         => $banco1,
+                'banco2'         => $banco2,
             ];
         }
     }
