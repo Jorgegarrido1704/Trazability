@@ -25,7 +25,7 @@
                     <option value="M4">MCUT-4</option>
                     <option value="M5">MCUT-5</option>
                     <option value="M6">MCUT-6</option>
-                    <option value="M7">MCUT-7</option>
+                    
 
                         </select>   
                 </div>
@@ -60,12 +60,14 @@
                     </select>   
                 </div>
                 <div class="col-md-2 mb-3">
-                    <label for="downtime" class="form-label">Tiempo Muerto</label>
+                    <label for="downtime" class="form-label">Tiempo Muerto (MIN)</label>
                     <input type="number" class="form-control" id="downtime" name="downtime" min="0" step="1" required>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="reason" class="form-label">Razon</label>
-                    <input type="text" class="form-control" id="reason" name="reason" maxlength="10" placeholder="Ej. K,J,G Separados por comas"  required>
+                    <label for="reason" class="form-label">Razon del defecto</label>
+                    <select class="form-select" id="reason" name="reason" required>
+                    <option value="" disabled selected>Selecciona una razon</option>
+                    </select>
                 </div> 
                     <button type="submit" class="btn btn-primary">Agregar Tiempo Muerto</button>
                 
@@ -77,9 +79,24 @@
 <script>
     window.onload = function() {
         var today = new Date().toISOString().split('T')[0];
-       
+        var yesterday = new Date(Date.now()).toISOString().split('T')[0];
         document.getElementById("dateRegistered").value=yesterday;
         document.getElementById("dateRegistered").setAttribute('max', today);
+        document.getElementById("dateRegistered").setAttribute('min', yesterday);
+        function getReasons(){
+            fetch('reasons.php').then(response => response.json()).then(data => {
+                var select = document.getElementById('reason');
+                data.forEach(reason => {
+                    var option = document.createElement('option');
+                    option.value = reason.clave;
+                    option.text = reason.defecto;
+                    select.add(option);
+                });
+            })
+        }
+            
+        
+        getReasons();
        
     };
 
