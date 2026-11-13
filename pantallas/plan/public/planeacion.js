@@ -62,12 +62,16 @@ function loadSchedule() {
 }
 
 async function consultarPlaneacion() {
+    let errorConsulta;
     try {
         const response = await fetch("./planeacion_hoy.php", {
             cache: "no-store",
             signal: AbortSignal.timeout(15000),
         });
-        if (!response.ok) throw new Error("Consulta fallida");
+        if (!response.ok) {
+            errorConsulta = (await response.json().catch(() => ({}))).error;
+            throw new Error("Consulta fallida");
+        }
         const { fecha, zona_horaria, consultado_en, registros } = await response.json();
         const dateText = formatDate(fecha, longDate);
         const queryTime = new Intl.DateTimeFormat("es-MX", {
@@ -87,9 +91,9 @@ async function consultarPlaneacion() {
         updated.hidden = false;
     } catch {
         message.classList.add("error");
-        message.textContent = tableContainer.hidden
+        message.textContent = errorConsulta || (tableContainer.hidden
             ? "No se pudo consultar la planeación. Usa Actualizar para reintentar."
-            : "No se pudo actualizar la planeación. La tabla conserva los datos de la última consulta.";
+            : "No se pudo actualizar la planeación. La tabla conserva los datos de la última consulta.");
         message.hidden = false;
     }
 }
@@ -127,6 +131,10 @@ async function enableImport() {
             return;
         }
         showImportStatus("");
+        const password = document.querySelector("#import-password");
+        document.querySelector("#import-password-field").hidden = !access.requiere_clave;
+        password.disabled = !access.requiere_clave;
+        password.required = Boolean(access.requiere_clave);
         importForm.hidden = false;
         importForm.addEventListener("submit", async event => {
             event.preventDefault();

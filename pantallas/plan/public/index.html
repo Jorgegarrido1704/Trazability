@@ -29,6 +29,10 @@
                     <label for="csv">Archivo CSV UTF-8</label>
                     <input id="csv" name="csv" type="file" accept=".csv,text/csv" required aria-describedby="import-help">
                 </div>
+                <div id="import-password-field" hidden>
+                    <label for="import-password">Contraseña de carga</label>
+                    <input id="import-password" name="clave_carga" type="password" autocomplete="current-password" disabled>
+                </div>
                 <button id="import-button" type="submit">Cargar CSV</button>
                 <p id="import-help">El archivo completo reemplaza la planeación de hoy. La primera columna debe ser Customer.</p>
             </form>

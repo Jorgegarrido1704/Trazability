@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-require dirname(__DIR__) . '/carga_planeacion.php';
-
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
@@ -13,6 +11,13 @@ function responderCarga(int $codigo, array $datos): void
 }
 
 try {
+    $dependencia = dirname(__DIR__) . '/carga_planeacion.php';
+    if (!is_readable($dependencia) || !is_readable(dirname(__DIR__) . '/conexion.php')) {
+        responderCarga(500, ['error' => 'Instala la carpeta completa. Faltan archivos PHP fuera de public/.']);
+        return;
+    }
+    require $dependencia;
+
     $metodo = $_SERVER['REQUEST_METHOD'];
     if ($metodo !== 'GET' && $metodo !== 'POST') {
         header('Allow: GET, POST');
@@ -20,12 +25,27 @@ try {
         return;
     }
 
-    session_start();
-    $config = require dirname(__DIR__) . '/config.local.php';
+    $config = configuracionPlaneacion();
+    if (session_status() !== PHP_SESSION_ACTIVE && !session_start()) {
+        responderCarga(500, ['error' => 'PHP no pudo iniciar la sesión. Revisa session.save_path en el servidor.']);
+        return;
+    }
+
     $autorizar = $config['autorizar_carga'] ?? null;
-    if (!is_callable($autorizar) || $autorizar() !== true) {
+    $autorizadoCvts = is_callable($autorizar) && $autorizar() === true;
+    $hash = $config['clave_carga_hash'] ?? '';
+    if (!$autorizadoCvts && (!is_string($hash) || $hash === '' || password_get_info($hash)['algo'] === null)) {
         session_write_close();
-        responderCarga(403, ['error' => 'La carga de CSV requiere acceso de Planeación en CVTS.']);
+        responderCarga(403, ['error' => 'Activa la carga en config.local.php con el permiso de CVTS o una contraseña de carga.']);
+        return;
+    }
+
+    $local = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)
+        && in_array($_SERVER['SERVER_NAME'] ?? '', ['localhost', '127.0.0.1', '::1', '[::1]'], true);
+    $https = in_array(strtolower($_SERVER['HTTPS'] ?? ''), ['on', '1'], true);
+    if (!$autorizadoCvts && !$https && !$local) {
+        session_write_close();
+        responderCarga(403, ['error' => 'Abre la pantalla por HTTPS para usar la contraseña de carga, o habilita el permiso de la sesión de CVTS.']);
         return;
     }
 
@@ -33,7 +53,7 @@ try {
         $_SESSION['cvts_planeacion_csrf'] ??= bin2hex(random_bytes(32));
         $token = $_SESSION['cvts_planeacion_csrf'];
         session_write_close();
-        responderCarga(200, ['token' => $token]);
+        responderCarga(200, ['token' => $token, 'requiere_clave' => !$autorizadoCvts]);
         return;
     }
 
@@ -42,6 +62,14 @@ try {
     if ($token === '' || !hash_equals($token, $_SERVER['HTTP_X_CVTS_CSRF'] ?? '')) {
         responderCarga(403, ['error' => 'Actualiza la página antes de cargar el CSV.']);
         return;
+    }
+
+    if (!$autorizadoCvts) {
+        $clave = $_POST['clave_carga'] ?? '';
+        if (!is_string($clave) || strlen($clave) > 72 || !password_verify($clave, $hash)) {
+            responderCarga(403, ['error' => 'Contraseña de carga incorrecta.']);
+            return;
+        }
     }
 
     $archivo = $_FILES['csv'] ?? [];
@@ -56,6 +84,11 @@ try {
     }
 
     responderCarga(200, cargarPlaneacion($archivo['tmp_name']));
+} catch (ConfiguracionPlaneacionException $error) {
+    responderCarga(500, ['error' => $error->getMessage()]);
+} catch (PDOException $error) {
+    error_log('Planeación CVTS, conexión: ' . $error->getMessage());
+    responderCarga(500, ['error' => 'Revisa la conexión a MySQL/MariaDB en config.local.php y el registro de errores de PHP.']);
 } catch (InvalidArgumentException $error) {
     responderCarga(422, ['error' => $error->getMessage()]);
 } catch (CargaPlaneacionException $error) {
