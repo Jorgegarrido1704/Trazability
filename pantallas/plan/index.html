@@ -198,9 +198,32 @@ setInterval(() => {
 
 cargarTabla();
 
-setTimeout(() => {
-    window.location.href = 'index.html';
-}, 15000);
+let redireccionProgramada = false;
+
+setInterval(() => {
+    if (
+        Date.now() < pausaHasta ||
+        ultimoContenido === null ||
+        redireccionProgramada
+    ) return;
+
+    const limite = Math.max(
+        0,
+        tabla.scrollHeight - tabla.clientHeight
+    );
+
+    if (tabla.scrollTop < limite - 1) {
+        tabla.scrollTop = Math.min(tabla.scrollTop + 1, limite);
+    } else {
+        redireccionProgramada = true;
+
+        // Espera 15 segundos al final antes de redirigir.
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 15000);
+    }
+}, 50);
+
 </script>
 </body>
 </html>
