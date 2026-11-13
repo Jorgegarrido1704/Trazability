@@ -6,7 +6,8 @@ ini_set('log_errors', '1');
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 require "../../app/conection.php";
 
-
+$deltehoy=date("Y-m-d");
+mysqli_query($con, "DELETE FROM pantallas WHERE fecha_up = '$deltehoy'   ");
 
 $numerosDeParte = [];
 
@@ -99,5 +100,5 @@ try {
 }
 
 $numerosDeParte = array_unique($numerosDeParte);
-header("Location: duplicados.php?np=" . urlencode(implode(',', $numerosDeParte)));
+header("Location: index.html");
 exit;

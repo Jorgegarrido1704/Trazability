@@ -1,24 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Plan de producción</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 32px 20px;
+            font-family: Arial, sans-serif;
+            background: #f3f5f9;
+            color: #243247;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        h1 { margin: 0 0 8px; }
+
+        .descripcion {
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        .tarjeta {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px #24324708;
+        }
+
+        form {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        input[type="file"] {
+            max-width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover { background: #1d4ed8; }
+
+        #estado {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        #estado.error { color: #b91c1c; }
+
+        #tabla { overflow-x: auto; }
+
+        #tabla table {
+            width: 100%;
+            border-collapse: collapse;
+            white-space: nowrap;
+        }
+
+        #tabla th,
+        #tabla td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        #tabla th {
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        #tabla tbody tr:hover { background: #f8fafc; }
+    </style>
 </head>
 <body>
-    <div class="row"></div>
-        <div class="col-lg-2 mb-4 border">
-            <h1>Cargar listas</h1>
-            <form action="upPlan.php" method="POST" enctype="multipart/form-data">
-                <input type="file" name="csv_file" accept=".csv">
-                <br>
-                <input type="submit" name="upload" value="Cargar CSV">
-            </form>
-        </div>
-        <div class="col-lg-12 mb-4 border" id="tabla"> </div>   
-            
-    </div>
-    
+<main>
+    <h1>Plan de producción</h1>
+    <p class="descripcion">Carga tu lista y consulta las órdenes del día.</p>
+
+    <section class="tarjeta">
+        <form action="upPlan.php" method="POST" enctype="multipart/form-data">
+            <label for="csv_file">Archivo CSV</label>
+            <input
+                type="file"
+                id="csv_file"
+                name="csv_file"
+                accept=".csv"
+                required
+            >
+            <button type="submit" name="upload" value="1">
+                Cargar CSV
+            </button>
+        </form>
+    </section>
+
+    <section class="tarjeta">
+        <p id="estado" role="status">Cargando tabla…</p>
+        <div id="tabla" aria-busy="true"></div>
+    </section>
+</main>
+
+<script>
+    const tabla = document.getElementById('tabla');
+    const estado = document.getElementById('estado');
+
+    async function cargarTabla() {
+        tabla.setAttribute('aria-busy', 'true');
+
+        try {
+            const response = await fetch('tabla.php', {
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            tabla.innerHTML = await response.text();
+
+            estado.classList.remove('error');
+            estado.textContent =
+                'Última actualización: ' + new Date().toLocaleTimeString();
+        } catch (error) {
+            console.error('Error al cargar la tabla:', error);
+            estado.classList.add('error');
+            estado.textContent =
+                'No se pudo actualizar la tabla. ' + error.message;
+        } finally {
+            tabla.setAttribute('aria-busy', 'false');
+            setTimeout(cargarTabla, 5000);
+        }
+    }
+
+    cargarTabla();
+</script>
 </body>
 </html>
-
