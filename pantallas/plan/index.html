@@ -91,6 +91,19 @@
         }
 
         #tabla tbody tr:hover { background: #f8fafc; }
+        #tabla {
+    max-height: 65vh;
+    overflow: auto;
+    scroll-behavior: auto;
+}
+
+#tabla th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #eff6ff;
+}
+
     </style>
 </head>
 <body>
@@ -134,7 +147,13 @@
                 throw new Error(`HTTP ${response.status}`);
             }
 
-            tabla.innerHTML = await response.text();
+            const contenido = await response.text();
+
+            if (tabla.innerHTML !== contenido) {
+                const posicion = tabla.scrollTop;
+                tabla.innerHTML = contenido;
+                tabla.scrollTop = posicion;
+            }
 
             estado.classList.remove('error');
             estado.textContent =
@@ -151,6 +170,52 @@
     }
 
     cargarTabla();
+    let pausaHasta = 0;
+let mouseSobreTabla = false;
+let tiempoAnterior = null;
+
+tabla.addEventListener('mouseenter', () => {
+    mouseSobreTabla = true;
+});
+
+tabla.addEventListener('mouseleave', () => {
+    mouseSobreTabla = false;
+});
+
+function pausarScroll() {
+    pausaHasta = performance.now() + 5000;
+}
+
+tabla.addEventListener('touchstart', pausarScroll, { passive: true });
+tabla.addEventListener('touchmove', pausarScroll, { passive: true });
+tabla.addEventListener('wheel', pausarScroll, { passive: true });
+
+function desplazarTabla(tiempo) {
+    const segundos = tiempoAnterior === null
+        ? 0
+        : Math.min((tiempo - tiempoAnterior) / 1000, 0.1);
+
+    tiempoAnterior = tiempo;
+
+    const limite = tabla.scrollHeight - tabla.clientHeight;
+
+    if (
+        limite > 0 &&
+        !mouseSobreTabla &&
+        tiempo > pausaHasta &&
+        tabla.scrollTop < limite
+    ) {
+        // Velocidad: 15 píxeles por segundo.
+        tabla.scrollTop = Math.min(
+            limite,
+            tabla.scrollTop + 15 * segundos
+        );
+    }
+
+    requestAnimationFrame(desplazarTabla);
+}
+
+requestAnimationFrame(desplazarTabla);
 </script>
 </body>
 </html>
