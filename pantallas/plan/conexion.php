@@ -12,9 +12,9 @@ function configuracionPlaneacion(): array
 {
     static $config;
     if ($config === null) {
-        $ruta = __DIR__ . '/config.ejemplo.php';
+        $ruta = __DIR__ . '/config.local.php';
         if (!is_readable($ruta)) {
-            throw new ConfiguracionPlaneacionException('Falta config.local.php en la carpeta que contiene conexion.php. Copia config.ejemplo.php y configura CVTS.');
+            throw new ConfiguracionPlaneacionException('Falta config.local.php. Copia config.ejemplo.php y configura el permiso de carga.');
         }
         try {
             $config = require $ruta;
@@ -30,23 +30,28 @@ function configuracionPlaneacion(): array
     return $config;
 }
 
-function conectar(): PDO
+function conectarPlaneacion(): mysqli
 {
-    $config = configuracionPlaneacion();
-    if (!class_exists(PDO::class) || !in_array('mysql', PDO::getAvailableDrivers(), true)) {
-        throw new ConfiguracionPlaneacionException('Habilita pdo_mysql en el PHP que usa el servidor web.');
+    static $con;
+
+    if ($con instanceof mysqli) {
+        return $con;
     }
-    if (!isset($config['dsn'], $config['usuario'], $config['clave'])) {
-        throw new ConfiguracionPlaneacionException('Completa dsn, usuario y clave en config.local.php.');
+    if (!extension_loaded('mysqli')) {
+        throw new ConfiguracionPlaneacionException('Habilita mysqli en el PHP del servidor.');
     }
-    return new PDO(
-        $config['dsn'],
-        $config['usuario'],
-        $config['clave'],
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ]
-    );
+
+    $ruta = dirname(__DIR__) . '/app/conection.php';
+    if (!is_readable($ruta)) {
+        throw new ConfiguracionPlaneacionException('No se encontró app/conection.php en la ruta configurada en conexion.php.');
+    }
+
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+    require $ruta;
+    if (!$con instanceof mysqli) {
+        throw new ConfiguracionPlaneacionException('app/conection.php debe proporcionar una conexión mysqli en $con.');
+    }
+    $con->set_charset('utf8mb4');
+
+    return $con;
 }

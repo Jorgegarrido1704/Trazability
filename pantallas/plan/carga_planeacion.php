@@ -33,7 +33,8 @@ function cargarPlaneacion(string $ruta): array
         throw new InvalidArgumentException('No se pudo abrir el archivo CSV.');
     }
 
-    $pdo = null;
+    $con = null;
+    $transaccionActiva = false;
     $bloqueado = false;
     try {
         $ahora = new DateTimeImmutable('now', zonaPlanta());
@@ -60,35 +61,37 @@ function cargarPlaneacion(string $ruta): array
             throw new InvalidArgumentException('Los encabezados no coinciden con la plantilla. Revisa las once columnas y su orden.');
         }
 
-        $pdo = conectar();
-        $motor = $pdo->query(
+        $con = conectarPlaneacion();
+        $motor = $con->query(
             "SELECT e.TRANSACTIONS
              FROM information_schema.TABLES AS t
              JOIN information_schema.ENGINES AS e ON e.ENGINE = t.ENGINE
              WHERE t.TABLE_SCHEMA = DATABASE() AND t.TABLE_NAME = 'pantallas'"
-        )->fetchColumn();
+        )->fetch_row()[0] ?? null;
         if ($motor !== 'YES') {
             throw new CargaPlaneacionException('La tabla pantallas debe usar un motor transaccional, como InnoDB.');
         }
 
         // Serializa las cargas de Planeación, incluso si todavía no hay filas para hoy.
-        $bloqueo = $pdo->query(
+        $bloqueo = $con->query(
             "SELECT GET_LOCK(CONCAT('cvts.plan.', SHA1(DATABASE())), 30)"
-        )->fetchColumn();
+        )->fetch_row()[0] ?? null;
         if ((string) $bloqueo !== '1') {
             throw new CargaPlaneacionException('No se pudo obtener el bloqueo de Planeación. Vuelve a intentar la carga.');
         }
 
         $bloqueado = true;
-        $pdo->beginTransaction();
-        $borrar = $pdo->prepare(
+        $con->begin_transaction();
+        $transaccionActiva = true;
+        $borrar = $con->prepare(
             "DELETE FROM pantallas
              WHERE pantalla = 'plan' AND fecha_up >= ? AND fecha_up < ?"
         );
         $borrar->execute([$fechaCarga, $fechaSiguiente]);
-        $reemplazados = $borrar->rowCount();
+        $reemplazados = (int) $borrar->affected_rows;
+        $borrar->close();
 
-        $guardar = $pdo->prepare(
+        $guardar = $con->prepare(
             "INSERT INTO pantallas (pantalla, fecha_up, customer, np, wo, qty_wo, corte, ensa, loom, cal, emb, fecha, comentarios)
              VALUES ('plan', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
@@ -125,7 +128,7 @@ function cargarPlaneacion(string $ruta): array
                 $guardados++;
             } catch (InvalidArgumentException $error) {
                 throw new InvalidArgumentException("Registro {$registro}: " . $error->getMessage(), 0, $error);
-            } catch (PDOException $error) {
+            } catch (mysqli_sql_exception $error) {
                 throw new CargaPlaneacionException("La base de datos rechazó el registro {$registro}.", 0, $error);
             }
         }
@@ -136,7 +139,9 @@ function cargarPlaneacion(string $ruta): array
         if ($guardados === 0) {
             throw new InvalidArgumentException('El CSV no contiene registros para importar.');
         }
-        $pdo->commit();
+        $guardar->close();
+        $con->commit();
+        $transaccionActiva = false;
 
         return [
             'fecha_carga' => $fechaCarga,
@@ -144,15 +149,19 @@ function cargarPlaneacion(string $ruta): array
             'guardados' => $guardados,
         ];
     } catch (Throwable $error) {
-        if ($pdo && $pdo->inTransaction()) {
-            $pdo->rollBack();
+        if ($transaccionActiva) {
+            try {
+                $con->rollback();
+            } catch (Throwable $errorRollback) {
+                error_log('Planeación CVTS, reversión: ' . $errorRollback->getMessage());
+            }
         }
         throw $error;
     } finally {
         fclose($archivo);
         if ($bloqueado) {
             try {
-                $pdo->query("SELECT RELEASE_LOCK(CONCAT('cvts.plan.', SHA1(DATABASE())))")->closeCursor();
+                $con->query("SELECT RELEASE_LOCK(CONCAT('cvts.plan.', SHA1(DATABASE())))")->free();
             } catch (Throwable $error) {
                 error_log('Planeación CVTS, liberar bloqueo: ' . $error->getMessage());
             }

@@ -86,9 +86,9 @@ try {
     responderCarga(200, cargarPlaneacion($archivo['tmp_name']));
 } catch (ConfiguracionPlaneacionException $error) {
     responderCarga(500, ['error' => $error->getMessage()]);
-} catch (PDOException $error) {
+} catch (mysqli_sql_exception $error) {
     error_log('Planeación CVTS, conexión: ' . $error->getMessage());
-    responderCarga(500, ['error' => 'Revisa la conexión a MySQL/MariaDB en config.local.php y el registro de errores de PHP.']);
+    responderCarga(500, ['error' => 'Revisa la conexión de app/conection.php y el registro de errores de PHP.']);
 } catch (InvalidArgumentException $error) {
     responderCarga(422, ['error' => $error->getMessage()]);
 } catch (CargaPlaneacionException $error) {
