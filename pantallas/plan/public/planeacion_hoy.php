@@ -13,7 +13,7 @@ try {
     $manana = $ahora->modify('+1 day')->format('Y-m-d');
 
     $consulta = conectar()->prepare(
-        'SELECT np, wo, qty_wo, corte, ensa, loom, cal, emb, fecha, comentarios
+        'SELECT customer, np, wo, qty_wo, corte, ensa, loom, cal, emb, fecha, comentarios
          FROM pantallas
          WHERE pantalla = :pantalla AND fecha_up >= :hoy AND fecha_up < :manana
          ORDER BY id'

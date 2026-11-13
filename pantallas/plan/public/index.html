@@ -21,6 +21,19 @@
             <button id="refresh" type="button">Actualizar</button>
         </div>
 
+        <section class="panel import-panel" aria-labelledby="import-title">
+            <div class="panel-header"><h2 id="import-title">Cargar planeación desde CSV</h2></div>
+            <p id="import-status" class="message" role="status">Comprobando acceso de carga…</p>
+            <form id="import-form" enctype="multipart/form-data" hidden>
+                <div>
+                    <label for="csv">Archivo CSV UTF-8</label>
+                    <input id="csv" name="csv" type="file" accept=".csv,text/csv" required aria-describedby="import-help">
+                </div>
+                <button id="import-button" type="submit">Cargar CSV</button>
+                <p id="import-help">El archivo completo reemplaza la planeación de hoy. La primera columna debe ser Customer.</p>
+            </form>
+        </section>
+
         <section class="panel" aria-labelledby="schedule-title">
             <div class="panel-header">
                 <h2 id="schedule-title">Órdenes cargadas hoy</h2>
@@ -30,11 +43,12 @@
             <div id="table-container" hidden>
                 <table role="table" aria-labelledby="schedule-title">
                     <colgroup>
-                        <col class="part"><col class="wo"><col class="qty">
+                        <col class="customer"><col class="part"><col class="wo"><col class="qty">
                         <col class="step" span="5"><col class="required"><col class="comments">
                     </colgroup>
                     <thead role="rowgroup">
                         <tr role="row">
+                            <th role="columnheader" scope="col">Customer</th>
                             <th role="columnheader" scope="col">Número de parte</th>
                             <th role="columnheader" scope="col">WO</th>
                             <th role="columnheader" scope="col" class="center">Cantidad</th>

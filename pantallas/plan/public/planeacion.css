@@ -62,11 +62,12 @@ h2 { margin: 0; color: var(--brand-dark); font-size: .975rem; }
 .message.error { background: #fff3f2; color: #8f1515; }
 .panel-footer { padding: 12px 18px; }
 table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: .875rem; }
-.part { width: 13%; }
-.wo { width: 9%; }
+.customer { width: 13%; }
+.part { width: 12%; }
+.wo { width: 8%; }
 .qty { width: 8%; }
-.step { width: 5%; }
-.required { width: 13%; }
+.step { width: 4%; }
+.required { width: 12%; }
 th, td { padding: 10px 9px; text-align: left; overflow-wrap: anywhere; }
 thead th { background: var(--table-red); color: white; font-weight: 650; }
 tbody td { border-bottom: 1px solid #dce6f6; vertical-align: top; line-height: 1.4; }
@@ -100,9 +101,32 @@ abbr { text-decoration: none; }
         font-size: .72rem;
         font-weight: 650;
     }
-    tbody td:nth-child(1) { grid-column: span 3; font-weight: 650; }
-    tbody td:nth-child(2) { grid-column: span 2; }
-    tbody td:nth-child(3) { grid-column: span 5; text-align: left; }
-    tbody td:nth-child(n+9) { grid-column: span 5; padding-top: 7px; border-top: 1px solid var(--border); }
+    tbody td:nth-child(1) { grid-column: span 5; font-weight: 650; }
+    tbody td:nth-child(2) { grid-column: span 3; }
+    tbody td:nth-child(3) { grid-column: span 2; }
+    tbody td:nth-child(4) { grid-column: span 5; text-align: left; }
+    tbody td:nth-child(n+10) { grid-column: span 5; padding-top: 7px; border-top: 1px solid var(--border); }
     tbody td.comment.empty { display: none; }
 }
+
+.import-panel { margin-bottom: 18px; }
+#import-form {
+    display: flex;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    padding: 16px 18px;
+}
+#import-form > div { min-width: 0; flex: 0 1 360px; }
+#import-form label { display: block; margin-bottom: 6px; font-size: .875rem; font-weight: 650; }
+#csv { display: block; max-width: 100%; font: inherit; font-size: .875rem; }
+#csv::file-selector-button {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    background: #f8f9fc;
+    color: #24344d;
+    cursor: pointer;
+}
+#import-help { flex-basis: 100%; margin: 0; color: var(--muted); font-size: .825rem; }
+#import-status { padding: 12px 18px; }
