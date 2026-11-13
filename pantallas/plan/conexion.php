@@ -8,7 +8,7 @@ function zonaPlanta(): DateTimeZone
 
 function conectar(): PDO
 {
-    $config = require __DIR__ . '/config.local.php';
+    $config = require __DIR__ . '/config.ejemplo.php';
     return new PDO(
         $config['dsn'],
         $config['usuario'],

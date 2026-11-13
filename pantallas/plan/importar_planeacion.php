@@ -6,7 +6,7 @@ if (PHP_SAPI !== 'cli') {
     exit;
 }
 
-require __DIR__ . '/conexion.php';
+require '../../app/conection.php';
 
 function normalizarEncabezado(string $valor): string
 {
