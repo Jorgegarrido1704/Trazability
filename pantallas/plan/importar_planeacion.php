@@ -41,8 +41,11 @@ if ($archivo === false) {
 }
 
 $pdo = null;
+$salida = 0;
 try {
-    $fechaCarga = (new DateTimeImmutable('now', zonaPlanta()))->format('Y-m-d');
+    $ahora = new DateTimeImmutable('now', zonaPlanta());
+    $fechaCarga = $ahora->format('Y-m-d');
+    $fechaSiguiente = $ahora->modify('+1 day')->format('Y-m-d');
     $primeraLinea = fgets($archivo);
     if ($primeraLinea === false) {
         throw new InvalidArgumentException('El CSV está vacío.');
@@ -65,7 +68,33 @@ try {
     }
 
     $pdo = conectar();
+    $motor = $pdo->query(
+        "SELECT e.TRANSACTIONS
+         FROM information_schema.TABLES AS t
+         JOIN information_schema.ENGINES AS e ON e.ENGINE = t.ENGINE
+         WHERE t.TABLE_SCHEMA = DATABASE() AND t.TABLE_NAME = 'pantallas'"
+    )->fetchColumn();
+    if ($motor !== 'YES') {
+        throw new RuntimeException('La tabla pantallas debe usar un motor transaccional, como InnoDB.');
+    }
+
+    // Serializa las cargas de Planeación, incluso si todavía no hay filas para hoy.
+    // MySQL/MariaDB libera el bloqueo al cerrar la conexión de este proceso.
+    $bloqueo = $pdo->query(
+        "SELECT GET_LOCK(CONCAT('cvts.plan.', SHA1(DATABASE())), 30)"
+    )->fetchColumn();
+    if ((string) $bloqueo !== '1') {
+        throw new RuntimeException('No se pudo obtener el bloqueo de Planeación. Vuelve a intentar la carga.');
+    }
+
     $pdo->beginTransaction();
+    $borrar = $pdo->prepare(
+        "DELETE FROM pantallas
+         WHERE pantalla = 'plan' AND fecha_up >= ? AND fecha_up < ?"
+    );
+    $borrar->execute([$fechaCarga, $fechaSiguiente]);
+    $reemplazados = $borrar->rowCount();
+
     $guardar = $pdo->prepare(
         "INSERT INTO pantallas (pantalla, fecha_up, np, wo, qty_wo, corte, ensa, loom, cal, emb, fecha, comentarios)
          VALUES ('plan', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
@@ -105,17 +134,21 @@ try {
         }
     }
 
+    if (!feof($archivo)) {
+        throw new RuntimeException('Ocurrió un error al leer el CSV.');
+    }
     if ($guardados === 0) {
         throw new InvalidArgumentException('El CSV no contiene registros para importar.');
     }
     $pdo->commit();
-    fwrite(STDOUT, "Registros insertados: {$guardados}. Fecha de carga: {$fechaCarga}.\n");
+    fwrite(STDOUT, "Registros anteriores eliminados: {$reemplazados}. Registros nuevos: {$guardados}. Fecha de carga: {$fechaCarga}.\n");
 } catch (Throwable $error) {
     if ($pdo && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
     fwrite(STDERR, $error->getMessage() . PHP_EOL);
-    exit(1);
+    $salida = 1;
 } finally {
     fclose($archivo);
 }
+exit($salida);

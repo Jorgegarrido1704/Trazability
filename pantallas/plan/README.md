@@ -5,7 +5,7 @@ La pantalla muestra los registros de `pantallas` con `pantalla = 'plan'` y `fech
 ## Conectar con CVTS
 
 1. Usa PHP 8.2 o superior con la extensión `pdo_mysql` habilitada. El módulo usa la tabla `pantallas` existente y presupone que `id` se genera automáticamente y que `fecha_up` y `fecha` son campos de fecha. Usa una tabla transaccional (por ejemplo, InnoDB) para que un error revierta la carga completa.
-2. Copia `config.ejemplo.php` a `config.local.php` y coloca los datos de conexión de CVTS. La cuenta necesita permisos de lectura e inserción sobre `pantallas`.
+2. Copia `config.ejemplo.php` a `config.local.php` y coloca los datos de conexión de CVTS. La cuenta necesita permisos de lectura, inserción y eliminación sobre `pantallas`.
 3. Para una prueba local, ejecuta desde esta carpeta:
 
    ```bash
@@ -24,7 +24,7 @@ La pantalla muestra los registros de `pantallas` con `pantalla = 'plan'` y `fech
    php importar_planeacion.php "mi_planeacion.csv"
    ```
 
-   El programa asigna `plan` y la fecha del día de la carga. Cada ejecución exitosa agrega los registros del archivo. Importar el mismo archivo otra vez vuelve a insertar sus filas, salvo que la tabla tenga una restricción de unicidad aplicable. El mensaje de salida indica el total insertado o el número de registro que provocó el error, contando el encabezado como registro 1.
+   El programa asigna `plan` y la fecha del día de la carga. Cada carga exitosa reemplaza todo el plan del día. Sube el CSV completo, con todas las órdenes que deben aparecer. Se conservan los planes de otros días y los registros de otras pantallas. Si el archivo está vacío, contiene errores o falla una inserción, se conserva la carga anterior. El mensaje de salida indica cuántos registros anteriores se eliminaron y cuántos se insertaron, o el número de registro que provocó el error, contando el encabezado como registro 1.
 
 | Posición | Excel / CSV | Campo en `pantallas` |
 | ---: | --- | --- |
