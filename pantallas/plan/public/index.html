@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Planeación diaria | CVTS</title>
+    <link rel="stylesheet" href="planeacion.css">
+    <script src="planeacion.js" defer></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="brand">CVTS</div>
+        <span class="app-section">Planeación</span>
+    </header>
+    <main>
+        <div class="page-heading">
+            <div>
+                <h1>Planeación diaria</h1>
+                <p id="date">Consultando la fecha de la planta…</p>
+            </div>
+            <button id="refresh" type="button">Actualizar</button>
+        </div>
+
+        <section class="panel" aria-labelledby="schedule-title">
+            <div class="panel-header">
+                <h2 id="schedule-title">Órdenes cargadas hoy</h2>
+                <span id="count" hidden></span>
+            </div>
+            <p id="message" class="message" role="status">Cargando registros…</p>
+            <div id="table-container" hidden>
+                <table role="table" aria-labelledby="schedule-title">
+                    <colgroup>
+                        <col class="part"><col class="wo"><col class="qty">
+                        <col class="step" span="5"><col class="required"><col class="comments">
+                    </colgroup>
+                    <thead role="rowgroup">
+                        <tr role="row">
+                            <th role="columnheader" scope="col">Número de parte</th>
+                            <th role="columnheader" scope="col">WO</th>
+                            <th role="columnheader" scope="col" class="center">Cantidad</th>
+                            <th role="columnheader" scope="col" class="center"><abbr title="Corte">L</abbr></th>
+                            <th role="columnheader" scope="col" class="center"><abbr title="Ensamble">E</abbr></th>
+                            <th role="columnheader" scope="col" class="center"><abbr title="Loom">L</abbr></th>
+                            <th role="columnheader" scope="col" class="center"><abbr title="Calidad">C</abbr></th>
+                            <th role="columnheader" scope="col" class="center"><abbr title="Embarque">E</abbr></th>
+                            <th role="columnheader" scope="col">Fecha requerida</th>
+                            <th role="columnheader" scope="col">Comentarios</th>
+                        </tr>
+                    </thead>
+                    <tbody role="rowgroup" id="rows"></tbody>
+                </table>
+            </div>
+            <footer class="panel-footer" id="updated" hidden></footer>
+        </section>
+    </main>
+</body>
+</html>
