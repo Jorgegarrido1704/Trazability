@@ -2,7 +2,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 require 'conector.php';
-require 'vendor/autoload.php';
+require '../vendor/autoload.php';
 
 try{
 $wo=isset($_POST['wo'])?$_POST['wo']:"";
