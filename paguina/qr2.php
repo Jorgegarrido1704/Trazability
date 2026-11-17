@@ -2,7 +2,7 @@
 
 require 'conector.php';
 require 'vendor/autoload.php';
-use chillerlan\QRCode\{QRCode, QROptions};
+
 try{
 $wo=isset($_POST['wo'])?$_POST['wo']:"";
 $cons=isset($_POST['const'])?$_POST['const']:"";
