@@ -160,19 +160,38 @@ try {
         display: flex;
     }
 
-    .bloque1 {
+        .bloque1 {
         width: 13mm;
         height: 13mm;
         display: flex;
+        flex-direction: column;      /* apilados */
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         background-color: #FFFFFF !important;
+        overflow: hidden;
     }
 
-    .bloque2 {
-        width: 18.5mm;
-        height: 14.9mm;
-        padding-top: 6px;
+    .qr {
+        display: block;
+        background-color: #FFFFFF !important;
+        padding: 0;                  /* el margen lo damos por fuera */
+        margin-top: 0.8mm;
+        flex: 0 0 auto;
+    }
+
+    .logo {
+        display: block;
+        width: 11mm;
+        height: 3.2mm;               /* altura explícita: clave */
+        padding: 0;
+        background-color: #FFFFFF !important;
+        flex: 0 0 auto;
+    }
+    .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
     }
 
 
@@ -244,7 +263,7 @@ for($j = $inicio; $j <= $cuentas; $j++){
                         <?php echo $qrcode; ?>
                     </div>
                     <div class="logo">
-                        <img src="logo.jpg" alt="Logo" style="width: 100%; height: 100%;">
+                        <img src="./logo.jpg" alt="Logo" style="width: 100%; height: 100%;">
                     </div>
                 </div>
                 <div class="bloque2">
