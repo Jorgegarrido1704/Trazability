@@ -23,6 +23,10 @@ $today = date('mdY');
             header("Location:qrEtiquetas/etiquetaProterra.php?wo=$wo&cons=$cons");
             exit;
         }
+        if($np=='190-3559'){
+            header("Location:qrEtiquetas/etiquetaConLogo.php?wo=$wo&cons=$cons");
+            exit;
+        }
         if ($np == '1003647380' or $np == '1003617118' or $np == '1003622360') {
             header("Location:label.php?rev=$rev&np=$np&desc=$desc");
             exit;
