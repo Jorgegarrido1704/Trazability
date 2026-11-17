@@ -7,6 +7,60 @@ try{
 $wo=isset($_POST['wo'])?$_POST['wo']:"";
 $cons=isset($_POST['const'])?$_POST['const']:"";
 $today = date('mdY');
+function generarDataMatrixHTML($texto, $sizeMM = 10) {
+    try {
+        $barcode = new \Com\Tecnick\Barcode\Barcode();
+        $bobj = $barcode->getBarcodeObj(
+            'DATAMATRIX', 
+            $texto,       
+            1, 
+            1, 
+            'black', 
+            array(0, 0, 0, 0)
+        )->setBackgroundColor('white');
+
+        $grid = $bobj->getGridArray();
+        if (!is_array($grid)) return '';
+
+        $numCols = count($grid[0]);
+        $numRows = count($grid);
+
+        // Conversión mm -> px a 96dpi (estándar de render del navegador)
+       // $mmToPx = 3.7795275591;
+      //  $mmToPx = 3.8;
+        $mmToPx = 3.8;
+        // pixelSize EXACTO para que el total dé el tamaño deseado en mm,
+        // sin importar cuántos módulos tenga la matriz generada
+        $pixelSize = ($sizeMM * $mmToPx) / $numCols;
+
+        $shadows = array();
+
+        foreach ($grid as $y => $row) {
+            foreach ($row as $x => $cell) {
+                if ($cell == 1) {
+                    // Calculamos la posición exacta de cada píxel negro
+                    $posX = $x * $pixelSize;
+                    $posY = $y * $pixelSize;
+                    $shadows[] = "{$posX}px {$posY}px 0 #000000c1";
+                }
+            }
+        }
+
+        // El ancho y alto total dependen del tamaño de la matriz
+        $totalWidth = $numCols * $pixelSize;
+        $totalHeight = $numRows * $pixelSize;
+        $shadowString = implode(', ', $shadows);
+
+        // Creamos un contenedor con la sombra para dibujar el código
+        $html = '<div style="position: relative; width: ' . $totalWidth . 'px; height: ' . $totalHeight . 'px; background: #FFFFFF; margin: auto;">';
+        $html .= '<div style="position: absolute; left: -' . $pixelSize . 'px; top: -' . $pixelSize . 'px; width: ' . $pixelSize . 'px; height: ' . $pixelSize . 'px; background: transparent; box-shadow: ' . $shadowString . '; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div>';
+        $html .= '</div>';
+
+        return $html;
+    } catch (\Exception $e) {
+        return '<span style="color:red; font-size:4px;">Error: ' . $e->getMessage() . '</span>';
+    }
+}
 
     $buscar = mysqli_query($con, "SELECT * FROM `registro` where `wo` = '$wo' ");
     if (mysqli_num_rows($buscar) > 0) {
@@ -23,10 +77,10 @@ $today = date('mdY');
             header("Location:qrEtiquetas/etiquetaProterra.php?wo=$wo&cons=$cons");
             exit;
         }
-        if($np=='190-3559'){
+      /*  if($np=='190-3559'){
             header("Location:qrEtiquetas/etiquetaConLogo.php?wo=$wo&cons=$cons");
             exit;
-        }
+        }*/
         if ($np == '1003647380' or $np == '1003617118' or $np == '1003622360') {
             header("Location:label.php?rev=$rev&np=$np&desc=$desc");
             exit;
@@ -195,7 +249,7 @@ if($cuentas<10){
                         $datosRegistro=$inicio;
                     }
                 $data = '5703|'.$np.'|'.$rev.'|'.$today.'|'.$datosRegistro;
-                $qrcode = (new QRCode)->render($data);
+                $qrcode = generarDataMatrixHTML($data, 7);
                 ?>
                     <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?>
                 </div>
