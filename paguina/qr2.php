@@ -11,57 +11,41 @@ function generarDataMatrixHTML($texto, $sizeMM = 10) {
     try {
         $barcode = new \Com\Tecnick\Barcode\Barcode();
         $bobj = $barcode->getBarcodeObj(
-            'DATAMATRIX', 
-            $texto,       
-            1, 
-            1, 
-            'black', 
+            'DATAMATRIX',
+            $texto,
+            1,
+            1,
+            'black',
             array(0, 0, 0, 0)
-        )->setBackgroundColor('white');
+        );
 
         $grid = $bobj->getGridArray();
-        if (!is_array($grid)) return '';
+        if (!is_array($grid) || empty($grid)) {
+            return '<span style="color:red;font-size:6px;">Grid vacio</span>';
+        }
 
-        $numCols = count($grid[0]);
         $numRows = count($grid);
+        $numCols = count($grid[0]);
 
-        // Conversión mm -> px a 96dpi (estándar de render del navegador)
-       // $mmToPx = 3.7795275591;
-      //  $mmToPx = 3.8;
-        $mmToPx = 3.8;
-        // pixelSize EXACTO para que el total dé el tamaño deseado en mm,
-        // sin importar cuántos módulos tenga la matriz generada
-        $pixelSize = ($sizeMM * $mmToPx) / $numCols;
-
-        $shadows = array();
-
+        $d = '';
         foreach ($grid as $y => $row) {
             foreach ($row as $x => $cell) {
                 if ($cell == 1) {
-                    // Calculamos la posición exacta de cada píxel negro
-                    $posX = $x * $pixelSize;
-                    $posY = $y * $pixelSize;
-                    $shadows[] = "{$posX}px {$posY}px 0 #000000c1";
+                    $d .= "M{$x},{$y}h1v1h-1z";
                 }
             }
         }
 
-        // El ancho y alto total dependen del tamaño de la matriz
-        $totalWidth = $numCols * $pixelSize;
-        $totalHeight = $numRows * $pixelSize;
-        $shadowString = implode(', ', $shadows);
-
-        // Creamos un contenedor con la sombra para dibujar el código
-        $html = '<div style="position: relative; width: ' . $totalWidth . 'px; height: ' . $totalHeight . 'px; background: #FFFFFF; margin: auto;">';
-        $html .= '<div style="position: absolute; left: -' . $pixelSize . 'px; top: -' . $pixelSize . 'px; width: ' . $pixelSize . 'px; height: ' . $pixelSize . 'px; background: transparent; box-shadow: ' . $shadowString . '; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;"></div>';
-        $html .= '</div>';
-
-        return $html;
+        return '<svg xmlns="http://www.w3.org/2000/svg" '
+            . 'width="' . $sizeMM . 'mm" height="' . $sizeMM . 'mm" '
+            . 'viewBox="0 0 ' . $numCols . ' ' . $numRows . '" '
+            . 'shape-rendering="crispEdges" '
+            . 'style="display:block;background:#fff;margin:auto;">'
+            . '<path d="' . $d . '" fill="#000"/></svg>';
     } catch (\Exception $e) {
-        return '<span style="color:red; font-size:4px;">Error: ' . $e->getMessage() . '</span>';
+        return '<span style="color:red;font-size:6px;">Error: ' . htmlspecialchars($e->getMessage()) . '</span>';
     }
 }
-
     $buscar = mysqli_query($con, "SELECT * FROM `registro` where `wo` = '$wo' ");
     if (mysqli_num_rows($buscar) > 0) {
         $rows = mysqli_fetch_array($buscar);
