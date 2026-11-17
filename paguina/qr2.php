@@ -240,7 +240,7 @@ if($cuentas<10){
                         $datosRegistro = $inicio;
                     }
                     $data = '5703|' . $np . '|' . $rev . '|' . $today . '|' . $datosRegistro;
-                    echo generarDataMatrixHTML($data, 7);
+                    echo generarDataMatrixHTML($data, 10);
                     ?>
                 </div>
                 <div class="qrss">
