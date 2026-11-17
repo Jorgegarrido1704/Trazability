@@ -231,6 +231,12 @@ if($cuentas<10){
     .textarea-container {
         margin-top: 0;
     }
+    @media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
     </style>
 </head>
 
@@ -241,17 +247,16 @@ if($cuentas<10){
             <div class="row">
                 <div class="qrs">
                     <?php
-                    if($inicio<10){
-                        $datosRegistro="00".$inicio;
-                    }else if($inicio>9 and  $inicio<100){
-                        $datosRegistro="0".$inicio;
-                    }else{
-                        $datosRegistro=$inicio;
+                    if ($inicio < 10) {
+                        $datosRegistro = "00" . $inicio;
+                    } else if ($inicio > 9 and $inicio < 100) {
+                        $datosRegistro = "0" . $inicio;
+                    } else {
+                        $datosRegistro = $inicio;
                     }
-                $data = '5703|'.$np.'|'.$rev.'|'.$today.'|'.$datosRegistro;
-                $qrcode = generarDataMatrixHTML($data, 7);
-                ?>
-                    <?php printf('<img src="%s" alt="QR Code" class="img-fluid" />', $qrcode);?>
+                    $data = '5703|' . $np . '|' . $rev . '|' . $today . '|' . $datosRegistro;
+                    echo generarDataMatrixHTML($data, 7);
+                    ?>
                 </div>
                 <div class="qrss">
                     <img id="qrs_img" src="proterra_dark.png" alt="codigo" class="img-fluid">
