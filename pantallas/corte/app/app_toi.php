@@ -55,7 +55,7 @@ try {
             $maquinas['M6'] = (int) $row['cantidad'];
         }elseif($m === 'M2' && $row['estado'] === 'Corte') {
             $maquinas['M2'] = (int) $row['cantidad'];
-        } elseif ($m !== 'M6'  && $row['estado'] === 'RUN') {
+        } elseif (($m !== 'M6' || $m !== 'M2')  && $row['estado'] === 'RUN') {
             $maquinas[$m] = (int) round($row['cantidad'] / 2);
         }
         
