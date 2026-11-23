@@ -104,36 +104,51 @@ if ($datos != '') {
         echo "No se encontraron otros números de parte del cliente con más del 30% de compatibilidad.";
     }
 
-}else if($items){
-    $items = explode(",", $items);
+}else if ($items) {
+    // Limpiar y quitar vacíos/duplicados
+    $items = array_values(array_unique(array_filter(array_map('trim', explode(",", $items)))));
     $ItemsCount = count($items);
 
-    $cuenta = 0;
-    if($ItemsCount <= 1){
+    if ($ItemsCount < 1) {
         header("Location: cuateRegistro.php");
+        exit;
     }
-   
-    $items = "('" . implode("', '", $items) . "')";
-    echo $items;
-    $buscarDatos= $con->prepare("SELECT part_num, COUNT(item) as coincidencias
-    FROM `datos`     WHERE item IN $items
-    GROUP BY part_num HAVING COUNT(item) >= 1
-    ORDER BY coincidencias DESC;");
-   
+
+    // Placeholders: ?,?,?
+    $placeholders = implode(',', array_fill(0, $ItemsCount, '?'));
+    $tipos = str_repeat('s', $ItemsCount);
+
+    $sql = "
+        SELECT 
+            d.part_num,
+            COUNT(DISTINCT d.item) AS coincidencias,
+            (SELECT COUNT(DISTINCT t.item) FROM datos t WHERE t.part_num = d.part_num) AS total_part
+        FROM datos d
+        WHERE d.item IN ($placeholders)
+        GROUP BY d.part_num
+        ORDER BY coincidencias DESC, total_part ASC
+    ";
+
+    $buscarDatos = $con->prepare($sql);
+    $buscarDatos->bind_param($tipos, ...$items);
     $buscarDatos->execute();
     $registrosItems = $buscarDatos->get_result();
-   
 
     while ($row = $registrosItems->fetch_assoc()) {
-        $parte = $row['part_num'];
-        $coincidencias = $row['coincidencias'];
+        $parte         = htmlspecialchars($row['part_num']);
+        $coincidencias = (int)$row['coincidencias'];
+        $totalPart     = (int)$row['total_part'];
+
+        // % respecto a lo que buscaste y % respecto a los componentes de esa parte
+        $simBusqueda = round(($coincidencias / $ItemsCount) * 100, 1);
+        $simParte    = $totalPart > 0 ? round(($coincidencias / $totalPart) * 100, 1) : 0;
+
         echo "<h3>Parte: $parte</h3>";
-        echo "<p>Coincidencias: $coincidencias</p>";
-
+        echo "<p>Coincidencias: $coincidencias de $ItemsCount buscados ($simBusqueda%)</p>";
+        echo "<p>Cobertura de la parte: $coincidencias de $totalPart items ($simParte%)</p>";
     }
-    $buscarDatos->close();
-    
 
+    $buscarDatos->close();
 } else {
 ?>
 <!DOCTYPE html>
