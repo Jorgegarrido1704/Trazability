@@ -56,9 +56,10 @@ try {
         } 
         if($m === 'M2' && $row['estado'] === 'Corte') {
             $maquinas['M2'] = (int) $row['cantidad'];
-        }/* elseif ($m !== 'M6' && $m !== 'M2'  && $row['estado'] === 'RUN') {
+        }
+        if ($m !== 'M6' && $m !== 'M2'  && $row['estado'] === 'RUN') {
             $maquinas[$m] = (int) round($row['cantidad'] / 2);
-        }*/
+        }
         
     }
 
