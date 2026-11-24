@@ -92,7 +92,7 @@
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 <script>
-    const INTERVALO_MS = 6000;
+    const INTERVALO_MS = 3000;
 
     function setTexto(id, valor) {
         const el = document.getElementById(id);
