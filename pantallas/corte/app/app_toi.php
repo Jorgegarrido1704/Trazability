@@ -57,7 +57,14 @@ try {
         if($m === 'M2' && $row['estado'] === 'Corte') {
             $maquinas['M2'] = (int) $row['cantidad'];
         }
-        if ($m !== 'M6' && $m !== 'M2'  && $row['estado'] === 'RUN') {
+        if ($m === 'M5' && $row['estado'] === 'Corte') {
+            $maquinas['M5'] = (int) $row['cantidad'];
+        } 
+        if($m === 'M4' && $row['estado'] === 'Corte') {
+            $maquinas['M4'] = (int) $row['cantidad'];
+        }
+        
+        if ($m !== 'M6' && $m !== 'M2' && $m !== 'M4' && $m !== 'M5'  && $row['estado'] === 'RUN') {
             $maquinas[$m] = (int) round($row['cantidad'] / 2);
         }
         

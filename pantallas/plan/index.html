@@ -157,7 +157,7 @@ async function cargarTabla() {
             'No se pudo actualizar la tabla: ' + error.message;
     } finally {
         tabla.setAttribute('aria-busy', 'false');
-        setTimeout(cargarTabla, 5000);
+        setTimeout(cargarTabla, 7500);
     }
 }
 
