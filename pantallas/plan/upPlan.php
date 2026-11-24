@@ -6,8 +6,18 @@ ini_set('log_errors', '1');
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 require "../../app/conection.php";
 
-$deltehoy=date("Y-m-d");
-mysqli_query($con, "DELETE FROM pantallas WHERE fecha_up = '$deltehoy'   ");
+// Conexión en UTF-8 (necesario para acentos y caracteres especiales)
+mysqli_set_charset($con, 'utf8mb4');
+
+// Convierte cualquier texto a UTF-8 (CSV de Excel suele venir en Windows-1252)
+function aUtf8(string $s): string {
+    return mb_check_encoding($s, 'UTF-8')
+        ? $s
+        : mb_convert_encoding($s, 'UTF-8', 'Windows-1252');
+}
+
+$deltehoy = date("Y-m-d");
+mysqli_query($con, "DELETE FROM pantallas WHERE fecha_up = '$deltehoy'");
 
 $numerosDeParte = [];
 
@@ -62,10 +72,13 @@ try {
     $rowCount = 0;
     $maxRows = 600;
 
-    while ($rowCount < $maxRows && ($data = fgetcsv($handle, 2000, ",")) !== false) {
+    while ($rowCount < $maxRows && ($data = fgetcsv($handle, 0, ",")) !== false) {
         if (count($data) < 11) {
             continue;
         }
+
+        // Convierte todas las celdas a UTF-8
+        $data = array_map('aUtf8', $data);
 
         if (trim($data[0]) === "") {
             break;
