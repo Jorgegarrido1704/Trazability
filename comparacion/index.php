@@ -161,7 +161,7 @@ $clases = [
 </style>
 </head>
 <body>
-<h1>Comparador BOM vs XLS</h1>
+<h1>Comparador BOM vs MRP</h1>
 
 <form method="post" enctype="multipart/form-data">
   <label>BOM (.xlsx) — Material B5↓, Qty E5↓
