@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $estado = 'Solo en BOM';
                     $res['soloBom']++;
                 } elseif ($qb === null && $qx !== null) {
-                    $estado = 'Solo en XLS';
+                    $estado = 'Solo en MRP';
                     $res['soloXls']++;
                 } elseif (round($qb, QTY_DECIMALS) === round($qx, QTY_DECIMALS)) {
                     $estado = 'OK';
@@ -133,7 +133,7 @@ $clases = [
     'OK' => 'ok',
     'Cantidad diferente' => 'qty',
     'Solo en BOM' => 'bom',
-    'Solo en XLS' => 'xls',
+    'Solo en MRP' => 'xls',
 ];
 ?>
 <!DOCTYPE html>
@@ -167,7 +167,7 @@ $clases = [
   <label>BOM (.xlsx) — Material B5↓, Qty E5↓
     <input type="file" name="bom" accept=".xls,.xlsx" required>
   </label>
-  <label>Reporte (.xls) — Part No E2↓, Qty H2↓
+  <label>Reporte MRP (.xls) — Part No E2↓, Qty H2↓
     <input type="file" name="xls" accept=".xls,.xlsx" required>
   </label>
   <button type="submit">Comparar</button>
